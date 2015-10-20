@@ -407,7 +407,8 @@ Internet-Draft                  SMTP-STS                  October 2015
       recipient domain.
 
    (_TODO:_ As this RFC standard progresses, the authors will register
-   .well-known/smtp-sts.  See [RFC5785].)
+   .well-known/smtp-sts.  See [RFC5785]. Then implementers will NOT
+   specify a URI, but rather rely on the .well-known URL)
 
    o  DNSSEC: In this mechanism, indicated by the "dnssec" value of the
       "a" field, the sender must retrieve the policy via a DNSSEC signed
