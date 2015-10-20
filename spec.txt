@@ -751,31 +751,31 @@ Authors' Addresses
    Daniel Margolis
    Google, Inc
 
-   Email: dmargolis@google.com
+   Email: dmargolis (at) google (dot com)
 
 
    Mark Risher
    Google, Inc
 
-   Email: risher@google.com
+   Email: risher (at) google (dot com)
 
 
    Nicolas Lizborski
    Google, Inc
 
-   Email: risher@google.com
+   Email: risher (at) google (dot com)
 
 
    Wei Chuang
    Google, Inc
 
-   Email: weihaw@google.com
+   Email: weihaw (at) google (dot com)
 
 
    Brandon Long
    Google, Inc
 
-   Email: blong@google.com
+   Email: blong (at) google (dot com)
 
 
 
@@ -789,13 +789,13 @@ Internet-Draft                  SMTP-STS                  October 2015
    Binu Ramakrishnan
    Yahoo!, Inc
 
-   Email: rbinu@yahoo-inc.com
+   Email: rbinu (at) yahoo-inc (dot com)
 
 
    Alexander Brotman
    Comcast, Inc
 
-   Email: alexander_brotman@cable.comcast.com
+   Email: alexander_brotman (at) cable.comcast (dot com)
 
 
 
