@@ -115,11 +115,10 @@ Internet-Draft                  SMTP-STS                  October 2015
 
 
    This document defines a mechanism for recipient domains to publish
-   policies specifying: * whether MTAs sending mail to this domain
-   should expect TLS support * how MTAs can validate the TLS server
-   certificate presented during mail delivery * what the recipient
-   recommends should be done with messages when TLS cannot be
-   successfully negotiated
+   policies specifying: 
+      * whether MTAs sending mail to this domain should expect TLS support
+      * how MTAs can validate the TLS server certificate presented during mail delivery 
+      * what the recipient recommends should be done with messages when TLS cannot be successfully negotiated
 
    The protocol described is separated into three logical components: 1.
    policy semantics: whether senders can expect a receiving server for
