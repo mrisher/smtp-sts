@@ -130,7 +130,7 @@ Internet-Draft                  SMTP-STS                  October 2015
 
 2.  Related Technologies
 
-   The DANE TLSA record [RFC6698] is similar, in that DANE is also
+   The DANE TLSA record [RFC7672] is similar, in that DANE is also
    designed to upgrade opportunistic encryption into required
    encryption.  DANE requires DNSSEC [RFC4033] for the secure delivery
    of policies; the protocol described here presents a variant for
@@ -232,7 +232,7 @@ Internet-Draft                  SMTP-STS                  October 2015
       routing tables).
 
    SMTP Strict Transport Security relies on certificate validation via
-   either TLS identity checking [RFC6125] or DANE TLSA [RFC6698].
+   either TLS identity checking [RFC6125] or DANE TLSA [RFC7672].
    Attackers who are able to obtain a valid certificate for the targeted
    recipient mail service (e.g. by compromising a certificate authority)
    are thus out of scope of this threat model.
@@ -452,7 +452,7 @@ Internet-Draft                  SMTP-STS                  October 2015
    o  DANE TLSA: When the "c" field is set to "tlsa", the receiving MX
       should be covered by a DANE TLSA record for the recipient domain,
       and the presented certificate should be valid according to that
-      record (as described by [RFC6698]).
+      record (as described by [RFC7672]).
 
 9.  Policy Application
 
