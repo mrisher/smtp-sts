@@ -3,9 +3,9 @@
 
 
 Using TLS in Applications                                    D. Margolis
-Internet-Draft                                                 M. Risher
+[not yet submitted]                                            M. Risher
 Intended status: Standards Track                                 N. Lidz
-Expires: March 12, 2016                                        W. Chuang
+                                                               W. Chuang
                                                                  B. Long
                                                              Google, Inc
                                                          B. Ramakrishnan
@@ -16,7 +16,7 @@ Expires: March 12, 2016                                        W. Chuang
 
 
                      SMTP Strict Transport Security
-                       draft-ietf-uta-smtp-sts-01
+                                                 
 
 Abstract
 
@@ -29,8 +29,7 @@ Abstract
 
 Status of This Memo
 
-   This Internet-Draft is submitted in full conformance with the
-   provisions of BCP 78 and BCP 79.
+   This Internet-Draft is not yet submitted.
 
    Internet-Drafts are working documents of the Internet Engineering
    Task Force (IETF).  Note that other groups may also distribute
@@ -42,12 +41,9 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on March 12, 2016.
-
 Copyright Notice
 
-   Copyright (c) 2015 IETF Trust and the persons identified as the
-   document authors.  All rights reserved.
+   Copyright (c) the persons identified as the document authors.  
 
 
 
