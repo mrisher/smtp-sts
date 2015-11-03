@@ -43,7 +43,7 @@ Status of This Memo
 
 Copyright Notice
 
-   Copyright (c) the persons identified as the document authors.  
+Copyright (c) 2015 the persons identified as the document authors.  All rights reserved.
 
 
 
