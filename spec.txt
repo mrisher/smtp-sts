@@ -12,6 +12,8 @@ Intended status: Standards Track                                 N. Lidz
                                                              Yahoo!, Inc
                                                               A. Brotman
                                                             Comcast, Inc
+							        J. Jones
+							  Microsoft Corp
                                                         October 18, 2015
 
 
@@ -794,6 +796,10 @@ Internet-Draft                  SMTP-STS                  October 2015
    Email: alexander_brotman (at) cable.comcast (dot com)
 
 
+   Janet Jones
+   Microsoft Corp
+
+   Email: Janet (dot) Jones (at) microsoft (dot com)
 
 
 
