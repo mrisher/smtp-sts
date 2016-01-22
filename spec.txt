@@ -4,7 +4,7 @@
 
 Using TLS in Applications                                    D. Margolis
 [not yet submitted]                                            M. Risher
-Intended status: Standards Track                                 N. Lidz
+Intended status: Standards Track                           N. Lidzborski
                                                                W. Chuang
                                                                  B. Long
                                                              Google, Inc
