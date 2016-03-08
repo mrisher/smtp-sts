@@ -3,22 +3,22 @@
 
 
 Using TLS in Applications                                    D. Margolis
-[not yet submitted]                                            M. Risher
-Intended status: Standards Track                           N. Lidzborski
-                                                               W. Chuang
+Internet-Draft                                                 M. Risher
+Intended status: Experimental                              N. Lidzborski
+Expires: September 9, 2016                                     W. Chuang
                                                                  B. Long
                                                              Google, Inc
                                                          B. Ramakrishnan
                                                              Yahoo!, Inc
                                                               A. Brotman
                                                             Comcast, Inc
-							        J. Jones
-							  Microsoft Corp
-                                                        October 18, 2015
+                                                                J. Jones
+                                                          Microsoft, Inc
+                                                           March 8, 2016
 
 
                      SMTP Strict Transport Security
-                                                 
+                       draft-ietf-uta-smtp-sts-01
 
 Abstract
 
@@ -31,7 +31,8 @@ Abstract
 
 Status of This Memo
 
-   This Internet-Draft is not yet submitted.
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
 
    Internet-Drafts are working documents of the Internet Engineering
    Task Force (IETF).  Note that other groups may also distribute
@@ -43,18 +44,24 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
+   This Internet-Draft will expire on September 9, 2016.
+
+
+
+
+
+
+
+
+Margolis, et al.        Expires September 9, 2016               [Page 1]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
+
 Copyright Notice
 
-Copyright (c) 2015 the persons identified as the document authors.  All rights reserved.
-
-
-
-
-
-Margolis, et al.         Expires March 12, 2016                 [Page 1]
-
-Internet-Draft                  SMTP-STS                  October 2015
-
+   Copyright (c) 2016 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
    Provisions Relating to IETF Documents
@@ -69,22 +76,25 @@ Internet-Draft                  SMTP-STS                  October 2015
 Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+     1.1.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   3
    2.  Related Technologies  . . . . . . . . . . . . . . . . . . . .   3
      2.1.  Differences from DANE . . . . . . . . . . . . . . . . . .   3
-     2.2.  Advantages When Used with DANE  . . . . . . . . . . . . .   3
+     2.2.  Advantages When Used with DANE  . . . . . . . . . . . . .   4
      2.3.  Advantages When Used Without DANE . . . . . . . . . . . .   4
      2.4.  Disadvantages When Used Without DANE  . . . . . . . . . .   4
-   3.  Threat Model  . . . . . . . . . . . . . . . . . . . . . . . .   4
+   3.  Threat Model  . . . . . . . . . . . . . . . . . . . . . . . .   5
    4.  Policy Semantics  . . . . . . . . . . . . . . . . . . . . . .   5
    5.  Policy Expirations  . . . . . . . . . . . . . . . . . . . . .   6
-   6.  Failure Reporting . . . . . . . . . . . . . . . . . . . . . .   6
-   7.  Policy Authentication . . . . . . . . . . . . . . . . . . . .   7
-   8.  Policy Validation . . . . . . . . . . . . . . . . . . . . . .   8
+   6.  Failure Reporting . . . . . . . . . . . . . . . . . . . . . .   7
+   7.  Policy Authentication . . . . . . . . . . . . . . . . . . . .   8
+   8.  Policy Validation . . . . . . . . . . . . . . . . . . . . . .   9
    9.  Policy Application  . . . . . . . . . . . . . . . . . . . . .   9
    10. Appendix 1: Validation Pseudocode . . . . . . . . . . . . . .  10
    11. Appendix 2: XML Schema for Failure Reports  . . . . . . . . .  10
    12. Appendix 3: Example report  . . . . . . . . . . . . . . . . .  12
-   13. Normative References  . . . . . . . . . . . . . . . . . . . .  13
+   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  13
+     13.1.  Normative References . . . . . . . . . . . . . . . . . .  13
+     13.2.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  14
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  14
 
 1.  Introduction
@@ -96,6 +106,14 @@ Table of Contents
    (b) server authenticity -- because the trust relationship from email
    domain to MTA server identity is not cryptographically validated.
 
+
+
+
+Margolis, et al.        Expires September 9, 2016               [Page 2]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
+
    While such "opportunistic" encryption protocols provide a high
    barrier against passive man-in-the-middle traffic interception, any
    attacker who can delete parts of the SMTP session (such as the "250
@@ -103,20 +121,12 @@ Table of Contents
    (perhaps by overwriting the resolved MX record of the delivery
    domain) can perform such a downgrade or interception attack.
 
-
-
-
-
-Margolis, et al.         Expires March 12, 2016                 [Page 2]
-
-Internet-Draft                  SMTP-STS                  October 2015
-
-
    This document defines a mechanism for recipient domains to publish
-   policies specifying: 
-      * whether MTAs sending mail to this domain should expect TLS support
-      * how MTAs can validate the TLS server certificate presented during mail delivery 
-      * what the recipient recommends should be done with messages when TLS cannot be successfully negotiated
+   policies specifying: * whether MTAs sending mail to this domain
+   should expect TLS support * how MTAs can validate the TLS server
+   certificate presented during mail delivery * what the recipient
+   recommends should be done with messages when TLS cannot be
+   successfully negotiated
 
    The protocol described is separated into three logical components: 1.
    policy semantics: whether senders can expect a receiving server for
@@ -125,6 +135,12 @@ Internet-Draft                  SMTP-STS                  October 2015
    failure report format: a mechanism for informing recipient domains
    about aggregate failure statistics 3. policy authentication: how to
    determine the authenticity of a published policy delivered via DNS
+
+1.1.  Terminology
+
+   The keywords MUST, MUST NOT, REQUIRED, SHALL, SHALL NOT, SHOULD,
+   SHOULD NOT, RECOMMENDED, MAY, and OPTIONAL, when they appear in this
+   document, are to be interpreted as described in [RFC2119].
 
 2.  Related Technologies
 
@@ -145,6 +161,15 @@ Internet-Draft                  SMTP-STS                  October 2015
    guarantees on first use offered by DNSSEC.  (For a thorough
    discussion of this trade-off, see the section _Threat_ _Model_.)
 
+
+
+
+
+Margolis, et al.        Expires September 9, 2016               [Page 3]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
+
    In addition, SMTP STS introduces a mechanism for failure reporting
    and a report-only mode, enabling progressive roll-out and auditing
    for compliance.
@@ -154,18 +179,6 @@ Internet-Draft                  SMTP-STS                  October 2015
    SMTP STS can be deployed for a recipient domain that also publishes a
    DANE TLSA record for SMTP.  In these cases, the SMTP STS policy can
    additionally declare a process for failure reporting.
-
-
-
-
-
-
-
-
-Margolis, et al.         Expires March 12, 2016                 [Page 3]
-
-Internet-Draft                  SMTP-STS                  October 2015
-
 
 2.3.  Advantages When Used Without DANE
 
@@ -202,6 +215,17 @@ Internet-Draft                  SMTP-STS                  October 2015
       an option to authenticate policy non-existence does not exist when
       looking up a policy over plain DNS.
 
+
+
+
+
+
+
+Margolis, et al.        Expires September 9, 2016               [Page 4]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
+
 3.  Threat Model
 
    SMTP Strict Transport Security protects against an active attacker
@@ -215,14 +239,6 @@ Internet-Draft                  SMTP-STS                  October 2015
 
    o  Impersonating the destination mail server, whereby the sender
       might deliver the message to an impostor, who could then monitor
-
-
-
-Margolis, et al.         Expires March 12, 2016                 [Page 4]
-
-Internet-Draft                  SMTP-STS                  October 2015
-
-
       and/or modify messages despite opportunistic TLS.  This
       impersonation could be accomplished by spoofing the DNS MX record
       for the recipient domain, or by redirecting client connections to
@@ -257,6 +273,15 @@ Internet-Draft                  SMTP-STS                  October 2015
       patterns, required).  One or more comma-separated patterns
       matching the expected MX for this domain.  For example,
       "_.example.com,_.example.net" indicates that mail for this domain
+
+
+
+
+Margolis, et al.        Expires September 9, 2016               [Page 5]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
+
       might be handled by any MX whose hostname is a subdomain of
       "example.com" or "example.net."
 
@@ -269,15 +294,6 @@ Internet-Draft                  SMTP-STS                  October 2015
 
       *  dnssec: Indicating that the policy is expected to be served
          over DNSSEC.
-
-
-
-
-
-Margolis, et al.         Expires March 12, 2016                 [Page 5]
-
-Internet-Draft                  SMTP-STS                  October 2015
-
 
    o  c: Constraints on the recipient MX's TLS certificate (plain-text,
       required).  See the section _Policy_ _Validation_ for more
@@ -314,6 +330,14 @@ Internet-Draft                  SMTP-STS                  October 2015
    An important consideration for domains publishing a policy is that
    senders may potentially see a policy expiration as relative to the
    fetch of a policy cached by their recursive resolver.  Consequently,
+
+
+
+Margolis, et al.        Expires September 9, 2016               [Page 6]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
+
    a sender may treat a policy as valid for up to {expiration time} +
    {DNS TTL}. Publishers should thus continue to expect senders to apply
    old policies for up to this duration.
@@ -326,14 +350,6 @@ Internet-Draft                  SMTP-STS                  October 2015
    misconfigurations and malicious activity.  These are verbose, and may
    not be desirable in regular production.  Aggregate reports contain
    tallies of policy failures, and are more appropriate for regular use.
-
-
-
-
-Margolis, et al.         Expires March 12, 2016                 [Page 6]
-
-Internet-Draft                  SMTP-STS                  October 2015
-
 
    Aggregate reports contain the following fields:
 
@@ -368,6 +384,16 @@ Internet-Draft                  SMTP-STS                  October 2015
 
    o  Hostname: The hostname of the recipient MX.
 
+
+
+
+
+
+Margolis, et al.        Expires September 9, 2016               [Page 7]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
+
    Note that the failure types are non-exclusive; an aggregate report
    may contain overlapping counts of failure types where a single send
    attempt encountered multiple errors.
@@ -383,30 +409,20 @@ Internet-Draft                  SMTP-STS                  October 2015
    serve new policies _prior_ to the expiration of a cached policy, and
    to prevent long-term (either malicious or active) denials of service,
    it is important that senders are able to validate a new policy
-
-
-
-Margolis, et al.         Expires March 12, 2016                 [Page 7]
-
-Internet-Draft                  SMTP-STS                  October 2015
-
-
    retrieved for a recipient domain.  There are two supported mechanisms
    for policy validation:
 
    o  Web PKI: In this mechanism, indicated by the "webpki" value of the
       "a" field, the sender fetches a HTTPS resource from the URI
-      indicated.  For example, "a=webpki:https://example.com/.well-
-      known/smtp_sts/current" indicates that the sender should fetch the
-      resource https://example.com/.well-known/smtp_sts/current.  The
-      HTTP response body served at this resource must exactly match the
-      policy initially loaded via the DNS TXT method, and must be served
-      from an HTTPS endpoint at the domain matching that of the
-      recipient domain.
+      indicated.  For example, a=webpki:[1] indicates that the sender
+      should fetch the resource [2].  The HTTP response body served at
+      this resource must exactly match the policy initially loaded via
+      the DNS TXT method, and must be served from an HTTPS endpoint at
+      the domain matching that of the recipient domain.
 
    (_TODO:_ As this RFC standard progresses, the authors will register
-   .well-known/smtp-sts.  See [RFC5785]. Then implementers will NOT
-   specify a URI, but rather rely on the .well-known URL)
+   .well-known/smtp-sts.  See [@!RFC5785}}. Then implementors will _not_
+   specify a URI, but will instead rely on the .well-known URL.)
 
    o  DNSSEC: In this mechanism, indicated by the "dnssec" value of the
       "a" field, the sender must retrieve the policy via a DNSSEC signed
@@ -425,6 +441,15 @@ Internet-Draft                  SMTP-STS                  October 2015
    unused) policy that has not successfully been applied should be
    disregarded.
 
+
+
+
+
+Margolis, et al.        Expires September 9, 2016               [Page 8]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
+
 8.  Policy Validation
 
    When sending to an MX at a domain for which the sender has a valid
@@ -439,14 +464,6 @@ Internet-Draft                  SMTP-STS                  October 2015
       chain to a root CA that is trusted by the sending MTA.  The
       certificate must have a CN or SAN matching the MX hostname (as
       described in [RFC6125]) and be non-expired.
-
-
-
-
-Margolis, et al.         Expires March 12, 2016                 [Page 8]
-
-Internet-Draft                  SMTP-STS                  October 2015
-
 
    o  DANE TLSA: When the "c" field is set to "tlsa", the receiving MX
       should be covered by a DANE TLSA record for the recipient domain,
@@ -481,6 +498,14 @@ Internet-Draft                  SMTP-STS                  October 2015
    1.  Check for cached non-expired policy.  If none exists, fetch the
        latest and cache it.
 
+
+
+
+Margolis, et al.        Expires September 9, 2016               [Page 9]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
+
    2.  Validate recipient MTA against policy.  If valid, deliver mail.
 
    3.  If policy invalid and policy specifies reporting, generate
@@ -495,15 +520,6 @@ Internet-Draft                  SMTP-STS                  October 2015
    Understanding the details of step 4 is critical to understanding the
    behavior of the system as a whole.
 
-
-
-
-
-Margolis, et al.         Expires March 12, 2016                 [Page 9]
-
-Internet-Draft                  SMTP-STS                  October 2015
-
-
    Remember that each policy has an expiration time (which may be long,
    on the order of months) and a validation method.  With these two
    mechanisms and the procedure specified in step 4, recipients who
@@ -514,22 +530,22 @@ Internet-Draft                  SMTP-STS                  October 2015
 
 10.  Appendix 1: Validation Pseudocode
 
-   policy = policy_from_cache()
-   if not policy or is_expired(policy):
-     policy = policy_from_dns()  // fetch and authenticate!
-     update_cache = true
-   if policy:
-     if invalid_mx_or_tls(policy):  // check MX and TLS cert
-       if rua:
-         generate_report()
-       if p_reject():
-         policy = policy_from_dns()  // fetch and authenticate #2!
-         update_cache = true
-         if invalid_mx_or_tls(policy):
-           reject_message()
-           update_cache = false
-     if update_cache:
-       cache(policy)
+      policy = policy_from_cache()
+      if not policy or is_expired(policy):
+        policy = policy_from_dns()  // fetch and authenticate!
+        update_cache = true
+      if policy:
+        if invalid_mx_or_tls(policy):  // check MX and TLS cert
+          if rua:
+            generate_report()
+          if p_reject():
+            policy = policy_from_dns()  // fetch and authenticate #2!
+            update_cache = true
+            if invalid_mx_or_tls(policy):
+              reject_message()
+              update_cache = false
+        if update_cache:
+          cache(policy)
 
 11.  Appendix 2: XML Schema for Failure Reports
 
@@ -538,6 +554,14 @@ Internet-Draft                  SMTP-STS                  October 2015
       targetNamespace="http://www.example.org/smtp-sts-xml/0.1">
     <!-- The time range in UTC covered by messages in this report,
          specified in seconds since epoch. -->
+
+
+
+Margolis, et al.        Expires September 9, 2016              [Page 10]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
+
     <xs:complexType name="DateRangeType">
       <xs:all>
         <xs:element name="begin" type="xs:integer"/>
@@ -552,14 +576,6 @@ Internet-Draft                  SMTP-STS                  October 2015
         <xs:element name="email" type="xs:string"/>
         <xs:element name="extra_contact_info" type="xs:string"
                     minOccurs="0"/>
-
-
-
-Margolis, et al.         Expires March 12, 2016                [Page 10]
-
-Internet-Draft                  SMTP-STS                  October 2015
-
-
         <xs:element name="report_id" type="xs:string"/>
         <xs:element name="date_range" type="DateRangeType"/>
       </xs:sequence>
@@ -594,6 +610,14 @@ Internet-Draft                  SMTP-STS                  October 2015
       </xs:restriction>
     </xs:simpleType>
 
+
+
+
+Margolis, et al.        Expires September 9, 2016              [Page 11]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
+
     <!-- The possible enforcement level: whether the reporter also drops
          messages -->
     <xs:simpleType name="EnforcementLevelType">
@@ -608,14 +632,6 @@ Internet-Draft                  SMTP-STS                  October 2015
       <xs:all>
         <xs:element name="failure" type="FailureType"/>
         <xs:element name="count" type="xs:integer"/>
-
-
-
-Margolis, et al.         Expires March 12, 2016                [Page 11]
-
-Internet-Draft                  SMTP-STS                  October 2015
-
-
         <xs:element name="hostname" type="xs:string"/>
         <xs:element name="connectedIp" type="xs:string" minOccurs="0"/>
         <xs:element name="sourceIp" type="xs:string" minOccurs="0"/>
@@ -653,57 +669,50 @@ Internet-Draft                  SMTP-STS                  October 2015
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Margolis, et al.         Expires March 12, 2016                [Page 12]
+Margolis, et al.        Expires September 9, 2016              [Page 12]
 
-Internet-Draft                  SMTP-STS                  October 2015
+Internet-Draft                  SMTP-STS                      March 2016
 
 
-   <?xml>
-   <feedback>
-     <version>1</version>
-     <report_metadata>
-       <org_name>Company XYZ</org_name>
-       <email>sts-reporting@company.com</email>
-       <extra_contact_info></extra_contact_info>
-       <report_id>12345</report_id>
-       <date_range><begin>1439227624</begin>
-       <end>1439313998</end></date_range>
-       </report_metadata>
-     <applied_policy>
-       <domain>company.com</domain>
-       <mx>*.mx.mail.company.com</mx>
-       <constraint>WebPKI</constraint>
-     </applied_policy>
-      <enforcement_level>ReportOnly</enforcement_level>
-     <record>
-         <failure>ExpiredCertificate</failure>
-         <count>13128</count>
-         <hostname>mta7.am0.yahoodns.net.</hostname>
-         <connectedIp> 98.136.216.25</connectedIp>
-     </record>>
-     <record>
-         <failure>StarttlsNotSupported</failure>
-         <count>19</count>
-         <hostname>mta7.am0.yahoodns.net.</hostname>
-         <connectedIp>98.22.33.99</connectedIp>
-     </record>>
-   </feedback>
+           <?xml>
+           <feedback>
+             <version>1</version>
+             <report_metadata>
+               <org_name>Company XYZ</org_name>
+               <email>sts-reporting@company.com</email>
+               <extra_contact_info></extra_contact_info>
+               <report_id>12345</report_id>
+               <date_range><begin>1439227624</begin>
+               <end>1439313998</end></date_range>
+               </report_metadata>
+             <applied_policy>
+               <domain>company.com</domain>
+               <mx>*.mx.mail.company.com</mx>
+               <constraint>WebPKI</constraint>
+             </applied_policy>
+              <enforcement_level>ReportOnly</enforcement_level>
+             <record>
+                 <failure>ExpiredCertificate</failure>
+                 <count>13128</count>
+                 <hostname>mta7.am0.yahoodns.net.</hostname>
+                 <connectedIp> 98.136.216.25</connectedIp>
+             </record>>
+             <record>
+                 <failure>StarttlsNotSupported</failure>
+                 <count>19</count>
+                 <hostname>mta7.am0.yahoodns.net.</hostname>
+                 <connectedIp>98.22.33.99</connectedIp>
+             </record>>
+           </feedback>
 
-13.  Normative References
+13.  References
+
+13.1.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
+              RFC2119, March 1997,
+              <http://www.rfc-editor.org/info/rfc2119>.
 
    [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
               Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
@@ -714,18 +723,11 @@ Internet-Draft                  SMTP-STS                  October 2015
               4033, DOI 10.17487/RFC4033, March 2005,
               <http://www.rfc-editor.org/info/rfc4033>.
 
-   [RFC5785]  Nottingham, M. and E. Hammer-Lahav, "Defining Well-Known
-              Uniform Resource Identifiers (URIs)", RFC 5785, DOI 10
-              .17487/RFC5785, April 2010,
-              <http://www.rfc-editor.org/info/rfc5785>.
 
 
-
-
-
-Margolis, et al.         Expires March 12, 2016                [Page 13]
+Margolis, et al.        Expires September 9, 2016              [Page 13]
 
-Internet-Draft                  SMTP-STS                  October 2015
+Internet-Draft                  SMTP-STS                      March 2016
 
 
    [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
@@ -735,21 +737,28 @@ Internet-Draft                  SMTP-STS                  October 2015
               Security (TLS)", RFC 6125, DOI 10.17487/RFC6125, March
               2011, <http://www.rfc-editor.org/info/rfc6125>.
 
-   [RFC6698]  Hoffman, P. and J. Schlyter, "The DNS-Based Authentication
-              of Named Entities (DANE) Transport Layer Security (TLS)
-              Protocol: TLSA", RFC 6698, DOI 10.17487/RFC6698, August
-              2012, <http://www.rfc-editor.org/info/rfc6698>.
-
    [RFC7469]  Evans, C., Palmer, C., and R. Sleevi, "Public Key Pinning
               Extension for HTTP", RFC 7469, DOI 10.17487/RFC7469, April
               2015, <http://www.rfc-editor.org/info/rfc7469>.
+
+   [RFC7672]  Dukhovni, V. and W. Hardaker, "SMTP Security via
+              Opportunistic DNS-Based Authentication of Named Entities
+              (DANE) Transport Layer Security (TLS)", RFC 7672, DOI 10
+              .17487/RFC7672, October 2015,
+              <http://www.rfc-editor.org/info/rfc7672>.
+
+13.2.  URIs
+
+   [1] https://example.com/.well-known/smtp_sts/current
+
+   [2] https://example.com/.well-known/smtp_sts/current
 
 Authors' Addresses
 
    Daniel Margolis
    Google, Inc
 
-   Email: dmargolis (at) google (dot com)
+   Email: dmargolis (at) google.com
 
 
    Mark Risher
@@ -758,10 +767,10 @@ Authors' Addresses
    Email: risher (at) google (dot com)
 
 
-   Nicolas Lizborski
+   Nicolas Lidzborski
    Google, Inc
 
-   Email: risher (at) google (dot com)
+   Email: nlidz (at) google (dot com)
 
 
    Wei Chuang
@@ -770,18 +779,17 @@ Authors' Addresses
    Email: weihaw (at) google (dot com)
 
 
+
+
+Margolis, et al.        Expires September 9, 2016              [Page 14]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
+
    Brandon Long
    Google, Inc
 
    Email: blong (at) google (dot com)
-
-
-
-
-
-Margolis, et al.         Expires March 12, 2016                [Page 14]
-
-Internet-Draft                  SMTP-STS                  October 2015
 
 
    Binu Ramakrishnan
@@ -797,11 +805,9 @@ Internet-Draft                  SMTP-STS                  October 2015
 
 
    Janet Jones
-   Microsoft Corp
+   Microsoft, Inc
 
-   Email: Janet (dot) Jones (at) microsoft (dot com)
-
-
+   Email: janet.jones (at) microsoft (dot com)
 
 
 
@@ -831,12 +837,4 @@ Internet-Draft                  SMTP-STS                  October 2015
 
 
 
-
-
-
-
-
-
-
-
-Margolis, et al.         Expires March 12, 2016                [Page 15]
+Margolis, et al.        Expires September 9, 2016              [Page 15]
