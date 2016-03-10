@@ -468,7 +468,26 @@ if policy:
     cache(policy)
 ~~~~~~~~~
 
-# Appendix 2: XML Schema for Failure Reports
+# Appendix 2: Domain Owner STS example record
+~~~~~~~~~
+
+The owner wishes to begin using STS
+with a policy that will solicit aggregate feedback from receivers
+without affecting how the messages are processed, in order to:
+
+* Confirm that its legitimate messages are sent over TLS
+
+* Verify the validity of the certificates
+
+* Verify what cyphers are in use
+
+* Determine how many messages would be affected by a strict policy  
+
+_smtp_sts  IN TXT ( "v=STS1; to=false; "
+                     "rua=mailto:sts-feedback@example.com " )
+~~~~~~~~~
+
+# Appendix 3: XML Schema for Failure Reports
 ~~~~~~~~~
 <?xml version="1.0"?>
    <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -563,7 +582,7 @@ if policy:
  </xs:schema>
 ~~~~~~~~~
 
-# Appendix 3: Example report
+# Appendix 4: Example report
 ~~~~~~~~~
 <?xml>
 <feedback>
