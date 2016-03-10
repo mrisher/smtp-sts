@@ -84,18 +84,19 @@ Table of Contents
      2.4.  Disadvantages When Used Without DANE  . . . . . . . . . .   4
    3.  Threat Model  . . . . . . . . . . . . . . . . . . . . . . . .   5
    4.  Policy Semantics  . . . . . . . . . . . . . . . . . . . . . .   5
-   5.  Policy Expirations  . . . . . . . . . . . . . . . . . . . . .   6
-   6.  Failure Reporting . . . . . . . . . . . . . . . . . . . . . .   7
-   7.  Policy Authentication . . . . . . . . . . . . . . . . . . . .   8
-   8.  Policy Validation . . . . . . . . . . . . . . . . . . . . . .   9
-   9.  Policy Application  . . . . . . . . . . . . . . . . . . . . .   9
-   10. Appendix 1: Validation Pseudocode . . . . . . . . . . . . . .  10
-   11. Appendix 2: XML Schema for Failure Reports  . . . . . . . . .  10
-   12. Appendix 3: Example report  . . . . . . . . . . . . . . . . .  12
-   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  13
-     13.1.  Normative References . . . . . . . . . . . . . . . . . .  13
-     13.2.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  14
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  14
+   5.  Formal Definition . . . . . . . . . . . . . . . . . . . . . .   6
+   6.  Policy Expirations  . . . . . . . . . . . . . . . . . . . . .   8
+   7.  Failure Reporting . . . . . . . . . . . . . . . . . . . . . .   8
+   8.  Policy Authentication . . . . . . . . . . . . . . . . . . . .   9
+   9.  Policy Validation . . . . . . . . . . . . . . . . . . . . . .  10
+   10. Policy Application  . . . . . . . . . . . . . . . . . . . . .  10
+   11. Appendix 1: Validation Pseudocode . . . . . . . . . . . . . .  11
+   12. Appendix 2: XML Schema for Failure Reports  . . . . . . . . .  12
+   13. Appendix 3: Example report  . . . . . . . . . . . . . . . . .  14
+   14. References  . . . . . . . . . . . . . . . . . . . . . . . . .  15
+     14.1.  Normative References . . . . . . . . . . . . . . . . . .  15
+     14.2.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  15
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
 
 1.  Introduction
 
@@ -105,7 +106,6 @@ Table of Contents
    because opportunistic STARTTLS is subject to downgrade attacks -- and
    (b) server authenticity -- because the trust relationship from email
    domain to MTA server identity is not cryptographically validated.
-
 
 
 
@@ -262,7 +262,7 @@ Internet-Draft                  SMTP-STS                      March 2016
 
    Policies must specify the following fields:
 
-   o  v: Version (plain-text, required).  Currently only "1" is
+   o  v: Version (plain-text, required).  Currently only "STS1" is
       supported.
 
    o  to: TLS-Only (plain-text, required).  If "true," the receiving MTA
@@ -312,11 +312,89 @@ Internet-Draft                  SMTP-STS                      March 2016
 
    o  rua: Address to which aggregate feedback should be sent (comma-
       separated plain-text list of email addresses, optional).  For
-      example, "mailto:postmaster@example.com".
+      example, "mailto:postmaster@example.com" from [RFC3986].
 
    o  ruf: Address to which detailed forensic reports should be sent
 
-5.  Policy Expirations
+5.  Formal Definition
+
+   The formal definition of the SMTP STS format, using [RFC5234], is as
+   follows:
+
+
+
+
+
+
+
+
+
+
+
+
+
+Margolis, et al.        Expires September 9, 2016               [Page 6]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
+
+   sts-uri         = URI [ "!" 1*DIGIT [ "k" / "m" / "g" / "t" ] ]
+                      ; "URI" is imported from [RFC3986]; commas (ASCII
+                      ; 0x2C) and exclamation points (ASCII 0x21)
+                      ; MUST be encoded; the numeric portion MUST fit
+                      ; within an unsigned 64-bit integer
+
+   sts-record      = sts-version sts-sep sts-to
+                      [sts-sep sts-mx]
+                      [sts-sep sts-a]
+                      [sts-sep sts-c]
+                      [sts-sep sts-e]
+                      [sts-sep sts-auri]
+                      [sts-sep sts-furi]
+                      [sts-sep]
+                      ; components other than sts-version and
+                      ; sts-to may appear in any order
+
+   sts-version     = "v" *WSP "=" *WSP %x53 %x54 %x53 %x31
+
+   sts-sep         = *WSP %x3b *WSP
+
+   sts-to          = "to" *WSP "=" *WSP ( "true" / "false" )
+
+   sts-mx          = "mx" *WSP "=" *WSP sts-domain-list
+
+   sts-domain-list = (domain-match *("," domain-match))
+
+   domain-match    =  ["*."] 1*dtext *("." 1*dtext)
+
+   dtext           =  %d30-39 /          ; 0-9
+                      %d41-5A /          ; a-z
+                      %61-7A /           ; A-Z
+                      %2D                ; "-"
+
+   sts-a           = "a" *WSP "=" *WSP ( URI / "dnssec")
+
+   sts-c           = "c" *WSP "=" *WSP ( "webpki" / "tlsa")
+
+   sts-e           = "e" *WSP "=" *WSP 1*6DIGIT
+
+   sts-auri        = "rua" *WSP "=" *WSP
+                      sts-uri *(*WSP "," *WSP sts-uri)
+
+   sts-furi        = "ruf" *WSP "=" *WSP
+                      sts-uri *(*WSP "," *WSP sts-uri)
+
+
+
+
+
+
+Margolis, et al.        Expires September 9, 2016               [Page 7]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
+
+6.  Policy Expirations
 
    In order to resist attackers inserting a fraudulent policy, SMTP STS
    policies are designed to be long-lived, with an expiry typically
@@ -330,19 +408,11 @@ Internet-Draft                  SMTP-STS                      March 2016
    An important consideration for domains publishing a policy is that
    senders may potentially see a policy expiration as relative to the
    fetch of a policy cached by their recursive resolver.  Consequently,
-
-
-
-Margolis, et al.        Expires September 9, 2016               [Page 6]
-
-Internet-Draft                  SMTP-STS                      March 2016
-
-
    a sender may treat a policy as valid for up to {expiration time} +
    {DNS TTL}. Publishers should thus continue to expect senders to apply
    old policies for up to this duration.
 
-6.  Failure Reporting
+7.  Failure Reporting
 
    Aggregate statistics on policy failures should be reported to the URI
    indicated in the "rua" field of the policy.  SMTP STS reports contain
@@ -371,6 +441,15 @@ Internet-Draft                  SMTP-STS                      March 2016
 
    o  invalid-certificate: This indicates that the certificate presented
       by the receiving MX did not validate according to the policy
+
+
+
+
+Margolis, et al.        Expires September 9, 2016               [Page 8]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
+
       validation constraint.  (Either it was not signed by a trusted CA
       or did not match the DANE TLSA record for the recipient MX.)
 
@@ -384,16 +463,6 @@ Internet-Draft                  SMTP-STS                      March 2016
 
    o  Hostname: The hostname of the recipient MX.
 
-
-
-
-
-
-Margolis, et al.        Expires September 9, 2016               [Page 7]
-
-Internet-Draft                  SMTP-STS                      March 2016
-
-
    Note that the failure types are non-exclusive; an aggregate report
    may contain overlapping counts of failure types where a single send
    attempt encountered multiple errors.
@@ -401,7 +470,7 @@ Internet-Draft                  SMTP-STS                      March 2016
    When sending failure reports, sending MTAs should not honor SMTP STS
    or DANE TLSA failures.
 
-7.  Policy Authentication
+8.  Policy Authentication
 
    The security of a domain implementing an SMTP STS policy against an
    active man-in-the-middle depends primarily upon the long-lived
@@ -428,6 +497,15 @@ Internet-Draft                  SMTP-STS                      March 2016
       "a" field, the sender must retrieve the policy via a DNSSEC signed
       response for the _smtp_sts TXT record.
 
+
+
+
+
+Margolis, et al.        Expires September 9, 2016               [Page 9]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
+
    When fetching a new policy when one is not already known, or when
    fetching a policy for a domain with an expired policy,
    unauthenticated policies should be trusted and honored.  When
@@ -441,16 +519,7 @@ Internet-Draft                  SMTP-STS                      March 2016
    unused) policy that has not successfully been applied should be
    disregarded.
 
-
-
-
-
-Margolis, et al.        Expires September 9, 2016               [Page 8]
-
-Internet-Draft                  SMTP-STS                      March 2016
-
-
-8.  Policy Validation
+9.  Policy Validation
 
    When sending to an MX at a domain for which the sender has a valid
    and non-expired SMTP STS policy, a sending MTA honoring SMTP STS
@@ -470,7 +539,7 @@ Internet-Draft                  SMTP-STS                      March 2016
       and the presented certificate should be valid according to that
       record (as described by [RFC7672]).
 
-9.  Policy Application
+10.  Policy Application
 
    When sending to an MX at a domain for which the sender has a valid
    non-expired SMTP STS policy, a sending MTA honoring SMTP STS can
@@ -485,6 +554,14 @@ Internet-Draft                  SMTP-STS                      March 2016
 
    o  Enforced: In this mode, sending MTAs should treat STS policy
       failures, in which the policy action is "reject", as a mail
+
+
+
+Margolis, et al.        Expires September 9, 2016              [Page 10]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
+
       delivery error, and should terminate the SMTP connection, not
       delivering any more mail to the recipient MTA.
 
@@ -497,14 +574,6 @@ Internet-Draft                  SMTP-STS                      March 2016
 
    1.  Check for cached non-expired policy.  If none exists, fetch the
        latest and cache it.
-
-
-
-
-Margolis, et al.        Expires September 9, 2016               [Page 9]
-
-Internet-Draft                  SMTP-STS                      March 2016
-
 
    2.  Validate recipient MTA against policy.  If valid, deliver mail.
 
@@ -528,7 +597,26 @@ Internet-Draft                  SMTP-STS                      March 2016
    attack) they would incur if they were to shorten the policy
    expiration time.
 
-10.  Appendix 1: Validation Pseudocode
+11.  Appendix 1: Validation Pseudocode
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Margolis, et al.        Expires September 9, 2016              [Page 11]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
 
       policy = policy_from_cache()
       if not policy or is_expired(policy):
@@ -547,21 +635,13 @@ Internet-Draft                  SMTP-STS                      March 2016
         if update_cache:
           cache(policy)
 
-11.  Appendix 2: XML Schema for Failure Reports
+12.  Appendix 2: XML Schema for Failure Reports
 
  <?xml version="1.0"?>
     <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
       targetNamespace="http://www.example.org/smtp-sts-xml/0.1">
     <!-- The time range in UTC covered by messages in this report,
          specified in seconds since epoch. -->
-
-
-
-Margolis, et al.        Expires September 9, 2016              [Page 10]
-
-Internet-Draft                  SMTP-STS                      March 2016
-
-
     <xs:complexType name="DateRangeType">
       <xs:all>
         <xs:element name="begin" type="xs:integer"/>
@@ -586,6 +666,14 @@ Internet-Draft                  SMTP-STS                      March 2016
     <xs:simpleType name="ConstraintType">
       <xs:restriction base="xs:string">
         <xs:enumeration value="WebPKI"/>
+
+
+
+Margolis, et al.        Expires September 9, 2016              [Page 12]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
+
         <xs:enumeration value="TLSA"/>
       </xs:restriction>
     </xs:simpleType>
@@ -609,14 +697,6 @@ Internet-Draft                  SMTP-STS                      March 2016
         <xs:enumeration value="StarttlsNotSupported"/>
       </xs:restriction>
     </xs:simpleType>
-
-
-
-
-Margolis, et al.        Expires September 9, 2016              [Page 11]
-
-Internet-Draft                  SMTP-STS                      March 2016
-
 
     <!-- The possible enforcement level: whether the reporter also drops
          messages -->
@@ -642,6 +722,14 @@ Internet-Draft                  SMTP-STS                      March 2016
     <xs:element name="feedback">
       <xs:complexType>
         <xs:sequence>
+
+
+
+Margolis, et al.        Expires September 9, 2016              [Page 13]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
+
           <xs:element name="version"
                       type="xs:decimal"/>
           <xs:element name="report_metadata"
@@ -657,22 +745,7 @@ Internet-Draft                  SMTP-STS                      March 2016
     </xs:element>
   </xs:schema>
 
-12.  Appendix 3: Example report
-
-
-
-
-
-
-
-
-
-
-
-Margolis, et al.        Expires September 9, 2016              [Page 12]
-
-Internet-Draft                  SMTP-STS                      March 2016
-
+13.  Appendix 3: Example report
 
            <?xml>
            <feedback>
@@ -705,30 +778,38 @@ Internet-Draft                  SMTP-STS                      March 2016
              </record>>
            </feedback>
 
-13.  References
 
-13.1.  Normative References
+
+
+Margolis, et al.        Expires September 9, 2016              [Page 14]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
+
+14.  References
+
+14.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
-              Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
-              RFC2119, March 1997,
-              <http://www.rfc-editor.org/info/rfc2119>.
+              Requirement Levels", BCP 14, RFC 2119, March 1997.
 
    [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
-              Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
-              February 2002, <http://www.rfc-editor.org/info/rfc3207>.
+              Transport Layer Security", RFC 3207, February 2002.
+
+   [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+              Resource Identifier (URI): Generic Syntax", STD 66, RFC
+              3986, DOI 10.17487/RFC3986, January 2005,
+              <http://www.rfc-editor.org/info/rfc3986>.
 
    [RFC4033]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
               Rose, "DNS Security Introduction and Requirements", RFC
               4033, DOI 10.17487/RFC4033, March 2005,
               <http://www.rfc-editor.org/info/rfc4033>.
 
-
-
-Margolis, et al.        Expires September 9, 2016              [Page 13]
-
-Internet-Draft                  SMTP-STS                      March 2016
-
+   [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
+              Specifications: ABNF", STD 68, RFC 5234, DOI 10.17487/
+              RFC5234, January 2008,
+              <http://www.rfc-editor.org/info/rfc5234>.
 
    [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
               Verification of Domain-Based Application Service Identity
@@ -743,15 +824,23 @@ Internet-Draft                  SMTP-STS                      March 2016
 
    [RFC7672]  Dukhovni, V. and W. Hardaker, "SMTP Security via
               Opportunistic DNS-Based Authentication of Named Entities
-              (DANE) Transport Layer Security (TLS)", RFC 7672, DOI 10
-              .17487/RFC7672, October 2015,
+              (DANE) Transport Layer Security (TLS)", RFC 7672, DOI
+              10.17487/RFC7672, October 2015,
               <http://www.rfc-editor.org/info/rfc7672>.
 
-13.2.  URIs
+14.2.  URIs
 
    [1] https://example.com/.well-known/smtp_sts/current
 
    [2] https://example.com/.well-known/smtp_sts/current
+
+
+
+
+Margolis, et al.        Expires September 9, 2016              [Page 15]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
 
 Authors' Addresses
 
@@ -779,13 +868,6 @@ Authors' Addresses
    Email: weihaw (at) google (dot com)
 
 
-
-
-Margolis, et al.        Expires September 9, 2016              [Page 14]
-
-Internet-Draft                  SMTP-STS                      March 2016
-
-
    Brandon Long
    Google, Inc
 
@@ -811,30 +893,4 @@ Internet-Draft                  SMTP-STS                      March 2016
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Margolis, et al.        Expires September 9, 2016              [Page 15]
+Margolis, et al.        Expires September 9, 2016              [Page 16]

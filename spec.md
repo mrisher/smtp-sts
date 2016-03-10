@@ -209,7 +209,7 @@ retrieved from "\_smtp_sts.example.com."
 
 Policies must specify the following fields:
 
-* v: Version (plain-text, required). Currently only "1" is supported.
+* v: Version (plain-text, required). Currently only "STS1" is supported.
 * to:  TLS-Only (plain-text, required). If “true,” the receiving MTA requests
   that messages be delivered only if they conform to the STS policy.
 * mx: MX patterns (comma-separated list of plain-text MX match patterns,
@@ -233,8 +233,58 @@ Policies must specify the following fields:
   time.
 * rua: Address to which aggregate feedback should be sent (comma-separated
   plain-text list of email addresses, optional). For example,
-  "mailto:postmaster@example.com".
+  "mailto:postmaster@example.com" from [@!RFC3986].
 * ruf: Address to which detailed forensic reports should be sent
+
+# Formal Definition
+
+The formal definition of the SMTP STS format, using [@!RFC5234], is as follows:
+
+    sts-uri         = URI [ "!" 1*DIGIT [ "k" / "m" / "g" / "t" ] ]
+                       ; "URI" is imported from [RFC3986]; commas (ASCII
+                       ; 0x2C) and exclamation points (ASCII 0x21)
+                       ; MUST be encoded; the numeric portion MUST fit
+                       ; within an unsigned 64-bit integer
+
+    sts-record      = sts-version sts-sep sts-to
+                       [sts-sep sts-mx]
+                       [sts-sep sts-a]
+                       [sts-sep sts-c]
+                       [sts-sep sts-e]
+                       [sts-sep sts-auri]
+                       [sts-sep sts-furi]
+                       [sts-sep]
+                       ; components other than sts-version and
+                       ; sts-to may appear in any order
+
+    sts-version     = "v" *WSP "=" *WSP %x53 %x54 %x53 %x31
+
+    sts-sep         = *WSP %x3b *WSP 
+
+    sts-to          = "to" *WSP "=" *WSP ( "true" / "false" )
+
+    sts-mx          = "mx" *WSP "=" *WSP sts-domain-list
+
+    sts-domain-list = (domain-match *("," domain-match))
+
+    domain-match    =  ["*."] 1*dtext *("." 1*dtext)
+
+    dtext           =  %d30-39 /          ; 0-9
+                       %d41-5A /          ; a-z
+                       %61-7A /           ; A-Z
+                       %2D                ; "-"
+
+    sts-a           = "a" *WSP "=" *WSP ( URI / "dnssec")
+
+    sts-c           = "c" *WSP "=" *WSP ( "webpki" / "tlsa")
+
+    sts-e           = "e" *WSP "=" *WSP 1*6DIGIT
+
+    sts-auri        = "rua" *WSP "=" *WSP
+                       sts-uri *(*WSP "," *WSP sts-uri)
+
+    sts-furi        = "ruf" *WSP "=" *WSP
+                       sts-uri *(*WSP "," *WSP sts-uri)
 
 # Policy Expirations
 
