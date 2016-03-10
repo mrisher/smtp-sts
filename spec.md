@@ -286,6 +286,13 @@ The formal definition of the SMTP STS format, using [@!RFC5234], is as follows:
     sts-furi        = "ruf" *WSP "=" *WSP
                        sts-uri *(*WSP "," *WSP sts-uri)
 
+A size limitation in a sts-uri, if provided, is interpreted as a
+count of units followed by an OPTIONAL unit size ("k" for kilobytes,
+"m" for megabytes, "g" for gigabytes, "t" for terabytes).  Without a
+unit, the number is presumed to be a basic byte count.  Note that the
+units are considered to be powers of two; a kilobyte is 2^10, a
+megabyte is 2^20, etc.
+
 # Policy Expirations
 
 In order to resist attackers inserting a fraudulent policy, SMTP STS policies
