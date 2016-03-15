@@ -226,11 +226,20 @@ Policies must specify the following fields:
 * v: Version (plain-text, required). Currently only "1" is supported.
 * to:  TLS-Only (plain-text, required). If “true,” the receiving MTA requests
   that messages be delivered only if they conform to the STS policy.
+* sto: Sends TLS-Only (plain-text, optional). If "true", the sender's domain
+  requests that messages be received, only if the connection is TLS encrypted.
+  The receiving MTA should defer unencrypted messages from this domain
+  temporarily. If ommited, the senders domain does not set an STS policy for
+  outgoing mail, thus must not be included in failure-reports.
 * mx: MX patterns (comma-separated list of plain-text MX match patterns,
   required). One or more comma-separated patterns matching the expected MX for
   this domain. For example, "*.example.com,*.example.net" indicates that mail
   for this domain might be handled by any MX whose hostname is a subdomain of
   "example.com" or "example.net."
+* smx: Sending MX patterns (comma-separated list of plain-text MX match
+  patterns, required if "sto" is set). One or more comma-separated patterns
+  matching the expected PTR-RR of the IP address sending the mail. The
+  corresponding A/AAAA-RR also must point back to the sending IP address.
 * a: The mechanisms available to use to authenticate this policy itself
   (required, comma-separated list). See the section _Policy_ _Authentication_
   for more details. Possible values are:
@@ -288,6 +297,8 @@ Repeated records contain the following fields:
   to grow over time based on real-world experience. The initial set is:
 * mx-mismatch: This indicates that the MX resolved for the recipient domain did
   not match the MX constraint specified in the policy.
+* smx-mismatch: This indicates that the sending MX resolved for the sending
+  domain did not match the MX constraint specified in the policy.
 * certificate-mismatch: This indicates that the certificate presented by the
   receiving MX did not match the MX hostname
 * invalid-certificate: This indicates that the certificate presented by the
@@ -297,6 +308,10 @@ Repeated records contain the following fields:
 * expired-certificate: This indicates that the certificate has expired.
 * starttls-not-supported: This indicates that the recipient MX did not support
   STARTTLS.
+* starttls-not-issued: This indicates that the sending MX did not issue
+  STARTTLS, although the corresponding policy for the sender domain requires it.
+* tls-not-negotiable: This indicates that the recipient MX did support
+  STARTTLS, but no session was negotiable (e.g. no common ciphers found).
 * Count: The number of times the error was encountered.
 * Hostname: The hostname of the recipient MX.
 
@@ -469,6 +484,8 @@ if policy:
        <xs:element name="domain" type="xs:string"/>
        <xs:element name="mx" type="xs:string"
            minOccurs="1" maxOccurs="unbounded"/>
+       <xs:element name="smx" type="xs:string"
+           minOccurs="0" maxOccurs="unbounded"/>
        <xs:element name="constraint" type="ConstraintType"/>
      </xs:all>
    </xs:complexType>
@@ -477,9 +494,12 @@ if policy:
    <xs:simpleType name="FailureType">
      <xs:restriction base="xs:string">
        <xs:enumeration value="MxMismatch"/>
+       <xs:enumeration value="SMxMismatch"/>
        <xs:enumeration value="InvalidCertificate"/>
        <xs:enumeration value="ExpiredCertificate"/>
        <xs:enumeration value="StarttlsNotSupported"/>
+       <xs:enumeration value="StarttlsNotIssued"/>
+       <xs:enumeration value="TlsNotNegotiable"/>
      </xs:restriction>
    </xs:simpleType>
 

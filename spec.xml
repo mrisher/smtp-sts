@@ -331,11 +331,20 @@ retrieved from &quot;_smtp_sts.example.com.&quot;
 <t>v: Version (plain-text, required). Currently only &quot;1&quot; is supported.</t>
 <t>to:  TLS-Only (plain-text, required). If “true,” the receiving MTA requests
 that messages be delivered only if they conform to the STS policy.</t>
+<t>sto: Sends TLS-Only (plain-text, optional). If &quot;true&quot;, the sender's domain
+requests that messages be received, only if the connection is TLS encrypted.
+The receiving MTA should defer unencrypted messages from this domain
+temporarily. If ommited, the senders domain does not set an STS policy for
+outgoing mail, thus must not be included in failure-reports.</t>
 <t>mx: MX patterns (comma-separated list of plain-text MX match patterns,
 required). One or more comma-separated patterns matching the expected MX for
 this domain. For example, &quot;<spanx style="emph">.example.com,</spanx>.example.net&quot; indicates that mail
 for this domain might be handled by any MX whose hostname is a subdomain of
 &quot;example.com&quot; or &quot;example.net.&quot;</t>
+<t>smx: Sending MX patterns (comma-separated list of plain-text MX match
+patterns, required if &quot;sto&quot; is set). One or more comma-separated patterns
+matching the expected PTR-RR of the IP address sending the mail. The
+corresponding A/AAAA-RR also must point back to the sending IP address.</t>
 <t>a: The mechanisms available to use to authenticate this policy itself
 (required, comma-separated list). See the section <spanx style="emph">Policy</spanx> <spanx style="emph">Authentication</spanx>
 for more details. Possible values are:
@@ -405,6 +414,8 @@ use.
 to grow over time based on real-world experience. The initial set is:</t>
 <t>mx-mismatch: This indicates that the MX resolved for the recipient domain did
 not match the MX constraint specified in the policy.</t>
+<t>smx-mismatch: This indicates that the sending MX resolved for the sending
+domain did not match the MX constraint specified in the policy.</t>
 <t>certificate-mismatch: This indicates that the certificate presented by the
 receiving MX did not match the MX hostname</t>
 <t>invalid-certificate: This indicates that the certificate presented by the
@@ -414,6 +425,10 @@ record for the recipient MX.)</t>
 <t>expired-certificate: This indicates that the certificate has expired.</t>
 <t>starttls-not-supported: This indicates that the recipient MX did not support
 STARTTLS.</t>
+<t>starttls-not-issued: This indicates that the sending MX did not issue
+STARTTLS, although the corresponding policy for the sender domain requires it.</t>
+<t>tls-not-negotiable: This indicates that the recipient MX did support
+STARTTLS, but no session was negotiable (e.g. no common ciphers found).</t>
 <t>Count: The number of times the error was encountered.</t>
 <t>Hostname: The hostname of the recipient MX.</t>
 </list>
@@ -607,6 +622,8 @@ if policy:
        &lt;xs:element name="domain" type="xs:string"/&gt;
        &lt;xs:element name="mx" type="xs:string"
            minOccurs="1" maxOccurs="unbounded"/&gt;
+       &lt;xs:element name="smx" type="xs:string"
+           minOccurs="0" maxOccurs="unbounded"/&gt;
        &lt;xs:element name="constraint" type="ConstraintType"/&gt;
      &lt;/xs:all&gt;
    &lt;/xs:complexType&gt;
@@ -615,9 +632,12 @@ if policy:
    &lt;xs:simpleType name="FailureType"&gt;
      &lt;xs:restriction base="xs:string"&gt;
        &lt;xs:enumeration value="MxMismatch"/&gt;
+       &lt;xs:enumeration value="SMxMismatch"/&gt;
        &lt;xs:enumeration value="InvalidCertificate"/&gt;
        &lt;xs:enumeration value="ExpiredCertificate"/&gt;
        &lt;xs:enumeration value="StarttlsNotSupported"/&gt;
+       &lt;xs:enumeration value="StarttlsNotIssued"/&gt;
+       &lt;xs:enumeration value="TlsNotNegotiable"/&gt;
      &lt;/xs:restriction&gt;
    &lt;/xs:simpleType&gt;
 
