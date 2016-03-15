@@ -132,6 +132,36 @@
 <uri></uri>
 </address>
 </author>
+<author initials="K." surname="Umbach" fullname="Klaus Umbach">
+<organization>1&amp;1 Mail &amp; Media Development &amp; Technology GmbH</organization>
+<address>
+<postal>
+<street></street>
+<city></city>
+<code></code>
+<country></country>
+<region></region>
+</postal>
+<phone></phone>
+<email>klaus.umbach (at) 1und1 (dot de)</email>
+<uri></uri>
+</address>
+</author>
+<author initials="M." surname="Laber" fullname="Markus Laber">
+<organization>1&amp;1 Mail &amp; Media Development &amp; Technology GmbH</organization>
+<address>
+<postal>
+<street></street>
+<city></city>
+<code></code>
+<country></country>
+<region></region>
+</postal>
+<phone></phone>
+<email>markus.laber (at) 1und1 (dot de)</email>
+<uri></uri>
+</address>
+</author>
 <date year="2016" month="March" day="8"/>
 
 <area>Applications</area>
@@ -306,15 +336,17 @@ required). One or more comma-separated patterns matching the expected MX for
 this domain. For example, &quot;<spanx style="emph">.example.com,</spanx>.example.net&quot; indicates that mail
 for this domain might be handled by any MX whose hostname is a subdomain of
 &quot;example.com&quot; or &quot;example.net.&quot;</t>
-<t>a: The mechanism to use to authenticate this policy itself. See the section
-<spanx style="emph">Policy</spanx> <spanx style="emph">Authentication</spanx> for more details. Possible values are:
+<t>a: The mechanisms available to use to authenticate this policy itself
+(required, comma-separated list). See the section <spanx style="emph">Policy</spanx> <spanx style="emph">Authentication</spanx>
+for more details. Possible values are:
 <list style="symbols">
 <t>webpki:URI, where URI points to an HTTPS resource at the recipient domain
 that serves the same policy text.</t>
 <t>dnssec: Indicating that the policy is expected to be served over DNSSEC.</t>
 </list></t>
-<t>c: Constraints on the recipient MX's TLS certificate (plain-text, required).
-See the section <spanx style="emph">Policy</spanx> <spanx style="emph">Validation</spanx> for more details. Possible values are:
+<t>c: Constraints on the recipient MX's TLS certificate (plain-text, required,
+comma-separated list). See the section <spanx style="emph">Policy</spanx> <spanx style="emph">Validation</spanx> for more
+detais. Possible values are:
 <list style="symbols">
 <t>webpki: Indicating that the TLS certificate presented by the recipient MX
 must be valid according to the &quot;web PKI&quot; mechanism.</t>
@@ -445,8 +477,9 @@ successfully been applied should be disregarded.
 non-expired SMTP STS policy, a sending MTA honoring SMTP STS should validate
 that the recipient MX supports STARTTLS and offers a TLS certificate which is
 valid according to the semantics of the SMTP STS policy. Policies can specify
-certificate validity in one of two ways by setting the value of the &quot;c&quot; field in
-the policy description.
+validation methods by setting the values of the &quot;c&quot; field in the policy
+description. If multiple methods are specified, at least one method in the
+&quot;c&quot; field must be validated.
 </t>
 <t>
 <list style="symbols">

@@ -67,6 +67,20 @@
    organization="Microsoft, Inc"
      [author.address]
      email="janet.jones (at) microsoft (dot com)"
+   [[author]]
+   initials="K."
+   surname="Umbach"
+   fullname="Klaus Umbach"
+   organization="1&1 Mail & Media Development & Technology GmbH"
+     [author.address]
+     email="klaus.umbach (at) 1und1 (dot de)"
+   [[author]]
+   initials="M."
+   surname="Laber"
+   fullname="Markus Laber"
+   organization="1&1 Mail & Media Development & Technology GmbH"
+     [author.address]
+     email="markus.laber (at) 1und1 (dot de)"
 
 %%%
 
@@ -217,13 +231,15 @@ Policies must specify the following fields:
   this domain. For example, "*.example.com,*.example.net" indicates that mail
   for this domain might be handled by any MX whose hostname is a subdomain of
   "example.com" or "example.net."
-* a: The mechanism to use to authenticate this policy itself. See the section
-  _Policy_ _Authentication_ for more details. Possible values are:
+* a: The mechanisms available to use to authenticate this policy itself
+  (required, comma-separated list). See the section _Policy_ _Authentication_
+  for more details. Possible values are:
   * webpki:URI, where URI points to an HTTPS resource at the recipient domain
     that serves the same policy text.
   * dnssec: Indicating that the policy is expected to be served over DNSSEC.
-* c: Constraints on the recipient MX's TLS certificate (plain-text, required).
-  See the section _Policy_ _Validation_ for more details. Possible values are:
+* c: Constraints on the recipient MX's TLS certificate (plain-text, required,
+  comma-separated list). See the section _Policy_ _Validation_ for more
+  detais. Possible values are:
   * webpki: Indicating that the TLS certificate presented by the recipient MX
     must be valid according to the "web PKI" mechanism.
   * tlsa: Indicating that the TLS certificate presented by the recipient MX must
@@ -335,8 +351,9 @@ When sending to an MX at a domain for which the sender has a valid and
 non-expired SMTP STS policy, a sending MTA honoring SMTP STS should validate
 that the recipient MX supports STARTTLS and offers a TLS certificate which is
 valid according to the semantics of the SMTP STS policy. Policies can specify
-certificate validity in one of two ways by setting the value of the "c" field in
-the policy description. 
+validation methods by setting the values of the "c" field in the policy
+description. If multiple methods are specified, at least one method in the
+"c" field must be validated.
 
 * Web PKI: When the "c" field is set to "webpki", the certificate presented by
   the receiving MX must be valid for the MX name and chain to a root CA that is
