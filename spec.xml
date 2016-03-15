@@ -132,6 +132,10 @@
 <uri></uri>
 </address>
 </author>
+<author initials="F." surname="Martin" fullname="Franck Martin">
+  <organization>LinkedIn</organization>
+  <email>fmartin (at) linkedin (dot com)</email>
+</author>
 <date year="2016" month="March" day="8"/>
 
 <area>Applications</area>
