@@ -67,6 +67,13 @@
    organization="Microsoft, Inc"
      [author.address]
      email="janet.jones (at) microsoft (dot com)"
+   [[author]]
+   initials="F."
+   surname="Martin"
+   fullname="Franck Martin"
+   organization="LinkedIn"
+     [author.address]
+     email="fmartin (at) linkedin (dot com)"
 
 %%%
 
