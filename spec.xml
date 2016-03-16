@@ -133,8 +133,19 @@
 </address>
 </author>
 <author initials="F." surname="Martin" fullname="Franck Martin">
-  <organization>LinkedIn</organization>
-  <email>fmartin (at) linkedin (dot com)</email>
+<organization>LinkedIn</organization>
+<address>
+<postal>
+<street></street>
+<city></city>
+<code></code>
+<country></country>
+<region></region>
+</postal>
+<phone></phone>
+<email>fmartin (at) linkedin (dot com)</email>
+<uri></uri>
+</address>
 </author>
 <date year="2016" month="March" day="8"/>
 
@@ -263,32 +274,6 @@ does not exist when looking up a policy over plain DNS.</t>
 </list>
 </t>
 </section>
-</section>
-
-<section anchor="threat-model" title="Threat Model">
-<t>SMTP Strict Transport Security protects against an active attacker who wishes to
-intercept or tamper with mail between hosts who support STARTTLS. There are two
-classes of attacks considered:
-</t>
-<t>
-<list style="symbols">
-<t>Foiling TLS negotiation, for example by deleting the &quot;250 STARTTLS&quot; response
-from a server or altering TLS session negotiation. This would result in the
-SMTP session occurring over plaintext, despite both parties supporting TLS.</t>
-<t>Impersonating the destination mail server, whereby the sender might deliver
-the message to an impostor, who could then monitor and/or modify messages
-despite opportunistic TLS. This impersonation could be accomplished by
-spoofing the DNS MX record for the recipient domain, or by redirecting client
-connections to the legitimate recipient server (for example, by altering BGP
-routing tables).</t>
-</list>
-</t>
-<t>SMTP Strict Transport Security relies on certificate validation via either TLS
-identity checking <xref target="RFC6125"/> or DANE TLSA <xref target="RFC7672"/>. Attackers who are able
-to obtain a valid certificate for the targeted recipient mail service (e.g. by
-compromising a certificate authority) are thus out of scope of this threat
-model.
-</t>
 </section>
 
 <section anchor="policy-semantics" title="Policy Semantics">
@@ -571,6 +556,37 @@ procedure specified in step 4, recipients who publish a policy have, in effect,
 a means of updating a cached policy at arbitrary intervals, without the risks
 (of a man-in-the-middle attack) they would incur if they were to shorten the
 policy expiration time.
+</t>
+</section>
+
+<section anchor="iana-considerations" title="IANA Considerations">
+<t>There are no identifiers defined herein to be reserved by IANA.
+</t>
+</section>
+
+<section anchor="security-considerations" title="Security Considerations">
+<t>SMTP Strict Transport Security protects against an active attacker who wishes to
+intercept or tamper with mail between hosts who support STARTTLS. There are two
+classes of attacks considered:
+</t>
+<t>
+<list style="symbols">
+<t>Foiling TLS negotiation, for example by deleting the &quot;250 STARTTLS&quot; response
+from a server or altering TLS session negotiation. This would result in the
+SMTP session occurring over plaintext, despite both parties supporting TLS.</t>
+<t>Impersonating the destination mail server, whereby the sender might deliver
+the message to an impostor, who could then monitor and/or modify messages
+despite opportunistic TLS. This impersonation could be accomplished by
+spoofing the DNS MX record for the recipient domain, or by redirecting client
+connections to the legitimate recipient server (for example, by altering BGP
+routing tables).</t>
+</list>
+</t>
+<t>SMTP Strict Transport Security relies on certificate validation via either TLS
+identity checking <xref target="RFC6125"/> or DANE TLSA <xref target="RFC7672"/>. Attackers who are able
+to obtain a valid certificate for the targeted recipient mail service (e.g. by
+compromising a certificate authority) are thus out of scope of this threat
+model.
 </t>
 </section>
 

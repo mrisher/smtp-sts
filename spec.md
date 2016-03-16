@@ -183,29 +183,6 @@ to DANE:
   the lack of a DANE record, such an option to authenticate policy non-existence
   does not exist when looking up a policy over plain DNS. 
 
-# Threat Model
-
-SMTP Strict Transport Security protects against an active attacker who wishes to
-intercept or tamper with mail between hosts who support STARTTLS. There are two
-classes of attacks considered:
-
-* Foiling TLS negotiation, for example by deleting the "250 STARTTLS" response
-  from a server or altering TLS session negotiation. This would result in the
-  SMTP session occurring over plaintext, despite both parties supporting TLS.
-
-* Impersonating the destination mail server, whereby the sender might deliver
-  the message to an impostor, who could then monitor and/or modify messages
-  despite opportunistic TLS. This impersonation could be accomplished by
-  spoofing the DNS MX record for the recipient domain, or by redirecting client
-  connections to the legitimate recipient server (for example, by altering BGP
-  routing tables).
-
-SMTP Strict Transport Security relies on certificate validation via either TLS
-identity checking [@!RFC6125] or DANE TLSA [@!RFC7672]. Attackers who are able
-to obtain a valid certificate for the targeted recipient mail service (e.g. by
-compromising a certificate authority) are thus out of scope of this threat
-model.
-
 # Policy Semantics
 
 SMTP STS policies are distributed at the recipient domain either through a new
@@ -454,6 +431,32 @@ a means of updating a cached policy at arbitrary intervals, without the risks
 (of a man-in-the-middle attack) they would incur if they were to shorten the
 policy expiration time.
 
+# IANA Considerations
+
+There are no identifiers defined herein to be reserved by IANA.
+
+# Security Considerations
+
+SMTP Strict Transport Security protects against an active attacker who wishes to
+intercept or tamper with mail between hosts who support STARTTLS. There are two
+classes of attacks considered:
+
+* Foiling TLS negotiation, for example by deleting the "250 STARTTLS" response
+  from a server or altering TLS session negotiation. This would result in the
+  SMTP session occurring over plaintext, despite both parties supporting TLS.
+
+* Impersonating the destination mail server, whereby the sender might deliver
+  the message to an impostor, who could then monitor and/or modify messages
+  despite opportunistic TLS. This impersonation could be accomplished by
+  spoofing the DNS MX record for the recipient domain, or by redirecting client
+  connections to the legitimate recipient server (for example, by altering BGP
+  routing tables).
+
+SMTP Strict Transport Security relies on certificate validation via either TLS
+identity checking [@!RFC6125] or DANE TLSA [@!RFC7672]. Attackers who are able
+to obtain a valid certificate for the targeted recipient mail service (e.g. by
+compromising a certificate authority) are thus out of scope of this threat
+model.
 
 # Appendix 1: Validation Pseudocode
 ~~~~~~~~~
