@@ -104,10 +104,10 @@ of the delivery domain) can perform such a downgrade or interception attack.
 
 This document defines a mechanism for recipient domains to publish policies
 specifying: 
-   * whether MTAs sending mail to this domain should expect TLS support
+   * whether MTAs sending mail to this domain can expect TLS support
    * how MTAs can validate the TLS server certificate presented during mail
      delivery
-   * what the recipient recommends should be done with messages when TLS cannot
+   * what the recipient recommends the sender do with messages when TLS cannot
      be successfully negotiated
 
 The protocol described is separated into three logical components: 
@@ -214,7 +214,7 @@ resource record, or as TXT records (similar to DMARC policies) under the name
 the recipient domain "example.com", the recipient's SMTP STS policy can be
 retrieved from "\_smtp_sts.example.com."
 
-Policies must specify the following fields:
+Policies MUST specify the following fields:
 
 * v: Version (plain-text, required). Currently only "STS1" is supported.
 * to:  TLS-Only (plain-text, required). If “true,” the receiving MTA requests
@@ -232,16 +232,16 @@ Policies must specify the following fields:
 * c: Constraints on the recipient MX's TLS certificate (plain-text, required).
   See the section _Policy_ _Validation_ for more details. Possible values are:
   * webpki: Indicating that the TLS certificate presented by the recipient MX
-    must be valid according to the "web PKI" mechanism.
-  * tlsa: Indicating that the TLS certificate presented by the recipient MX must
-    match a (presumed to exist) DANE TLSA record.
+    will be validated according to the "web PKI" mechanism.
+  * tlsa: Indicating that the TLS certificate presented by the recipient MX
+    will match a (presumed to exist) DANE TLSA record.
 * e: Max lifetime of the policy (plain-text integer seconds). Well-behaved
-  clients should cache a policy for up to this value from last policy fetch
+  clients SHOULD cache a policy for up to this value from last policy fetch
   time.
-* rua: Address to which aggregate feedback should be sent (comma-separated
+* rua: Address to which aggregate feedback MAY be sent (comma-separated
   plain-text list of email addresses, optional). For example,
   "mailto:postmaster@example.com" from [@!RFC3986].
-* ruf: Address to which detailed forensic reports should be sent
+* ruf: Address to which detailed forensic reports MAY be sent
 
 # Formal Definition
 
@@ -307,18 +307,18 @@ are designed to be long-lived, with an expiry typically greater than two weeks.
 Policy validity is controlled by two separate expiration times: the lifetime
 indicated in the policy ("e=") and the TTL on the DNS record itself. The policy
 expiration will ordinarily be longer than that of the DNS TTL, and senders
-should cache a policy (and apply it to all mail to the recipient domain) until
+SHOULD cache a policy (and apply it to all mail to the recipient domain) until
 the policy expiration.
 
-An important consideration for domains publishing a policy is that senders may
+An important consideration for domains publishing a policy is that senders can
 potentially see a policy expiration as relative to the fetch of a policy cached
-by their recursive resolver. Consequently, a sender may treat a policy as valid
-for up to {expiration time} + {DNS TTL}. Publishers should thus continue to
+by their recursive resolver. Consequently, a sender MAY treat a policy as valid
+for up to {expiration time} + {DNS TTL}. Publishers SHOULD thus continue to
 expect senders to apply old policies for up to this duration.
 
 # Failure Reporting
 
-Aggregate statistics on policy failures should be reported to the URI indicated
+Aggregate statistics on policy failures MAY be reported to the URI indicated
 in the "rua" field of the policy. SMTP STS reports contain information about
 policy failures to allow diagnosis of misconfigurations and malicious activity.
 These are verbose, and may not be desirable in regular production. Aggregate
@@ -348,11 +348,11 @@ Repeated records contain the following fields:
 * Count: The number of times the error was encountered.
 * Hostname: The hostname of the recipient MX.
 
-Note that the failure types are non-exclusive; an aggregate report may contain
+Note that the failure types are non-exclusive; an aggregate report MAY contain
 overlapping counts of failure types where a single send attempt encountered
 multiple errors.
 
-When sending failure reports, sending MTAs should not honor SMTP STS or DANE
+When sending failure reports, sending MTAs MUST NOT honor SMTP STS or DANE
 TLSA failures.
 
 # Policy Authentication
@@ -369,53 +369,53 @@ for policy validation:
   the sender fetches a HTTPS resource from the URI indicated. For example,
   a=webpki:https://example.com/.well-known/smtp_sts/current indicates that the
   sender should fetch the resource
-  https://example.com/.well-known/smtp_sts/current. The HTTP response body
-  served at this resource must exactly match the policy initially loaded via the
-  DNS TXT method, and must be served from an HTTPS endpoint at the domain
-  matching that of the recipient domain. 
+  https://example.com/.well-known/smtp_sts/current. In order for the policy to
+  be valid, the HTTP response body served at this resource MUST exactly match
+  the policy initially loaded via the DNS TXT method, and MUST be served from an
+  HTTPS endpoint at the domain matching that of the recipient domain. 
 
 (_TODO:_ As this RFC standard progresses, the authors will register
 .well-known/smtp-sts. See [@!RFC5785}}. Then implementors will _not_ specify a
 URI, but will instead rely on the .well-known URL.)
 
 * DNSSEC: In this mechanism, indicated by the "dnssec" value of the "a" field,
-  the sender must retrieve the policy via a DNSSEC signed response for the
+  the sender MUST retrieve the policy via a DNSSEC signed response for the
   \_smtp_sts TXT record.
 
 When fetching a new policy when one is not already known, or when fetching a
-policy for a domain with an expired policy, unauthenticated policies should be
+policy for a domain with an expired policy, unauthenticated policies MUST be
 trusted and honored. When fetching a policy and authenticating it, as described
 in detail in _Policy_ _Application_, policies will be authenticated using the
 mechanism specified by the existing cached policy.
 
 Note, however, as described in detail in _Policy_ _Application_, that new
-policies should not be considered as valid if they do not validate on first
+policies MUST NOT be considered as valid if they do not validate on first
 application. That is, a freshly fetched (and unused) policy that has not
-successfully been applied should be disregarded. 
+successfully been applied MUST be disregarded. 
 
 # Policy Validation
 
 When sending to an MX at a domain for which the sender has a valid and
-non-expired SMTP STS policy, a sending MTA honoring SMTP STS should validate
+non-expired SMTP STS policy, a sending MTA honoring SMTP STS SHOULD validate
 that the recipient MX supports STARTTLS and offers a TLS certificate which is
 valid according to the semantics of the SMTP STS policy. Policies can specify
 certificate validity in one of two ways by setting the value of the "c" field in
 the policy description. 
 
 * Web PKI: When the "c" field is set to "webpki", the certificate presented by
-  the receiving MX must be valid for the MX name and chain to a root CA that is
-  trusted by the sending MTA. The certificate must have a CN or SAN matching the
+  the receiving MX MUST be valid for the MX name and chain to a root CA that is
+  trusted by the sending MTA. The certificate MUST have a CN or SAN matching the
   MX hostname (as described in [@!RFC6125]) and be non-expired.
 
-* DANE TLSA: When the "c" field is set to "tlsa", the receiving MX should be
+* DANE TLSA: When the "c" field is set to "tlsa", the receiving MX MUST be
   covered by a DANE TLSA record for the recipient domain, and the presented
-  certificate should be valid according to that record (as described by
+  certificate MUST be valid according to that record (as described by
   [@!RFC7672]). 
 
 # Policy Application
 
 When sending to an MX at a domain for which the sender has a valid non-expired
-SMTP STS policy, a sending MTA honoring SMTP STS can apply the result of a
+SMTP STS policy, a sending MTA honoring SMTP STS MAY apply the result of a
 policy validation one of two ways:
 
 * Report-only: In this mode, sending MTAs merely send a report to the designated
@@ -424,12 +424,12 @@ policy validation one of two ways:
   for MTAs who wish to enhance transparency of TLS tampering without making
   complicated changes to production mail-handling infrastructure.
 
-* Enforced: In this mode, sending MTAs should treat STS policy failures, in
-  which the policy action is "reject", as a mail delivery error, and should
+* Enforced: In this mode, sending MTAs SHOULD treat STS policy failures, in
+  which the policy action is "reject", as a mail delivery error, and SHOULD
   terminate the SMTP connection, not delivering any more mail to the recipient
   MTA. 
 
-In enforced mode, however, sending MTAs should first check for a new
+In enforced mode, however, sending MTAs MUST first check for a new
 _authenticated_ policy before actually treating a message failure as fatal.
 
 Thus the control flow for a sending MTA that does online policy application
@@ -447,12 +447,12 @@ consists of the following steps:
 Understanding the details of step 4 is critical to understanding the behavior of
 the system as a whole. 
 
-Remember that each policy has an expiration time (which may be long, on the
-order of months) and a validation method. With these two mechanisms and the
-procedure specified in step 4, recipients who publish a policy have, in effect,
-a means of updating a cached policy at arbitrary intervals, without the risks
-(of a man-in-the-middle attack) they would incur if they were to shorten the
-policy expiration time.
+Remember that each policy has an expiration time (which SHOULD be long, on the
+order of days or months) and a validation method. With these two mechanisms and
+the procedure specified in step 4, recipients who publish a policy have, in
+effect, a means of updating a cached policy at arbitrary intervals, without the
+risks (of a man-in-the-middle attack) they would incur if they were to shorten
+the policy expiration time.
 
 
 # Appendix 1: Validation Pseudocode
