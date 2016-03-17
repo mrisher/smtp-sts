@@ -90,9 +90,9 @@ Table of Contents
    8.  Policy Validation . . . . . . . . . . . . . . . . . . . . . .  10
    9.  Policy Application  . . . . . . . . . . . . . . . . . . . . .  10
    10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  11
-   11. Security Considerations . . . . . . . . . . . . . . . . . . .  12
+   11. Security Considerations . . . . . . . . . . . . . . . . . . .  11
    12. Appendix 1: Validation Pseudocode . . . . . . . . . . . . . .  12
-   13. Appendix 2: Domain Owner STS example record . . . . . . . . .  13
+   13. Appendix 2: Domain Owner STS example record . . . . . . . . .  12
    14. Appendix 3: XML Schema for Failure Reports  . . . . . . . . .  13
    15. Appendix 4: Example report  . . . . . . . . . . . . . . . . .  15
    16. References  . . . . . . . . . . . . . . . . . . . . . . . . .  16
@@ -125,11 +125,10 @@ Internet-Draft                  SMTP-STS                      March 2016
    domain) can perform such a downgrade or interception attack.
 
    This document defines a mechanism for recipient domains to publish
-   policies specifying: * whether MTAs sending mail to this domain
-   should expect TLS support * how MTAs can validate the TLS server
-   certificate presented during mail delivery * what the recipient
-   recommends should be done with messages when TLS cannot be
-   successfully negotiated
+   policies specifying: * whether MTAs sending mail to this domain can
+   expect TLS support * how MTAs can validate the TLS server certificate
+   presented during mail delivery * what the recipient recommends the
+   sender do with messages when TLS cannot be successfully negotiated
 
    The protocol described is separated into three logical components: 1.
    policy semantics: whether senders can expect a receiving server for
@@ -161,7 +160,8 @@ Internet-Draft                  SMTP-STS                      March 2016
    system and a trust-on-first-use (TOFU) approach to avoid
    interception.  The TOFU model allows a degree of security similar to
    that of HPKP [RFC7469], omitting both the complexity and the
-
+   guarantees on first use offered by DNSSEC.  (For a thorough
+   discussion of this trade-off, see the section _Threat_ _Model_.)
 
 
 
@@ -169,9 +169,6 @@ Margolis, et al.        Expires September 9, 2016               [Page 3]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
-
-   guarantees on first use offered by DNSSEC.  (For a thorough
-   discussion of this trade-off, see the section _Threat_ _Model_.)
 
    In addition, SMTP STS introduces a mechanism for failure reporting
    and a report-only mode, enabling progressive roll-out and auditing
@@ -221,6 +218,9 @@ Internet-Draft                  SMTP-STS                      March 2016
 
 
 
+
+
+
 Margolis, et al.        Expires September 9, 2016               [Page 4]
 
 Internet-Draft                  SMTP-STS                      March 2016
@@ -235,7 +235,7 @@ Internet-Draft                  SMTP-STS                      March 2016
    "example.com", the recipient's SMTP STS policy can be retrieved from
    "_smtp_sts.example.com."
 
-   Policies must specify the following fields:
+   Policies MUST specify the following fields:
 
    o  v: Version (plain-text, required).  Currently only "STS1" is
       supported.
@@ -266,11 +266,11 @@ Internet-Draft                  SMTP-STS                      March 2016
       details.  Possible values are:
 
       *  webpki: Indicating that the TLS certificate presented by the
-         recipient MX must be valid according to the "web PKI"
+         recipient MX will be validated according to the "web PKI"
          mechanism.
 
       *  tlsa: Indicating that the TLS certificate presented by the
-         recipient MX must match a (presumed to exist) DANE TLSA record.
+         recipient MX will match a (presumed to exist) DANE TLSA record.
 
 
 
@@ -283,14 +283,14 @@ Internet-Draft                  SMTP-STS                      March 2016
 
 
    o  e: Max lifetime of the policy (plain-text integer seconds).  Well-
-      behaved clients should cache a policy for up to this value from
+      behaved clients SHOULD cache a policy for up to this value from
       last policy fetch time.
 
-   o  rua: Address to which aggregate feedback should be sent (comma-
+   o  rua: Address to which aggregate feedback MAY be sent (comma-
       separated plain-text list of email addresses, optional).  For
       example, "mailto:postmaster@example.com" from [RFC3986].
 
-   o  ruf: Address to which detailed forensic reports should be sent
+   o  ruf: Address to which detailed forensic reports MAY be sent
 
 4.  Formal Definition
 
@@ -407,19 +407,19 @@ Internet-Draft                  SMTP-STS                      March 2016
    separate expiration times: the lifetime indicated in the policy
    ("e=") and the TTL on the DNS record itself.  The policy expiration
    will ordinarily be longer than that of the DNS TTL, and senders
-   should cache a policy (and apply it to all mail to the recipient
+   SHOULD cache a policy (and apply it to all mail to the recipient
    domain) until the policy expiration.
 
    An important consideration for domains publishing a policy is that
-   senders may potentially see a policy expiration as relative to the
+   senders can potentially see a policy expiration as relative to the
    fetch of a policy cached by their recursive resolver.  Consequently,
-   a sender may treat a policy as valid for up to {expiration time} +
-   {DNS TTL}. Publishers should thus continue to expect senders to apply
+   a sender MAY treat a policy as valid for up to {expiration time} +
+   {DNS TTL}. Publishers SHOULD thus continue to expect senders to apply
    old policies for up to this duration.
 
 6.  Failure Reporting
 
-   Aggregate statistics on policy failures should be reported to the URI
+   Aggregate statistics on policy failures MAY be reported to the URI
    indicated in the "rua" field of the policy.  SMTP STS reports contain
    information about policy failures to allow diagnosis of
    misconfigurations and malicious activity.  These are verbose, and may
@@ -469,11 +469,11 @@ Internet-Draft                  SMTP-STS                      March 2016
    o  Hostname: The hostname of the recipient MX.
 
    Note that the failure types are non-exclusive; an aggregate report
-   may contain overlapping counts of failure types where a single send
+   MAY contain overlapping counts of failure types where a single send
    attempt encountered multiple errors.
 
-   When sending failure reports, sending MTAs should not honor SMTP STS
-   or DANE TLSA failures.
+   When sending failure reports, sending MTAs MUST NOT honor SMTP STS or
+   DANE TLSA failures.
 
 7.  Policy Authentication
 
@@ -489,15 +489,15 @@ Internet-Draft                  SMTP-STS                      March 2016
    o  Web PKI: In this mechanism, indicated by the "webpki" value of the
       "a" field, the sender fetches a HTTPS resource from the URI
       indicated.  For example, a=webpki:[1] indicates that the sender
-      should fetch the resource [2].  The HTTP response body served at
-      this resource must exactly match the policy initially loaded via
-      the DNS TXT method, and must be served from an HTTPS endpoint at
-      the domain matching that of the recipient domain.
+      should fetch the resource [2].  In order for the policy to be
+      valid, the HTTP response body served at this resource MUST exactly
+      match the policy initially loaded via the DNS TXT method, and MUST
+      be served from an HTTPS endpoint at the domain matching that of
+      the recipient domain.
 
    (_TODO:_ As this RFC standard progresses, the authors will register
    .well-known/smtp-sts.  See [@!RFC5785}}. Then implementors will _not_
    specify a URI, but will instead rely on the .well-known URL.)
-
 
 
 
@@ -507,53 +507,53 @@ Internet-Draft                  SMTP-STS                      March 2016
 
 
    o  DNSSEC: In this mechanism, indicated by the "dnssec" value of the
-      "a" field, the sender must retrieve the policy via a DNSSEC signed
+      "a" field, the sender MUST retrieve the policy via a DNSSEC signed
       response for the _smtp_sts TXT record.
 
    When fetching a new policy when one is not already known, or when
    fetching a policy for a domain with an expired policy,
-   unauthenticated policies should be trusted and honored.  When
-   fetching a policy and authenticating it, as described in detail in
-   _Policy_ _Application_, policies will be authenticated using the
-   mechanism specified by the existing cached policy.
+   unauthenticated policies MUST be trusted and honored.  When fetching
+   a policy and authenticating it, as described in detail in _Policy_
+   _Application_, policies will be authenticated using the mechanism
+   specified by the existing cached policy.
 
    Note, however, as described in detail in _Policy_ _Application_, that
-   new policies should not be considered as valid if they do not
-   validate on first application.  That is, a freshly fetched (and
-   unused) policy that has not successfully been applied should be
-   disregarded.
+   new policies MUST NOT be considered as valid if they do not validate
+   on first application.  That is, a freshly fetched (and unused) policy
+   that has not successfully been applied MUST be disregarded.
 
 8.  Policy Validation
 
    When sending to an MX at a domain for which the sender has a valid
    and non-expired SMTP STS policy, a sending MTA honoring SMTP STS
-   should validate that the recipient MX supports STARTTLS and offers a
+   SHOULD validate that the recipient MX supports STARTTLS and offers a
    TLS certificate which is valid according to the semantics of the SMTP
    STS policy.  Policies can specify certificate validity in one of two
    ways by setting the value of the "c" field in the policy description.
 
    o  Web PKI: When the "c" field is set to "webpki", the certificate
-      presented by the receiving MX must be valid for the MX name and
+      presented by the receiving MX MUST be valid for the MX name and
       chain to a root CA that is trusted by the sending MTA.  The
-      certificate must have a CN or SAN matching the MX hostname (as
+      certificate MUST have a CN or SAN matching the MX hostname (as
       described in [RFC6125]) and be non-expired.
 
    o  DANE TLSA: When the "c" field is set to "tlsa", the receiving MX
-      should be covered by a DANE TLSA record for the recipient domain,
-      and the presented certificate should be valid according to that
+      MUST be covered by a DANE TLSA record for the recipient domain,
+      and the presented certificate MUST be valid according to that
       record (as described by [RFC7672]).
 
 9.  Policy Application
 
    When sending to an MX at a domain for which the sender has a valid
-   non-expired SMTP STS policy, a sending MTA honoring SMTP STS can
+   non-expired SMTP STS policy, a sending MTA honoring SMTP STS MAY
    apply the result of a policy validation one of two ways:
 
    o  Report-only: In this mode, sending MTAs merely send a report to
       the designated report address indicating policy application
       failures.  This can be done "offline", i.e. based on the MTA logs,
       and is thus a suitable low-risk option for MTAs who wish to
-
+      enhance transparency of TLS tampering without making complicated
+      changes to production mail-handling infrastructure.
 
 
 
@@ -562,15 +562,12 @@ Margolis, et al.        Expires September 9, 2016              [Page 10]
 Internet-Draft                  SMTP-STS                      March 2016
 
 
-      enhance transparency of TLS tampering without making complicated
-      changes to production mail-handling infrastructure.
-
-   o  Enforced: In this mode, sending MTAs should treat STS policy
+   o  Enforced: In this mode, sending MTAs SHOULD treat STS policy
       failures, in which the policy action is "reject", as a mail
-      delivery error, and should terminate the SMTP connection, not
+      delivery error, and SHOULD terminate the SMTP connection, not
       delivering any more mail to the recipient MTA.
 
-   In enforced mode, however, sending MTAs should first check for a new
+   In enforced mode, however, sending MTAs MUST first check for a new
    _authenticated_ policy before actually treating a message failure as
    fatal.
 
@@ -594,20 +591,23 @@ Internet-Draft                  SMTP-STS                      March 2016
    Understanding the details of step 4 is critical to understanding the
    behavior of the system as a whole.
 
-   Remember that each policy has an expiration time (which may be long,
-   on the order of months) and a validation method.  With these two
-   mechanisms and the procedure specified in step 4, recipients who
-   publish a policy have, in effect, a means of updating a cached policy
-   at arbitrary intervals, without the risks (of a man-in-the-middle
-   attack) they would incur if they were to shorten the policy
-   expiration time.
+   Remember that each policy has an expiration time (which SHOULD be
+   long, on the order of days or months) and a validation method.  With
+   these two mechanisms and the procedure specified in step 4,
+   recipients who publish a policy have, in effect, a means of updating
+   a cached policy at arbitrary intervals, without the risks (of a man-
+   in-the-middle attack) they would incur if they were to shorten the
+   policy expiration time.
 
 10.  IANA Considerations
 
    There are no identifiers defined herein to be reserved by IANA.
 
+11.  Security Considerations
 
-
+   SMTP Strict Transport Security protects against an active attacker
+   who wishes to intercept or tamper with mail between hosts who support
+   STARTTLS.  There are two classes of attacks considered:
 
 
 
@@ -617,12 +617,6 @@ Margolis, et al.        Expires September 9, 2016              [Page 11]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
-
-11.  Security Considerations
-
-   SMTP Strict Transport Security protects against an active attacker
-   who wishes to intercept or tamper with mail between hosts who support
-   STARTTLS.  There are two classes of attacks considered:
 
    o  Foiling TLS negotiation, for example by deleting the "250
       STARTTLS" response from a server or altering TLS session
@@ -662,6 +656,12 @@ Internet-Draft                  SMTP-STS                      March 2016
         if update_cache:
           cache(policy)
 
+13.  Appendix 2: Domain Owner STS example record
+
+
+
+
+
 
 
 
@@ -672,9 +672,6 @@ Internet-Draft                  SMTP-STS                      March 2016
 Margolis, et al.        Expires September 9, 2016              [Page 12]
 
 Internet-Draft                  SMTP-STS                      March 2016
-
-
-13.  Appendix 2: Domain Owner STS example record
 
 
     The owner wishes to begin using STS
@@ -722,6 +719,9 @@ Internet-Draft                  SMTP-STS                      March 2016
     <!-- The constraints applied in a policy -->
     <xs:simpleType name="ConstraintType">
       <xs:restriction base="xs:string">
+        <xs:enumeration value="WebPKI"/>
+        <xs:enumeration value="TLSA"/>
+      </xs:restriction>
 
 
 
@@ -730,9 +730,6 @@ Margolis, et al.        Expires September 9, 2016              [Page 13]
 Internet-Draft                  SMTP-STS                      March 2016
 
 
-        <xs:enumeration value="WebPKI"/>
-        <xs:enumeration value="TLSA"/>
-      </xs:restriction>
     </xs:simpleType>
 
     <!-- The policy that was applied at send time. -->
@@ -778,6 +775,9 @@ Internet-Draft                  SMTP-STS                      March 2016
      <!-- Parent -->
     <xs:element name="feedback">
       <xs:complexType>
+        <xs:sequence>
+          <xs:element name="version"
+                      type="xs:decimal"/>
 
 
 
@@ -786,9 +786,6 @@ Margolis, et al.        Expires September 9, 2016              [Page 14]
 Internet-Draft                  SMTP-STS                      March 2016
 
 
-        <xs:sequence>
-          <xs:element name="version"
-                      type="xs:decimal"/>
           <xs:element name="report_metadata"
                       type="ReportMetadataType"/>
           <xs:element name="applied_policy"
@@ -834,6 +831,9 @@ Internet-Draft                  SMTP-STS                      March 2016
                  <connectedIp>98.22.33.99</connectedIp>
              </record>>
            </feedback>
+
+
+
 
 
 
