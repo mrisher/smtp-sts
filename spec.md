@@ -399,6 +399,12 @@ the policy description.
   certificate MUST be valid according to that record (as described by
   [@!RFC7672]).
 
+A sending MTA who does not support the validation method required--for example,
+an MTA that does not have a DNSSEC-compatible resolver--MUST behave as though
+the policy did not validate. As described in the section on _Policy_
+_Application_, a policy which has not ever been successfully validated MUST not
+be used to reject mail.
+
 # Policy Application
 
 When sending to an MX at a domain for which the sender has a valid non-expired
