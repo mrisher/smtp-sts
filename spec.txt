@@ -91,8 +91,8 @@ Table of Contents
    4.  Failure Reporting . . . . . . . . . . . . . . . . . . . . . .  10
    5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  12
    6.  Security Considerations . . . . . . . . . . . . . . . . . . .  12
-   7.  Future Work . . . . . . . . . . . . . . . . . . . . . . . . .  12
-   8.  Appendix 1: Validation Pseudocode . . . . . . . . . . . . . .  13
+   7.  Future Work . . . . . . . . . . . . . . . . . . . . . . . . .  13
+   8.  Appendix 1: Validation Pseudocode . . . . . . . . . . . . . .  14
    9.  Appendix 2: Domain Owner STS example record . . . . . . . . .  14
    10. Appendix 3: XML Schema for Failure Reports  . . . . . . . . .  14
    11. Appendix 4: Example report  . . . . . . . . . . . . . . . . .  16
@@ -133,14 +133,14 @@ Internet-Draft                  SMTP-STS                      March 2016
    o  how MTAs can validate the TLS server certificate presented during
       mail delivery
 
-   o  what an implementing sender SHOULD do with messages when TLS
+   o  what an implementing sender should do with messages when TLS
       cannot be be successfully negotiated
 
    The mechanism described is separated into four logical components:
 
-   1.  policy semantics: whether senders can expect a receiving server
-       for the recipient domain to support TLS encryption and how to
-       validate the TLS certificate presented
+   1.  policy semantics: whether senders can expect a server for the
+       recipient domain to support TLS encryption and how to validate
+       the TLS certificate presented
 
    2.  policy authentication: how to determine the authenticity of a
        published policy delivered via DNS
@@ -159,9 +159,9 @@ Internet-Draft                  SMTP-STS                      March 2016
 
    We also define the following terms for further use in this document:
 
-   o  policy: An STS policy is a definition of the expected TLS
-      availability for a given domain.
-
+   o  STS Policy: A definition of the expected TLS availability and
+      behavior, as well as the desired actions for a given domain when a
+      sending MTA encounters different results.
 
 
 
@@ -170,7 +170,7 @@ Margolis, et al.        Expires September 9, 2016               [Page 3]
 Internet-Draft                  SMTP-STS                      March 2016
 
 
-   o  Policy Domain: The domain against which a policy is defined.
+   o  Policy Domain: The domain against which an STS Policy is defined.
 
 2.  Related Technologies
 
@@ -188,7 +188,7 @@ Internet-Draft                  SMTP-STS                      March 2016
    records, whereas SMTP STS relies on the certificate authority (CA)
    system and a trust-on-first-use (TOFU) approach to avoid
    interception.  The TOFU model allows a degree of security similar to
-   that of HPKP [RFC7469], omitting both the complexity and the
+   that of HPKP [RFC7469], reducing the complexity but without the
    guarantees on first use offered by DNSSEC.  (For a thorough
    discussion of this trade-off, see the section _Security_
    _Considerations_.)
@@ -216,8 +216,8 @@ Internet-Draft                  SMTP-STS                      March 2016
       SMTP connections without the need to modify MTA codebases
       directly.
 
-   o  _Incrementalism:_ DANE does not provide a reporting mechanism, nor
-      does it have a concept of "report-only" failures; as a result, a
+   o  _Incrementalism:_ DANE does not provide a reporting mechanism and
+      does not have a concept of "report-only" for failures; as a
 
 
 
@@ -226,8 +226,8 @@ Margolis, et al.        Expires September 9, 2016               [Page 4]
 Internet-Draft                  SMTP-STS                      March 2016
 
 
-      service provider has no choice but to "flip the switch" and affect
-      the entire mail stream at once.
+      result, a service provider has no choice but to "flip the switch"
+      and affect the entire mail stream at once.
 
 2.4.  Disadvantages When Used Without DANE
 
@@ -266,14 +266,14 @@ Internet-Draft                  SMTP-STS                      March 2016
 
    o  to: TLS-Only (plain-text, required).  If "true," the receiving MTA
       requests that messages be delivered only if they conform to the
-      STS policy.
+      STS policy.  If "false," the receiving MTA requests that failure
+      reports be delivered, as specified by the "rua" parameter.
 
    o  mx: MX patterns (comma-separated list of plain-text MX match
       patterns, required).  One or more comma-separated patterns
       matching the expected MX for this domain.  For example,
       "_.example.com,_.example.net" indicates that mail for this domain
-      might be handled by any MX whose hostname is a subdomain of
-      "example.com" or "example.net."
+
 
 
 
@@ -281,6 +281,9 @@ Margolis, et al.        Expires September 9, 2016               [Page 5]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
+
+      might be handled by any MX whose hostname is a subdomain of
+      "example.com" or "example.net."
 
    o  a: The mechanism to use to authenticate this policy itself.  See
       the section _Policy_ _Authentication_ for more details.  Possible
@@ -315,9 +318,6 @@ Internet-Draft                  SMTP-STS                      March 2016
 
    The formal definition of the SMTP STS format, using [RFC5234], is as
    follows:
-
-
-
 
 
 
@@ -600,11 +600,11 @@ Internet-Draft                  SMTP-STS                      March 2016
       *  starttls-not-supported: This indicates that the recipient MX
          did not support STARTTLS.
 
-      *  tlsa-invalid: This indicates a validation error for policy
-         domain specifying "tlsa" validation.
+      *  tlsa-invalid: This indicates a validation error for Policy
+         Domain specifying "tlsa" validation.
 
       *  dnssec-invalid: This indicates a failure to validate DNS
-         records for a policy domain specifying "tlsa" validation or
+         records for a Policy Domain specifying "tlsa" validation or
          "dnssec" authentication.
 
       *  sender-does-not-support-validation-method: This indicates the
@@ -631,7 +631,11 @@ Internet-Draft                  SMTP-STS                      March 2016
 
 5.  IANA Considerations
 
-   There are no identifiers defined herein to be reserved by IANA.
+   The ".well-known" URI for Policy Domains to host their STS Policies
+   will be registered by following the procedure documented in [RFC5785]
+   (i.e. sending a request to the "wellknown-uri-review@ietf.org"
+   mailing list for review and comment).  The proposed URI-suffix is
+   "smtp-sts".
 
 6.  Security Considerations
 
@@ -658,14 +662,10 @@ Internet-Draft                  SMTP-STS                      March 2016
    recipient mail service (e.g. by compromising a certificate authority)
    are thus out of scope of this threat model.
 
-7.  Future Work
-
-   The authors would like to suggest multiple considerations for future
-   discussion.
-
-   o  Certificate pinning: One potential improvement in the robustness
-      of the certificate validation methods discussed would be the
-      deployment of public-key pinning as defined for HTTP in [RFC7469].
+   In the WebPKI constraint mode, an attacker who is able to block DNS
+   responses can suppress the delivery of an STS Policy, making the
+   Policy Domain appear not to have an STS Policy.  The caching model
+   described in _Policy_ _Expirations_ is designed to resist this
 
 
 
@@ -674,12 +674,23 @@ Margolis, et al.        Expires September 9, 2016              [Page 12]
 Internet-Draft                  SMTP-STS                      March 2016
 
 
+   attack, and there is discussion in the _Future_ _Work_ section around
+   future distribution mechanisms that are robust against this attack.
+
+7.  Future Work
+
+   The authors would like to suggest multiple considerations for future
+   discussion.
+
+   o  Certificate pinning: One potential improvement in the robustness
+      of the certificate validation methods discussed would be the
+      deployment of public-key pinning as defined for HTTP in [RFC7469].
       A policy extension supporting these semantics would enable Policy
       Domains to specify certificates that MUST appear in the MX
       certificate chain, thus providing resistence against compromised
       CA or DNSSEC zone keys.
 
-   o  Policy transparency: As with Certificate Transparency ([RFC6962]),
+   o  Policy distribution: As with Certificate Transparency ([RFC6962]),
       it may be possible to provide a verifiable log of policy
       _observations_ (meaning which policies have been observed for a
       given Policy Domain).  This would provide insight into policy
@@ -709,17 +720,6 @@ Internet-Draft                  SMTP-STS                      March 2016
 
    o  The registration of the .well-known/smtp-sts URI as per [RFC5785].
 
-8.  Appendix 1: Validation Pseudocode
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -729,6 +729,8 @@ Margolis, et al.        Expires September 9, 2016              [Page 13]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
+
+8.  Appendix 1: Validation Pseudocode
 
       policy = policy_from_cache()
       if not policy or is_expired(policy):
@@ -776,8 +778,6 @@ Internet-Draft                  SMTP-STS                      March 2016
     <xs:complexType name="DateRangeType">
       <xs:all>
         <xs:element name="begin" type="xs:integer"/>
-        <xs:element name="end" type="xs:integer"/>
-      </xs:all>
 
 
 
@@ -786,6 +786,8 @@ Margolis, et al.        Expires September 9, 2016              [Page 14]
 Internet-Draft                  SMTP-STS                      March 2016
 
 
+        <xs:element name="end" type="xs:integer"/>
+      </xs:all>
     </xs:complexType>
 
     <!-- Report generator metadata. -->
@@ -832,8 +834,6 @@ Internet-Draft                  SMTP-STS                      March 2016
       </xs:restriction>
     </xs:simpleType>
 
-    <!-- The possible enforcement level: whether the reporter also drops
-         messages -->
 
 
 
@@ -842,6 +842,8 @@ Margolis, et al.        Expires September 9, 2016              [Page 15]
 Internet-Draft                  SMTP-STS                      March 2016
 
 
+    <!-- The possible enforcement level: whether the reporter also drops
+         messages -->
     <xs:simpleType name="EnforcementLevelType">
       <xs:restriction base="xs:string">
         <xs:enumeration value="ReportOnly"/>
@@ -880,8 +882,6 @@ Internet-Draft                  SMTP-STS                      March 2016
  </xs:schema>
 
 11.  Appendix 4: Example report
-
-
 
 
 
