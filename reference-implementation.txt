@@ -16,9 +16,11 @@ Table of contents
  1. Introduction
  2. Test purpose
  3. Description of the test bed
- 4. Test cases
-  4.1. SMTP Transmission fullfilling SMTP-STS policy
-  4.2. SMTP Transmission violating SMTP-STS policy
+ 4. Test infrastructure
+  4.1. Nameserver
+ X. Test cases
+  X.1. SMTP Transmission fullfilling SMTP-STS policy
+  X.2. SMTP Transmission violating SMTP-STS policy
   
   
   1.Introduction
@@ -46,6 +48,114 @@ Table of contents
     The hosts reply to an echo@$HOSTNAME mail with a dump of the mail header and other relevant debug information.
     Denis and dionys are the authoritative nameserver for the testing domain sts-test.org.
     
+    
+  4. Test infrastructure
+  
+  4.1. Nameserver
+  
+  DNS name resolution is provided by denis.sts-test.org (master) and dionys.sts-test.org (slave) on both servers runs bind 9.9.5 which supports DNSSEC.
+  
+  Configuration of denis.sts-test.org (master)
+  	
+  	root@denis:/# cat /etc/bind/named.conf.local 
+	//
+	// Do any local configuration here
+	//
+
+	// Consider adding the 1918 zones here, if they are not used in your
+	// organization
+	//include "/etc/bind/zones.rfc1918";
+
+	zone "sts-test.org" {
+        	type master;
+        	allow-transfer {212.227.72.244;};
+        	also-notify {212.227.72.244;};
+        	file "/etc/bind/pri.sts-test.org";
+	};
+	
+	
+	
+  Zone file for sts-test.org
+  
+  	root@denis:/# cat /etc/bind/pri.sts-test.org
+	$TTL        3600
+	@       IN      SOA     denis.sts-test.org. zonemaster.sts-test.org. (
+                        2016031801       ; serial, todays date + todays serial #
+                        300     C         ; refresh, seconds
+                        100              ; retry, seconds
+                        6000              ; expire, seconds
+                        600 )            ; negative caching, seconds
+	;
+
+	denis.sts-org. 300 A        212.227.72.64
+	sts-test.org. 300      MX    10   alice.sts-test.org.
+	sts-test.org. 300      NS        denis.sts-test.org.
+	sts-test.org. 300      NS        dionys.sts-test.org.
+	sts-test.org. 300      TXT        "v=spf1 a mx ptr -all"
+	mail 300 A        1.2.3.4
+	alice           300 A           217.160.15.201
+	bob             300 A           217.160.13.217
+	mallory         300 A           217.227.8.129
+	denis           300 A           217.227.72.64
+	dionys          300 A           217.227.72.244
+
+
+  Configuration of dionys.sts-test.org (slave)
+  
+  root@dionys:/# cat /etc/bind/named.conf.local 
+
+	// Consider adding the 1918 zones here, if they are not used in your
+	// organization
+	//include "/etc/bind/zones.rfc1918";
+
+	zone "sts-test.org" {
+        	type slave;
+        	masters {212.227.72.64;};
+        	allow-transfer {none;};
+        	also-notify {212.227.72.64;};
+        	file "/etc/bind/slave/sec.sts-test.org";
+	};
+
+
+
+	root@dionys:/# mkdir /etc/bind/slave/
+	root@dionys:/# chown -R bind:bind /etc/bind/slave
+
+  
+  
+  Check that everything works fine:
+
+  root@denis:/# dig MX sts-test.org @dionys.sts-test.org
+
+; <<>> DiG 9.9.5-9+deb8u6-Debian <<>> MX sts-test.org @dionys.sts-test.org
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 40866
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 2, ADDITIONAL: 4
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;sts-test.org.                  IN      MX
+
+;; ANSWER SECTION:
+sts-test.org.           300     IN      MX      10 alice.sts-test.org.
+
+;; AUTHORITY SECTION:
+sts-test.org.           300     IN      NS      denis.sts-test.org.
+sts-test.org.           300     IN      NS      dionys.sts-test.org.
+
+;; ADDITIONAL SECTION:
+alice.sts-test.org.     300     IN      A       217.160.15.201
+denis.sts-test.org.     300     IN      A       217.227.72.64
+dionys.sts-test.org.    300     IN      A       217.227.72.244
+
+;; Query time: 2 msec
+;; SERVER: 212.227.72.64#53(212.227.72.64)
+;; WHEN: Fri Mar 18 17:13:46 CET 2016
+;; MSG SIZE  rcvd: 152
+
+
 	    
     
     
