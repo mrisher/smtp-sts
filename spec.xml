@@ -219,7 +219,7 @@ specifying:
 <t>whether MTAs sending mail to this domain can expect TLS support</t>
 <t>how MTAs can validate the TLS server certificate presented during mail
  delivery</t>
-<t>what an implementing sender SHOULD do with messages when TLS cannot be be
+<t>what an implementing sender should do with messages when TLS cannot be be
  successfully negotiated</t>
 </list>
 </t>
@@ -227,7 +227,7 @@ specifying:
 </t>
 <t>
 <list style="numbers">
-<t>policy semantics: whether senders can expect a receiving server for the
+<t>policy semantics: whether senders can expect a server for the
   recipient domain to support TLS encryption and how to validate the TLS
   certificate presented</t>
 <t>policy authentication: how to determine the authenticity of a published
@@ -248,9 +248,10 @@ they appear in this document, are to be interpreted as described in <xref target
 </t>
 <t>
 <list style="symbols">
-<t>policy: An STS policy is a definition of the expected TLS availability for a
-given domain.</t>
-<t>Policy Domain: The domain against which a policy is defined.</t>
+<t>STS Policy: A definition of the expected TLS availability and behavior, as
+well as the desired actions for a given domain when a sending MTA encounters
+different results.</t>
+<t>Policy Domain: The domain against which an STS Policy is defined.</t>
 </list>
 </t>
 </section>
@@ -269,7 +270,7 @@ for reporting TLS negotiation failures.
 requires the use of DNSSEC to authenticate DANE TLSA records, whereas SMTP STS
 relies on the certificate authority (CA) system and a trust-on-first-use (TOFU)
 approach to avoid interception. The TOFU model allows a degree of security
-similar to that of HPKP <xref target="RFC7469"/>, omitting both the complexity and the
+similar to that of HPKP <xref target="RFC7469"/>, reducing the complexity but without the
 guarantees on first use offered by DNSSEC. (For a thorough discussion of this
 trade-off, see the section <spanx style="emph">Security</spanx> <spanx style="emph">Considerations</spanx>.)
 </t>
@@ -297,8 +298,8 @@ advantages compared to DANE:
  analysis of STARTTLS failures, enabling mail providers to gain insight into
  the security of their SMTP connections without the need to modify MTA
  codebases directly.</t>
-<t><spanx style="emph">Incrementalism:</spanx> DANE does not provide a reporting mechanism, nor does it
- have a concept of &quot;report-only&quot; failures; as a result, a service provider
+<t><spanx style="emph">Incrementalism:</spanx> DANE does not provide a reporting mechanism and does not
+ have a concept of &quot;report-only&quot; for failures; as a result, a service provider
  has no choice but to &quot;flip the switch&quot; and affect the entire mail stream at
  once.</t>
 </list>
@@ -341,7 +342,9 @@ distribution. See the section <spanx style="emph">Future</spanx> <spanx style="e
 <list style="symbols">
 <t>v: Version (plain-text, required). Currently only &quot;STS1&quot; is supported.</t>
 <t>to:  TLS-Only (plain-text, required). If “true,” the receiving MTA requests
-that messages be delivered only if they conform to the STS policy.</t>
+that messages be delivered only if they conform to the STS policy. If &quot;false,&quot;
+the receiving MTA requests that failure reports be delivered, as specified by
+the <spanx style="verb">rua</spanx> parameter.</t>
 <t>mx: MX patterns (comma-separated list of plain-text MX match patterns,
 required). One or more comma-separated patterns matching the expected MX for
 this domain. For example, &quot;<spanx style="emph">.example.com,</spanx>.example.net&quot; indicates that mail
@@ -601,10 +604,10 @@ record for the recipient MX.)</t>
 <t>expired-certificate: This indicates that the certificate has expired.</t>
 <t>starttls-not-supported: This indicates that the recipient MX did not support
 STARTTLS.</t>
-<t>tlsa-invalid: This indicates a validation error for policy domain specifying
+<t>tlsa-invalid: This indicates a validation error for Policy Domain specifying
 &quot;tlsa&quot; validation.</t>
 <t>dnssec-invalid: This indicates a failure to validate DNS records for a
-policy domain specifying &quot;tlsa&quot; validation or &quot;dnssec&quot; authentication.</t>
+Policy Domain specifying &quot;tlsa&quot; validation or &quot;dnssec&quot; authentication.</t>
 <t>sender-does-not-support-validation-method: This indicates the sending system
 can never validate using the requested validation mechanism.</t>
 </list></t>
@@ -622,7 +625,10 @@ TLSA failures.
 </section>
 
 <section anchor="iana-considerations" title="IANA Considerations">
-<t>There are no identifiers defined herein to be reserved by IANA.
+<t>The <spanx style="verb">.well-known</spanx> URI for Policy Domains to host their STS Policies will be
+registered by following the procedure documented in <xref target="RFC5785"/> (i.e. sending a
+request to the <spanx style="verb">wellknown-uri-review@ietf.org</spanx> mailing list for review and comment).
+The proposed URI-suffix is <spanx style="verb">smtp-sts</spanx>.
 </t>
 </section>
 
@@ -650,6 +656,12 @@ to obtain a valid certificate for the targeted recipient mail service (e.g. by
 compromising a certificate authority) are thus out of scope of this threat
 model.
 </t>
+<t>In the WebPKI constraint mode, an attacker who is able to block DNS responses can
+suppress the delivery of an STS Policy, making the Policy Domain appear not to have
+an STS Policy. The caching model described in <spanx style="emph">Policy</spanx> <spanx style="emph">Expirations</spanx> is designed to
+resist this attack, and there is discussion in the <spanx style="emph">Future</spanx> <spanx style="emph">Work</spanx> section around
+future distribution mechanisms that are robust against this attack.
+</t>
 </section>
 
 <section anchor="future-work" title="Future Work">
@@ -663,7 +675,7 @@ pinning as defined for HTTP in <xref target="RFC7469"/>. A policy extension supp
 these semantics would enable Policy Domains to specify certificates that MUST
 appear in the MX certificate chain, thus providing resistence against
 compromised CA or DNSSEC zone keys.</t>
-<t>Policy transparency: As with Certificate Transparency (<xref target="RFC6962"/>), it may be
+<t>Policy distribution: As with Certificate Transparency (<xref target="RFC6962"/>), it may be
 possible to provide a verifiable log of policy <spanx style="emph">observations</spanx> (meaning which
 policies have been observed for a given Policy Domain). This would provide
 insight into policy spoofing or faked policy non-existence. This may be

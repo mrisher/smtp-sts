@@ -144,8 +144,9 @@ they appear in this document, are to be interpreted as described in [@!RFC2119].
 
 We also define the following terms for further use in this document:
 
-* STS Policy: A definition of the expected TLS availability and behavior, as well as the desired actions for a
-  given domain when a sending MTA encounters different results.
+* STS Policy: A definition of the expected TLS availability and behavior, as
+  well as the desired actions for a given domain when a sending MTA encounters
+  different results.
 * Policy Domain: The domain against which an STS Policy is defined.
 
 # Related Technologies
