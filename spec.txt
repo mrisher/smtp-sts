@@ -16,6 +16,9 @@ Expires: September 9, 2016                                     W. Chuang
                                                           Microsoft, Inc
                                                                F. Martin
                                                                 LinkedIn
+                                                               K. Umbach
+                                                                M. Laber
+                          1&1 Mail & Media Development & Technology GmbH
                                                            March 8, 2016
 
 
@@ -46,9 +49,6 @@ Status of This Memo
    material or to cite them other than as "work in progress."
 
    This Internet-Draft will expire on September 9, 2016.
-
-
-
 
 
 
@@ -1028,16 +1028,16 @@ Internet-Draft                  SMTP-STS                      March 2016
    Email: fmartin (at) linkedin (dot com)
 
 
+   Klaus Umbach
+   1&1 Mail & Media Development & Technology GmbH
+
+   Email: klaus.umbach (at) 1und1 (dot de)
 
 
+   Markus Laber
+   1&1 Mail & Media Development & Technology GmbH
 
-
-
-
-
-
-
-
+   Email: markus.laber (at) 1und1 (dot de)
 
 
 

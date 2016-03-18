@@ -147,6 +147,36 @@
 <uri></uri>
 </address>
 </author>
+<author initials="K." surname="Umbach" fullname="Klaus Umbach">
+<organization>1&amp;1 Mail &amp; Media Development &amp; Technology GmbH</organization>
+<address>
+<postal>
+<street></street>
+<city></city>
+<code></code>
+<country></country>
+<region></region>
+</postal>
+<phone></phone>
+<email>klaus.umbach (at) 1und1 (dot de)</email>
+<uri></uri>
+</address>
+</author>
+<author initials="M." surname="Laber" fullname="Markus Laber">
+<organization>1&amp;1 Mail &amp; Media Development &amp; Technology GmbH</organization>
+<address>
+<postal>
+<street></street>
+<city></city>
+<code></code>
+<country></country>
+<region></region>
+</postal>
+<phone></phone>
+<email>markus.laber (at) 1und1 (dot de)</email>
+<uri></uri>
+</address>
+</author>
 <date year="2016" month="March" day="8"/>
 
 <area>Applications</area>

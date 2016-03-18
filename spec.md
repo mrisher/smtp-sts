@@ -74,6 +74,20 @@
    organization="LinkedIn"
      [author.address]
      email="fmartin (at) linkedin (dot com)"
+   [[author]]
+   initials="K."
+   surname="Umbach"
+   fullname="Klaus Umbach"
+   organization="1&1 Mail & Media Development & Technology GmbH"
+     [author.address]
+     email="klaus.umbach (at) 1und1 (dot de)"
+   [[author]]
+   initials="M."
+   surname="Laber"
+   fullname="Markus Laber"
+   organization="1&1 Mail & Media Development & Technology GmbH"
+     [author.address]
+     email="markus.laber (at) 1und1 (dot de)"
 
 %%%
 
