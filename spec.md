@@ -2,7 +2,7 @@
 
    Title = "SMTP Strict Transport Security"
    abbrev = "SMTP-STS"
-   category = "exp"
+   category = "std"
    docName = "draft-ietf-uta-smtp-sts-01"
    ipr = "trust200902"
    area = "Applications"

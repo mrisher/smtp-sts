@@ -4,7 +4,7 @@
 
 Using TLS in Applications                                    D. Margolis
 Internet-Draft                                                 M. Risher
-Intended status: Experimental                              N. Lidzborski
+Intended status: Standards Track                           N. Lidzborski
 Expires: September 9, 2016                                     W. Chuang
                                                                  B. Long
                                                              Google, Inc
