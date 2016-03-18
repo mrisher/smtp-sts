@@ -301,48 +301,6 @@ recursive resolver. Consequently, a sender MAY treat a policy as valid for up to
 {expiration time} + {DNS TTL}. Publishers SHOULD thus continue to expect senders
 to apply old policies for up to this duration.
 
-# Failure Reporting
-
-Aggregate statistics on policy failures MAY be reported to the URI indicated
-in the "rua" field of the policy. SMTP STS reports contain information about
-policy failures to allow diagnosis of misconfigurations and malicious activity.
-
-(There may also be a need for enabling more detailed "forensic" reporting during
-initial stages of a deployment. To address this, the authors consider the
-possibility of an optional additional "forensic reporting mode" in which more
-details--such as certificate chains and MTA banners--may be reported. See the
-section _Future_ _Work_ for more details.)
-
-Aggregate reports contain the following fields:
-
-* The SMTP STS policy applied (as a string)
-* The beginning and end of the reporting period
-
-Repeated records contain the following fields:
-
-* Failure type: This list will start with the minimal set below, and is expected
-  to grow over time based on real-world experience. The initial set is:
-* mx-mismatch: This indicates that the MX resolved for the recipient domain did
-  not match the MX constraint specified in the policy.
-* certificate-mismatch: This indicates that the certificate presented by the
-  receiving MX did not match the MX hostname
-* invalid-certificate: This indicates that the certificate presented by the
-  receiving MX did not validate according to the policy validation constraint.
-  (Either it was not signed by a trusted CA or did not match the DANE TLSA
-  record for the recipient MX.)
-* expired-certificate: This indicates that the certificate has expired.
-* starttls-not-supported: This indicates that the recipient MX did not support
-  STARTTLS.
-* Count: The number of times the error was encountered.
-* Hostname: The hostname of the recipient MX.
-
-Note that the failure types are non-exclusive; an aggregate report MAY contain
-overlapping counts of failure types where a single send attempt encountered
-multiple errors.
-
-When sending failure reports, sending MTAs MUST NOT honor SMTP STS or DANE
-TLSA failures.
-
 # Policy Authentication
 
 The security of a domain implementing an SMTP STS policy against an active
@@ -448,6 +406,48 @@ the procedure specified in step 4, recipients who publish a policy have, in
 effect, a means of updating a cached policy at arbitrary intervals, without the
 risks (of a man-in-the-middle attack) they would incur if they were to shorten
 the policy expiration time.
+
+# Failure Reporting
+
+Aggregate statistics on policy failures MAY be reported to the URI indicated
+in the "rua" field of the policy. SMTP STS reports contain information about
+policy failures to allow diagnosis of misconfigurations and malicious activity.
+
+(There may also be a need for enabling more detailed "forensic" reporting during
+initial stages of a deployment. To address this, the authors consider the
+possibility of an optional additional "forensic reporting mode" in which more
+details--such as certificate chains and MTA banners--may be reported. See the
+section _Future_ _Work_ for more details.)
+
+Aggregate reports contain the following fields:
+
+* The SMTP STS policy applied (as a string)
+* The beginning and end of the reporting period
+
+Repeated records contain the following fields:
+
+* Failure type: This list will start with the minimal set below, and is expected
+  to grow over time based on real-world experience. The initial set is:
+* mx-mismatch: This indicates that the MX resolved for the recipient domain did
+  not match the MX constraint specified in the policy.
+* certificate-mismatch: This indicates that the certificate presented by the
+  receiving MX did not match the MX hostname
+* invalid-certificate: This indicates that the certificate presented by the
+  receiving MX did not validate according to the policy validation constraint.
+  (Either it was not signed by a trusted CA or did not match the DANE TLSA
+  record for the recipient MX.)
+* expired-certificate: This indicates that the certificate has expired.
+* starttls-not-supported: This indicates that the recipient MX did not support
+  STARTTLS.
+* Count: The number of times the error was encountered.
+* Hostname: The hostname of the recipient MX.
+
+Note that the failure types are non-exclusive; an aggregate report MAY contain
+overlapping counts of failure types where a single send attempt encountered
+multiple errors.
+
+When sending failure reports, sending MTAs MUST NOT honor SMTP STS or DANE
+TLSA failures.
 
 # IANA Considerations
 
