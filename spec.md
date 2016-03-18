@@ -606,6 +606,9 @@ _smtp_sts  IN TXT ( "v=STS1; to=false; "
        <xs:enumeration value="InvalidCertificate"/>
        <xs:enumeration value="ExpiredCertificate"/>
        <xs:enumeration value="StarttlsNotSupported"/>
+       <xs:enumeration value="TlsaInvalid"/>
+       <xs:enumeration value="DnssecInvalid"/>
+       <xs:enumeration value="SenderDoesNotSupportValidationMethod"/>
      </xs:restriction>
    </xs:simpleType>
 
