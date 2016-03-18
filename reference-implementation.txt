@@ -31,14 +31,21 @@ Table of contents
     
   3. Description of the test bed
   
-    The test bed consists of three hosts:
+    The test bed consists of five hosts:
     
+    	MTAs:
      	alice.sts-test.org 		217.160.15.201
 	bob.sts-test.org 		217.160.13.217	
 	mallory.sts-test.org 		212.227.8.129
+	Nameserver:
+	denis 				212.227.72.64  	
+	dionys 				212.227.72.244
+	
 	    
-    Each server runs a MTA. Alice an Bob represent communication partners A/B and simulate regular SMTP-STS secured mail transfers. Mallory simulates possible STARTTLS downgrade attacks and other STS policy violations.
+    Alice,bob and mallory run a MTA. Alice an Bob represent communication partners A/B and simulate regular SMTP-STS secured mail transfers. Mallory simulates possible STARTTLS downgrade attacks and other STS policy violations.
     The hosts reply to an echo@$HOSTNAME mail with a dump of the mail header and other relevant debug information.
+    Denis and dionys are the authoritative nameserver for the testing domain sts-test.org.
+    
 	    
     
     
