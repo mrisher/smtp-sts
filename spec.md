@@ -550,8 +550,9 @@ _smtp_sts  IN TXT ( "v=STS1; to=false; "
 # Appendix 3: XML Schema for Failure Reports
 ~~~~~~~~~
 <?xml version="1.0"?>
-   <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-     targetNamespace="http://www.example.org/smtp-sts-xml/0.1">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://www.example.org/smtp-sts-xml/0.1"
+    xmlns:tns="http://www.example.org/smtp-sts-xml/0.1">
    <!-- The time range in UTC covered by messages in this report,
         specified in seconds since epoch. -->
    <xs:complexType name="DateRangeType">
@@ -569,7 +570,7 @@ _smtp_sts  IN TXT ( "v=STS1; to=false; "
        <xs:element name="extra_contact_info" type="xs:string"
                    minOccurs="0"/>
        <xs:element name="report_id" type="xs:string"/>
-       <xs:element name="date_range" type="DateRangeType"/>
+       <xs:element name="date_range" type="tns:DateRangeType"/>
      </xs:sequence>
    </xs:complexType>
 
@@ -587,8 +588,8 @@ _smtp_sts  IN TXT ( "v=STS1; to=false; "
      <xs:all>
        <xs:element name="domain" type="xs:string"/>
        <xs:element name="mx" type="xs:string"
-           minOccurs="1" maxOccurs="unbounded"/>
-       <xs:element name="constraint" type="ConstraintType"/>
+           minOccurs="1" />
+       <xs:element name="constraint" type="tns:ConstraintType"/>
      </xs:all>
    </xs:complexType>
 
@@ -614,7 +615,7 @@ _smtp_sts  IN TXT ( "v=STS1; to=false; "
    <!-- Record for individual failure types. -->
    <xs:complexType name="FailureRecordType">
      <xs:all>
-       <xs:element name="failure" type="FailureType"/>
+       <xs:element name="failure" type="tns:FailureType"/>
        <xs:element name="count" type="xs:integer"/>
        <xs:element name="hostname" type="xs:string"/>
        <xs:element name="connectedIp" type="xs:string" minOccurs="0"/>
@@ -629,23 +630,22 @@ _smtp_sts  IN TXT ( "v=STS1; to=false; "
          <xs:element name="version"
                      type="xs:decimal"/>
          <xs:element name="report_metadata"
-                     type="ReportMetadataType"/>
+                     type="tns:ReportMetadataType"/>
          <xs:element name="applied_policy"
-                     type="AppliedPolicyType"/>
+                     type="tns:AppliedPolicyType"/>
    <xs:element name="enforcement_level"
-   type="EnforcementLevelType"/>
-         <xs:element name="record" type="FailureRecordType"
+   type="tns:EnforcementLevelType"/>
+         <xs:element name="record" type="tns:FailureRecordType"
                      maxOccurs="unbounded"/>
        </xs:sequence>
      </xs:complexType>
    </xs:element>
- </xs:schema>
+</xs:schema>
 ~~~~~~~~~
 
 # Appendix 4: Example report
 ~~~~~~~~~
-<?xml>
-<feedback>
+<feedback xmlns="http://www.example.org/smtp-sts-xml/0.1">
   <version>1</version>
   <report_metadata>
     <org_name>Company XYZ</org_name>
@@ -666,13 +666,13 @@ _smtp_sts  IN TXT ( "v=STS1; to=false; "
       <count>13128</count>
       <hostname>mta7.am0.yahoodns.net.</hostname>
       <connectedIp> 98.136.216.25</connectedIp>
-  </record>>
+  </record>
   <record>
       <failure>StarttlsNotSupported</failure>
       <count>19</count>
       <hostname>mta7.am0.yahoodns.net.</hostname>
       <connectedIp>98.22.33.99</connectedIp>
-  </record>>
+  </record>
 </feedback>
 ~~~~~~~~~
 
