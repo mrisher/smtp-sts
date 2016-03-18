@@ -1,0 +1,46 @@
+
+Using TLS in Applications                                    M. Laber
+Reference implementation                                     K. Umbach         
+
+
+
+                     SMTP Strict Transport Security
+                       Reference implementation
+
+Abstract
+
+This document describes a reference implementation of SMTP-STS based on unmodified open source software.
+
+
+Table of contents
+ 1. Introduction
+ 2. Test purpose
+ 3. Description of the test bed
+ 4. Test cases
+  4.1. SMTP Transmission fullfilling SMTP-STS policy
+  4.2. SMTP Transmission violating SMTP-STS policy
+  
+  
+  1.Introduction
+  
+    SMTP-STS prevents TLS secured SMTP transmissions from possible downgrade attacks by validating a defined policy which describes the expected TLS behavior and other security relevant parameters for the domain.
+    Therefor sending and receiving MTAs have to interpret the DNS referenced SMTP-STS policy and construct automatic MTA specific rules and configuration.
+    
+    This reference implementation uses the commonly used open source MTA 'Exim' without any modifications.
+    
+    
+  3. Description of the test bed
+  
+    The test bed consists of three hosts:
+    
+     	alice.sts-test.org 		217.160.15.201
+	bob.sts-test.org 		217.160.13.217	
+	mallory.sts-test.org 		212.227.8.129
+	    
+    Each server runs a MTA. Alice an Bob represent communication partners A/B and simulate regular SMTP-STS secured mail transfers. Mallory simulates possible STARTTLS downgrade attacks and other STS policy violations.
+    The hosts reply to an echo@$HOSTNAME mail with a dump of the mail header and other relevant debug information.
+	    
+    
+    
+ 
+ 

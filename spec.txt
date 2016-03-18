@@ -89,8 +89,8 @@ Table of Contents
    7.  Policy Authentication . . . . . . . . . . . . . . . . . . . .   9
    8.  Policy Validation . . . . . . . . . . . . . . . . . . . . . .  10
    9.  Policy Application  . . . . . . . . . . . . . . . . . . . . .  10
-   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  11
-   11. Security Considerations . . . . . . . . . . . . . . . . . . .  11
+   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  12
+   11. Security Considerations . . . . . . . . . . . . . . . . . . .  12
    12. Future Work . . . . . . . . . . . . . . . . . . . . . . . . .  12
    13. Appendix 1: Validation Pseudocode . . . . . . . . . . . . . .  13
    14. Appendix 2: Domain Owner STS example record . . . . . . . . .  13
@@ -542,18 +542,18 @@ Internet-Draft                  SMTP-STS                      March 2016
       and the presented certificate MUST be valid according to that
       record (as described by [RFC7672]).
 
+   A sending MTA who does not support the validation method required--
+   for example, an MTA that does not have a DNSSEC-compatible resolver--
+   MUST behave as though the policy did not validate.  As described in
+   the section on _Policy_ _Application_, a policy which has not ever
+   been successfully validated MUST not be used to reject mail.
+
 9.  Policy Application
 
    When sending to an MX at a domain for which the sender has a valid
    non-expired SMTP STS policy, a sending MTA honoring SMTP STS MAY
    apply the result of a policy validation one of two ways:
 
-   o  Report-only: In this mode, sending MTAs merely send a report to
-      the designated report address indicating policy application
-      failures.  This can be done "offline", i.e. based on the MTA logs,
-      and is thus a suitable low-risk option for MTAs who wish to
-      enhance transparency of TLS tampering without making complicated
-      changes to production mail-handling infrastructure.
 
 
 
@@ -561,6 +561,13 @@ Margolis, et al.        Expires September 9, 2016              [Page 10]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
+
+   o  Report-only: In this mode, sending MTAs merely send a report to
+      the designated report address indicating policy application
+      failures.  This can be done "offline", i.e. based on the MTA logs,
+      and is thus a suitable low-risk option for MTAs who wish to
+      enhance transparency of TLS tampering without making complicated
+      changes to production mail-handling infrastructure.
 
    o  Enforced: In this mode, sending MTAs SHOULD treat STS policy
       failures, in which the policy action is "reject", as a mail
@@ -599,15 +606,8 @@ Internet-Draft                  SMTP-STS                      March 2016
    in-the-middle attack) they would incur if they were to shorten the
    policy expiration time.
 
-10.  IANA Considerations
 
-   There are no identifiers defined herein to be reserved by IANA.
 
-11.  Security Considerations
-
-   SMTP Strict Transport Security protects against an active attacker
-   who wishes to intercept or tamper with mail between hosts who support
-   STARTTLS.  There are two classes of attacks considered:
 
 
 
@@ -617,6 +617,16 @@ Margolis, et al.        Expires September 9, 2016              [Page 11]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
+
+10.  IANA Considerations
+
+   There are no identifiers defined herein to be reserved by IANA.
+
+11.  Security Considerations
+
+   SMTP Strict Transport Security protects against an active attacker
+   who wishes to intercept or tamper with mail between hosts who support
+   STARTTLS.  There are two classes of attacks considered:
 
    o  Foiling TLS negotiation, for example by deleting the "250
       STARTTLS" response from a server or altering TLS session
@@ -656,6 +666,14 @@ Internet-Draft                  SMTP-STS                      March 2016
       given Policy Domain).  This would provide insight into policy
       spoofing or faked policy non-existence.  This may be particularly
       useful for Policy Domains not using DNSSEC, since it would provide
+
+
+
+Margolis, et al.        Expires September 9, 2016              [Page 12]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
+
       sending MTAs an authoritative source for whether a policy is
       expected for a given domain.
 
@@ -666,14 +684,6 @@ Internet-Draft                  SMTP-STS                      March 2016
       misconfigurations.  However, the security properties of a
       "receiver-enforced" system differ from those of the current
       design; in particular, an active man-in-the-middle attacker may be
-
-
-
-Margolis, et al.        Expires September 9, 2016              [Page 12]
-
-Internet-Draft                  SMTP-STS                      March 2016
-
-
       able to exploit misconfigured sending MTAs in a way that would not
       be possible today with a sender-enforced model.
 
@@ -708,16 +718,6 @@ Internet-Draft                  SMTP-STS                      March 2016
           cache(policy)
 
 14.  Appendix 2: Domain Owner STS example record
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -806,6 +806,9 @@ Internet-Draft                  SMTP-STS                      March 2016
         <xs:enumeration value="InvalidCertificate"/>
         <xs:enumeration value="ExpiredCertificate"/>
         <xs:enumeration value="StarttlsNotSupported"/>
+        <xs:enumeration value="TlsaInvalid"/>
+        <xs:enumeration value="DnssecInvalid"/>
+        <xs:enumeration value="SenderDoesNotSupportValidationMethod"/>
       </xs:restriction>
     </xs:simpleType>
 
@@ -831,9 +834,6 @@ Internet-Draft                  SMTP-STS                      March 2016
 
      <!-- Parent -->
     <xs:element name="feedback">
-      <xs:complexType>
-        <xs:sequence>
-          <xs:element name="version"
 
 
 
@@ -842,6 +842,9 @@ Margolis, et al.        Expires September 9, 2016              [Page 15]
 Internet-Draft                  SMTP-STS                      March 2016
 
 
+      <xs:complexType>
+        <xs:sequence>
+          <xs:element name="version"
                       type="xs:decimal"/>
           <xs:element name="report_metadata"
                       type="tns:ReportMetadataType"/>
@@ -887,9 +890,6 @@ Internet-Draft                  SMTP-STS                      March 2016
               <connectedIp>98.22.33.99</connectedIp>
           </record>
         </feedback>
-
-
-
 
 
 

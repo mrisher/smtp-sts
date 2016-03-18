@@ -521,6 +521,12 @@ certificate MUST be valid according to that record (as described by
 <xref target="RFC7672"/>).</t>
 </list>
 </t>
+<t>A sending MTA who does not support the validation method required--for example,
+an MTA that does not have a DNSSEC-compatible resolver--MUST behave as though
+the policy did not validate. As described in the section on <spanx style="emph">Policy</spanx>
+<spanx style="emph">Application</spanx>, a policy which has not ever been successfully validated MUST not
+be used to reject mail.
+</t>
 </section>
 
 <section anchor="policy-application" title="Policy Application">
@@ -742,6 +748,9 @@ _smtp_sts  IN TXT ( "v=STS1; to=false; "
        &lt;xs:enumeration value="InvalidCertificate"/&gt;
        &lt;xs:enumeration value="ExpiredCertificate"/&gt;
        &lt;xs:enumeration value="StarttlsNotSupported"/&gt;
+       &lt;xs:enumeration value="TlsaInvalid"/&gt;
+       &lt;xs:enumeration value="DnssecInvalid"/&gt;
+       &lt;xs:enumeration value="SenderDoesNotSupportValidationMethod"/&gt;
      &lt;/xs:restriction&gt;
    &lt;/xs:simpleType&gt;
 
