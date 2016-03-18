@@ -117,13 +117,15 @@ of the delivery domain) can perform such a downgrade or interception attack.
 
 This document defines a mechanism for recipient domains to publish policies
 specifying:
+
    * whether MTAs sending mail to this domain can expect TLS support
    * how MTAs can validate the TLS server certificate presented during mail
      delivery
    * what an implementing sender SHOULD do with messages when TLS cannot be be
      successfully negotiated
 
-The protocol described is separated into four logical components:
+The mechanism described is separated into four logical components:
+
    1. policy semantics: whether senders can expect a receiving server for the
       recipient domain to support TLS encryption and how to validate the TLS
       certificate presented
@@ -150,13 +152,13 @@ We also define the following terms for further use in this document:
 
 The DANE TLSA record [@!RFC7672] is similar, in that DANE is also designed to
 upgrade opportunistic encryption into required encryption. DANE requires DNSSEC
-[@!RFC4033] for the secure delivery of policies; the protocol described here
+[@!RFC4033] for the secure delivery of policies; the mechanism described here
 presents a variant for systems not yet supporting DNSSEC, and specifies a method
 for reporting TLS negotiation failures.
 
 ## Differences from DANE
 
-The primary difference between the protocol described here and DANE is that DANE
+The primary difference between the mechanism described here and DANE is that DANE
 requires the use of DNSSEC to authenticate DANE TLSA records, whereas SMTP STS
 relies on the certificate authority (CA) system and a trust-on-first-use (TOFU)
 approach to avoid interception. The TOFU model allows a degree of security
@@ -405,6 +407,7 @@ consists of the following steps:
 3. If policy invalid and policy specifies reporting, generate report.
 4. If policy invalid and policy specifies rejection, perform the following
    steps:
+
    a. Check for a new (non-cached) _authenticated_ policy. If one exists, update
       the current policy and go to step 1.
    b. If none exists or the newly
@@ -441,17 +444,25 @@ Repeated records contain the following fields:
 
 * Failure type: This list will start with the minimal set below, and is expected
   to grow over time based on real-world experience. The initial set is:
-* mx-mismatch: This indicates that the MX resolved for the recipient domain did
-  not match the MX constraint specified in the policy.
-* certificate-mismatch: This indicates that the certificate presented by the
-  receiving MX did not match the MX hostname
-* invalid-certificate: This indicates that the certificate presented by the
-  receiving MX did not validate according to the policy validation constraint.
-  (Either it was not signed by a trusted CA or did not match the DANE TLSA
-  record for the recipient MX.)
-* expired-certificate: This indicates that the certificate has expired.
-* starttls-not-supported: This indicates that the recipient MX did not support
-  STARTTLS.
+
+  * mx-mismatch: This indicates that the MX resolved for the recipient domain did
+    not match the MX constraint specified in the policy.
+  * certificate-mismatch: This indicates that the certificate presented by the
+    receiving MX did not match the MX hostname
+  * invalid-certificate: This indicates that the certificate presented by the
+    receiving MX did not validate according to the policy validation constraint.
+    (Either it was not signed by a trusted CA or did not match the DANE TLSA
+    record for the recipient MX.)
+  * expired-certificate: This indicates that the certificate has expired.
+  * starttls-not-supported: This indicates that the recipient MX did not support
+    STARTTLS.
+  * tlsa-invalid: This indicates a validation error for policy domain specifying
+    "tlsa" validation.
+  * dnssec-invalid: This indicates a failure to validate DNS records for a
+    policy domain specifying "tlsa" validation or "dnssec" authentication.
+  * sender-does-not-support-validation-method: This indicates the sending system
+    can never validate using the requested validation mechanism.
+
 * Count: The number of times the error was encountered.
 * Hostname: The hostname of the recipient MX.
 

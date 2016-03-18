@@ -213,22 +213,30 @@ of the delivery domain) can perform such a downgrade or interception attack.
 </t>
 <t>This document defines a mechanism for recipient domains to publish policies
 specifying:
-   * whether MTAs sending mail to this domain can expect TLS support
-   * how MTAs can validate the TLS server certificate presented during mail
-     delivery
-   * what an implementing sender SHOULD do with messages when TLS cannot be be
-     successfully negotiated
 </t>
-<t>The protocol described is separated into four logical components:
-   1. policy semantics: whether senders can expect a receiving server for the
-      recipient domain to support TLS encryption and how to validate the TLS
-      certificate presented
-   2. policy authentication: how to determine the authenticity of a published
-      policy delivered via DNS
-   3. failure report format: a mechanism for informing recipient domains about
-      aggregate failure statistics
-   4. failure handling: what sending MTAs should do in the case of policy
-      failures
+<t>
+<list style="symbols">
+<t>whether MTAs sending mail to this domain can expect TLS support</t>
+<t>how MTAs can validate the TLS server certificate presented during mail
+ delivery</t>
+<t>what an implementing sender SHOULD do with messages when TLS cannot be be
+ successfully negotiated</t>
+</list>
+</t>
+<t>The mechanism described is separated into four logical components:
+</t>
+<t>
+<list style="numbers">
+<t>policy semantics: whether senders can expect a receiving server for the
+  recipient domain to support TLS encryption and how to validate the TLS
+  certificate presented</t>
+<t>policy authentication: how to determine the authenticity of a published
+  policy delivered via DNS</t>
+<t>failure report format: a mechanism for informing recipient domains about
+  aggregate failure statistics</t>
+<t>failure handling: what sending MTAs should do in the case of policy
+  failures</t>
+</list>
 </t>
 
 <section anchor="terminology" title="Terminology">
@@ -251,13 +259,13 @@ given domain.</t>
 <section anchor="related-technologies" title="Related Technologies">
 <t>The DANE TLSA record <xref target="RFC7672"/> is similar, in that DANE is also designed to
 upgrade opportunistic encryption into required encryption. DANE requires DNSSEC
-<xref target="RFC4033"/> for the secure delivery of policies; the protocol described here
+<xref target="RFC4033"/> for the secure delivery of policies; the mechanism described here
 presents a variant for systems not yet supporting DNSSEC, and specifies a method
 for reporting TLS negotiation failures.
 </t>
 
 <section anchor="differences-from-dane" title="Differences from DANE">
-<t>The primary difference between the protocol described here and DANE is that DANE
+<t>The primary difference between the mechanism described here and DANE is that DANE
 requires the use of DNSSEC to authenticate DANE TLSA records, whereas SMTP STS
 relies on the certificate authority (CA) system and a trust-on-first-use (TOFU)
 approach to avoid interception. The TOFU model allows a degree of security
@@ -539,12 +547,13 @@ cache it.</t>
 <t>Validate recipient MTA against policy. If valid, deliver mail.</t>
 <t>If policy invalid and policy specifies reporting, generate report.</t>
 <t>If policy invalid and policy specifies rejection, perform the following
-steps:
-a. Check for a new (non-cached) <spanx style="emph">authenticated</spanx> policy. If one exists, update
-  the current policy and go to step 1.
-b. If none exists or the newly
-  fetched policy also fails, treat the delivery as a failure.</t>
+steps:</t>
 </list>
+</t>
+<t>a. Check for a new (non-cached) <spanx style="emph">authenticated</spanx> policy. If one exists, update
+      the current policy and go to step 1.
+   b. If none exists or the newly
+      fetched policy also fails, treat the delivery as a failure.
 </t>
 <t>Understanding the details of step 4 is critical to understanding the behavior of
 the system as a whole.
@@ -583,7 +592,8 @@ section <spanx style="emph">Future</spanx> <spanx style="emph">Work</spanx> for 
 <t>
 <list style="symbols">
 <t>Failure type: This list will start with the minimal set below, and is expected
-to grow over time based on real-world experience. The initial set is:</t>
+to grow over time based on real-world experience. The initial set is:
+<list style="symbols">
 <t>mx-mismatch: This indicates that the MX resolved for the recipient domain did
 not match the MX constraint specified in the policy.</t>
 <t>certificate-mismatch: This indicates that the certificate presented by the
@@ -595,6 +605,13 @@ record for the recipient MX.)</t>
 <t>expired-certificate: This indicates that the certificate has expired.</t>
 <t>starttls-not-supported: This indicates that the recipient MX did not support
 STARTTLS.</t>
+<t>tlsa-invalid: This indicates a validation error for policy domain specifying
+&quot;tlsa&quot; validation.</t>
+<t>dnssec-invalid: This indicates a failure to validate DNS records for a
+policy domain specifying &quot;tlsa&quot; validation or &quot;dnssec&quot; authentication.</t>
+<t>sender-does-not-support-validation-method: This indicates the sending system
+can never validate using the requested validation mechanism.</t>
+</list></t>
 <t>Count: The number of times the error was encountered.</t>
 <t>Hostname: The hostname of the recipient MX.</t>
 </list>
