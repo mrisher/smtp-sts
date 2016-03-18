@@ -78,7 +78,7 @@ Table of Contents
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.1.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   3
    2.  Related Technologies  . . . . . . . . . . . . . . . . . . . .   3
-     2.1.  Differences from DANE . . . . . . . . . . . . . . . . . .   3
+     2.1.  Differences from DANE . . . . . . . . . . . . . . . . . .   4
      2.2.  Advantages When Used with DANE  . . . . . . . . . . . . .   4
      2.3.  Advantages When Used Without DANE . . . . . . . . . . . .   4
      2.4.  Disadvantages When Used Without DANE  . . . . . . . . . .   4
@@ -145,6 +145,11 @@ Internet-Draft                  SMTP-STS                      March 2016
    SHOULD NOT, RECOMMENDED, MAY, and OPTIONAL, when they appear in this
    document, are to be interpreted as described in [RFC2119].
 
+   We also define the following terms for further use in this document:
+   * Policy: An STS policy is a definition of the expected TLS
+   availability for a given domain.  * Policy domain: The domain against
+   which a policy is defined.
+
 2.  Related Technologies
 
    The DANE TLSA record [RFC7672] is similar, in that DANE is also
@@ -153,14 +158,9 @@ Internet-Draft                  SMTP-STS                      March 2016
    of policies; the protocol described here presents a variant for
    systems not yet supporting DNSSEC.
 
-2.1.  Differences from DANE
 
-   The primary difference between the protocol described here and DANE
-   is that DANE requires the use of DNSSEC to authenticate DANE TLSA
-   records, whereas SMTP STS relies on the certificate authority (CA)
-   system and a trust-on-first-use (TOFU) approach to avoid
-   interception.  The TOFU model allows a degree of security similar to
-   that of HPKP [RFC7469], omitting both the complexity and the
+
+
 
 
 
@@ -170,6 +170,14 @@ Margolis, et al.        Expires September 9, 2016               [Page 3]
 Internet-Draft                  SMTP-STS                      March 2016
 
 
+2.1.  Differences from DANE
+
+   The primary difference between the protocol described here and DANE
+   is that DANE requires the use of DNSSEC to authenticate DANE TLSA
+   records, whereas SMTP STS relies on the certificate authority (CA)
+   system and a trust-on-first-use (TOFU) approach to avoid
+   interception.  The TOFU model allows a degree of security similar to
+   that of HPKP [RFC7469], omitting both the complexity and the
    guarantees on first use offered by DNSSEC.  (For a thorough
    discussion of this trade-off, see the section _Threat_ _Model_.)
 
@@ -209,14 +217,6 @@ Internet-Draft                  SMTP-STS                      March 2016
 
    o  Infrastructure: DANE may be easier for some providers to deploy.
       In particular, for providers who already support DNSSEC, SMTP STS
-      would additionally require they obtain a CA-signed x509
-      certificate for the recipient domain.
-
-   o  Security: DANE offers an advantage against policy-lookup DoS
-      attacks; that is, while a DNSSEC-signed NX response to a DANE
-      lookup authoritatively indicates the lack of a DANE record, such
-      an option to authenticate policy non-existence does not exist when
-      looking up a policy over plain DNS.
 
 
 
@@ -225,6 +225,15 @@ Margolis, et al.        Expires September 9, 2016               [Page 4]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
+
+      would additionally require they obtain a CA-signed x509
+      certificate for the recipient domain.
+
+   o  Security: DANE offers an advantage against policy-lookup DoS
+      attacks; that is, while a DNSSEC-signed NX response to a DANE
+      lookup authoritatively indicates the lack of a DANE record, such
+      an option to authenticate policy non-existence does not exist when
+      looking up a policy over plain DNS.
 
 3.  Policy Semantics
 
@@ -240,20 +249,18 @@ Internet-Draft                  SMTP-STS                      March 2016
    o  v: Version (plain-text, required).  Currently only "STS1" is
       supported.
 
-   o  to: TLS-Only (plain-text, required).  If "true," the receiving MTA
-      requests that messages be delivered only if they conform to the
+   o  to: TLS-Only (plain-text, required).  If "true," the messages to
+      the policy domain SHOULD be delivered only if they conform to the
       STS policy.
 
-   o  sto: Sends TLS-Only (plain-text, optional).  If "true", the
-      sender's domain requests that messages be received, only if the
-      connection is TLS encrypted.  The receiving MTA should defer
-      unencrypted messages from this domain temporarily.  If ommited,
-      the senders domain does not set an STS policy for outgoing mail,
-      thus must not be included in failure-reports.
+   o  sto: Sends TLS-Only (plain-text, optional).  If "true", messages
+      from the policy domain are expected to be delivered via TLS;
+      recipient domains SHOULD report deviations from this as described
+      in _Failure_ _Reporting_.
 
    o  mx: MX patterns (comma-separated list of plain-text MX match
       patterns, required).  One or more comma-separated patterns
-      matching the expected MX for this domain.  For example,
+      matching the expected MX for the policy domain.  For example,
       "_.example.com,_.example.net" indicates that mail for this domain
       might be handled by any MX whose hostname is a subdomain of
       "example.com" or "example.net."
@@ -261,8 +268,19 @@ Internet-Draft                  SMTP-STS                      March 2016
    o  smx: Sending MX patterns (comma-separated list of plain-text MX
       match patterns, required if "sto" is set).  One or more comma-
       separated patterns matching the expected PTR-RR of the IP address
-      sending the mail.  The corresponding A/AAAA-RR also must point
-      back to the sending IP address.
+      of the sending MTA for mail received from the policy domain.  The
+      corresponding A/AAAA-RR also must point back to the sending IP
+      address.
+
+
+
+
+
+
+Margolis, et al.        Expires September 9, 2016               [Page 5]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
 
    o  a: The mechanisms available to use to authenticate this policy
       itself (required, comma-separated list).  See the section _Policy_
@@ -273,14 +291,6 @@ Internet-Draft                  SMTP-STS                      March 2016
 
       *  dnssec: Indicating that the policy is expected to be served
          over DNSSEC.
-
-
-
-
-Margolis, et al.        Expires September 9, 2016               [Page 5]
-
-Internet-Draft                  SMTP-STS                      March 2016
-
 
    o  c: Constraints on the recipient MX's TLS certificate (plain-text,
       required, comma-separated list).  See the section _Policy_
@@ -307,16 +317,6 @@ Internet-Draft                  SMTP-STS                      March 2016
 
    The formal definition of the SMTP STS format, using [RFC5234], is as
    follows:
-
-
-
-
-
-
-
-
-
-
 
 
 

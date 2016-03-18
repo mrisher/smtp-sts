@@ -139,6 +139,11 @@ The keywords **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**,
 **SHOULD**, **SHOULD NOT**, **RECOMMENDED**, **MAY**, and **OPTIONAL**, when
 they appear in this document, are to be interpreted as described in [@!RFC2119].
 
+We also define the following terms for further use in this document:
+* Policy: An STS policy is a definition of the expected TLS availability for
+  a given domain.
+* Policy domain: The domain against which a policy is defined.
+
 # Related Technologies
 
 The DANE TLSA record [@!RFC7672] is similar, in that DANE is also designed to
@@ -208,22 +213,21 @@ retrieved from "\_smtp_sts.example.com."
 Policies must specify the following fields:
 
 * v: Version (plain-text, required). Currently only "STS1" is supported.
-* to:  TLS-Only (plain-text, required). If “true,” the receiving MTA requests
-  that messages be delivered only if they conform to the STS policy.
-* sto: Sends TLS-Only (plain-text, optional). If "true", the sender's domain
-  requests that messages be received, only if the connection is TLS encrypted.
-  The receiving MTA should defer unencrypted messages from this domain
-  temporarily. If ommited, the senders domain does not set an STS policy for
-  outgoing mail, thus must not be included in failure-reports.
+* to: TLS-Only (plain-text, required). If "true," the messages to the policy
+  domain SHOULD be delivered only if they conform to the STS policy.
+* sto: Sends TLS-Only (plain-text, optional). If "true", messages from the
+  policy domain are expected to be delivered via TLS; recipient domains SHOULD
+  report deviations from this as described in _Failure_ _Reporting_.
 * mx: MX patterns (comma-separated list of plain-text MX match patterns,
   required). One or more comma-separated patterns matching the expected MX for
-  this domain. For example, "*.example.com,*.example.net" indicates that mail
-  for this domain might be handled by any MX whose hostname is a subdomain of
-  "example.com" or "example.net."
+  the policy domain. For example, "*.example.com,*.example.net" indicates that
+  mail for this domain might be handled by any MX whose hostname is a subdomain
+  of "example.com" or "example.net."
 * smx: Sending MX patterns (comma-separated list of plain-text MX match
   patterns, required if "sto" is set). One or more comma-separated patterns
-  matching the expected PTR-RR of the IP address sending the mail. The
-  corresponding A/AAAA-RR also must point back to the sending IP address.
+  matching the expected PTR-RR of the IP address of the sending MTA for mail
+  received from the policy domain. The corresponding A/AAAA-RR also must point
+  back to the sending IP address.
 * a: The mechanisms available to use to authenticate this policy itself
   (required, comma-separated list). See the section _Policy_ _Authentication_
   for more details. Possible values are:
