@@ -187,8 +187,8 @@ specifying:
    * whether MTAs sending mail to this domain can expect TLS support
    * how MTAs can validate the TLS server certificate presented during mail
      delivery
-   * what the recipient recommends the sender do with messages when TLS cannot
-     be successfully negotiated
+   * what an implementing sender SHOULD do with messages when TLS cannot be be
+     successfully negotiated
 </t>
 <t>The protocol described is separated into three logical components:
    1. policy semantics: whether senders can expect a receiving server for the
@@ -222,7 +222,7 @@ relies on the certificate authority (CA) system and a trust-on-first-use (TOFU)
 approach to avoid interception. The TOFU model allows a degree of security
 similar to that of HPKP <xref target="RFC7469"/>, omitting both the complexity and the
 guarantees on first use offered by DNSSEC. (For a thorough discussion of this
-trade-off, see the section <spanx style="emph">Threat</spanx> <spanx style="emph">Model</spanx>.)
+trade-off, see the section <spanx style="emph">Security</spanx> <spanx style="emph">Considerations</spanx>.)
 </t>
 <t>In addition, SMTP STS introduces a mechanism for failure reporting and a
 report-only mode, enabling progressive roll-out and auditing for compliance.

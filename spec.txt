@@ -127,8 +127,8 @@ Internet-Draft                  SMTP-STS                      March 2016
    This document defines a mechanism for recipient domains to publish
    policies specifying: * whether MTAs sending mail to this domain can
    expect TLS support * how MTAs can validate the TLS server certificate
-   presented during mail delivery * what the recipient recommends the
-   sender do with messages when TLS cannot be successfully negotiated
+   presented during mail delivery * what an implementing sender SHOULD
+   do with messages when TLS cannot be be successfully negotiated
 
    The protocol described is separated into three logical components: 1.
    policy semantics: whether senders can expect a receiving server for
@@ -161,7 +161,7 @@ Internet-Draft                  SMTP-STS                      March 2016
    interception.  The TOFU model allows a degree of security similar to
    that of HPKP [RFC7469], omitting both the complexity and the
    guarantees on first use offered by DNSSEC.  (For a thorough
-   discussion of this trade-off, see the section _Threat_ _Model_.)
+
 
 
 
@@ -169,6 +169,9 @@ Margolis, et al.        Expires September 9, 2016               [Page 3]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
+
+   discussion of this trade-off, see the section _Security_
+   _Considerations_.)
 
    In addition, SMTP STS introduces a mechanism for failure reporting
    and a report-only mode, enabling progressive roll-out and auditing
@@ -214,9 +217,6 @@ Internet-Draft                  SMTP-STS                      March 2016
       lookup authoritatively indicates the lack of a DANE record, such
       an option to authenticate policy non-existence does not exist when
       looking up a policy over plain DNS.
-
-
-
 
 
 
