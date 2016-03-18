@@ -547,13 +547,14 @@ cache it.</t>
 <t>Validate recipient MTA against policy. If valid, deliver mail.</t>
 <t>If policy invalid and policy specifies reporting, generate report.</t>
 <t>If policy invalid and policy specifies rejection, perform the following
-steps:</t>
+steps:
+<list style="symbols">
+<t>Check for a new (non-cached) <spanx style="emph">authenticated</spanx> policy. If one exists, update
+the current policy and go to step 1.</t>
+<t>If none exists or the newly fetched policy also fails, treat the delivery
+as a failure.</t>
+</list></t>
 </list>
-</t>
-<t>a. Check for a new (non-cached) <spanx style="emph">authenticated</spanx> policy. If one exists, update
-      the current policy and go to step 1.
-   b. If none exists or the newly
-      fetched policy also fails, treat the delivery as a failure.
 </t>
 <t>Understanding the details of step 4 is critical to understanding the behavior of
 the system as a whole.

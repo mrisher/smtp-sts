@@ -408,10 +408,10 @@ consists of the following steps:
 4. If policy invalid and policy specifies rejection, perform the following
    steps:
 
-   a. Check for a new (non-cached) _authenticated_ policy. If one exists, update
-      the current policy and go to step 1.
-   b. If none exists or the newly
-      fetched policy also fails, treat the delivery as a failure.
+  * Check for a new (non-cached) _authenticated_ policy. If one exists, update
+    the current policy and go to step 1.
+  * If none exists or the newly fetched policy also fails, treat the delivery
+    as a failure.
 
 Understanding the details of step 4 is critical to understanding the behavior of
 the system as a whole.

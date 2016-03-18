@@ -529,10 +529,11 @@ Internet-Draft                  SMTP-STS                      March 2016
    4.  If policy invalid and policy specifies rejection, perform the
        following steps:
 
-   a.  Check for a new (non-cached) _authenticated_ policy.  If one
-   exists, update the current policy and go to step 1.  b.  If none
-   exists or the newly fetched policy also fails, treat the delivery as
-   a failure.
+       *  Check for a new (non-cached) _authenticated_ policy.  If one
+          exists, update the current policy and go to step 1.
+
+       *  If none exists or the newly fetched policy also fails, treat
+          the delivery as a failure.
 
    Understanding the details of step 4 is critical to understanding the
    behavior of the system as a whole.
@@ -552,8 +553,7 @@ Internet-Draft                  SMTP-STS                      March 2016
    information about policy failures to allow diagnosis of
    misconfigurations and malicious activity.
 
-   (There may also be a need for enabling more detailed "forensic"
-   reporting during initial stages of a deployment.  To address this,
+
 
 
 
@@ -562,6 +562,8 @@ Margolis, et al.        Expires September 9, 2016              [Page 10]
 Internet-Draft                  SMTP-STS                      March 2016
 
 
+   (There may also be a need for enabling more detailed "forensic"
+   reporting during initial stages of a deployment.  To address this,
    the authors consider the possibility of an optional additional
    "forensic reporting mode" in which more details--such as certificate
    chains and MTA banners--may be reported.  See the section _Future_
@@ -609,14 +611,14 @@ Internet-Draft                  SMTP-STS                      March 2016
          sending system can never validate using the requested
          validation mechanism.
 
-   o  Count: The number of times the error was encountered.
-
 
 
 Margolis, et al.        Expires September 9, 2016              [Page 11]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
+
+   o  Count: The number of times the error was encountered.
 
    o  Hostname: The hostname of the recipient MX.
 
@@ -664,8 +666,6 @@ Internet-Draft                  SMTP-STS                      March 2016
    o  Certificate pinning: One potential improvement in the robustness
       of the certificate validation methods discussed would be the
       deployment of public-key pinning as defined for HTTP in [RFC7469].
-      A policy extension supporting these semantics would enable Policy
-      Domains to specify certificates that MUST appear in the MX
 
 
 
@@ -674,6 +674,8 @@ Margolis, et al.        Expires September 9, 2016              [Page 12]
 Internet-Draft                  SMTP-STS                      March 2016
 
 
+      A policy extension supporting these semantics would enable Policy
+      Domains to specify certificates that MUST appear in the MX
       certificate chain, thus providing resistence against compromised
       CA or DNSSEC zone keys.
 
@@ -708,8 +710,6 @@ Internet-Draft                  SMTP-STS                      March 2016
    o  The registration of the .well-known/smtp-sts URI as per [RFC5785].
 
 8.  Appendix 1: Validation Pseudocode
-
-
 
 
 
