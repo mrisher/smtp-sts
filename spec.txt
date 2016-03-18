@@ -23,7 +23,7 @@ Expires: September 18, 2016                                    W. Chuang
 
 
                      SMTP Strict Transport Security
-                       draft-ietf-uta-smtp-sts-00
+                       draft-margolis-smtp-sts-00
 
 Abstract
 
