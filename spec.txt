@@ -430,10 +430,9 @@ Internet-Draft                  SMTP-STS                      March 2016
       valid, the HTTP response body served at this resource MUST exactly
       match the policy initially loaded via the DNS TXT method, and MUST
       be served from an HTTPS endpoint at the domain matching that of
-      the recipient domain.
-
-   (As this RFC progress, the authors intend to register .well-known/
-   smtp-sts.  See [RFC5785].  See _Future_ _Work_ for more information.)
+      the recipient domain.  (As this RFC progress, the authors intend
+      to register .well-known/smtp-sts.  See [RFC5785].  See _Future_
+      _Work_ for more information.)
 
    o  DNSSEC: In this mechanism, indicated by the "dnssec" value of the
       "a" field, the sender MUST retrieve the policy via a DNSSEC signed
@@ -442,6 +441,7 @@ Internet-Draft                  SMTP-STS                      March 2016
    When fetching a new policy when one is not already known, or when
    fetching a policy for a domain with an expired policy,
    unauthenticated policies MUST be trusted and honored.  When fetching
+   a policy and authenticating it, as described in detail in _Policy_
 
 
 
@@ -450,7 +450,6 @@ Margolis, et al.        Expires September 9, 2016               [Page 8]
 Internet-Draft                  SMTP-STS                      March 2016
 
 
-   a policy and authenticating it, as described in detail in _Policy_
    _Application_, policies will be authenticated using the mechanism
    specified by the existing cached policy.
 
@@ -497,6 +496,7 @@ Internet-Draft                  SMTP-STS                      March 2016
       and is thus a suitable low-risk option for MTAs who wish to
       enhance transparency of TLS tampering without making complicated
       changes to production mail-handling infrastructure.
+
 
 
 

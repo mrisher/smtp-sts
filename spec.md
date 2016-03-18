@@ -333,10 +333,9 @@ for policy validation:
   https://example.com/.well-known/smtp-sts/current. In order for the policy to
   be valid, the HTTP response body served at this resource MUST exactly match
   the policy initially loaded via the DNS TXT method, and MUST be served from an
-  HTTPS endpoint at the domain matching that of the recipient domain.
-
-(As this RFC progress, the authors intend to register .well-known/smtp-sts.
-See [@!RFC5785]. See _Future_ _Work_ for more information.)
+  HTTPS endpoint at the domain matching that of the recipient domain.  (As this
+  RFC progress, the authors intend to register .well-known/smtp-sts.  See
+  [@!RFC5785]. See _Future_ _Work_ for more information.)
 
 * DNSSEC: In this mechanism, indicated by the "dnssec" value of the "a" field,
   the sender MUST retrieve the policy via a DNSSEC signed response for the

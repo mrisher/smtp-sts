@@ -462,14 +462,9 @@ sender should fetch the resource
 <eref target="https://example.com/.well-known/smtp-sts/current"/>. In order for the policy to
 be valid, the HTTP response body served at this resource MUST exactly match
 the policy initially loaded via the DNS TXT method, and MUST be served from an
-HTTPS endpoint at the domain matching that of the recipient domain.</t>
-</list>
-</t>
-<t>(As this RFC progress, the authors intend to register .well-known/smtp-sts.
-See <xref target="RFC5785"/>. See <spanx style="emph">Future</spanx> <spanx style="emph">Work</spanx> for more information.)
-</t>
-<t>
-<list style="symbols">
+HTTPS endpoint at the domain matching that of the recipient domain.  (As this
+RFC progress, the authors intend to register .well-known/smtp-sts.  See
+<xref target="RFC5785"/>. See <spanx style="emph">Future</spanx> <spanx style="emph">Work</spanx> for more information.)</t>
 <t>DNSSEC: In this mechanism, indicated by the &quot;dnssec&quot; value of the &quot;a&quot; field,
 the sender MUST retrieve the policy via a DNSSEC signed response for the
 _smtp_sts TXT record.</t>
