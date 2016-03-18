@@ -5,7 +5,7 @@
 Using TLS in Applications                                    D. Margolis
 Internet-Draft                                                 M. Risher
 Intended status: Standards Track                           N. Lidzborski
-Expires: September 9, 2016                                     W. Chuang
+Expires: September 18, 2016                                    W. Chuang
                                                                  B. Long
                                                              Google, Inc
                                                          B. Ramakrishnan
@@ -19,7 +19,7 @@ Expires: September 9, 2016                                     W. Chuang
                                                                K. Umbach
                                                                 M. Laber
                           1&1 Mail & Media Development & Technology GmbH
-                                                           March 8, 2016
+                                                          March 18, 2016
 
 
                      SMTP Strict Transport Security
