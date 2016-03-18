@@ -5,7 +5,7 @@
 Using TLS in Applications                                    D. Margolis
 Internet-Draft                                                 M. Risher
 Intended status: Standards Track                           N. Lidzborski
-Expires: September 18, 2016                                    W. Chuang
+Expires: September 19, 2016                                    W. Chuang
                                                                  B. Long
                                                              Google, Inc
                                                          B. Ramakrishnan
@@ -48,12 +48,12 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on September 18, 2016.
+   This Internet-Draft will expire on September 19, 2016.
 
 
 
 
-Margolis, et al.        Expires September 18, 2016               [Page 1]
+Margolis, et al.       Expires September 19, 2016               [Page 1]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Margolis, et al.        Expires September 18, 2016               [Page 2]
+Margolis, et al.       Expires September 19, 2016               [Page 2]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
@@ -165,7 +165,7 @@ Internet-Draft                  SMTP-STS                      March 2016
 
 
 
-Margolis, et al.        Expires September 18, 2016               [Page 3]
+Margolis, et al.       Expires September 19, 2016               [Page 3]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
@@ -221,7 +221,7 @@ Internet-Draft                  SMTP-STS                      March 2016
 
 
 
-Margolis, et al.        Expires September 18, 2016               [Page 4]
+Margolis, et al.       Expires September 19, 2016               [Page 4]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
@@ -277,7 +277,7 @@ Internet-Draft                  SMTP-STS                      March 2016
 
 
 
-Margolis, et al.        Expires September 18, 2016               [Page 5]
+Margolis, et al.       Expires September 19, 2016               [Page 5]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
@@ -333,7 +333,7 @@ Internet-Draft                  SMTP-STS                      March 2016
 
 
 
-Margolis, et al.        Expires September 18, 2016               [Page 6]
+Margolis, et al.       Expires September 19, 2016               [Page 6]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
@@ -389,7 +389,7 @@ Internet-Draft                  SMTP-STS                      March 2016
 
 
 
-Margolis, et al.        Expires September 18, 2016               [Page 7]
+Margolis, et al.       Expires September 19, 2016               [Page 7]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
@@ -445,7 +445,7 @@ Internet-Draft                  SMTP-STS                      March 2016
 
 
 
-Margolis, et al.        Expires September 18, 2016               [Page 8]
+Margolis, et al.       Expires September 19, 2016               [Page 8]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
@@ -501,7 +501,7 @@ Internet-Draft                  SMTP-STS                      March 2016
 
 
 
-Margolis, et al.        Expires September 18, 2016               [Page 9]
+Margolis, et al.       Expires September 19, 2016               [Page 9]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
@@ -557,7 +557,7 @@ Internet-Draft                  SMTP-STS                      March 2016
 
 
 
-Margolis, et al.        Expires September 18, 2016              [Page 10]
+Margolis, et al.       Expires September 19, 2016              [Page 10]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
@@ -613,7 +613,7 @@ Internet-Draft                  SMTP-STS                      March 2016
 
 
 
-Margolis, et al.        Expires September 18, 2016              [Page 11]
+Margolis, et al.       Expires September 19, 2016              [Page 11]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
@@ -669,7 +669,7 @@ Internet-Draft                  SMTP-STS                      March 2016
 
 
 
-Margolis, et al.        Expires September 18, 2016              [Page 12]
+Margolis, et al.       Expires September 19, 2016              [Page 12]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
@@ -725,7 +725,7 @@ Internet-Draft                  SMTP-STS                      March 2016
 
 
 
-Margolis, et al.        Expires September 18, 2016              [Page 13]
+Margolis, et al.       Expires September 19, 2016              [Page 13]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
@@ -781,7 +781,7 @@ Internet-Draft                  SMTP-STS                      March 2016
 
 
 
-Margolis, et al.        Expires September 18, 2016              [Page 14]
+Margolis, et al.       Expires September 19, 2016              [Page 14]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
@@ -837,7 +837,7 @@ Internet-Draft                  SMTP-STS                      March 2016
 
 
 
-Margolis, et al.        Expires September 18, 2016              [Page 15]
+Margolis, et al.       Expires September 19, 2016              [Page 15]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
@@ -893,7 +893,7 @@ Internet-Draft                  SMTP-STS                      March 2016
 
 
 
-Margolis, et al.        Expires September 18, 2016              [Page 16]
+Margolis, et al.       Expires September 19, 2016              [Page 16]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
@@ -949,7 +949,7 @@ Internet-Draft                  SMTP-STS                      March 2016
 
 
 
-Margolis, et al.        Expires September 18, 2016              [Page 17]
+Margolis, et al.       Expires September 19, 2016              [Page 17]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
@@ -1005,7 +1005,7 @@ Authors' Addresses
 
 
 
-Margolis, et al.        Expires September 18, 2016              [Page 18]
+Margolis, et al.       Expires September 19, 2016              [Page 18]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
@@ -1061,7 +1061,7 @@ Internet-Draft                  SMTP-STS                      March 2016
 
 
 
-Margolis, et al.        Expires September 18, 2016              [Page 19]
+Margolis, et al.       Expires September 19, 2016              [Page 19]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
@@ -1117,4 +1117,4 @@ Internet-Draft                  SMTP-STS                      March 2016
 
 
 
-Margolis, et al.        Expires September 18, 2016              [Page 20]
+Margolis, et al.       Expires September 19, 2016              [Page 20]
