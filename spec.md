@@ -229,7 +229,6 @@ Policies MUST specify the following fields:
 * rua: Address to which aggregate feedback MAY be sent (comma-separated
   plain-text list of email addresses, optional). For example,
   "mailto:postmaster@example.com" from [@!RFC3986].
-* ruf: Address to which detailed forensic reports MAY be sent
 
 # Formal Definition
 
