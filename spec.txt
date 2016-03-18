@@ -83,22 +83,22 @@ Table of Contents
      2.3.  Advantages When Used Without DANE . . . . . . . . . . . .   4
      2.4.  Disadvantages When Used Without DANE  . . . . . . . . . .   4
    3.  Policy Semantics  . . . . . . . . . . . . . . . . . . . . . .   5
-   4.  Formal Definition . . . . . . . . . . . . . . . . . . . . . .   6
-   5.  Policy Expirations  . . . . . . . . . . . . . . . . . . . . .   8
-   6.  Failure Reporting . . . . . . . . . . . . . . . . . . . . . .   8
-   7.  Policy Authentication . . . . . . . . . . . . . . . . . . . .   9
-   8.  Policy Validation . . . . . . . . . . . . . . . . . . . . . .  10
-   9.  Policy Application  . . . . . . . . . . . . . . . . . . . . .  10
-   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  12
-   11. Security Considerations . . . . . . . . . . . . . . . . . . .  12
-   12. Future Work . . . . . . . . . . . . . . . . . . . . . . . . .  12
-   13. Appendix 1: Validation Pseudocode . . . . . . . . . . . . . .  13
-   14. Appendix 2: Domain Owner STS example record . . . . . . . . .  13
-   15. Appendix 3: XML Schema for Failure Reports  . . . . . . . . .  14
-   16. Appendix 4: Example report  . . . . . . . . . . . . . . . . .  16
-   17. References  . . . . . . . . . . . . . . . . . . . . . . . . .  17
-     17.1.  Normative References . . . . . . . . . . . . . . . . . .  17
-     17.2.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  18
+     3.1.  Formal Definition . . . . . . . . . . . . . . . . . . . .   6
+     3.2.  Policy Expirations  . . . . . . . . . . . . . . . . . . .   8
+     3.3.  Policy Authentication . . . . . . . . . . . . . . . . . .   8
+     3.4.  Policy Validation . . . . . . . . . . . . . . . . . . . .   9
+     3.5.  Policy Application  . . . . . . . . . . . . . . . . . . .   9
+   4.  Failure Reporting . . . . . . . . . . . . . . . . . . . . . .  10
+   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  11
+   6.  Security Considerations . . . . . . . . . . . . . . . . . . .  12
+   7.  Future Work . . . . . . . . . . . . . . . . . . . . . . . . .  12
+   8.  Appendix 1: Validation Pseudocode . . . . . . . . . . . . . .  13
+   9.  Appendix 2: Domain Owner STS example record . . . . . . . . .  13
+   10. Appendix 3: XML Schema for Failure Reports  . . . . . . . . .  14
+   11. Appendix 4: Example report  . . . . . . . . . . . . . . . . .  16
+   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  17
+     12.1.  Normative References . . . . . . . . . . . . . . . . . .  17
+     12.2.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  18
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  18
 
 1.  Introduction
@@ -301,12 +301,12 @@ Internet-Draft                  SMTP-STS                      March 2016
       separated plain-text list of email addresses, optional).  For
       example, "mailto:postmaster@example.com" from [RFC3986].
 
-   o  ruf: Address to which detailed forensic reports MAY be sent
-
-4.  Formal Definition
+3.1.  Formal Definition
 
    The formal definition of the SMTP STS format, using [RFC5234], is as
    follows:
+
+
 
 
 
@@ -394,7 +394,7 @@ Margolis, et al.        Expires September 9, 2016               [Page 7]
 Internet-Draft                  SMTP-STS                      March 2016
 
 
-5.  Policy Expirations
+3.2.  Policy Expirations
 
    In order to resist attackers inserting a fraudulent policy, SMTP STS
    policies are designed to be long-lived, with an expiry typically
@@ -412,70 +412,7 @@ Internet-Draft                  SMTP-STS                      March 2016
    Publishers SHOULD thus continue to expect senders to apply old
    policies for up to this duration.
 
-6.  Failure Reporting
-
-   Aggregate statistics on policy failures MAY be reported to the URI
-   indicated in the "rua" field of the policy.  SMTP STS reports contain
-   information about policy failures to allow diagnosis of
-   misconfigurations and malicious activity.
-
-   (There may also be a need for enabling more detailed "forensic"
-   reporting during initial stages of a deployment.  To address this,
-   the authors consider the possibility of an optional additional
-   "forensic reporting mode" in which more details--such as certificate
-   chains and MTA banners--may be reported.  See the section _Future_
-   _Work_ for more details.)
-
-   Aggregate reports contain the following fields:
-
-   o  The SMTP STS policy applied (as a string)
-
-   o  The beginning and end of the reporting period
-
-   Repeated records contain the following fields:
-
-   o  Failure type: This list will start with the minimal set below, and
-      is expected to grow over time based on real-world experience.  The
-      initial set is:
-
-   o  mx-mismatch: This indicates that the MX resolved for the recipient
-      domain did not match the MX constraint specified in the policy.
-
-
-
-
-
-Margolis, et al.        Expires September 9, 2016               [Page 8]
-
-Internet-Draft                  SMTP-STS                      March 2016
-
-
-   o  certificate-mismatch: This indicates that the certificate
-      presented by the receiving MX did not match the MX hostname
-
-   o  invalid-certificate: This indicates that the certificate presented
-      by the receiving MX did not validate according to the policy
-      validation constraint.  (Either it was not signed by a trusted CA
-      or did not match the DANE TLSA record for the recipient MX.)
-
-   o  expired-certificate: This indicates that the certificate has
-      expired.
-
-   o  starttls-not-supported: This indicates that the recipient MX did
-      not support STARTTLS.
-
-   o  Count: The number of times the error was encountered.
-
-   o  Hostname: The hostname of the recipient MX.
-
-   Note that the failure types are non-exclusive; an aggregate report
-   MAY contain overlapping counts of failure types where a single send
-   attempt encountered multiple errors.
-
-   When sending failure reports, sending MTAs MUST NOT honor SMTP STS or
-   DANE TLSA failures.
-
-7.  Policy Authentication
+3.3.  Policy Authentication
 
    The security of a domain implementing an SMTP STS policy against an
    active man-in-the-middle depends primarily upon the long-lived
@@ -498,14 +435,6 @@ Internet-Draft                  SMTP-STS                      March 2016
    (As this RFC progress, the authors intend to register .well-known/
    smtp-sts.  See [RFC5785].  See _Future_ _Work_ for more information.)
 
-
-
-
-Margolis, et al.        Expires September 9, 2016               [Page 9]
-
-Internet-Draft                  SMTP-STS                      March 2016
-
-
    o  DNSSEC: In this mechanism, indicated by the "dnssec" value of the
       "a" field, the sender MUST retrieve the policy via a DNSSEC signed
       response for the _smtp_sts TXT record.
@@ -513,6 +442,14 @@ Internet-Draft                  SMTP-STS                      March 2016
    When fetching a new policy when one is not already known, or when
    fetching a policy for a domain with an expired policy,
    unauthenticated policies MUST be trusted and honored.  When fetching
+
+
+
+Margolis, et al.        Expires September 9, 2016               [Page 8]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
+
    a policy and authenticating it, as described in detail in _Policy_
    _Application_, policies will be authenticated using the mechanism
    specified by the existing cached policy.
@@ -522,7 +459,7 @@ Internet-Draft                  SMTP-STS                      March 2016
    on first application.  That is, a freshly fetched (and unused) policy
    that has not successfully been applied MUST be disregarded.
 
-8.  Policy Validation
+3.4.  Policy Validation
 
    When sending to an MX at a domain for which the sender has a valid
    and non-expired SMTP STS policy, a sending MTA honoring SMTP STS
@@ -548,19 +485,11 @@ Internet-Draft                  SMTP-STS                      March 2016
    the section on _Policy_ _Application_, a policy which has not ever
    been successfully validated MUST not be used to reject mail.
 
-9.  Policy Application
+3.5.  Policy Application
 
    When sending to an MX at a domain for which the sender has a valid
    non-expired SMTP STS policy, a sending MTA honoring SMTP STS MAY
    apply the result of a policy validation one of two ways:
-
-
-
-
-Margolis, et al.        Expires September 9, 2016              [Page 10]
-
-Internet-Draft                  SMTP-STS                      March 2016
-
 
    o  Report-only: In this mode, sending MTAs merely send a report to
       the designated report address indicating policy application
@@ -568,6 +497,14 @@ Internet-Draft                  SMTP-STS                      March 2016
       and is thus a suitable low-risk option for MTAs who wish to
       enhance transparency of TLS tampering without making complicated
       changes to production mail-handling infrastructure.
+
+
+
+
+Margolis, et al.        Expires September 9, 2016               [Page 9]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
 
    o  Enforced: In this mode, sending MTAs SHOULD treat STS policy
       failures, in which the policy action is "reject", as a mail
@@ -606,8 +543,71 @@ Internet-Draft                  SMTP-STS                      March 2016
    in-the-middle attack) they would incur if they were to shorten the
    policy expiration time.
 
+4.  Failure Reporting
+
+   Aggregate statistics on policy failures MAY be reported to the URI
+   indicated in the "rua" field of the policy.  SMTP STS reports contain
+   information about policy failures to allow diagnosis of
+   misconfigurations and malicious activity.
+
+   (There may also be a need for enabling more detailed "forensic"
+   reporting during initial stages of a deployment.  To address this,
+   the authors consider the possibility of an optional additional
+   "forensic reporting mode" in which more details--such as certificate
 
 
+
+Margolis, et al.        Expires September 9, 2016              [Page 10]
+
+Internet-Draft                  SMTP-STS                      March 2016
+
+
+   chains and MTA banners--may be reported.  See the section _Future_
+   _Work_ for more details.)
+
+   Aggregate reports contain the following fields:
+
+   o  The SMTP STS policy applied (as a string)
+
+   o  The beginning and end of the reporting period
+
+   Repeated records contain the following fields:
+
+   o  Failure type: This list will start with the minimal set below, and
+      is expected to grow over time based on real-world experience.  The
+      initial set is:
+
+   o  mx-mismatch: This indicates that the MX resolved for the recipient
+      domain did not match the MX constraint specified in the policy.
+
+   o  certificate-mismatch: This indicates that the certificate
+      presented by the receiving MX did not match the MX hostname
+
+   o  invalid-certificate: This indicates that the certificate presented
+      by the receiving MX did not validate according to the policy
+      validation constraint.  (Either it was not signed by a trusted CA
+      or did not match the DANE TLSA record for the recipient MX.)
+
+   o  expired-certificate: This indicates that the certificate has
+      expired.
+
+   o  starttls-not-supported: This indicates that the recipient MX did
+      not support STARTTLS.
+
+   o  Count: The number of times the error was encountered.
+
+   o  Hostname: The hostname of the recipient MX.
+
+   Note that the failure types are non-exclusive; an aggregate report
+   MAY contain overlapping counts of failure types where a single send
+   attempt encountered multiple errors.
+
+   When sending failure reports, sending MTAs MUST NOT honor SMTP STS or
+   DANE TLSA failures.
+
+5.  IANA Considerations
+
+   There are no identifiers defined herein to be reserved by IANA.
 
 
 
@@ -618,11 +618,7 @@ Margolis, et al.        Expires September 9, 2016              [Page 11]
 Internet-Draft                  SMTP-STS                      March 2016
 
 
-10.  IANA Considerations
-
-   There are no identifiers defined herein to be reserved by IANA.
-
-11.  Security Considerations
+6.  Security Considerations
 
    SMTP Strict Transport Security protects against an active attacker
    who wishes to intercept or tamper with mail between hosts who support
@@ -647,7 +643,7 @@ Internet-Draft                  SMTP-STS                      March 2016
    recipient mail service (e.g. by compromising a certificate authority)
    are thus out of scope of this threat model.
 
-12.  Future Work
+7.  Future Work
 
    The authors would like to suggest multiple considerations for future
    discussion.
@@ -666,6 +662,10 @@ Internet-Draft                  SMTP-STS                      March 2016
       given Policy Domain).  This would provide insight into policy
       spoofing or faked policy non-existence.  This may be particularly
       useful for Policy Domains not using DNSSEC, since it would provide
+      sending MTAs an authoritative source for whether a policy is
+      expected for a given domain.
+
+
 
 
 
@@ -673,9 +673,6 @@ Margolis, et al.        Expires September 9, 2016              [Page 12]
 
 Internet-Draft                  SMTP-STS                      March 2016
 
-
-      sending MTAs an authoritative source for whether a policy is
-      expected for a given domain.
 
    o  Receive-from restrictions: Policy publishers may wish to also
       indicate to domains _receiving_ mail from the Policy Domain that
@@ -698,7 +695,7 @@ Internet-Draft                  SMTP-STS                      March 2016
 
    o  The registration of the .well-known/smtp-sts URI as per [RFC5785].
 
-13.  Appendix 1: Validation Pseudocode
+8.  Appendix 1: Validation Pseudocode
 
       policy = policy_from_cache()
       if not policy or is_expired(policy):
@@ -717,7 +714,10 @@ Internet-Draft                  SMTP-STS                      March 2016
         if update_cache:
           cache(policy)
 
-14.  Appendix 2: Domain Owner STS example record
+9.  Appendix 2: Domain Owner STS example record
+
+
+
 
 
 
@@ -745,7 +745,7 @@ Internet-Draft                  SMTP-STS                      March 2016
     _smtp_sts  IN TXT ( "v=STS1; to=false; "
                          "rua=mailto:sts-feedback@example.com " )
 
-15.  Appendix 3: XML Schema for Failure Reports
+10.  Appendix 3: XML Schema for Failure Reports
 
  <?xml version="1.0"?>
  <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -859,7 +859,7 @@ Internet-Draft                  SMTP-STS                      March 2016
     </xs:element>
  </xs:schema>
 
-16.  Appendix 4: Example report
+11.  Appendix 4: Example report
 
         <feedback xmlns="http://www.example.org/smtp-sts-xml/0.1">
           <version>1</version>
@@ -898,9 +898,9 @@ Margolis, et al.        Expires September 9, 2016              [Page 16]
 Internet-Draft                  SMTP-STS                      March 2016
 
 
-17.  References
+12.  References
 
-17.1.  Normative References
+12.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
@@ -960,7 +960,7 @@ Internet-Draft                  SMTP-STS                      March 2016
               .17487/RFC7672, October 2015,
               <http://www.rfc-editor.org/info/rfc7672>.
 
-17.2.  URIs
+12.2.  URIs
 
    [1] https://example.com/.well-known/smtp-sts/current
 

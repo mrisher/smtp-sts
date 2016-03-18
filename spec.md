@@ -230,7 +230,7 @@ Policies MUST specify the following fields:
   plain-text list of email addresses, optional). For example,
   "mailto:postmaster@example.com" from [@!RFC3986].
 
-# Formal Definition
+## Formal Definition
 
 The formal definition of the SMTP STS format, using [@!RFC5234], is as follows:
 
@@ -284,7 +284,7 @@ unit, the number is presumed to be a basic byte count.  Note that the
 units are considered to be powers of two; a kilobyte is 2^10, a
 megabyte is 2^20, etc.
 
-# Policy Expirations
+## Policy Expirations
 
 In order to resist attackers inserting a fraudulent policy, SMTP STS policies
 are designed to be long-lived, with an expiry typically greater than two weeks.
@@ -300,7 +300,7 @@ recursive resolver. Consequently, a sender MAY treat a policy as valid for up to
 {expiration time} + {DNS TTL}. Publishers SHOULD thus continue to expect senders
 to apply old policies for up to this duration.
 
-# Policy Authentication
+## Policy Authentication
 
 The security of a domain implementing an SMTP STS policy against an active
 man-in-the-middle depends primarily upon the long-lived caching of policies.
@@ -337,7 +337,7 @@ policies MUST NOT be considered as valid if they do not validate on first
 application. That is, a freshly fetched (and unused) policy that has not
 successfully been applied MUST be disregarded.
 
-# Policy Validation
+## Policy Validation
 
 When sending to an MX at a domain for which the sender has a valid and
 non-expired SMTP STS policy, a sending MTA honoring SMTP STS SHOULD validate
@@ -362,7 +362,7 @@ the policy did not validate. As described in the section on _Policy_
 _Application_, a policy which has not ever been successfully validated MUST not
 be used to reject mail.
 
-# Policy Application
+## Policy Application
 
 When sending to an MX at a domain for which the sender has a valid non-expired
 SMTP STS policy, a sending MTA honoring SMTP STS MAY apply the result of a
