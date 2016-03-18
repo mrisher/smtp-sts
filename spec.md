@@ -121,12 +121,12 @@ specifying:
    * whether MTAs sending mail to this domain can expect TLS support
    * how MTAs can validate the TLS server certificate presented during mail
      delivery
-   * what an implementing sender SHOULD do with messages when TLS cannot be be
+   * what an implementing sender should do with messages when TLS cannot be be
      successfully negotiated
 
 The mechanism described is separated into four logical components:
 
-   1. policy semantics: whether senders can expect a receiving server for the
+   1. policy semantics: whether senders can expect a server for the
       recipient domain to support TLS encryption and how to validate the TLS
       certificate presented
    2. policy authentication: how to determine the authenticity of a published
@@ -144,9 +144,9 @@ they appear in this document, are to be interpreted as described in [@!RFC2119].
 
 We also define the following terms for further use in this document:
 
-* policy: An STS policy is a definition of the expected TLS availability for a
-  given domain.
-* Policy Domain: The domain against which a policy is defined.
+* STS Policy: A definition of the expected TLS availability and behavior, as well as the desired actions for a
+  given domain when a sending MTA encounters different results.
+* Policy Domain: The domain against which an STS Policy is defined.
 
 # Related Technologies
 
@@ -162,7 +162,7 @@ The primary difference between the mechanism described here and DANE is that DAN
 requires the use of DNSSEC to authenticate DANE TLSA records, whereas SMTP STS
 relies on the certificate authority (CA) system and a trust-on-first-use (TOFU)
 approach to avoid interception. The TOFU model allows a degree of security
-similar to that of HPKP [@!RFC7469], omitting both the complexity and the
+similar to that of HPKP [@!RFC7469], reducing the complexity but without the 
 guarantees on first use offered by DNSSEC. (For a thorough discussion of this
 trade-off, see the section _Security_ _Considerations_.)
 
@@ -186,8 +186,8 @@ advantages compared to DANE:
      analysis of STARTTLS failures, enabling mail providers to gain insight into
      the security of their SMTP connections without the need to modify MTA
      codebases directly.
-   * *Incrementalism:* DANE does not provide a reporting mechanism, nor does it
-     have a concept of "report-only" failures; as a result, a service provider
+   * *Incrementalism:* DANE does not provide a reporting mechanism and does not
+     have a concept of "report-only" for failures; as a result, a service provider
      has no choice but to "flip the switch" and affect the entire mail stream at
      once.
 
@@ -222,7 +222,9 @@ Policies MUST specify the following fields:
 
 * v: Version (plain-text, required). Currently only "STS1" is supported.
 * to:  TLS-Only (plain-text, required). If “true,” the receiving MTA requests
-  that messages be delivered only if they conform to the STS policy.
+  that messages be delivered only if they conform to the STS policy. If "false,"
+  the receiving MTA requests that failure reports be delivered, as specified by
+  the `rua` parameter.
 * mx: MX patterns (comma-separated list of plain-text MX match patterns,
   required). One or more comma-separated patterns matching the expected MX for
   this domain. For example, "*.example.com,*.example.net" indicates that mail
@@ -455,10 +457,10 @@ Repeated records contain the following fields:
   * expired-certificate: This indicates that the certificate has expired.
   * starttls-not-supported: This indicates that the recipient MX did not support
     STARTTLS.
-  * tlsa-invalid: This indicates a validation error for policy domain specifying
+  * tlsa-invalid: This indicates a validation error for Policy Domain specifying
     "tlsa" validation.
   * dnssec-invalid: This indicates a failure to validate DNS records for a
-    policy domain specifying "tlsa" validation or "dnssec" authentication.
+    Policy Domain specifying "tlsa" validation or "dnssec" authentication.
   * sender-does-not-support-validation-method: This indicates the sending system
     can never validate using the requested validation mechanism.
 
@@ -474,7 +476,10 @@ TLSA failures.
 
 # IANA Considerations
 
-There are no identifiers defined herein to be reserved by IANA.
+The `.well-known` URI for Policy Domains to host their STS Policies will be
+registered by following the procedure documented in [@!RFC5785] (i.e. sending a
+request to the `wellknown-uri-review@ietf.org` mailing list for review and comment).
+The proposed URI-suffix is `smtp-sts`.
 
 # Security Considerations
 
@@ -499,6 +504,12 @@ to obtain a valid certificate for the targeted recipient mail service (e.g. by
 compromising a certificate authority) are thus out of scope of this threat
 model.
 
+In the WebPKI constraint mode, an attacker who is able to block DNS responses can
+suppress the delivery of an STS Policy, making the Policy Domain appear not to have 
+an STS Policy. The caching model described in _Policy_ _Expirations_ is designed to
+resist this attack, and there is discussion in the _Future_ _Work_ section around
+future distribution mechanisms that are robust against this attack.
+
 # Future Work
 
 The authors would like to suggest multiple considerations for future discussion.
@@ -510,7 +521,7 @@ The authors would like to suggest multiple considerations for future discussion.
   appear in the MX certificate chain, thus providing resistence against
   compromised CA or DNSSEC zone keys.
 
-* Policy transparency: As with Certificate Transparency ([@!RFC6962]), it may be
+* Policy distribution: As with Certificate Transparency ([@!RFC6962]), it may be
   possible to provide a verifiable log of policy *observations* (meaning which
   policies have been observed for a given Policy Domain). This would provide
   insight into policy spoofing or faked policy non-existence. This may be
