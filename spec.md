@@ -3,7 +3,7 @@
    Title = "SMTP Strict Transport Security"
    abbrev = "SMTP-STS"
    category = "std"
-   docName = "draft-margolis-smtp-sts-00"
+   docName = "draft-ietf-uta-smtp-sts-00"
    ipr = "trust200902"
    area = "Applications"
    workgroup = "Using TLS in Applications"
@@ -118,6 +118,7 @@ of the delivery domain) can perform such a downgrade or interception attack.
 This document defines a mechanism for recipient domains to publish policies
 specifying:
 
+   * MTA that handles emails for the recipient domain
    * whether MTAs sending mail to this domain can expect TLS support
    * how MTAs can validate the TLS server certificate presented during mail
      delivery
@@ -204,13 +205,13 @@ to DANE:
   recipient domain.
 
 * Security: DANE offers an advantage against policy-lookup DoS attacks; that is,
-  while a DNSSEC-signed NX response to a DANE lookup authoritatively indicates
+  while a DNSSEC-signed MX response to a DANE lookup authoritatively indicates
   the lack of a DANE record, such an option to authenticate policy non-existence
   does not exist when looking up a policy over plain DNS.
 
 # Policy Semantics
 
-SMTP STS policies are distributed at the Policy Domain either through a new
+SMTP STS policies are distributed from Policy Domain's DNS either through a new
 resource record, or as TXT records (similar to DMARC policies) under the name
 "_smtp_sts.” (Current implementations deploy as TXT records.) For example, for
 the Policy Domain "example.com", the recipient's SMTP STS policy can be
@@ -232,12 +233,14 @@ Policies MUST specify the following fields:
   for this domain might be handled by any MX whose hostname is a subdomain of
   "example.com" or "example.net."
 * a: The mechanism to use to authenticate this policy itself. See the section
-  _Policy_ _Authentication_ for more details. Possible values are:
-  * webpki:URI, where URI points to an HTTPS resource at the recipient domain
-    that serves the same policy text.
+  _Policy_ _Discovery_ _&_ _Authentication_ for more details. Possible values are:
+  * webpki: Indicating that the policy is expected to be served over HTTPS on a
+    well-known URI: https://policy.\_smtp\_sts.example.com/current. The 
+    example.com is the recipient's domain, and the endpoint serves the same policy
+    text.
   * dnssec: Indicating that the policy is expected to be served over DNSSEC.
 * c: Constraints on the recipient MX's TLS certificate (plain-text, required).
-  See the section _Policy_ _Validation_ for more details. Possible values are:
+  See the section _Recipient's_ _Certificate_ _Validation_ for more details. Possible values are:
   * webpki: Indicating that the TLS certificate presented by the recipient MX
     will be validated according to the "web PKI" mechanism.
   * tlsa: Indicating that the TLS certificate presented by the recipient MX
@@ -246,8 +249,9 @@ Policies MUST specify the following fields:
   clients SHOULD cache a policy for up to this value from last policy fetch
   time.
 * rua: Address to which aggregate feedback MAY be sent (comma-separated
-  plain-text list of email addresses, optional). For example,
-  "mailto:postmaster@example.com" from [@!RFC3986].
+  plain-text list of email addresses or an HTTPS endpoint, optional). For example,
+  "mailto:postmaster@example.com" from [@!RFC3986] or "https://example.com/sts-report".
+* id: A unique identifier to identify a policy. It could be first 16 bytes of SHA256(all fields except 'id') hash
 
 ## Formal Definition
 
@@ -266,6 +270,7 @@ The formal definition of the SMTP STS format, using [@!RFC5234], is as follows:
                        [sts-sep sts-e]
                        [sts-sep sts-auri]
                        [sts-sep]
+                       [sts-id]
                        ; components other than sts-version and
                        ; sts-to may appear in any order
 
@@ -286,7 +291,7 @@ The formal definition of the SMTP STS format, using [@!RFC5234], is as follows:
                        %61-7A /           ; A-Z
                        %2D                ; "-"
 
-    sts-a           = "a" *WSP "=" *WSP ( URI / "dnssec")
+    sts-a           = "a" *WSP "=" *WSP ( "webpki" / "dnssec")
 
     sts-c           = "c" *WSP "=" *WSP ( "webpki" / "tlsa")
 
@@ -294,6 +299,8 @@ The formal definition of the SMTP STS format, using [@!RFC5234], is as follows:
 
     sts-auri        = "rua" *WSP "=" *WSP
                        sts-uri *(*WSP "," *WSP sts-uri)
+    sts-id           = "id" *WSP "=" *WSP 1*16HEXDIG
+                     ; takes only first 16 bytes of SHA256
 
 
 A size limitation in a sts-uri, if provided, is interpreted as a
@@ -319,43 +326,39 @@ recursive resolver. Consequently, a sender MAY treat a policy as valid for up to
 {expiration time} + {DNS TTL}. Publishers SHOULD thus continue to expect senders
 to apply old policies for up to this duration.
 
-## Policy Authentication
+## Policy Discovery & Authentication
 
-The security of a domain implementing an SMTP STS policy against an active
+Senders discover recipient's STS policy by making an attempt to fetch TXT records
+in recipient's DNS under the name "_smtp_sts.". If found, the policy is fetched 
+and authenticated. The security of a domain implementing an SMTP STS policy against an active
 man-in-the-middle depends primarily upon the long-lived caching of policies.
 However, to allow recipient domains to safely serve new policies _prior_ to the
 expiration of a cached policy, and to prevent long-term (either malicious or
-active) denials of service, it is important that senders are able to validate a
+active) denials of service, it is important that senders are able to authenticate a
 new policy retrieved for a recipient domain. There are two supported mechanisms
-for policy validation:
+for policy authentication:
 
 * Web PKI: In this mechanism, indicated by the "webpki" value of the "a" field,
-  the sender fetches a HTTPS resource from the URI indicated. For example,
-  a=webpki:https://example.com/.well-known/smtp-sts/current indicates that the
-  sender should fetch the resource
-  https://example.com/.well-known/smtp-sts/current. In order for the policy to
+  the sender fetches a HTTPS resource from a well known URI. For example,
+  a=webpki indicates that the sender should fetch the resource from
+  https://policy.\_smtp\_sts.example.com/current. In order for the policy to
   be valid, the HTTP response body served at this resource MUST exactly match
   the policy initially loaded via the DNS TXT method, and MUST be served from an
   HTTPS endpoint at the domain matching that of the recipient domain.  (As this
-  RFC progress, the authors intend to register .well-known/smtp-sts.  See
+  RFC progress, the authors intend to register _smtp-sts.  See
   [@!RFC5785]. See _Future_ _Work_ for more information.)
 
 * DNSSEC: In this mechanism, indicated by the "dnssec" value of the "a" field,
   the sender MUST retrieve the policy via a DNSSEC signed response for the
   _smtp_sts TXT record.
 
-When fetching a new policy when one is not already known, or when fetching a
-policy for a domain with an expired policy, unauthenticated policies MUST be
-trusted and honored. When fetching a policy and authenticating it, as described
-in detail in _Policy_ _Application_, policies will be authenticated using the
-mechanism specified by the existing cached policy.
+When fetching a new policy, or when fetching a policy for a domain with an 
+expired policy or if the sender detects a policy update (by checking policy id
+or computing SHA256 of policy), the new policy SHOULD be authenticated before use. 
+If the policy domain is DNSSEC enabled, then sender MAY skip explicit policy
+authentication mechanisms mentioned above ('a' field in the policy).
 
-Note, however, as described in detail in _Policy_ _Application_, that new
-policies MUST NOT be considered as valid if they do not validate on first
-application. That is, a freshly fetched (and unused) policy that has not
-successfully been applied MUST be disregarded.
-
-## Policy Validation
+## Recipient's Certificate Validation
 
 When sending to an MX at a domain for which the sender has a valid and
 non-expired SMTP STS policy, a sending MTA honoring SMTP STS SHOULD validate
@@ -403,7 +406,7 @@ _authenticated_ policy before actually treating a message failure as fatal.
 Thus the control flow for a sending MTA that does online policy application
 consists of the following steps:
 
-1. Check for cached non-expired policy. If none exists, fetch the latest and
+1. Check for cached non-expired policy. If none exists, fetch the latest, authenticate and
    cache it.
 2. Validate recipient MTA against policy. If valid, deliver mail.
 3. If policy invalid and policy specifies reporting, generate report.
@@ -480,7 +483,7 @@ TLSA failures.
 The `.well-known` URI for Policy Domains to host their STS Policies will be
 registered by following the procedure documented in [@!RFC5785] (i.e. sending a
 request to the `wellknown-uri-review@ietf.org` mailing list for review and comment).
-The proposed URI-suffix is `smtp-sts`.
+The proposed URI-prefix domain is `_smtp-sts`.
 
 # Security Considerations
 
@@ -631,6 +634,7 @@ _smtp_sts  IN TXT ( "v=STS1; to=false; "
        <xs:element name="mx" type="xs:string"
            minOccurs="1" />
        <xs:element name="constraint" type="tns:ConstraintType"/>
+       <xs:element name="policy_id" type="xs:string"
      </xs:all>
    </xs:complexType>
 
@@ -692,29 +696,30 @@ _smtp_sts  IN TXT ( "v=STS1; to=false; "
 <feedback xmlns="http://www.example.org/smtp-sts-xml/0.1">
   <version>1</version>
   <report_metadata>
-    <org_name>Company XYZ</org_name>
-    <email>sts-reporting@company.com</email>
+    <org_name>Company-X</org_name>
+    <email>sts-reporting@company-x.com</email>
     <extra_contact_info></extra_contact_info>
     <report_id>12345</report_id>
     <date_range><begin>1439227624</begin>
     <end>1439313998</end></date_range>
     </report_metadata>
   <applied_policy>
-    <domain>company.com</domain>
-    <mx>*.mx.mail.company.com</mx>
+    <domain>company-y.com</domain>
+    <mx>*.mx.mail.company-y.com</mx>
     <constraint>WebPKI</constraint>
+    <policy_id>33a0fe07d5c5359c</policy_id>
   </applied_policy>
    <enforcement_level>ReportOnly</enforcement_level>
   <record>
       <failure>ExpiredCertificate</failure>
       <count>13128</count>
-      <hostname>mta7.am0.yahoodns.net.</hostname>
-      <connectedIp> 98.136.216.25</connectedIp>
+      <hostname>mta7.mx.mail.company-y.com</hostname>
+      <connectedIp>98.136.216.25</connectedIp>
   </record>
   <record>
       <failure>StarttlsNotSupported</failure>
       <count>19</count>
-      <hostname>mta7.am0.yahoodns.net.</hostname>
+      <hostname>mta7.mx.mail.company-y.com</hostname>
       <connectedIp>98.22.33.99</connectedIp>
   </record>
 </feedback>
