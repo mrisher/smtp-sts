@@ -205,7 +205,7 @@ to DANE:
   recipient domain.
 
 * Security: DANE offers an advantage against policy-lookup DoS attacks; that is,
-  while a DNSSEC-signed MX response to a DANE lookup authoritatively indicates
+  while a DNSSEC-signed NXDOMAIN response to a DANE lookup authoritatively indicates
   the lack of a DANE record, such an option to authenticate policy non-existence
   does not exist when looking up a policy over plain DNS.
 
@@ -223,7 +223,7 @@ distribution. See the section _Future_ _Work_ for more discussion.)
 Policies MUST specify the following fields:
 
 * v: Version (plain-text, required). Currently only "STS1" is supported.
-* m:  (plain-text, required). If "enforce", the receiving MTA requests
+* m: Mode (plain-text, required). If "enforce", the receiving MTA requests
   that messages be delivered only if they conform to the STS policy. If "report"
   the receiving MTA requests that failure reports be delivered, as specified by
   the `rua` parameter.
@@ -250,7 +250,7 @@ Policies MUST specify the following fields:
   time.
 * rua: Address to which aggregate feedback MAY be sent (comma-separated
   plain-text list of email addresses or an HTTPS endpoint, optional). For example,
-  "mailto:postmaster@example.com" from [@!RFC3986] or "https://example.com/sts-report".
+  "mailto:postmaster@example.com" from [@!RFC3986] or HTTP POST to "https://example.com/sts-report".
 * id: A unique identifier to identify a policy. It could be first 16 bytes of SHA256(all fields except 'id') hash
 
 ## Formal Definition
@@ -358,10 +358,12 @@ for policy authentication:
   _smtp_sts TXT record.
 
 When fetching a new policy, or when fetching a policy for a domain with an 
-expired policy or if the sender detects a policy update (by checking policy id
-or computing SHA256 of policy), the new policy SHOULD be authenticated before use. 
+expired policy or if the sender detects a policy update (by checking policy id),
+the new policy SHOULD be authenticated before use. 
 If the policy domain is DNSSEC enabled, then sender MAY skip explicit policy
-authentication mechanisms mentioned above ('a' field in the policy).
+authentication mechanisms mentioned above ('a' field in the policy). The 
+requirement is that the policy should be authenticated by either dnssec OR webpki
+mechanism.
 
 ## Recipient's Certificate Validation
 
@@ -483,13 +485,6 @@ multiple errors.
 When sending failure reports, sending MTAs MUST NOT honor SMTP STS or DANE
 TLSA failures.
 
-# IANA Considerations
-
-The `.well-known` URI for Policy Domains to host their STS Policies will be
-registered by following the procedure documented in [@!RFC5785] (i.e. sending a
-request to the `wellknown-uri-review@ietf.org` mailing list for review and comment).
-The proposed URI-prefix domain is `policy._smtp-sts`.
-
 # Security Considerations
 
 SMTP Strict Transport Security protects against an active attacker who wishes to
@@ -555,8 +550,6 @@ In addition, the authors leave currently open the following details:
 * Whether and how more detailed "forensic reporting" should be accomplished, as
   discussed in the section _Failure_ _Reporting_.
 
-* The registration of the .well-known policy._smtp-sts URI prefix as per [@!RFC5785].
-
 # Appendix 1: Validation Pseudocode
 ~~~~~~~~~
 policy = policy_from_cache()
@@ -602,8 +595,8 @@ _smtp_sts  IN TXT ( "v=STS1; m=report; "
 Example 2
 ~~~~~~~~~
 
-Similar to example 1, but in _enforce_ mode. Since the auth field 'a' is webpki,
-the sender will authenticate the policy by making a HTTPS request to:
+Similar to Example 1 above, but in _enforce_ mode. Since the auth field 'a' is
+webpki, the sender will authenticate the policy by making a HTTPS request to:
 https://policy._smtp_sts.example.com/current and compare the content with the
 policy in the DNS. example.com is the recipient's domain.
 
