@@ -332,7 +332,7 @@ If the policy is authenticated over webpki, then in order to change an STS polic
 the policy owner has to update the policy in two places - DNS TXT RR and HTTPS
 endpoint. To address a potential race-condition state, or in other words if the
 policy update in HTTPS lags behind the DNS TXT record or vice versa, the policy
-fetched during that period will fail to authenticate (and thus invalid). In such
+fetched during that period will fail to authenticate (and is thus invalid). In such
 cases, senders SHOULD treat that as a policy not existing. Senders who have a
 cached policy will thus fall back to that cached policy. So for recipient domains,
 they should expect the old policy to be used until the new one is rolled out in both
