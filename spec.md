@@ -290,7 +290,7 @@ The formal definition of the SMTP STS format, using [@!RFC5234], is as follows:
 
     sts-c           = "c" *WSP "=" *WSP ( "webpki" / "tlsa")
 
-    sts-e           = "e" *WSP "=" *WSP 1*6DIGIT
+    sts-e           = "e" *WSP "=" *WSP 1*10DIGIT
 
     sts-auri        = "rua" *WSP "=" *WSP
                        sts-uri *(*WSP "," *WSP sts-uri)
