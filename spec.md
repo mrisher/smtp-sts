@@ -164,7 +164,7 @@ The primary difference between the mechanism described here and DANE is that DAN
 requires the use of DNSSEC to authenticate DANE TLSA records, whereas SMTP STS
 relies on the certificate authority (CA) system and a trust-on-first-use (TOFU)
 approach to avoid interception. The TOFU model allows a degree of security
-similar to that of HPKP [@!RFC7469], reducing the complexity but without the 
+similar to that of HPKP [@!RFC7469], reducing the complexity but without the
 guarantees on first use offered by DNSSEC. (For a thorough discussion of this
 trade-off, see the section _Security_ _Considerations_.)
 
@@ -356,13 +356,13 @@ There are two supported mechanisms for policy authentication:
   host a separate web server different from on their main domain. This model
   also enables a third party mail service provider to host a policy for their
   users' domains.
-  
+
 * DNSSEC: In this mechanism, indicated by the "dnssec" value of the "a" field,
   the sender MUST retrieve the policy via a DNSSEC signed response for the
   _smtp_sts TXT record.
 
 When fetching a new policy or updated policy,the new policy MUST be
-authenticated before use. 
+authenticated before use.
 
 ## Policy Validation
 
@@ -515,7 +515,7 @@ compromising a certificate authority) are thus out of scope of this threat
 model.
 
 In the WebPKI constraint mode, an attacker who is able to block DNS responses can
-suppress the delivery of an STS Policy, making the Policy Domain appear not to have 
+suppress the delivery of an STS Policy, making the Policy Domain appear not to have
 an STS Policy. The caching model described in _Policy_ _Expirations_ is designed to
 resist this attack, and there is discussion in the _Future_ _Work_ section around
 future distribution mechanisms that are robust against this attack.
