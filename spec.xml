@@ -276,7 +276,8 @@ guarantees on first use offered by DNSSEC. (For a thorough discussion of this
 trade-off, see the section <spanx style="emph">Security</spanx> <spanx style="emph">Considerations</spanx>.)
 </t>
 <t>In addition, SMTP STS introduces a mechanism for failure reporting and a
-report-only mode, enabling progressive roll-out and auditing for compliance.
+report-only mode, enabling offline (&quot;report-only&quot;) deployments and auditing for
+compliance.
 </t>
 </section>
 
@@ -299,10 +300,13 @@ advantages compared to DANE:
  analysis of STARTTLS failures, enabling mail providers to gain insight into
  the security of their SMTP connections without the need to modify MTA
  codebases directly.</t>
-<t><spanx style="emph">Incrementalism:</spanx> DANE does not provide a reporting mechanism and does not
- have a concept of &quot;report-only&quot; for failures; as a result, a service provider
- has no choice but to &quot;flip the switch&quot; and affect the entire mail stream at
- once.</t>
+<t><spanx style="emph">Offline- or report-only usage:</spanx> DANE does not provide a reporting
+ mechanism and does not have a concept of &quot;report-only&quot; for failures; as a
+ result, a service provider cannot receive metrics on TLS acceptability
+ without asking senders to enforce a given policy; similarly, senders who
+ cannot enforce DANE constraints at send-time have no mechanism to provide
+ recipients such metrics from an offline (and potentially easier-to-deploy)
+ logs-analysis batch process.</t>
 </list>
 </t>
 </section>
