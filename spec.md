@@ -25,70 +25,6 @@
    organization="Google, Inc"
      [author.address]
      email="risher (at) google (dot com)"
-   [[author]]
-   initials="N."
-   surname="Lidzborski"
-   fullname="Nicolas Lidzborski"
-   organization="Google, Inc"
-     [author.address]
-     email="nlidz (at) google (dot com)"
-   [[author]]
-   initials="W."
-   surname="Chuang"
-   fullname="Wei Chuang"
-   organization="Google, Inc"
-     [author.address]
-     email="weihaw (at) google (dot com)"
-   [[author]]
-   initials="B."
-   surname="Long"
-   fullname="Brandon Long"
-   organization="Google, Inc"
-     [author.address]
-     email="blong (at) google (dot com)"
-   [[author]]
-   initials="B."
-   surname="Ramakrishnan"
-   fullname="Binu Ramakrishnan"
-   organization="Yahoo!, Inc"
-     [author.address]
-     email="rbinu (at) yahoo-inc (dot com)"
-   [[author]]
-   initials="A."
-   surname="Brotman"
-   fullname="Alexander Brotman"
-   organization="Comcast, Inc"
-     [author.address]
-     email="alexander_brotman (at) cable.comcast (dot com)"
-   [[author]]
-   initials="J."
-   surname="Jones"
-   fullname="Janet Jones"
-   organization="Microsoft, Inc"
-     [author.address]
-     email="janet.jones (at) microsoft (dot com)"
-   [[author]]
-   initials="F."
-   surname="Martin"
-   fullname="Franck Martin"
-   organization="LinkedIn"
-     [author.address]
-     email="fmartin (at) linkedin (dot com)"
-   [[author]]
-   initials="K."
-   surname="Umbach"
-   fullname="Klaus Umbach"
-   organization="1&1 Mail & Media Development & Technology GmbH"
-     [author.address]
-     email="klaus.umbach (at) 1und1 (dot de)"
-   [[author]]
-   initials="M."
-   surname="Laber"
-   fullname="Markus Laber"
-   organization="1&1 Mail & Media Development & Technology GmbH"
-     [author.address]
-     email="markus.laber (at) 1und1 (dot de)"
-
 %%%
 
 .# Abstract
@@ -559,6 +495,24 @@ In addition, the authors leave currently open the following details:
 
 * Whether and how more detailed "forensic reporting" should be accomplished, as
   discussed in the section _Failure_ _Reporting_.
+
+# Contributors
+This draft document could not exist without the contributions of numerous 
+individuals, who submitted content, proofread copy, provided examples and
+clarification, and authored sections.
+   
+* Alexander Brotman, Comcast, Inc: (alexander_brotman (at) cable.comcast (dot
+com))
+* Janet Jones, Microsoft, Inc: (janet.jones (at) microsoft (dot com))
+* Binu Ramakrishnan, Yahoo!, Inc: (rbinu (at) yahoo-inc (dot com))
+* Franck Martin, LinkedIn: (fmartin (at) linkedin (dot com))
+* Klaus Umbach, 1&1 Mail & Media Development & Technology GmbH: (klaus.umbach (at)
+1und1 (dot de))
+* Markus Laber, 1&1 Mail & Media Development & Technology GmbH: (markus.laber (at)
+1und1 (dot de))
+* Nicolas Lidzborski, Google, Inc: (nlidz (at) google (dot com))
+* Wei Chuang, Google, Inc: (weihaw (at) google (dot com))
+* Brandon Long, Google, Inc: (blong (at) google (dot com))
 
 # Appendix 1: Validation Pseudocode
 ~~~~~~~~~
