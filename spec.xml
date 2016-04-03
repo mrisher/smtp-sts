@@ -42,141 +42,6 @@
 <uri></uri>
 </address>
 </author>
-<author initials="N." surname="Lidzborski" fullname="Nicolas Lidzborski">
-<organization>Google, Inc</organization>
-<address>
-<postal>
-<street></street>
-<city></city>
-<code></code>
-<country></country>
-<region></region>
-</postal>
-<phone></phone>
-<email>nlidz (at) google (dot com)</email>
-<uri></uri>
-</address>
-</author>
-<author initials="W." surname="Chuang" fullname="Wei Chuang">
-<organization>Google, Inc</organization>
-<address>
-<postal>
-<street></street>
-<city></city>
-<code></code>
-<country></country>
-<region></region>
-</postal>
-<phone></phone>
-<email>weihaw (at) google (dot com)</email>
-<uri></uri>
-</address>
-</author>
-<author initials="B." surname="Long" fullname="Brandon Long">
-<organization>Google, Inc</organization>
-<address>
-<postal>
-<street></street>
-<city></city>
-<code></code>
-<country></country>
-<region></region>
-</postal>
-<phone></phone>
-<email>blong (at) google (dot com)</email>
-<uri></uri>
-</address>
-</author>
-<author initials="B." surname="Ramakrishnan" fullname="Binu Ramakrishnan">
-<organization>Yahoo!, Inc</organization>
-<address>
-<postal>
-<street></street>
-<city></city>
-<code></code>
-<country></country>
-<region></region>
-</postal>
-<phone></phone>
-<email>rbinu (at) yahoo-inc (dot com)</email>
-<uri></uri>
-</address>
-</author>
-<author initials="A." surname="Brotman" fullname="Alexander Brotman">
-<organization>Comcast, Inc</organization>
-<address>
-<postal>
-<street></street>
-<city></city>
-<code></code>
-<country></country>
-<region></region>
-</postal>
-<phone></phone>
-<email>alexander_brotman (at) cable.comcast (dot com)</email>
-<uri></uri>
-</address>
-</author>
-<author initials="J." surname="Jones" fullname="Janet Jones">
-<organization>Microsoft, Inc</organization>
-<address>
-<postal>
-<street></street>
-<city></city>
-<code></code>
-<country></country>
-<region></region>
-</postal>
-<phone></phone>
-<email>janet.jones (at) microsoft (dot com)</email>
-<uri></uri>
-</address>
-</author>
-<author initials="F." surname="Martin" fullname="Franck Martin">
-<organization>LinkedIn</organization>
-<address>
-<postal>
-<street></street>
-<city></city>
-<code></code>
-<country></country>
-<region></region>
-</postal>
-<phone></phone>
-<email>fmartin (at) linkedin (dot com)</email>
-<uri></uri>
-</address>
-</author>
-<author initials="K." surname="Umbach" fullname="Klaus Umbach">
-<organization>1&amp;1 Mail &amp; Media Development &amp; Technology GmbH</organization>
-<address>
-<postal>
-<street></street>
-<city></city>
-<code></code>
-<country></country>
-<region></region>
-</postal>
-<phone></phone>
-<email>klaus.umbach (at) 1und1 (dot de)</email>
-<uri></uri>
-</address>
-</author>
-<author initials="M." surname="Laber" fullname="Markus Laber">
-<organization>1&amp;1 Mail &amp; Media Development &amp; Technology GmbH</organization>
-<address>
-<postal>
-<street></street>
-<city></city>
-<code></code>
-<country></country>
-<region></region>
-</postal>
-<phone></phone>
-<email>markus.laber (at) 1und1 (dot de)</email>
-<uri></uri>
-</address>
-</author>
 <date year="2016" month="March" day="18"/>
 
 <area>Applications</area>
@@ -715,6 +580,29 @@ restrict TLS negotiation to specific ciphers or TLS versions.</t>
 <list style="symbols">
 <t>Whether and how more detailed &quot;forensic reporting&quot; should be accomplished, as
 discussed in the section <spanx style="emph">Failure</spanx> <spanx style="emph">Reporting</spanx>.</t>
+</list>
+</t>
+</section>
+
+<section anchor="contributors" title="Contributors">
+<t>This draft document could not exist without the contributions of numerous
+individuals, who submitted content, proofread copy, provided examples and
+clarification, and authored sections.
+</t>
+<t>
+<list style="symbols">
+<t>Alexander Brotman, Comcast, Inc: (alexander_brotman (at) cable.comcast (dot
+com))</t>
+<t>Janet Jones, Microsoft, Inc: (janet.jones (at) microsoft (dot com))</t>
+<t>Binu Ramakrishnan, Yahoo!, Inc: (rbinu (at) yahoo-inc (dot com))</t>
+<t>Franck Martin, LinkedIn: (fmartin (at) linkedin (dot com))</t>
+<t>Klaus Umbach, 1&amp;1 Mail &amp; Media Development &amp; Technology GmbH: (klaus.umbach (at)
+1und1 (dot de))</t>
+<t>Markus Laber, 1&amp;1 Mail &amp; Media Development &amp; Technology GmbH: (markus.laber (at)
+1und1 (dot de))</t>
+<t>Nicolas Lidzborski, Google, Inc: (nlidz (at) google (dot com))</t>
+<t>Wei Chuang, Google, Inc: (weihaw (at) google (dot com))</t>
+<t>Brandon Long, Google, Inc: (blong (at) google (dot com))</t>
 </list>
 </t>
 </section>
