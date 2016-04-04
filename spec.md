@@ -3,13 +3,13 @@
    Title = "SMTP Strict Transport Security"
    abbrev = "SMTP-STS"
    category = "std"
-   docName = "draft-margolis-smtp-sts-00"
+   docName = "draft-ietf-uta-mta-sts-00"
    ipr = "trust200902"
    area = "Applications"
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2016-03-18T19:00:00Z
+   date = 2016-04-18T00:00:00Z
 
    [[author]]
    initials="D."
@@ -95,7 +95,7 @@
 
 SMTP STS is a mechanism enabling mail service providers to declare their ability
 to receive TLS-secured connections, to declare particular methods for
-certificate validation, and to request sending SMTP servers to report upon
+certificate validation, and to request that sending SMTP servers report upon
 and/or refuse to deliver messages that cannot be delivered securely.
 
 {mainmatter}
@@ -242,12 +242,6 @@ Policies MUST specify the following fields:
   * webpki:URI, where URI points to an HTTPS resource at the recipient domain
     that serves the same policy text.
   * dnssec: Indicating that the policy is expected to be served over DNSSEC.
-* c: Constraints on the recipient MX's TLS certificate (plain-text, required).
-  See the section _Policy_ _Validation_ for more details. Possible values are:
-  * webpki: Indicating that the TLS certificate presented by the recipient MX
-    will be validated according to the "web PKI" mechanism.
-  * tlsa: Indicating that the TLS certificate presented by the recipient MX
-    will match a (presumed to exist) DANE TLSA record.
 * e: Max lifetime of the policy (plain-text integer seconds). Well-behaved
   clients SHOULD cache a policy for up to this value from last policy fetch
   time.
@@ -269,7 +263,6 @@ The formal definition of the SMTP STS format, using [@!RFC5234], is as follows:
     sts-record      = sts-version sts-sep sts-to
                        [sts-sep sts-mx]
                        [sts-sep sts-a]
-                       [sts-sep sts-c]
                        [sts-sep sts-e]
                        [sts-sep sts-auri]
                        [sts-sep]
@@ -294,8 +287,6 @@ The formal definition of the SMTP STS format, using [@!RFC5234], is as follows:
                        %2D                ; "-"
 
     sts-a           = "a" *WSP "=" *WSP ( "webpki" / "dnssec")
-
-    sts-c           = "c" *WSP "=" *WSP ( "webpki" / "tlsa")
 
     sts-e           = "e" *WSP "=" *WSP 1*10DIGIT
 
@@ -371,26 +362,12 @@ authenticated before use.
 ## Policy Validation
 
 When sending to an MX at a domain for which the sender has a valid and
-non-expired SMTP STS policy, a sending MTA honoring SMTP STS SHOULD validate
+non-expired SMTP STS policy, a sending MTA honoring SMTP STS MUST validate
 that the recipient MX supports STARTTLS and offers a TLS certificate which is
-valid according to the semantics of the SMTP STS policy. Policies can specify
-certificate validity in one of two ways by setting the value of the "c" field in
-the policy description.
+valid according to the semantics of the SMTP STS policy. 
 
-* Web PKI: When the "c" field is set to "webpki", the certificate presented by
-  the receiving MX MUST be valid for the MX name and chain to a root CA that is
-  trusted by the sending MTA. The certificate MUST have a CN or SAN matching the
-  MX hostname (as described in [@!RFC6125]) and be non-expired.
-
-* DANE TLSA: When the "c" field is set to "tlsa", the receiving MX MUST be
-  covered by a DANE TLSA record for the recipient domain, and the presented
-  certificate MUST be valid according to that record (as described by
-  [@!RFC7672]).
-
-A sending MTA who does not support the validation method required--for example,
-an MTA that does not have a DNSSEC-compatible resolver--MUST behave as though
-the policy did not validate. As described in the section on _Policy_
-_Application_, a policy which has not ever been successfully validated MUST not
+As described in the section on _Policy_
+_Application_, a policy which has not ever been successfully validated MUST NOT
 be used to reject mail.
 
 ## Policy Application
@@ -474,10 +451,8 @@ Repeated records contain the following fields:
   * expired-certificate: This indicates that the certificate has expired.
   * starttls-not-supported: This indicates that the recipient MX did not support
     STARTTLS.
-  * tlsa-invalid: This indicates a validation error for Policy Domain specifying
-    "tlsa" validation.
   * dnssec-invalid: This indicates a failure to validate DNS records for a
-    Policy Domain specifying "tlsa" validation or "dnssec" authentication.
+    Policy Domain specifying "dnssec" authentication.
   * sender-does-not-support-validation-method: This indicates the sending system
     can never validate using the requested validation mechanism.
 
@@ -599,7 +574,7 @@ are processed, in order to:
 ~~~~~~~~~
 _smtp_sts  IN TXT ( "v=STS1; m=report; "
                      "mx=*mail.example.com; "
-                     "a=dnssec; c=webpki; e=123456"
+                     "a=dnssec; e=604800"
                      "rua=mailto:sts-feedback@example.com" )
 ~~~~~~~~~
 
@@ -613,7 +588,7 @@ policy in the DNS. example.com is the recipient's domain.
 ~~~~~~~~~
 _smtp_sts  IN TXT ( "v=STS1; m=enforce; "
                      "mx=*mail.example.com; "
-                     "a=webpki; c=webpki; e=123456"
+                     "a=webpki; e=604800"
                      "rua=mailto:sts-feedback@example.com" )
 ~~~~~~~~~
 
