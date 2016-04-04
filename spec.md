@@ -3,13 +3,13 @@
    Title = "SMTP Strict Transport Security"
    abbrev = "SMTP-STS"
    category = "std"
-   docName = "draft-margolis-smtp-sts-00"
+   docName = "draft-ietf-uta-mta-sts-00"
    ipr = "trust200902"
    area = "Applications"
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2016-03-18T19:00:00Z
+   date = 2016-04-18T00:00:00Z
 
    [[author]]
    initials="D."
