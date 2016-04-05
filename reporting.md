@@ -38,13 +38,16 @@ Authentication of Named Entities (DANE, [@!RFC6698]).
 # Introduction
 
 The STARTTLS extension to SMTP [@!RFC3207] allows SMTP clients and hosts to
-establish secure SMTP sessions over TLS. The protocol design is based
-on "Opportunistic Security" (OS) [@!RFC7435], which provides interoperability for clients that do not support it, but means that  any attacker who can delete
+establish secure SMTP sessions over TLS. The protocol design is based on
+"Opportunistic Security" (OS) [@!RFC7435], which provides interoperability for
+clients that do not support it, but means that any attacker who can delete
 parts of the SMTP session (such as the "250 STARTTLS" response) or who can
 redirect the entire SMTP session (perhaps by overwriting the resolved MX record
 of the delivery domain) can perform such a downgrade or interception attack.
 
-Because such "downgrade attacks" are not necessarily apparent to the receiving MTA, this document defines a mechanism for sending domains to report on failures at multiple parts of the MTA-to-MTA conversation. 
+Because such "downgrade attacks" are not necessarily apparent to the receiving MTA, this
+document defines a mechanism for sending domains to report on failures at
+multiple parts of the MTA-to-MTA conversation.
 
 Specifically, this document defines a reporting schema that covers:
 
@@ -67,15 +70,22 @@ We also define the following terms for further use in this document:
 
 # Related Technologies
 
-  * The Public Key Pinning Extension for HTTP [@!RFC7469] contains a JSON-based definition for reporting individual pin validation failures. 
-  * The Domain-based Message Authentication, Reporting, and Conformance (DMARC) [@!RFC7489] contains an XML-based reporting format for aggregate and detailed email delivery errors. 
+  * The Public Key Pinning Extension for HTTP [@!RFC7469] contains a JSON-based
+    definition for reporting individual pin validation failures.
+
+  * The Domain-based Message Authentication, Reporting, and Conformance (DMARC)
+    [@!RFC7489] contains an XML-based reporting format for aggregate and
+    detailed email delivery errors.
+
 
 
 # Reporting Policy
 
-SMTP TLSRPT policies are distributed via DNS from the Policy Domain's zone, either through a new resource record, or as TXT records (similar to DMARC policies) under the name `_smtp_tlsrpt`. (Current implementations deploy as TXT records.) For
-example, for the Policy Domain `example.com`, the recipient's SMTP STS policy
-can be retrieved from `_smtp_tlsrpt.example.com`.
+SMTP TLSRPT policies are distributed via DNS from the Policy Domain's zone,
+either through a new resource record, or as TXT records (similar to DMARC
+policies) under the name `_smtp_tlsrpt`. (Current implementations deploy as TXT
+records.) For example, for the Policy Domain `example.com`, the recipient's
+SMTP STS policy can be retrieved from `_smtp_tlsrpt.example.com`.
 
 (Future implementations may move to alternate methods of policy discovery or
 distribution. See the section _Future_ _Work_ for more discussion.)
@@ -106,12 +116,14 @@ Policies consist of the following directives:
 
 ### Report using MAILTO:
 
-```_smtp_tlsrpt.mail.example.com. IN TXT "aggregate-report-uri:mailto:reports@example.com"
+```_smtp_tlsrpt.mail.example.com. IN TXT \
+		"aggregate-report-uri:mailto:reports@example.com"
 ```
 
 ### Report using HTTPS:
 
-```_smtp_tlsrpt.mail.example.com. IN TXT "aggregate-report-uri:https://reporting.example.com/v1/tlsrpt"
+```_smtp_tlsrpt.mail.example.com. IN TXT \
+		"aggregate-report-uri:https://reporting.example.com/v1/tlsrpt"
 ```
 
 
@@ -121,7 +133,8 @@ Aggregate reports contain the following fields:
 
 * _Report metadata_: 
 	* The organization responsible for the report
-	* Contact information for one or more responsible parties for the contents of the report
+	* Contact information for one or more responsible parties for the contents 
+	of the report
 	* A unique identifier for the report
 	* The reporting date range for the report
 * _Applied policy_, consisting of: 
@@ -131,7 +144,11 @@ Aggregate reports contain the following fields:
 	* The domain for which the policy is applied
 	* The MX host
 	* An identifier for the policy (where applicable)
-* _Aggregate counts_, comprising _result type_, _sending MTA IP_, _receiving MTA hostname_, _message count_, and an optional _additional information_ field containing a URI for recipients to review further information on a failure type.
+* _Aggregate counts_, comprising _result type_, _sending MTA IP_, _receiving
+  MTA hostname_, _message count_, and an optional _additional information_
+  field containing a URI for recipients to review further information on a
+  failure type.
+
 
 
 Note that the failure types are non-exclusive; an aggregate report MAY contain
@@ -145,7 +162,11 @@ The list of result types will start with the minimal set below, and is expected
   to grow over time based on real-world experience. The initial set is:
 
 ### Success Type
-  * `success`: This indicates that the sending MTA was able to successfully negotiate a policy-compliant TLS connection, and serves to provide a "heartbeat" to receiving domains that reporting is functional and tabulating correctly.
+  * `success`: This indicates that the sending MTA was able to successfully
+    negotiate a policy-compliant TLS connection, and serves to provide a
+    "heartbeat" to receiving domains that reporting is functional and
+    tabulating correctly.
+
   
 ### Routing Failures
   * `mx-mismatch`: This indicates that the MX resolved for the recipient domain
@@ -183,10 +204,19 @@ There are no IANA considerations at this time.
 # Security Considerations
 
 SMTP TLS Reporting provides transparency into misconfigurations and attempts to
-intercept or tamper with mail between hosts who support STARTTLS. There are several security risks presented by the existence of this reporting channel:
+intercept or tamper with mail between hosts who support STARTTLS. There are
+several security risks presented by the existence of this reporting channel:
 
-  * _Flooding of the_ `aggregate-report-uri` _endpoint_: An attacker could flood the endpoint and prevent the receiving domain from accepting additional reports. This type of Denial-of-Service attack would limit visibility into STARTTLS failures, leaving the receiving domain blind to an ongoing attack.
-  * _Untrusted content_: An attacker could inject malicious code into the report, opening a vulnerability in the receiving domain. Implementers are advised to take precautions against evaluating the contents of the report.
+  * _Flooding of the_ `aggregate-report-uri` _endpoint_: An attacker could
+    flood the endpoint and prevent the receiving domain from accepting
+    additional reports. This type of Denial-of-Service attack would limit
+    visibility into STARTTLS failures, leaving the receiving domain blind to an
+    ongoing attack.
+
+  * _Untrusted content_: An attacker could inject malicious code into the
+    report, opening a vulnerability in the receiving domain. Implementers are
+    advised to take precautions against evaluating the contents of the report.
+
 
 
 
@@ -359,21 +389,55 @@ The JSON schema is derived from the HPKP JSON schema [@!RFC7469] (cf. Section 3)
                        Figure x: JSON Report Format
 ~~~~~~~~
 
-  * `organization-name`: The name of the organization responsible for the report. It is provided as a string.
-  * `date-time`: The date-time indicates the start- and end-times for the report range. It is provided as a string formatted according to
+  * `organization-name`: The name of the organization responsible for the
+    report. It is provided as a string.
+
+  * `date-time`: The date-time indicates the start- and end-times for the
+    report range. It is provided as a string formatted according to
    Section 5.6, "Internet Date/Time Format", of [@!RFC3339].
-  * `email-address`: The contact information for a responsible party of the report. It is provided as a string formatted according to Section 3.4.1, "Addr-Spec", of [@!RFC5322].
-  * `report-id`: A unique identifier for the report. Report authors may use whatever scheme they prefer to generate a unique identifier. It is provided as a string.
-  * `policy-type`: The type of policy that was applied by the sending domain. Presently, the only two valid choices are `tlsa` and `sts`. It is provided as a string.
-  * `policy-string`: The string serialization of the policy, whether TLSA record or STS policy. Any linefeeds from the original policy MUST be replaced with [SP]. TODO: Help with specifics. 
-  * `domain`: The Policy Domain upon which the policy was applied. For messages sent to `user@example.com` this field would contain `example.com`. It is provided as a string.
-  * `mx-host-pattern`: The pattern of MX hostnames from the applied policy. It is provided as a string.
+   
+  * `email-address`: The contact information for a responsible party of the
+    report. It is provided as a string formatted according to Section 3.4.1,
+    "Addr-Spec", of [@!RFC5322].
+
+  * `report-id`: A unique identifier for the report. Report authors may use
+    whatever scheme they prefer to generate a unique identifier. It is provided
+    as a string.
+
+  * `policy-type`: The type of policy that was applied by the sending domain.
+    Presently, the only two valid choices are `tlsa` and `sts`. It is provided
+    as a string.
+
+  * `policy-string`: The string serialization of the policy, whether TLSA
+    record or STS policy. Any linefeeds from the original policy MUST be
+    replaced with [SP]. TODO: Help with specifics.
+
+  * `domain`: The Policy Domain upon which the policy was applied. For messages
+    sent to `user@example.com` this field would contain `example.com`. It is
+    provided as a string.
+
+  * `mx-host-pattern`: The pattern of MX hostnames from the applied policy. It
+    is provided as a string.
+
   * `policy-id`: The version number of the STS policy, or left blank for TLSA.
+
   * `result-type`: A value from the _Result Types_ section above.
-  * `ip-address`: The IP address of the sending MTA that attempted the STARTTLS connection. It is provided as a string representation of an IPv4 or IPv6 address.
-  * `receiving-mta-hostname`: The hostname of the receiving MTA with which the sending MTA referenced in the `ip-address` field attempted to negotiate a STARTTLS connection.
-  * `message-count`: The number of (attempted) messages that match the relevant `result-type` for this section.
-  * `additional-info-uri`: An optional URI pointing to additional information around the relevant `result-type`. For example, this URI might host the complete certificate chain presented during an attempted STARTTLS session. 
+
+  * `ip-address`: The IP address of the sending MTA that attempted the STARTTLS
+    connection. It is provided as a string representation of an IPv4 or IPv6
+    address.
+
+  * `receiving-mta-hostname`: The hostname of the receiving MTA with which the
+    sending MTA referenced in the `ip-address` field attempted to negotiate a
+    STARTTLS connection.
+
+  * `message-count`: The number of (attempted) messages that match the relevant
+    `result-type` for this section.
+
+  * `additional-info-uri`: An optional URI pointing to additional information
+    around the relevant `result-type`. For example, this URI might host the
+    complete certificate chain presented during an attempted STARTTLS session.
+
 					   
 
 # Appendix 4: Example JSON Report
