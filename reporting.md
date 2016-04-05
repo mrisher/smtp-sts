@@ -98,25 +98,49 @@ We also define the following terms for further use in this document:
   * The Public Key Pinning Extension for HTTP [@!RFC7469] contains a JSON-based definition for reporting individual pin validation failures. 
   * The Domain-based Message Authentication, Reporting, and Conformance (DMARC) [@!RFC7489] contains an XML-based reporting format for aggregate and detailed email delivery errors. 
 
-# Failure Reporting Policy
 
-Aggregate statistics on policy failures MAY be reported to the URI indicated
-in the `aggregate-report-uri` field of the policy. SMTP TLSRPT reports contain information about policy failures to allow diagnosis of misconfigurations and malicious activity.
+# Reporting Policy
 
-(There may also be a need for enabling more detailed "forensic" reporting during
-initial stages of a deployment. To address this, the authors consider the
-possibility of an optional additional "forensic reporting mode" in which more
-details--such as certificate chains and MTA banners--may be reported. See the
-section _Future_ _Work_ for more details.)
+SMTP TLSRPT policies are distributed via DNS from the Policy Domain's zone, either through a new resource record, or as TXT records (similar to DMARC policies) under the name `_smtp_tlsrpt`. (Current implementations deploy as TXT records.) For
+example, for the Policy Domain `example.com`, the recipient's SMTP STS policy
+can be retrieved from `_smtp_tlsrpt.example.com`.
 
-The supported URI schemes are `mailto` and `https`. 
+(Future implementations may move to alternate methods of policy discovery or
+distribution. See the section _Future_ _Work_ for more discussion.)
 
-   * In the case of `https`, reports should be submitted via POST ([@!RFC2818])
-     to the specified URI.
+Policies consist of the following directives:
 
-   * In the case of `mailto`, reports should be submitted to the specified
+   * `aggregate-report-uri`: A URI specifying the endpoint to which aggregate
+     information about policy failures should be sent (see the section
+     _Reporting Schema_ for more information). Two URI schemes are supported:
+     `mailto` and `https`.
+
+	 * In the case of `https`, reports should be submitted via POST
+     ([@!RFC2818]) to the specified URI.
+
+ 	 * In the case of `mailto`, reports should be submitted to the specified
      email address. When sending failure reports via SMTP, sending MTAs MUST
      NOT honor SMTP STS or DANE TLSA failures.
+
+   * `detailed-report-uri`: Future use. (There may also be a need for enabling
+     more detailed "forensic" reporting during initial stages of a deployment.
+     To address this, the authors consider the possibility of an optional
+     additional "forensic reporting mode" in which more details--such as
+     certificate chains and MTA banners--may be reported. See the section
+     _Future_ _Work_ for more details.)
+
+
+## Example Reporting Policy
+
+### Report using MAILTO:
+
+```_smtp_tlsrpt.mail.example.com. IN TXT "aggregate-report-uri:mailto:reports@example.com"
+```
+
+### Report using HTTPS:
+
+```_smtp_tlsrpt.mail.example.com. IN TXT "aggregate-report-uri:https://reporting.example.com/v1/tlsrpt"
+```
 
 
 # Reporting Schema
