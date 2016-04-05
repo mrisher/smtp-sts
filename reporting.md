@@ -221,7 +221,7 @@ several security risks presented by the existence of this reporting channel:
 
 
 # Appendix 1: XML Schema for Failure Reports
-~~~~~~~~~
+~~~~~~~~~ xml
 
 <?xml version="1.0"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -322,7 +322,7 @@ several security risks presented by the existence of this reporting channel:
 ~~~~~~~~~
 
 # Appendix 2: Example XML Report
-~~~~~~~~~
+~~~~~~~~~ xml
 <feedback xmlns="http://www.example.org/smtp-sts-xml/0.1">
   <version>1</version>
   <report_metadata>
@@ -359,7 +359,7 @@ several security risks presented by the existence of this reporting channel:
 
 The JSON schema is derived from the HPKP JSON schema [@!RFC7469] (cf. Section 3)
 
-~~~~~~~~~
+```
 {
 	 "organization-name": organization-name,
      "date-range": {
@@ -385,9 +385,8 @@ The JSON schema is derived from the HPKP JSON schema [@!RFC7469] (cf. Section 3)
 		}
 	 ]
 }
-
-                       Figure x: JSON Report Format
-~~~~~~~~
+```
+Figure x: JSON Report Format
 
   * `organization-name`: The name of the organization responsible for the
     report. It is provided as a string.
@@ -441,7 +440,7 @@ The JSON schema is derived from the HPKP JSON schema [@!RFC7469] (cf. Section 3)
 					   
 
 # Appendix 4: Example JSON Report
-~~~~~~~~~
+```
 {
 	 "organization-name": "Company-X",
      "date-range": {
@@ -474,6 +473,6 @@ The JSON schema is derived from the HPKP JSON schema [@!RFC7469] (cf. Section 3)
 		}
 	 ]
 }
-~~~~~~~~~
+```
 
 {backmatter}
