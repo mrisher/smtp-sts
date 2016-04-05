@@ -98,7 +98,7 @@ We also define the following terms for further use in this document:
   * The Public Key Pinning Extension for HTTP [@!RFC7469] contains a JSON-based definition for reporting individual pin validation failures. 
   * The Domain-based Message Authentication, Reporting, and Conformance (DMARC) [@!RFC7489] contains an XML-based reporting format for aggregate and detailed email delivery errors. 
 
-# Failure Reporting
+# Failure Reporting Policy
 
 Aggregate statistics on policy failures MAY be reported to the URI indicated
 in the `aggregate-report-uri` field of the policy. SMTP TLSRPT reports contain information about policy failures to allow diagnosis of misconfigurations and malicious activity.
@@ -117,6 +117,9 @@ The supported URI schemes are `mailto` and `https`.
    * In the case of `mailto`, reports should be submitted to the specified
      email address. When sending failure reports via SMTP, sending MTAs MUST
      NOT honor SMTP STS or DANE TLSA failures.
+
+
+# Reporting Schema
 
 Aggregate reports contain the following fields:
 
