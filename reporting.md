@@ -152,10 +152,15 @@ Aggregate reports contain the following fields:
 	* Contact information for one or more responsible parties for the contents of the report
 	* A unique identifier for the report
 	* The reporting date range for the report
-* _Policy specifics_, consisting of one of the following:
-	* The SMTP MTA STS policy applied (as a string)
-	* The DANE TLSA record applied (as a string)
+* _Applied policy_, consisting of: 
+	* One of the following policy types:
+		* The SMTP MTA STS policy applied (as a string)
+		* The DANE TLSA record applied (as a string)
+	* The domain for which the policy is applied
+	* The MX host
+	* An identifier for the policy (where applicable)
 * _Aggregate counts_, comprising _result type_, _sending MTA IP_, _receiving MTA hostname_, _message count_, and an optional _additional information_ field containing a URI for recipients to review further information on a failure type.
+
 
 Note that the failure types are non-exclusive; an aggregate report MAY contain
 overlapping `counts` of failure types where a single send attempt encountered
@@ -212,64 +217,8 @@ intercept or tamper with mail between hosts who support STARTTLS. There are seve
   * _Untrusted content_: An attacker could inject malicious code into the report, opening a vulnerability in the receiving domain. Implementers are advised to take precautions against evaluating the contents of the report.
 
 
-# Appendix 1: Validation Pseudocode
-~~~~~~~~~
-policy = policy_from_cache()
-if not policy or is_expired(policy):
-  policy = policy_from_dns()  // fetch and authenticate!
-  update_cache = true
-if policy:
-  if invalid_mx_or_tls(policy):  // check MX and TLS cert
-    if rua:
-      generate_report()
-    if p_reject():
-      policy = policy_from_dns()  // fetch and authenticate #2!
-      update_cache = true
-      if invalid_mx_or_tls(policy):
-        reject_message()
-        update_cache = false
-  if update_cache:
-    cache(policy)
-~~~~~~~~~
 
-# Appendix 2: Domain Owner STS example record
-
-## Example 1
-
-The owner of example.com wishes to begin using STS with a policy that will
-solicit aggregate feedback from receivers without affecting how the messages
-are processed, in order to:
-
-* Confirm that its legitimate messages are sent over TLS
-
-* Verify the validity of the certificates
-
-* Verify what ciphers are in use
-
-* Determine how many messages would be affected by a strict policy
-
-~~~~~~~~~
-_smtp_sts  IN TXT ( "v=STS1; m=report; "
-                     "mx=*mail.example.com; "
-                     "a=dnssec; c=webpki; e=123456"
-                     "rua=mailto:sts-feedback@example.com" )
-~~~~~~~~~
-
-## Example 2
-
-Similar to Example 1 above, but in _enforce_ mode. Since the auth field 'a' is
-webpki, the sender will authenticate the policy by making a HTTPS request to:
-https://policy._smtp_sts.example.com/current and compare the content with the
-policy in the DNS. example.com is the recipient's domain.
-
-~~~~~~~~~
-_smtp_sts  IN TXT ( "v=STS1; m=enforce; "
-                     "mx=*mail.example.com; "
-                     "a=webpki; c=webpki; e=123456"
-                     "rua=mailto:sts-feedback@example.com" )
-~~~~~~~~~
-
-# Appendix 3: XML Schema for Failure Reports
+# Appendix 1: XML Schema for Failure Reports
 ~~~~~~~~~
 
 <?xml version="1.0"?>
@@ -370,7 +319,7 @@ _smtp_sts  IN TXT ( "v=STS1; m=enforce; "
 </xs:schema>
 ~~~~~~~~~
 
-# Appendix 4: Example report
+# Appendix 2: Example XML Report
 ~~~~~~~~~
 <feedback xmlns="http://www.example.org/smtp-sts-xml/0.1">
   <version>1</version>
@@ -402,6 +351,93 @@ _smtp_sts  IN TXT ( "v=STS1; m=enforce; "
       <connectedIp>98.22.33.99</connectedIp>
   </record>
 </feedback>
+~~~~~~~~~
+
+# Appendix 3: JSON Report Schema
+
+The JSON schema is derived from the HPKP JSON schema [@!RFC7469] (cf. Section 3)
+
+~~~~~~~~~
+{
+	 "organization-name": organization-name,
+     "date-range": {
+		 "start-datetime": date-time,
+		 "end-datetime": date-time
+	 },
+	 "contact-info": email-address,
+	 "report-id": report-id,
+	 "applied-policy": {
+		 "policy-type": policy-type,
+		 "policy-string": policy-string,
+		 "policy-domain": domain,
+		 "mx-host": mx-host-pattern,
+		 "policy-id": policy-id
+	 },
+	 "report-items": [
+	 	{
+			"result-type": result-type,
+			"sending-mta-ip": ip-address,
+			"receiving-mta-hostname": receiving-mta-hostname,
+			"message-count": message-count,
+			"additional-information": additional-info-uri
+		}
+	 ]
+}
+
+                       Figure x: JSON Report Format
+
+  * `organization-name`: The name of the organization responsible for the report. It is provided as a string.
+  * `date-time`: The date-time indicates the start- and end-times for the report range. It is provided as a string formatted according to
+   Section 5.6, "Internet Date/Time Format", of [@!RFC3339].
+  * `email-address`: The contact information for a responsible party of the report. It is provided as a string formatted according to Section 3.4.1, "Addr-Spec", of [@!RFC5322].
+  * `report-id`: A unique identifier for the report. Report authors may use whatever scheme they prefer to generate a unique identifier. It is provided as a string.
+  * `policy-type`: The type of policy that was applied by the sending domain. Presently, the only two valid choices are `tlsa` and `sts`. It is provided as a string.
+  * `policy-string`: The string serialization of the policy, whether TLSA record or STS policy. Any linefeeds from the original policy MUST be replaced with [SP]. TODO: Help with specifics. 
+  * `domain`: The Policy Domain upon which the policy was applied. For messages sent to `user@example.com` this field would contain `example.com`. It is provided as a string.
+  * `mx-host-pattern`: The pattern of MX hostnames from the applied policy. It is provided as a string.
+  * `policy-id`: The version number of the STS policy, or left blank for TLSA.
+  * `result-type`: A value from the _Result Types_ section above.
+  * `ip-address`: The IP address of the sending MTA that attempted the STARTTLS connection. It is provided as a string representation of an IPv4 or IPv6 address.
+  * `receiving-mta-hostname`: The hostname of the receiving MTA with which the sending MTA referenced in the `ip-address` field attempted to negotiate a STARTTLS connection.
+  * `message-count`: The number of (attempted) messages that match the relevant `result-type` for this section.
+  * `additional-info-uri`: An optional URI pointing to additional information around the relevant `result-type`. For example, this URI might host the complete certificate chain presented during an attempted STARTTLS session. 
+					   
+~~~~~~~~~
+
+# Appendix 4: Example JSON Report
+~~~~~~~~~
+{
+	 "organization-name": "Company-X",
+     "date-range": {
+		 "start-datetime": "2016-04-01T00:00:00Z",
+		 "end-datetime": "2016-04-01T23:59:59Z"
+	 },
+	 "contact-info": "sts-reporting@company-x.com",
+	 "report-id": "5065427c-23d3-47ca-b6e0-946ea0e8c4be",
+	 "applied-policy": {
+		 "policy-type": "sts",
+		 "policy-string": TODO: Add me,
+		 "policy-domain": "company-y.com",
+		 "mx-host": "*.mx.mail.company-y.com",
+		 "policy-id": "33a0fe07d5c5359c"
+	 },
+	 "report-items": [
+	 	{
+			"result-type": "ExpiredCertificate",
+			"sending-mta-ip": "98.136.216.25",
+			"receiving-mta-hostname": "mta7.mx.mail.company-y.com",
+			"message-count": 13128
+		},
+	 	{
+			"result-type": "StarttlsNotSupported",
+			"sending-mta-ip": "98.22.33.99",
+			"receiving-mta-hostname": "mta7.mx.mail.company-y.com",
+			"message-count": 19,
+			"additional-information": "https://reports.company-x.com/report_info?id=5065427c-23d3#StarttlsNotSupported"
+		}
+	 ]
+}
+
 ~~~~~~~~~
 
 {backmatter}
