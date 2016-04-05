@@ -12,40 +12,12 @@
    date = 2016-04-18T00:00:00Z
 
    [[author]]
-   initials="DM"
+   initials="TBD"
    surname="Margolis"
-   fullname="Daniel Margolis"
+   fullname="TBD"
    organization="Google, Inc"
      [author.address]
      email="dmargolis (at) google.com"
-   [[author]]
-   initials="AB"
-   surname="Brotman"
-   fullname="Alexander Brotman"
-   organization="Comcast, Inc"
-     [author.address]
-     email="alexander_brotman (at) cable.comcast (dot com)"
-   [[author]]
-   initials="BR"
-   surname="Ramakrishnan"
-   fullname="Binu Ramakrishnan"
-   organization="Yahoo!, Inc"
-     [author.address]
-     email="rbinu (at) yahoo-inc (dot com)"
-   [[author]]
-   initials="JJ"
-   surname="Jones"
-   fullname="Janet Jones"
-   organization="Microsoft, Inc"
-     [author.address]
-     email="janet.jones (at) microsoft (dot com)"
-   [[author]]
-   initials="MR"
-   surname="Risher"
-   fullname="Mark Risher"
-   organization="Google, Inc"
-     [author.address]
-     email="risher (at) google (dot com)"
 
 %%%
 
@@ -57,7 +29,7 @@ nature of the STARTTLS protocol, malicious and misconfigured intermediaries can
 interfere with the successful establishment of suitable encryption, and such
 interference is not always detectable by the receiving server. This document
 provides transparency into failures in the SMTP MTA Strict Transport Security
-policy [@!TBD], negotiation of STARTTLS [@!RFC3207], and the DNS-Based
+policy (TODO: Add ref), negotiation of STARTTLS [@!RFC3207], and the DNS-Based
 Authentication of Named Entities (DANE, [@!RFC6698]).
 
 
@@ -213,7 +185,7 @@ There are no IANA considerations at this time.
 SMTP TLS Reporting provides transparency into misconfigurations and attempts to
 intercept or tamper with mail between hosts who support STARTTLS. There are several security risks presented by the existence of this reporting channel:
 
-  * _Flooding of the `aggregate-report-uri` endpoint_: An attacker could flood the endpoint and prevent the receiving domain from accepting additional reports. This type of Denial-of-Service attack would limit visibility into STARTTLS failures, leaving the receiving domain blind to an ongoing attack.
+  * _Flooding of the_ `aggregate-report-uri` _endpoint_: An attacker could flood the endpoint and prevent the receiving domain from accepting additional reports. This type of Denial-of-Service attack would limit visibility into STARTTLS failures, leaving the receiving domain blind to an ongoing attack.
   * _Untrusted content_: An attacker could inject malicious code into the report, opening a vulnerability in the receiving domain. Implementers are advised to take precautions against evaluating the contents of the report.
 
 
@@ -385,6 +357,7 @@ The JSON schema is derived from the HPKP JSON schema [@!RFC7469] (cf. Section 3)
 }
 
                        Figure x: JSON Report Format
+~~~~~~~~
 
   * `organization-name`: The name of the organization responsible for the report. It is provided as a string.
   * `date-time`: The date-time indicates the start- and end-times for the report range. It is provided as a string formatted according to
@@ -402,7 +375,6 @@ The JSON schema is derived from the HPKP JSON schema [@!RFC7469] (cf. Section 3)
   * `message-count`: The number of (attempted) messages that match the relevant `result-type` for this section.
   * `additional-info-uri`: An optional URI pointing to additional information around the relevant `result-type`. For example, this URI might host the complete certificate chain presented during an attempted STARTTLS session. 
 					   
-~~~~~~~~~
 
 # Appendix 4: Example JSON Report
 ~~~~~~~~~
@@ -433,11 +405,11 @@ The JSON schema is derived from the HPKP JSON schema [@!RFC7469] (cf. Section 3)
 			"sending-mta-ip": "98.22.33.99",
 			"receiving-mta-hostname": "mta7.mx.mail.company-y.com",
 			"message-count": 19,
-			"additional-information": "https://reports.company-x.com/report_info?id=5065427c-23d3#StarttlsNotSupported"
+			"additional-information": "hxxps://reports.company-x.com" /
+                          "/report_info?id=5065427c-23d3#StarttlsNotSupported"
 		}
 	 ]
 }
-
 ~~~~~~~~~
 
 {backmatter}
