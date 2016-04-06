@@ -3,7 +3,7 @@
    Title = "SMTP Strict Transport Security"
    abbrev = "SMTP-STS"
    category = "std"
-   docName = "draft-ietf-uta-mta-sts-00"
+   docName = "draft-margolis-smtp-sts-00"
    ipr = "trust200902"
    area = "Applications"
    workgroup = "Using TLS in Applications"
