@@ -493,11 +493,12 @@ to obtain a valid certificate for the targeted recipient mail service (e.g. by
 compromising a certificate authority) are thus out of scope of this threat
 model.
 
-In the WebPKI constraint mode, an attacker who is able to block DNS responses can
-suppress the delivery of an STS Policy, making the Policy Domain appear not to have
-an STS Policy. The caching model described in _Policy_ _Expirations_ is designed to
-resist this attack, and there is discussion in the _Future_ _Work_ section around
-future distribution mechanisms that are robust against this attack.
+In the WebPKI constraint mode, an attacker who is able to block DNS responses
+can suppress the delivery of an STS Policy, making the Policy Domain appear not
+to have an STS Policy. The caching model described in _Policy_ _Expirations_ is
+designed to resist this attack, and there is discussion in the _Future_ _Work_
+section around future distribution mechanisms that are robust against this
+attack.
 
 # Future Work
 
