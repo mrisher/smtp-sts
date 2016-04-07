@@ -12,20 +12,48 @@
    date = 2016-04-18T00:00:00Z
 
    [[author]]
-   initials="TBD"
+   initials="DM"
    surname="Margolis"
-   fullname="TBD"
+   fullname="Daniel Margolis"
    organization="Google, Inc"
      [author.address]
      email="dmargolis (at) google.com"
+   [[author]]
+   initials="AB"
+   surname="Brotman"
+   fullname="Alexander Brotman"
+   organization="Comcast, Inc"
+     [author.address]
+     email="alexander_brotman (at) cable.comcast (dot com)"
+   [[author]]
+   initials="BR"
+   surname="Ramakrishnan"
+   fullname="Binu Ramakrishnan"
+   organization="Yahoo!, Inc"
+     [author.address]
+     email="rbinu (at) yahoo-inc (dot com)"
+   [[author]]
+   initials="JJ"
+   surname="Jones"
+   fullname="Janet Jones"
+   organization="Microsoft, Inc"
+     [author.address]
+     email="janet.jones (at) microsoft (dot com)"
+   [[author]]
+   initials="MR"
+   surname="Risher"
+   fullname="Mark Risher"
+   organization="Google, Inc"
+     [author.address]
+     email="risher (at) google (dot com)"
 
 %%%
 
 .# Abstract
 
 SMTP Mail Transfer Agents often conduct encrypted communication on the Internet
-through the use of Transport Layer Security (TLS). Due to the opportunistic
-nature of the STARTTLS protocol, malicious and misconfigured intermediaries can
+through the use of Transport Layer Security (TLS). Because the STARTTLS protocol
+is opportunistic in nature, malicious and misconfigured intermediaries can
 interfere with the successful establishment of suitable encryption, and such
 interference is not always detectable by the receiving server. This document
 provides transparency into failures in the SMTP MTA Strict Transport Security
@@ -45,14 +73,20 @@ parts of the SMTP session (such as the "250 STARTTLS" response) or who can
 redirect the entire SMTP session (perhaps by overwriting the resolved MX record
 of the delivery domain) can perform such a downgrade or interception attack.
 
-Because such "downgrade attacks" are not necessarily apparent to the receiving MTA, this
-document defines a mechanism for sending domains to report on failures at
-multiple parts of the MTA-to-MTA conversation.
+Because such "downgrade attacks" are not necessarily apparent to the receiving
+MTA, this document defines a mechanism for sending domains to report on
+failures at multiple parts of the MTA-to-MTA conversation.
 
-Specifically, this document defines a reporting schema that covers:
+Specifically, this document defines a reporting schema that covers failures 
+in routing, STARTTLS negotiation, and both DANE [@!RFC7671] and STS (TODO: Add
+ref) policy validation errors.
 
-   *   
+Implementers establish a policy by publishing a TXT record in the DNS which
+instructs comliant sending MTAs to deliver reports of delivery and STARTTLS
+failures in the appropriate format to the specified endpoint.
 
+This document is intended as a companion to the specification for SMTP MTA 
+Strict Transport Security (MTA-STS, TODO: Add ref).
 
 ## Terminology
 
@@ -69,6 +103,9 @@ We also define the following terms for further use in this document:
 * Sending MTA: The MTA initiating the delivery of an email message.
 
 # Related Technologies
+
+  * This document is intended as a companion to the specification for SMTP MTA
+    Strict Transport Security (MTA-STS, TODO: Add ref).
 
   * The Public Key Pinning Extension for HTTP [@!RFC7469] contains a JSON-based
     definition for reporting individual pin validation failures.
@@ -224,136 +261,134 @@ several security risks presented by the existence of this reporting channel:
 ~~~~~~~~~ xml
 
 <?xml version="1.0"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://www.example.org/smtp-sts-xml/0.1"
-    xmlns:tns="http://www.example.org/smtp-sts-xml/0.1">
-   <!-- The time range in UTC covered by messages in this report,
-        specified in seconds since epoch. -->
-   <xs:complexType name="DateRangeType">
-     <xs:all>
-       <xs:element name="begin" type="xs:integer"/>
-       <xs:element name="end" type="xs:integer"/>
-     </xs:all>
-   </xs:complexType>
-
-   <!-- Report generator metadata. -->
-   <xs:complexType name="ReportMetadataType">
-     <xs:sequence>
-       <xs:element name="org_name" type="xs:string"/>
-       <xs:element name="email" type="xs:string"/>
-       <xs:element name="extra_contact_info" type="xs:string"
-                   minOccurs="0"/>
-       <xs:element name="report_id" type="xs:string"/>
-       <xs:element name="date_range" type="tns:DateRangeType"/>
-     </xs:sequence>
-   </xs:complexType>
-
-
-   <!-- The constraints applied in a policy -->
-   <xs:simpleType name="ConstraintType">
-     <xs:restriction base="xs:string">
-       <xs:enumeration value="WebPKI"/>
-       <xs:enumeration value="TLSA"/>
-     </xs:restriction>
-   </xs:simpleType>
-
-   <!-- The policy that was applied at send time. -->
-   <xs:complexType name="AppliedPolicyType">
-     <xs:all>
-       <xs:element name="domain" type="xs:string"/>
-       <xs:element name="mx" type="xs:string"
-           minOccurs="1" />
-       <xs:element name="constraint" type="tns:ConstraintType"/>
-       <xs:element name="policy_id" type="xs:string"
-     </xs:all>
-   </xs:complexType>
-
-   <!-- The possible failure types applied in a policy -->
-   <xs:simpleType name="FailureType">
-     <xs:restriction base="xs:string">
-       <xs:enumeration value="MxMismatch"/>
-       <xs:enumeration value="InvalidCertificate"/>
-       <xs:enumeration value="ExpiredCertificate"/>
-       <xs:enumeration value="StarttlsNotSupported"/>
-       <xs:enumeration value="TlsaInvalid"/>
-       <xs:enumeration value="DnssecInvalid"/>
-       <xs:enumeration value="SenderDoesNotSupportValidationMethod"/>
-     </xs:restriction>
-   </xs:simpleType>
-
-   <!-- The possible enforcement level: whether the reporter also drops
-        messages -->
-   <xs:simpleType name="EnforcementLevelType">
-     <xs:restriction base="xs:string">
-       <xs:enumeration value="ReportOnly"/>
-       <xs:enumeration value="Reject"/>
-     </xs:restriction>
-   </xs:simpleType>
-
-   <!-- Record for individual failure types. -->
-   <xs:complexType name="FailureRecordType">
-     <xs:all>
-       <xs:element name="failure" type="tns:FailureType"/>
-       <xs:element name="count" type="xs:integer"/>
-       <xs:element name="hostname" type="xs:string"/>
-       <xs:element name="connectedIp" type="xs:string" minOccurs="0"/>
-       <xs:element name="sourceIp" type="xs:string" minOccurs="0"/>
-     </xs:all>
-   </xs:complexType>
-
-    <!-- Parent -->
-   <xs:element name="feedback">
-     <xs:complexType>
-       <xs:sequence>
-         <xs:element name="version"
-                     type="xs:decimal"/>
-         <xs:element name="report_metadata"
-                     type="tns:ReportMetadataType"/>
-         <xs:element name="applied_policy"
-                     type="tns:AppliedPolicyType"/>
-   <xs:element name="enforcement_level"
-   type="tns:EnforcementLevelType"/>
-         <xs:element name="record" type="tns:FailureRecordType"
-                     maxOccurs="unbounded"/>
-       </xs:sequence>
-     </xs:complexType>
-   </xs:element>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+	xmlns:tns="http://www.example.org/smtp-sts-xml/0.1" 
+	targetNamespace="http://www.example.org/smtp-sts-xml/0.1">
+	<!-- The time range
+in UTC covered by messages in this report, specified in seconds since epoch.
+-->
+	<xs:complexType name="DateRangeType">
+		<xs:all>
+			<xs:element name="begin" type="xs:integer"/>
+			<xs:element name="end" type="xs:integer"/>
+		</xs:all>
+	</xs:complexType>
+	<!-- Report generator metadata. -->
+	<xs:complexType name="ReportMetadataType">
+		<xs:sequence>
+			<xs:element name="org_name" type="xs:string"/>
+			<xs:element name="email" type="xs:string"/>
+			<xs:element name="extra_contact_info" type="xs:string" 
+				minOccurs="0"/>
+			<xs:element name="report_id" type="xs:string"/>
+			<xs:element name="date_range" type="tns:DateRangeType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- The
+constraints applied in a policy -->
+	<xs:simpleType name="ConstraintType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="WebPKI"/>
+			<xs:enumeration value="TLSA"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- The
+policy that was applied at send time. -->
+	<xs:complexType name="AppliedPolicyType">
+		<xs:all>
+			<xs:element name="domain" type="xs:string"/>
+			<xs:element name="mx" type="xs:string" minOccurs="1"/>
+			<xs:element name="constraint" type="tns:ConstraintType"/>
+			<xs:element name="policy_id" type="xs:string"/>
+		</xs:all>
+	</xs:complexType>
+	<!-- The possible failure types
+applied in a policy -->
+	<xs:simpleType name="FailureType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="MxMismatch"/>
+			<xs:enumeration value="InvalidCertificate"/>
+			<xs:enumeration value="ExpiredCertificate"/>
+			<xs:enumeration value="StarttlsNotSupported"/>
+			<xs:enumeration value="TlsaInvalid"/>
+			<xs:enumeration value="DnssecInvalid"/>
+			<xs:enumeration value="SenderDoesNotSupportValidationMethod"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- The possible enforcement level: whether the reporter also
+drops messages -->
+	<xs:simpleType name="EnforcementLevelType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ReportOnly"/>
+			<xs:enumeration value="Reject"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- Record for individual
+failure types. -->
+	<xs:complexType name="FailureRecordType">
+		<xs:all>
+			<xs:element name="failure" type="tns:FailureType"/>
+			<xs:element name="count" type="xs:integer"/>
+			<xs:element name="hostname" type="xs:string"/>
+			<xs:element name="connectedIp" type="xs:string" minOccurs="0"/>
+			<xs:element name="sourceIp" type="xs:string" minOccurs="0"/>
+		</xs:all>
+	</xs:complexType>
+	<!-- Parent -->
+	<xs:element name="feedback">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="version" type="xs:decimal"/>
+				<xs:element name="report_metadata" type="tns:ReportMetadataType"/>
+				<xs:element name="applied_policy" type="tns:AppliedPolicyType"/>
+				<xs:element name="enforcement_level" type="tns:EnforcementLevelType"/>
+				<xs:element name="record" type="tns:FailureRecordType" 
+					maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 </xs:schema>
+
+
 ~~~~~~~~~
 
 # Appendix 2: Example XML Report
-~~~~~~~~~ xml
+```
+<?xml version="1.0"?>
 <feedback xmlns="http://www.example.org/smtp-sts-xml/0.1">
-  <version>1</version>
-  <report_metadata>
-    <org_name>Company-X</org_name>
-    <email>sts-reporting@company-x.com</email>
-    <extra_contact_info></extra_contact_info>
-    <report_id>12345</report_id>
-    <date_range><begin>1439227624</begin>
-    <end>1439313998</end></date_range>
-    </report_metadata>
-  <applied_policy>
-    <domain>company-y.com</domain>
-    <mx>*.mx.mail.company-y.com</mx>
-    <constraint>WebPKI</constraint>
-    <policy_id>33a0fe07d5c5359c</policy_id>
-  </applied_policy>
-   <enforcement_level>ReportOnly</enforcement_level>
-  <record>
-      <failure>ExpiredCertificate</failure>
-      <count>13128</count>
-      <hostname>mta7.mx.mail.company-y.com</hostname>
-      <connectedIp>98.136.216.25</connectedIp>
-  </record>
-  <record>
-      <failure>StarttlsNotSupported</failure>
-      <count>19</count>
-      <hostname>mta7.mx.mail.company-y.com</hostname>
-      <connectedIp>98.22.33.99</connectedIp>
-  </record>
+	<version>1</version>
+	<report_metadata>
+		<org_name>Company-X</org_name>
+		<email>sts-reporting@company-x.com</email>
+		<extra_contact_info/>
+		<report_id>12345</report_id>
+		<date_range>
+			<begin>1439227624</begin>
+			<end>1439313998</end>
+		</date_range>
+	</report_metadata>
+	<applied_policy>
+		<domain>company-y.com</domain>
+		<mx>*.mx.mail.company-y.com</mx>
+		<constraint>WebPKI</constraint>
+		<policy_id>33a0fe07d5c5359c</policy_id>
+	</applied_policy>
+	<enforcement_level>ReportOnly</enforcement_level>
+	<record>
+		<failure>ExpiredCertificate</failure>
+		<count>13128</count>
+		<hostname>mta7.mx.mail.company-y.com</hostname>
+		<connectedIp>98.136.216.25</connectedIp>
+	</record>
+	<record>
+		<failure>StarttlsNotSupported</failure>
+		<count>19</count>
+		<hostname>mta7.mx.mail.company-y.com</hostname>
+		<connectedIp>98.22.33.99</connectedIp>
+	</record>
 </feedback>
-~~~~~~~~~
+
+```
 
 # Appendix 3: JSON Report Schema
 
