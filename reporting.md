@@ -129,6 +129,8 @@ distribution. See the section _Future_ _Work_ for more discussion.)
 
 Policies consist of the following directives:
 
+   * `version`: This value MUST be equal to `TLSRPT1`.
+   
    * `aggregate-report-uri`: A URI specifying the endpoint to which aggregate
      information about policy failures should be sent (see the section
      _Reporting Schema_ for more information). Two URI schemes are supported:
@@ -154,13 +156,14 @@ Policies consist of the following directives:
 ### Report using MAILTO:
 
 ```_smtp_tlsrpt.mail.example.com. IN TXT \
-		"aggregate-report-uri:mailto:reports@example.com"
+		"version:TLSRPT1;aggregate-report-uri:mailto:reports@example.com"
 ```
 
 ### Report using HTTPS:
 
 ```_smtp_tlsrpt.mail.example.com. IN TXT \
-		"aggregate-report-uri:https://reporting.example.com/v1/tlsrpt"
+		"version:TLSRPT1; \
+		aggregate-report-uri:https://reporting.example.com/v1/tlsrpt"
 ```
 
 
@@ -233,6 +236,100 @@ The list of result types will start with the minimal set below, and is expected
 
   * sender-does-not-support-validation-method: This indicates the sending system
     can never validate using the requested validation mechanism.
+
+
+# Reporting Delegation
+
+   It is possible to specify destinations for the different reports that
+   are outside the authority of the Policy Domain making the request.
+   This allows domains that do not operate mail servers to request
+   reports and have them go someplace that is able to receive and
+   process them.
+
+   Without checks, this would allow a bad actor to publish a TLS-RPT policy
+   record that requests that reports be sent to a victim address, potentially
+   causing the victim to be flooded with unwanted reports. Therefore, a
+   verification mechanism is included as inspired by Section 7.1 from 
+   [@!RFC7489].
+
+   When a sending MTA discovers an TLS-RPT policy in the DNS, and the
+   Organizational Domain at which that record was discovered is not
+   identical to the Organizational Domain of the host part of the
+   authority component of a [URI] specified in the "rua" or "ruf" tag,
+   the following verification steps are to be taken:
+
+   1.  Extract the host portion of the authority component of the URI.
+       Call this the "destination host", as it refers to a Report
+       Receiver.
+
+   2.  Prepend the string "_report._tlsrpt".
+
+   3.  Prepend the domain name from which the policy was retrieved,
+       after conversion to an A-label if needed.
+
+   4.  Query the DNS for a TXT record at the constructed name.  If the
+       result of this request is a temporary DNS error of some kind
+       (e.g., a timeout), the Mail Receiver MAY elect to temporarily
+       fail the delivery so the verification test can be repeated later.
+
+   5.  For each record returned, parse the result as a series of
+       "tag:value" pairs, i.e., the same overall format as the policy
+       record.  In particular, the "version:TLSRPT1" tag is
+       mandatory and MUST appear first in the list.  Discard any that do
+       not pass this test.
+
+   6.  If the result includes no TXT resource records that pass basic
+       parsing, a positive determination of the external reporting
+       relationship cannot be made; stop.
+
+   7.  If at least one TXT resource record remains in the set after
+       parsing, then the external reporting arrangement was authorized
+       by the Report Receiver.
+
+   8. If a "aggregate-report-uri" or "detailed-report-uri" tag is thus
+   discovered, replace the corresponding value extracted with the one found in
+   this record. This permits the Report Receiver to override the report
+   destination. However, to prevent loops or indirect abuse, the overriding URI
+   MUST use the same destination host from the first step.
+
+``` TODO FIX
+   For example, if a TLSRPT policy query for "blue.example.com" contained
+   "rua=mailto:reports@red.example.net", the host extracted from the
+   latter ("red.example.net") does not match "blue.example.com", so this
+   procedure is enacted.  A TXT query for
+   "blue.example.com._report._dmarc.red.example.net" is issued.  If a
+   single reply comes back containing a tag of "v=DMARC1", then the
+   relationship between the two is confirmed.  Moreover,
+   "red.example.net" has the opportunity to override the report
+   destination requested by "blue.example.com" if needed.
+
+   Where the above algorithm fails to confirm that the external
+   reporting was authorized by the Report Receiver, the URI MUST be
+   ignored by the Mail Receiver generating the report.  Further, if the
+   confirming record includes a URI whose host is again different than
+   the domain publishing that override, the Mail Receiver generating the
+   report MUST NOT generate a report to either the original or the
+   override URI.
+
+   A Report Receiver publishes such a record in its DNS if it wishes to
+   receive reports for other domains.
+
+   A Report Receiver that is willing to receive reports for any domain
+   can use a wildcard DNS record.  For example, a TXT resource record at
+   "*._report._dmarc.example.com" containing at least "v=DMARC1"
+   confirms that example.com is willing to receive DMARC reports for any
+   domain.
+
+   If the Report Receiver is overcome by volume, it can simply remove
+   the confirming DNS record.  However, due to positive caching, the
+   change could take as long as the time-to-live (TTL) on the record to
+   go into effect.
+
+   A Mail Receiver might decide not to enact this procedure if, for
+   example, it relies on a local list of domains for which external
+   reporting addresses are permitted.
+```
+
 
 # IANA Considerations
 
