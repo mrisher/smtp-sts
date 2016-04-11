@@ -1,0 +1,952 @@
+
+
+
+
+Using TLS in Applications                                   DM. Margolis
+Internet-Draft                                               Google, Inc
+Intended status: Standards Track                             AB. Brotman
+Expires: October 20, 2016                                   Comcast, Inc
+                                                        BR. Ramakrishnan
+                                                             Yahoo!, Inc
+                                                               JJ. Jones
+                                                          Microsoft, Inc
+                                                              MR. Risher
+                                                             Google, Inc
+                                                          April 18, 2016
+
+
+                           SMTP TLS Reporting
+                     draft-ietf-uta-smtp-tlsrpt-00
+
+Abstract
+
+   SMTP Mail Transfer Agents often conduct encrypted communication on
+   the Internet through the use of Transport Layer Security (TLS).
+   Because the STARTTLS protocol is opportunistic in nature, malicious
+   and misconfigured intermediaries can interfere with the successful
+   establishment of suitable encryption, and such interference is not
+   always detectable by the receiving server.  This document provides
+   transparency into failures in the SMTP MTA Strict Transport Security
+   policy (TODO: Add ref), negotiation of STARTTLS [RFC3207], and the
+   DNS-Based Authentication of Named Entities (DANE, [RFC6698]).
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at http://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on October 20, 2016.
+
+
+
+
+
+
+
+Margolis, et al.        Expires October 20, 2016                [Page 1]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2016
+
+
+Copyright Notice
+
+   Copyright (c) 2016 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (http://trustee.ietf.org/license-info) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Simplified BSD License text as described in Section 4.e of
+   the Trust Legal Provisions and are provided without warranty as
+   described in the Simplified BSD License.
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+     1.1.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   3
+   2.  Related Technologies  . . . . . . . . . . . . . . . . . . . .   3
+   3.  Reporting Policy  . . . . . . . . . . . . . . . . . . . . . .   4
+     3.1.  Example Reporting Policy  . . . . . . . . . . . . . . . .   4
+       3.1.1.  Report using MAILTO:  . . . . . . . . . . . . . . . .   4
+   4.  Reporting Schema  . . . . . . . . . . . . . . . . . . . . . .   5
+     4.1.  Result Types  . . . . . . . . . . . . . . . . . . . . . .   6
+       4.1.1.  Success Type  . . . . . . . . . . . . . . . . . . . .   6
+       4.1.2.  Routing Failures  . . . . . . . . . . . . . . . . . .   6
+       4.1.3.  Negotiation Failures  . . . . . . . . . . . . . . . .   6
+   5.  Reporting Delegation  . . . . . . . . . . . . . . . . . . . .   7
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
+   8.  Appendix 1: XML Schema for Failure Reports  . . . . . . . . .  10
+   9.  Appendix 2: Example XML Report  . . . . . . . . . . . . . . .  12
+   10. Appendix 3: JSON Report Schema  . . . . . . . . . . . . . . .  13
+   11. Appendix 4: Example JSON Report . . . . . . . . . . . . . . .  14
+   12. Normative References  . . . . . . . . . . . . . . . . . . . .  15
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
+
+1.  Introduction
+
+   The STARTTLS extension to SMTP [RFC3207] allows SMTP clients and
+   hosts to establish secure SMTP sessions over TLS.  The protocol
+   design is based on "Opportunistic Security" (OS) [RFC7435], which
+   provides interoperability for clients that do not support it, but
+   means that any attacker who can delete parts of the SMTP session
+   (such as the "250 STARTTLS" response) or who can redirect the entire
+   SMTP session (perhaps by overwriting the resolved MX record of the
+   delivery domain) can perform such a downgrade or interception attack.
+
+
+
+Margolis, et al.        Expires October 20, 2016                [Page 2]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2016
+
+
+   Because such "downgrade attacks" are not necessarily apparent to the
+   receiving MTA, this document defines a mechanism for sending domains
+   to report on failures at multiple parts of the MTA-to-MTA
+   conversation.
+
+   Specifically, this document defines a reporting schema that covers
+   failures in routing, STARTTLS negotiation, and both DANE [RFC7671]
+   and STS (TODO: Add ref) policy validation errors.
+
+   Implementers establish a policy by publishing a TXT record in the DNS
+   which instructs comliant sending MTAs to deliver reports of delivery
+   and STARTTLS failures in the appropriate format to the specified
+   endpoint.
+
+   This document is intended as a companion to the specification for
+   SMTP MTA Strict Transport Security (MTA-STS, TODO: Add ref).
+
+1.1.  Terminology
+
+   The keywords MUST, MUST NOT, REQUIRED, SHALL, SHALL NOT, SHOULD,
+   SHOULD NOT, RECOMMENDED, MAY, and OPTIONAL, when they appear in this
+   document, are to be interpreted as described in [RFC2119].
+
+   We also define the following terms for further use in this document:
+
+   o  STS Policy: A definition of the expected TLS availability and
+      behavior, as well as the desired actions for a given domain when a
+      sending MTA encounters different results.
+
+   o  Policy Domain: The domain against which an STS Policy is defined.
+
+   o  Sending MTA: The MTA initiating the delivery of an email message.
+
+2.  Related Technologies
+
+   o  This document is intended as a companion to the specification for
+      SMTP MTA Strict Transport Security (MTA-STS, TODO: Add ref).
+
+   o  The Public Key Pinning Extension for HTTP [RFC7469] contains a
+      JSON-based definition for reporting individual pin validation
+      failures.
+
+   o  The Domain-based Message Authentication, Reporting, and
+      Conformance (DMARC) [RFC7489] contains an XML-based reporting
+      format for aggregate and detailed email delivery errors.
+
+
+
+
+
+
+Margolis, et al.        Expires October 20, 2016                [Page 3]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2016
+
+
+3.  Reporting Policy
+
+   SMTP TLSRPT policies are distributed via DNS from the Policy Domain's
+   zone, either through a new resource record, or as TXT records
+   (similar to DMARC policies) under the name "_smtp_tlsrpt".  (Current
+   implementations deploy as TXT records.)  For example, for the Policy
+   Domain "example.com", the recipient's SMTP STS policy can be
+   retrieved from "_smtp_tlsrpt.example.com".
+
+   (Future implementations may move to alternate methods of policy
+   discovery or distribution.  See the section _Future_ _Work_ for more
+   discussion.)
+
+   Policies consist of the following directives:
+
+   o  "version": This value MUST be equal to "TLSRPT1".
+
+   o  "aggregate-report-uri": A URI specifying the endpoint to which
+      aggregate information about policy failures should be sent (see
+      the section _Reporting Schema_ for more information).  Two URI
+      schemes are supported: "mailto" and "https".
+
+      *  In the case of "https", reports should be submitted via POST
+         ([RFC2818]) to the specified URI.
+
+      *  In the case of "mailto", reports should be submitted to the
+         specified email address.  When sending failure reports via
+         SMTP, sending MTAs MUST NOT honor SMTP STS or DANE TLSA
+         failures.
+
+   o  "detailed-report-uri": Future use.  (There may also be a need for
+      enabling more detailed "forensic" reporting during initial stages
+      of a deployment.  To address this, the authors consider the
+      possibility of an optional additional "forensic reporting mode" in
+      which more details--such as certificate chains and MTA banners--
+      may be reported.  See the section _Future_ _Work_ for more
+      details.)
+
+3.1.  Example Reporting Policy
+
+3.1.1.  Report using MAILTO:
+
+   ```_smtp_tlsrpt.mail.example.com.  IN TXT
+   "version:TLSRPT1;aggregate-report-uri:mailto:reports@example.com"
+
+
+
+
+
+
+
+Margolis, et al.        Expires October 20, 2016                [Page 4]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2016
+
+
+   ### Report using HTTPS:
+
+   ```_smtp_tlsrpt.mail.example.com. IN TXT \
+           "version:TLSRPT1; \
+           aggregate-report-uri:https://reporting.example.com/v1/tlsrpt"
+
+4.  Reporting Schema
+
+   Aggregate reports contain the following fields:
+
+   o  _Report metadata_:
+
+      *  The organization responsible for the report
+
+      *  Contact information for one or more responsible parties for the
+         contents of the report
+
+      *  A unique identifier for the report
+
+      *  The reporting date range for the report
+
+   o  _Applied policy_, consisting of:
+
+      *  One of the following policy types:
+
+         +  The SMTP MTA STS policy applied (as a string)
+
+         +  The DANE TLSA record applied (as a string)
+
+      *  The domain for which the policy is applied
+
+      *  The MX host
+
+      *  An identifier for the policy (where applicable)
+
+   o  _Aggregate counts_, comprising _result type_, _sending MTA IP_,
+      _receiving MTA hostname_, _message count_, and an optional
+      _additional information_ field containing a URI for recipients to
+      review further information on a failure type.
+
+   Note that the failure types are non-exclusive; an aggregate report
+   MAY contain overlapping "counts" of failure types where a single send
+   attempt encountered multiple errors.
+
+
+
+
+
+
+
+
+Margolis, et al.        Expires October 20, 2016                [Page 5]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2016
+
+
+4.1.  Result Types
+
+   The list of result types will start with the minimal set below, and
+   is expected to grow over time based on real-world experience.  The
+   initial set is:
+
+4.1.1.  Success Type
+
+   o  "success": This indicates that the sending MTA was able to
+      successfully negotiate a policy-compliant TLS connection, and
+      serves to provide a "heartbeat" to receiving domains that
+      reporting is functional and tabulating correctly.
+
+4.1.2.  Routing Failures
+
+   o  "mx-mismatch": This indicates that the MX resolved for the
+      recipient domain did not match the MX constraint specified in the
+      policy.
+
+   o  "certificate-mismatch": This indicates that the certificate
+      presented by the receiving MX did not match the MX hostname
+
+4.1.3.  Negotiation Failures
+
+   o  "starttls-not-supported": This indicates that the recipient MX did
+      not support STARTTLS.
+
+   o  "invalid-certificate": This indicates that the certificate
+      presented by the receiving MX did not validate according to the
+      policy validation constraint.  (Either it was not signed by a
+      trusted CA or did not match the DANE TLSA record for the recipient
+      MX.)
+
+   o  "expired-certificate": This indicates that the certificate has
+      expired.
+
+4.1.3.1.  DANE-specific Policy Failures
+
+   o  "tlsa-invalid": This indicates a validation error for Policy
+      Domain specifying "tlsa" validation.
+
+   o  "dnssec-invalid": This indicates a failure to validate DNS records
+      for a Policy Domain with a published "tlsa" record.
+
+
+
+
+
+
+
+
+Margolis, et al.        Expires October 20, 2016                [Page 6]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2016
+
+
+4.1.3.2.  STS-specific Policy Failures
+
+   o  "sts-invalid": This indicates a validation error for Policy Domain
+      specifying "STS" validation.
+
+   o  sender-does-not-support-validation-method: This indicates the
+      sending system can never validate using the requested validation
+      mechanism.
+
+5.  Reporting Delegation
+
+   It is possible to specify destinations for the different reports that
+   are outside the authority of the Policy Domain making the request.
+   This allows domains that do not operate mail servers to request
+   reports and have them go someplace that is able to receive and
+   process them.
+
+   Without checks, this would allow a bad actor to publish a TLS-RPT
+   policy record that requests that reports be sent to a victim address,
+   potentially causing the victim to be flooded with unwanted reports.
+   Therefore, a verification mechanism is included as inspired by
+   Section 7.1 from [RFC7489].
+
+   When a sending MTA discovers an TLS-RPT policy in the DNS, and the
+   Organizational Domain at which that record was discovered is not
+   identical to the Organizational Domain of the host part of the
+   authority component of a [URI] specified in the "rua" or "ruf" tag,
+   the following verification steps are to be taken:
+
+   1.  Extract the host portion of the authority component of the URI.
+       Call this the "destination host", as it refers to a Report
+       Receiver.
+
+   2.  Prepend the string "_report._tlsrpt".
+
+   3.  Prepend the domain name from which the policy was retrieved,
+       after conversion to an A-label if needed.
+
+   4.  Query the DNS for a TXT record at the constructed name.  If the
+       result of this request is a temporary DNS error of some kind
+       (e.g., a timeout), the Mail Receiver MAY elect to temporarily
+       fail the delivery so the verification test can be repeated later.
+
+   5.  For each record returned, parse the result as a series of
+       "tag:value" pairs, i.e., the same overall format as the policy
+       record.  In particular, the "version:TLSRPT1" tag is mandatory
+       and MUST appear first in the list.  Discard any that do not pass
+       this test.
+
+
+
+Margolis, et al.        Expires October 20, 2016                [Page 7]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2016
+
+
+   6.  If the result includes no TXT resource records that pass basic
+       parsing, a positive determination of the external reporting
+       relationship cannot be made; stop.
+
+   7.  If at least one TXT resource record remains in the set after
+       parsing, then the external reporting arrangement was authorized
+       by the Report Receiver.
+
+   8.  If a "aggregate-report-uri" or "detailed-report-uri" tag is thus
+       discovered, replace the corresponding value extracted with the
+       one found in this record.  This permits the Report Receiver to
+       override the report destination.  However, to prevent loops or
+       indirect abuse, the overriding URI MUST use the same destination
+       host from the first step.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Margolis, et al.        Expires October 20, 2016                [Page 8]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2016
+
+
+   **TODO FIX to match TLSRPT (instead of DMARC) if we think we need this.**
+
+   For example, if a TLSRPT policy query for "blue.example.com" contained
+   "rua=mailto:reports@red.example.net", the host extracted from the
+   latter ("red.example.net") does not match "blue.example.com", so this
+   procedure is enacted.  A TXT query for
+   "blue.example.com._report._dmarc.red.example.net" is issued.  If a
+   single reply comes back containing a tag of "v=DMARC1", then the
+   relationship between the two is confirmed.  Moreover,
+   "red.example.net" has the opportunity to override the report
+   destination requested by "blue.example.com" if needed.
+
+   Where the above algorithm fails to confirm that the external
+   reporting was authorized by the Report Receiver, the URI MUST be
+   ignored by the Mail Receiver generating the report.  Further, if the
+   confirming record includes a URI whose host is again different than
+   the domain publishing that override, the Mail Receiver generating the
+   report MUST NOT generate a report to either the original or the
+   override URI.
+
+   A Report Receiver publishes such a record in its DNS if it wishes to
+   receive reports for other domains.
+
+   A Report Receiver that is willing to receive reports for any domain
+   can use a wildcard DNS record.  For example, a TXT resource record at
+   "*._report._dmarc.example.com" containing at least "v=DMARC1"
+   confirms that example.com is willing to receive DMARC reports for any
+   domain.
+
+   If the Report Receiver is overcome by volume, it can simply remove
+   the confirming DNS record.  However, due to positive caching, the
+   change could take as long as the time-to-live (TTL) on the record to
+   go into effect.
+
+   A Mail Receiver might decide not to enact this procedure if, for
+   example, it relies on a local list of domains for which external
+   reporting addresses are permitted.
+
+6.  IANA Considerations
+
+   There are no IANA considerations at this time.
+
+7.  Security Considerations
+
+   SMTP TLS Reporting provides transparency into misconfigurations and
+   attempts to intercept or tamper with mail between hosts who support
+   STARTTLS.  There are several security risks presented by the
+   existence of this reporting channel:
+
+
+
+Margolis, et al.        Expires October 20, 2016                [Page 9]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2016
+
+
+   o  _Flooding of the_ "aggregate-report-uri" _endpoint_: An attacker
+      could flood the endpoint and prevent the receiving domain from
+      accepting additional reports.  This type of Denial-of-Service
+      attack would limit visibility into STARTTLS failures, leaving the
+      receiving domain blind to an ongoing attack.
+
+   o  _Untrusted content_: An attacker could inject malicious code into
+      the report, opening a vulnerability in the receiving domain.
+      Implementers are advised to take precautions against evaluating
+      the contents of the report.
+
+8.  Appendix 1: XML Schema for Failure Reports
+
+
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:tns="http://www.example.org/smtp-sts-xml/0.1"
+    targetNamespace="http://www.example.org/smtp-sts-xml/0.1">
+    <!-- The time range
+in UTC covered by messages in this report, specified in seconds since epoch.
+-->
+    <xs:complexType name="DateRangeType">
+        <xs:all>
+            <xs:element name="begin" type="xs:integer"/>
+            <xs:element name="end" type="xs:integer"/>
+        </xs:all>
+    </xs:complexType>
+    <!-- Report generator metadata. -->
+    <xs:complexType name="ReportMetadataType">
+        <xs:sequence>
+            <xs:element name="org_name" type="xs:string"/>
+            <xs:element name="email" type="xs:string"/>
+            <xs:element name="extra_contact_info" type="xs:string"
+                minOccurs="0"/>
+            <xs:element name="report_id" type="xs:string"/>
+            <xs:element name="date_range" type="tns:DateRangeType"/>
+        </xs:sequence>
+    </xs:complexType>
+    <!-- The
+constraints applied in a policy -->
+    <xs:simpleType name="ConstraintType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="WebPKI"/>
+            <xs:enumeration value="TLSA"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <!-- The
+policy that was applied at send time. -->
+
+
+
+Margolis, et al.        Expires October 20, 2016               [Page 10]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2016
+
+
+    <xs:complexType name="AppliedPolicyType">
+        <xs:all>
+            <xs:element name="domain" type="xs:string"/>
+            <xs:element name="mx" type="xs:string" minOccurs="1"/>
+            <xs:element name="constraint" type="tns:ConstraintType"/>
+            <xs:element name="policy_id" type="xs:string"/>
+        </xs:all>
+    </xs:complexType>
+    <!-- The possible failure types
+applied in a policy -->
+    <xs:simpleType name="FailureType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="MxMismatch"/>
+            <xs:enumeration value="InvalidCertificate"/>
+            <xs:enumeration value="ExpiredCertificate"/>
+            <xs:enumeration value="StarttlsNotSupported"/>
+            <xs:enumeration value="TlsaInvalid"/>
+            <xs:enumeration value="DnssecInvalid"/>
+            <xs:enumeration value="SenderDoesNotSupportValidationMethod"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <!-- The possible enforcement level: whether the reporter also
+drops messages -->
+    <xs:simpleType name="EnforcementLevelType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="ReportOnly"/>
+            <xs:enumeration value="Reject"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <!-- Record for individual
+failure types. -->
+    <xs:complexType name="FailureRecordType">
+        <xs:all>
+            <xs:element name="failure" type="tns:FailureType"/>
+            <xs:element name="count" type="xs:integer"/>
+            <xs:element name="hostname" type="xs:string"/>
+            <xs:element name="connectedIp" type="xs:string" minOccurs="0"/>
+            <xs:element name="sourceIp" type="xs:string" minOccurs="0"/>
+        </xs:all>
+    </xs:complexType>
+    <!-- Parent -->
+    <xs:element name="feedback">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="version" type="xs:decimal"/>
+                <xs:element name="report_metadata"
+                                  type="tns:ReportMetadataType"/>
+                <xs:element name="applied_policy"
+
+
+
+Margolis, et al.        Expires October 20, 2016               [Page 11]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2016
+
+
+                                  type="tns:AppliedPolicyType"/>
+                <xs:element name="enforcement_level"
+                                  type="tns:EnforcementLevelType"/>
+                <xs:element name="record" type="tns:FailureRecordType"
+                    maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
+
+
+
+9.  Appendix 2: Example XML Report
+
+        <?xml version="1.0"?>
+        <feedback xmlns="http://www.example.org/smtp-sts-xml/0.1">
+            <version>1</version>
+            <report_metadata>
+                <org_name>Company-X</org_name>
+                <email>sts-reporting@company-x.com</email>
+                <extra_contact_info/>
+                <report_id>12345</report_id>
+                <date_range>
+                    <begin>1439227624</begin>
+                    <end>1439313998</end>
+                </date_range>
+            </report_metadata>
+            <applied_policy>
+                <domain>company-y.com</domain>
+                <mx>*.mx.mail.company-y.com</mx>
+                <constraint>WebPKI</constraint>
+                <policy_id>33a0fe07d5c5359c</policy_id>
+            </applied_policy>
+            <enforcement_level>ReportOnly</enforcement_level>
+            <record>
+                <failure>ExpiredCertificate</failure>
+                <count>13128</count>
+                <hostname>mta7.mx.mail.company-y.com</hostname>
+                <connectedIp>98.136.216.25</connectedIp>
+            </record>
+            <record>
+                <failure>StarttlsNotSupported</failure>
+                <count>19</count>
+                <hostname>mta7.mx.mail.company-y.com</hostname>
+                <connectedIp>98.22.33.99</connectedIp>
+            </record>
+        </feedback>
+
+
+
+
+Margolis, et al.        Expires October 20, 2016               [Page 12]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2016
+
+
+10.  Appendix 3: JSON Report Schema
+
+   The JSON schema is derived from the HPKP JSON schema [RFC7469] (cf.
+   Section 3)
+
+       {
+            "organization-name": organization-name,
+            "date-range": {
+                "start-datetime": date-time,
+                "end-datetime": date-time
+            },
+            "contact-info": email-address,
+            "report-id": report-id,
+            "applied-policy": {
+                "policy-type": policy-type,
+                "policy-string": policy-string,
+                "policy-domain": domain,
+                "mx-host": mx-host-pattern,
+                "policy-id": policy-id
+            },
+            "report-items": [
+               {
+                   "result-type": result-type,
+                   "sending-mta-ip": ip-address,
+                   "receiving-mta-hostname": receiving-mta-hostname,
+                   "message-count": message-count,
+                   "additional-information": additional-info-uri
+               }
+            ]
+       }
+
+   Figure x: JSON Report Format
+
+   o  "organization-name": The name of the organization responsible for
+      the report.  It is provided as a string.
+
+   o  "date-time": The date-time indicates the start- and end-times for
+      the report range.  It is provided as a string formatted according
+      to Section 5.6, "Internet Date/Time Format", of [RFC3339].
+
+   o  "email-address": The contact information for a responsible party
+      of the report.  It is provided as a string formatted according to
+      Section 3.4.1, "Addr-Spec", of [RFC5322].
+
+   o  "report-id": A unique identifier for the report.  Report authors
+      may use whatever scheme they prefer to generate a unique
+      identifier.  It is provided as a string.
+
+
+
+
+Margolis, et al.        Expires October 20, 2016               [Page 13]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2016
+
+
+   o  "policy-type": The type of policy that was applied by the sending
+      domain.  Presently, the only two valid choices are "tlsa" and
+      "sts".  It is provided as a string.
+
+   o  "policy-string": The string serialization of the policy, whether
+      TLSA record or STS policy.  Any linefeeds from the original policy
+      MUST be replaced with [SP].  TODO: Help with specifics.
+
+   o  "domain": The Policy Domain upon which the policy was applied.
+      For messages sent to "user@example.com" this field would contain
+      "example.com".  It is provided as a string.
+
+   o  "mx-host-pattern": The pattern of MX hostnames from the applied
+      policy.  It is provided as a string.
+
+   o  "policy-id": The version number of the STS policy, or left blank
+      for TLSA.
+
+   o  "result-type": A value from the _Result Types_ section above.
+
+   o  "ip-address": The IP address of the sending MTA that attempted the
+      STARTTLS connection.  It is provided as a string representation of
+      an IPv4 or IPv6 address.
+
+   o  "receiving-mta-hostname": The hostname of the receiving MTA with
+      which the sending MTA referenced in the "ip-address" field
+      attempted to negotiate a STARTTLS connection.
+
+   o  "message-count": The number of (attempted) messages that match the
+      relevant "result-type" for this section.
+
+   o  "additional-info-uri": An optional URI pointing to additional
+      information around the relevant "result-type".  For example, this
+      URI might host the complete certificate chain presented during an
+      attempted STARTTLS session.
+
+11.  Appendix 4: Example JSON Report
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Margolis, et al.        Expires October 20, 2016               [Page 14]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2016
+
+
+{
+     "organization-name": "Company-X",
+     "date-range": {
+         "start-datetime": "2016-04-01T00:00:00Z",
+         "end-datetime": "2016-04-01T23:59:59Z"
+     },
+     "contact-info": "sts-reporting@company-x.com",
+     "report-id": "5065427c-23d3-47ca-b6e0-946ea0e8c4be",
+     "applied-policy": {
+         "policy-type": "sts",
+         "policy-string": TODO: Add me,
+         "policy-domain": "company-y.com",
+         "mx-host": "*.mx.mail.company-y.com",
+         "policy-id": "33a0fe07d5c5359c"
+     },
+     "report-items": [
+        {
+            "result-type": "ExpiredCertificate",
+            "sending-mta-ip": "98.136.216.25",
+            "receiving-mta-hostname": "mta7.mx.mail.company-y.com",
+            "message-count": 13128
+        },
+        {
+            "result-type": "StarttlsNotSupported",
+            "sending-mta-ip": "98.22.33.99",
+            "receiving-mta-hostname": "mta7.mx.mail.company-y.com",
+            "message-count": 19,
+            "additional-information": "hxxps://reports.company-x.com" /
+                          "/report_info?id=5065427c-23d3#StarttlsNotSupported"
+        }
+     ]
+}
+
+12.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
+              RFC2119, March 1997,
+              <http://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC2818]  Rescorla, E., "HTTP Over TLS", RFC 2818, DOI 10.17487/
+              RFC2818, May 2000,
+              <http://www.rfc-editor.org/info/rfc2818>.
+
+   [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
+              Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
+              February 2002, <http://www.rfc-editor.org/info/rfc3207>.
+
+
+
+
+Margolis, et al.        Expires October 20, 2016               [Page 15]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2016
+
+
+   [RFC3339]  Klyne, G. and C. Newman, "Date and Time on the Internet:
+              Timestamps", RFC 3339, DOI 10.17487/RFC3339, July 2002,
+              <http://www.rfc-editor.org/info/rfc3339>.
+
+   [RFC5322]  Resnick, P., Ed., "Internet Message Format", RFC 5322, DOI
+              10.17487/RFC5322, October 2008,
+              <http://www.rfc-editor.org/info/rfc5322>.
+
+   [RFC6698]  Hoffman, P. and J. Schlyter, "The DNS-Based Authentication
+              of Named Entities (DANE) Transport Layer Security (TLS)
+              Protocol: TLSA", RFC 6698, DOI 10.17487/RFC6698, August
+              2012, <http://www.rfc-editor.org/info/rfc6698>.
+
+   [RFC7435]  Dukhovni, V., "Opportunistic Security: Some Protection
+              Most of the Time", RFC 7435, DOI 10.17487/RFC7435,
+              December 2014, <http://www.rfc-editor.org/info/rfc7435>.
+
+   [RFC7469]  Evans, C., Palmer, C., and R. Sleevi, "Public Key Pinning
+              Extension for HTTP", RFC 7469, DOI 10.17487/RFC7469, April
+              2015, <http://www.rfc-editor.org/info/rfc7469>.
+
+   [RFC7489]  Kucherawy, M., Ed. and E. Zwicky, Ed., "Domain-based
+              Message Authentication, Reporting, and Conformance
+              (DMARC)", RFC 7489, DOI 10.17487/RFC7489, March 2015,
+              <http://www.rfc-editor.org/info/rfc7489>.
+
+   [RFC7671]  Dukhovni, V. and W. Hardaker, "The DNS-Based
+              Authentication of Named Entities (DANE) Protocol: Updates
+              and Operational Guidance", RFC 7671, DOI 10.17487/RFC7671,
+              October 2015, <http://www.rfc-editor.org/info/rfc7671>.
+
+Authors' Addresses
+
+   Daniel Margolis
+   Google, Inc
+
+   Email: dmargolis (at) google.com
+
+
+   Alexander Brotman
+   Comcast, Inc
+
+   Email: alexander_brotman (at) cable.comcast (dot com)
+
+
+
+
+
+
+
+
+Margolis, et al.        Expires October 20, 2016               [Page 16]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2016
+
+
+   Binu Ramakrishnan
+   Yahoo!, Inc
+
+   Email: rbinu (at) yahoo-inc (dot com)
+
+
+   Janet Jones
+   Microsoft, Inc
+
+   Email: janet.jones (at) microsoft (dot com)
+
+
+   Mark Risher
+   Google, Inc
+
+   Email: risher (at) google (dot com)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Margolis, et al.        Expires October 20, 2016               [Page 17]

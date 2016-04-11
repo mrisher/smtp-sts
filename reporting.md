@@ -438,9 +438,12 @@ failure types. -->
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element name="version" type="xs:decimal"/>
-				<xs:element name="report_metadata" type="tns:ReportMetadataType"/>
-				<xs:element name="applied_policy" type="tns:AppliedPolicyType"/>
-				<xs:element name="enforcement_level" type="tns:EnforcementLevelType"/>
+				<xs:element name="report_metadata" 
+                                  type="tns:ReportMetadataType"/>
+				<xs:element name="applied_policy" 
+                                  type="tns:AppliedPolicyType"/>
+				<xs:element name="enforcement_level" 
+                                  type="tns:EnforcementLevelType"/>
 				<xs:element name="record" type="tns:FailureRecordType" 
 					maxOccurs="unbounded"/>
 			</xs:sequence>
