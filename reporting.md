@@ -292,7 +292,9 @@ The list of result types will start with the minimal set below, and is expected
    destination. However, to prevent loops or indirect abuse, the overriding URI
    MUST use the same destination host from the first step.
 
-``` TODO FIX
+``` 
+   **TODO FIX to match TLSRPT (instead of DMARC) if we think we need this.**
+
    For example, if a TLSRPT policy query for "blue.example.com" contained
    "rua=mailto:reports@red.example.net", the host extracted from the
    latter ("red.example.net") does not match "blue.example.com", so this
