@@ -63,6 +63,7 @@ failures in SMTP MTA Strict Transport Security (TODO: Add ref), STARTTLS
 
 {mainmatter}
 
+
 # Introduction
 
 The STARTTLS extension to SMTP [@!RFC3207] allows SMTP clients and hosts to
@@ -104,6 +105,7 @@ We also define the following terms for further use in this document:
   * Policy Domain: The domain against which an STS Policy is defined.
   * Sending MTA: The MTA initiating the delivery of an email message.
 
+
 # Related Technologies
   * This document is intended as a companion to the specification for SMTP MTA
     Strict Transport Security (MTA-STS, TODO: Add ref).
@@ -112,6 +114,7 @@ We also define the following terms for further use in this document:
   * The Domain-based Message Authentication, Reporting, and Conformance (DMARC)
     [@!RFC7489] contains an XML-based reporting format for aggregate and
     detailed email delivery errors.
+
 
 # Reporting Policy
 
@@ -158,7 +161,6 @@ Policies consist of the following directives:
 		"version:TLSRPT1; \
 		aggregate-report-uri:https://reporting.example.com/v1/tlsrpt"
 ```
-
 
 # Reporting Schema
 
@@ -329,6 +331,7 @@ The list of result types will start with the minimal set below, and is expected
 # IANA Considerations
 
 There are no IANA considerations at this time.
+
 
 # Security Considerations
 
