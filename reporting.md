@@ -353,143 +353,7 @@ several security risks presented by the existence of this reporting channel:
     not present a significant new vulnerability.
 
 
-# Appendix 1: XML Schema for Failure Reports
-~~~~~~~~~ xml
-
-<?xml version="1.0"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
-	xmlns:tns="http://www.example.org/smtp-sts-xml/0.1" 
-	targetNamespace="http://www.example.org/smtp-sts-xml/0.1">
-	<!-- The time range
-in UTC covered by messages in this report, specified in seconds since epoch.
--->
-	<xs:complexType name="DateRangeType">
-		<xs:all>
-			<xs:element name="begin" type="xs:integer"/>
-			<xs:element name="end" type="xs:integer"/>
-		</xs:all>
-	</xs:complexType>
-	<!-- Report generator metadata. -->
-	<xs:complexType name="ReportMetadataType">
-		<xs:sequence>
-			<xs:element name="org_name" type="xs:string"/>
-			<xs:element name="email" type="xs:string"/>
-			<xs:element name="extra_contact_info" type="xs:string" 
-				minOccurs="0"/>
-			<xs:element name="report_id" type="xs:string"/>
-			<xs:element name="date_range" type="tns:DateRangeType"/>
-		</xs:sequence>
-	</xs:complexType>
-	<!-- The
-constraints applied in a policy -->
-	<xs:simpleType name="ConstraintType">
-		<xs:restriction base="xs:string">
-			<xs:enumeration value="WebPKI"/>
-			<xs:enumeration value="TLSA"/>
-		</xs:restriction>
-	</xs:simpleType>
-	<!-- The
-policy that was applied at send time. -->
-	<xs:complexType name="AppliedPolicyType">
-		<xs:all>
-			<xs:element name="domain" type="xs:string"/>
-			<xs:element name="mx" type="xs:string" minOccurs="1"/>
-			<xs:element name="constraint" type="tns:ConstraintType"/>
-			<xs:element name="policy_id" type="xs:string"/>
-		</xs:all>
-	</xs:complexType>
-	<!-- The possible failure types
-applied in a policy -->
-	<xs:simpleType name="FailureType">
-		<xs:restriction base="xs:string">
-			<xs:enumeration value="MxMismatch"/>
-			<xs:enumeration value="InvalidCertificate"/>
-			<xs:enumeration value="ExpiredCertificate"/>
-			<xs:enumeration value="StarttlsNotSupported"/>
-			<xs:enumeration value="TlsaInvalid"/>
-			<xs:enumeration value="DnssecInvalid"/>
-			<xs:enumeration value="SenderDoesNotSupportValidationMethod"/>
-		</xs:restriction>
-	</xs:simpleType>
-	<!-- The possible enforcement level: whether the reporter also
-drops messages -->
-	<xs:simpleType name="EnforcementLevelType">
-		<xs:restriction base="xs:string">
-			<xs:enumeration value="ReportOnly"/>
-			<xs:enumeration value="Reject"/>
-		</xs:restriction>
-	</xs:simpleType>
-	<!-- Record for individual
-failure types. -->
-	<xs:complexType name="FailureRecordType">
-		<xs:all>
-			<xs:element name="failure" type="tns:FailureType"/>
-			<xs:element name="count" type="xs:integer"/>
-			<xs:element name="hostname" type="xs:string"/>
-			<xs:element name="connectedIp" type="xs:string" minOccurs="0"/>
-			<xs:element name="sourceIp" type="xs:string" minOccurs="0"/>
-		</xs:all>
-	</xs:complexType>
-	<!-- Parent -->
-	<xs:element name="feedback">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="version" type="xs:decimal"/>
-				<xs:element name="report_metadata" 
-                                  type="tns:ReportMetadataType"/>
-				<xs:element name="applied_policy" 
-                                  type="tns:AppliedPolicyType"/>
-				<xs:element name="enforcement_level" 
-                                  type="tns:EnforcementLevelType"/>
-				<xs:element name="record" type="tns:FailureRecordType" 
-					maxOccurs="unbounded"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-</xs:schema>
-
-
-~~~~~~~~~
-
-# Appendix 2: Example XML Report
-```
-<?xml version="1.0"?>
-<feedback xmlns="http://www.example.org/smtp-sts-xml/0.1">
-	<version>1</version>
-	<report_metadata>
-		<org_name>Company-X</org_name>
-		<email>sts-reporting@company-x.com</email>
-		<extra_contact_info/>
-		<report_id>12345</report_id>
-		<date_range>
-			<begin>1439227624</begin>
-			<end>1439313998</end>
-		</date_range>
-	</report_metadata>
-	<applied_policy>
-		<domain>company-y.com</domain>
-		<mx>*.mx.mail.company-y.com</mx>
-		<constraint>WebPKI</constraint>
-		<policy_id>33a0fe07d5c5359c</policy_id>
-	</applied_policy>
-	<enforcement_level>ReportOnly</enforcement_level>
-	<record>
-		<failure>ExpiredCertificate</failure>
-		<count>13128</count>
-		<hostname>mta7.mx.mail.company-y.com</hostname>
-		<connectedIp>98.136.216.25</connectedIp>
-	</record>
-	<record>
-		<failure>StarttlsNotSupported</failure>
-		<count>19</count>
-		<hostname>mta7.mx.mail.company-y.com</hostname>
-		<connectedIp>98.22.33.99</connectedIp>
-	</record>
-</feedback>
-
-```
-
-# Appendix 3: JSON Report Schema
+# Appendix 1: JSON Report Schema
 
 The JSON schema is derived from the HPKP JSON schema [@!RFC7469] (cf. Section 3)
 
@@ -559,7 +423,7 @@ Figure x: JSON Report Format
     complete certificate chain presented during an attempted STARTTLS session.
 
 
-# Appendix 4: Example JSON Report
+# Appendix 2: Example JSON Report
 ```
 {
 	"organization-name": "Company-X",
