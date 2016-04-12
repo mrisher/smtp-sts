@@ -2,15 +2,15 @@
 
 
 
-Using TLS in Applications                                   DM. Margolis
+Using TLS in Applications                                    D. Margolis
 Internet-Draft                                               Google, Inc
-Intended status: Standards Track                             AB. Brotman
+Intended status: Standards Track                              A. Brotman
 Expires: October 20, 2016                                   Comcast, Inc
-                                                        BR. Ramakrishnan
+                                                         B. Ramakrishnan
                                                              Yahoo!, Inc
-                                                               JJ. Jones
+                                                                J. Jones
                                                           Microsoft, Inc
-                                                              MR. Risher
+                                                               M. Risher
                                                              Google, Inc
                                                           April 18, 2016
 
@@ -20,15 +20,15 @@ Expires: October 20, 2016                                   Comcast, Inc
 
 Abstract
 
-   SMTP Mail Transfer Agents often conduct encrypted communication on
-   the Internet through the use of Transport Layer Security (TLS).
-   Because the STARTTLS protocol is opportunistic in nature, malicious
-   and misconfigured intermediaries can interfere with the successful
-   establishment of suitable encryption, and such interference is not
-   always detectable by the receiving server.  This document provides
-   transparency into failures in the SMTP MTA Strict Transport Security
-   policy (TODO: Add ref), negotiation of STARTTLS [RFC3207], and the
-   DNS-Based Authentication of Named Entities (DANE, [RFC6698]).
+   SMTP Mail Transfer Agents often conduct encrypted communication
+   through the use of Transport Layer Security (TLS).  Because the
+   STARTTLS protocol employs opportunistic encryption, "Man-in-the-
+   Middle" intermediaries can interfere with the successful
+   establishment of suitable encryption in ways that may not be
+   detectable by the receiving server.  This document provides
+   transparency into failures in SMTP MTA Strict Transport Security
+   (TODO: Add ref), STARTTLS [RFC3207], and the DNS-Based Authentication
+   of Named Entities (DANE, [RFC6698]).
 
 Status of This Memo
 
@@ -92,9 +92,9 @@ Table of Contents
    8.  Appendix 1: XML Schema for Failure Reports  . . . . . . . . .  10
    9.  Appendix 2: Example XML Report  . . . . . . . . . . . . . . .  12
    10. Appendix 3: JSON Report Schema  . . . . . . . . . . . . . . .  13
-   11. Appendix 4: Example JSON Report . . . . . . . . . . . . . . .  14
-   12. Normative References  . . . . . . . . . . . . . . . . . . . .  15
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
+   11. Appendix 4: Example JSON Report . . . . . . . . . . . . . . .  15
+   12. Normative References  . . . . . . . . . . . . . . . . . . . .  16
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  17
 
 1.  Introduction
 
@@ -143,6 +143,9 @@ Internet-Draft                 SMTP-TLSRPT                    April 2016
       behavior, as well as the desired actions for a given domain when a
       sending MTA encounters different results.
 
+   o  TLSRPT Policy: A policy detailing the endpoint for sending MTAs
+      should to deliver reports
+
    o  Policy Domain: The domain against which an STS Policy is defined.
 
    o  Sending MTA: The MTA initiating the delivery of an email message.
@@ -159,9 +162,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2016
    o  The Domain-based Message Authentication, Reporting, and
       Conformance (DMARC) [RFC7489] contains an XML-based reporting
       format for aggregate and detailed email delivery errors.
-
-
-
 
 
 
@@ -361,11 +361,12 @@ Internet-Draft                 SMTP-TLSRPT                    April 2016
    Therefore, a verification mechanism is included as inspired by
    Section 7.1 from [RFC7489].
 
-   When a sending MTA discovers an TLS-RPT policy in the DNS, and the
+   When a sending MTA discovers a TLS-RPT policy in the DNS, and the
    Organizational Domain at which that record was discovered is not
    identical to the Organizational Domain of the host part of the
-   authority component of a [URI] specified in the "rua" or "ruf" tag,
-   the following verification steps are to be taken:
+   authority component of a [URI] specified in the "aggregate-report-
+   uri" or "detailed-report-uri" tag, the following verification steps
+   are to be taken:
 
    1.  Extract the host portion of the authority component of the URI.
        Call this the "destination host", as it refers to a Report
@@ -378,14 +379,13 @@ Internet-Draft                 SMTP-TLSRPT                    April 2016
 
    4.  Query the DNS for a TXT record at the constructed name.  If the
        result of this request is a temporary DNS error of some kind
-       (e.g., a timeout), the Mail Receiver MAY elect to temporarily
+       (e.g., a timeout), the sending domain MAY elect to temporarily
        fail the delivery so the verification test can be repeated later.
 
    5.  For each record returned, parse the result as a series of
        "tag:value" pairs, i.e., the same overall format as the policy
        record.  In particular, the "version:TLSRPT1" tag is mandatory
-       and MUST appear first in the list.  Discard any that do not pass
-       this test.
+
 
 
 
@@ -394,23 +394,23 @@ Margolis, et al.        Expires October 20, 2016                [Page 7]
 Internet-Draft                 SMTP-TLSRPT                    April 2016
 
 
+       and MUST appear first in the list.  Discard any that do not pass
+       this test.
+
    6.  If the result includes no TXT resource records that pass basic
        parsing, a positive determination of the external reporting
        relationship cannot be made; stop.
 
    7.  If at least one TXT resource record remains in the set after
        parsing, then the external reporting arrangement was authorized
-       by the Report Receiver.
+       by the Policy Domain.
 
    8.  If a "aggregate-report-uri" or "detailed-report-uri" tag is thus
        discovered, replace the corresponding value extracted with the
-       one found in this record.  This permits the Report Receiver to
+       one found in this record.  This permits the Policy Domain to
        override the report destination.  However, to prevent loops or
        indirect abuse, the overriding URI MUST use the same destination
        host from the first step.
-
-
-
 
 
 
@@ -517,6 +517,13 @@ Internet-Draft                 SMTP-TLSRPT                    April 2016
       Implementers are advised to take precautions against evaluating
       the contents of the report.
 
+   o  _Report snooping_: An attacker could create a bogus TLSRPT record
+      to receive statistics about a domain the attacker does not own.
+      Since an attacker able to poison DNS is already able to receive
+      counts of SMTP connections (and, in fact, actual SMTP message
+      payloads) today, this does not present a significant new
+      vulnerability.
+
 8.  Appendix 1: XML Schema for Failure Reports
 
 
@@ -547,13 +554,6 @@ in UTC covered by messages in this report, specified in seconds since epoch.
     <!-- The
 constraints applied in a policy -->
     <xs:simpleType name="ConstraintType">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="WebPKI"/>
-            <xs:enumeration value="TLSA"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <!-- The
-policy that was applied at send time. -->
 
 
 
@@ -562,6 +562,13 @@ Margolis, et al.        Expires October 20, 2016               [Page 10]
 Internet-Draft                 SMTP-TLSRPT                    April 2016
 
 
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="WebPKI"/>
+            <xs:enumeration value="TLSA"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <!-- The
+policy that was applied at send time. -->
     <xs:complexType name="AppliedPolicyType">
         <xs:all>
             <xs:element name="domain" type="xs:string"/>
@@ -603,13 +610,6 @@ failure types. -->
         </xs:all>
     </xs:complexType>
     <!-- Parent -->
-    <xs:element name="feedback">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="version" type="xs:decimal"/>
-                <xs:element name="report_metadata"
-                                  type="tns:ReportMetadataType"/>
-                <xs:element name="applied_policy"
 
 
 
@@ -618,6 +618,13 @@ Margolis, et al.        Expires October 20, 2016               [Page 11]
 Internet-Draft                 SMTP-TLSRPT                    April 2016
 
 
+    <xs:element name="feedback">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="version" type="xs:decimal"/>
+                <xs:element name="report_metadata"
+                                  type="tns:ReportMetadataType"/>
+                <xs:element name="applied_policy"
                                   type="tns:AppliedPolicyType"/>
                 <xs:element name="enforcement_level"
                                   type="tns:EnforcementLevelType"/>
@@ -631,6 +638,41 @@ Internet-Draft                 SMTP-TLSRPT                    April 2016
 
 
 9.  Appendix 2: Example XML Report
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Margolis, et al.        Expires October 20, 2016               [Page 12]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2016
+
 
         <?xml version="1.0"?>
         <feedback xmlns="http://www.example.org/smtp-sts-xml/0.1">
@@ -667,17 +709,26 @@ Internet-Draft                 SMTP-TLSRPT                    April 2016
         </feedback>
 
 
-
-
-Margolis, et al.        Expires October 20, 2016               [Page 12]
-
-Internet-Draft                 SMTP-TLSRPT                    April 2016
-
-
 10.  Appendix 3: JSON Report Schema
 
    The JSON schema is derived from the HPKP JSON schema [RFC7469] (cf.
    Section 3)
+
+
+
+
+
+
+
+
+
+
+
+
+Margolis, et al.        Expires October 20, 2016               [Page 13]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2016
+
 
        {
             "organization-name": organization-name,
@@ -722,17 +773,18 @@ Internet-Draft                 SMTP-TLSRPT                    April 2016
       may use whatever scheme they prefer to generate a unique
       identifier.  It is provided as a string.
 
-
-
-
-Margolis, et al.        Expires October 20, 2016               [Page 13]
-
-Internet-Draft                 SMTP-TLSRPT                    April 2016
-
-
    o  "policy-type": The type of policy that was applied by the sending
       domain.  Presently, the only two valid choices are "tlsa" and
       "sts".  It is provided as a string.
+
+
+
+
+
+Margolis, et al.        Expires October 20, 2016               [Page 14]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2016
+
 
    o  "policy-string": The string serialization of the policy, whether
       TLSA record or STS policy.  Any linefeeds from the original policy
@@ -781,7 +833,11 @@ Internet-Draft                 SMTP-TLSRPT                    April 2016
 
 
 
-Margolis, et al.        Expires October 20, 2016               [Page 14]
+
+
+
+
+Margolis, et al.        Expires October 20, 2016               [Page 15]
 
 Internet-Draft                 SMTP-TLSRPT                    April 2016
 
@@ -837,7 +893,7 @@ Internet-Draft                 SMTP-TLSRPT                    April 2016
 
 
 
-Margolis, et al.        Expires October 20, 2016               [Page 15]
+Margolis, et al.        Expires October 20, 2016               [Page 16]
 
 Internet-Draft                 SMTP-TLSRPT                    April 2016
 
@@ -893,7 +949,7 @@ Authors' Addresses
 
 
 
-Margolis, et al.        Expires October 20, 2016               [Page 16]
+Margolis, et al.        Expires October 20, 2016               [Page 17]
 
 Internet-Draft                 SMTP-TLSRPT                    April 2016
 
@@ -949,4 +1005,4 @@ Internet-Draft                 SMTP-TLSRPT                    April 2016
 
 
 
-Margolis, et al.        Expires October 20, 2016               [Page 17]
+Margolis, et al.        Expires October 20, 2016               [Page 18]

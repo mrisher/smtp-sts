@@ -12,35 +12,35 @@
    date = 2016-04-18T00:00:00Z
 
    [[author]]
-   initials="DM"
+   initials="D."
    surname="Margolis"
    fullname="Daniel Margolis"
    organization="Google, Inc"
      [author.address]
      email="dmargolis (at) google.com"
    [[author]]
-   initials="AB"
+   initials="A."
    surname="Brotman"
    fullname="Alexander Brotman"
    organization="Comcast, Inc"
      [author.address]
      email="alexander_brotman (at) cable.comcast (dot com)"
    [[author]]
-   initials="BR"
+   initials="B."
    surname="Ramakrishnan"
    fullname="Binu Ramakrishnan"
    organization="Yahoo!, Inc"
      [author.address]
      email="rbinu (at) yahoo-inc (dot com)"
    [[author]]
-   initials="JJ"
+   initials="J."
    surname="Jones"
    fullname="Janet Jones"
    organization="Microsoft, Inc"
      [author.address]
      email="janet.jones (at) microsoft (dot com)"
    [[author]]
-   initials="MR"
+   initials="M."
    surname="Risher"
    fullname="Mark Risher"
    organization="Google, Inc"
@@ -51,14 +51,14 @@
 
 .# Abstract
 
-SMTP Mail Transfer Agents often conduct encrypted communication on the Internet
-through the use of Transport Layer Security (TLS). Because the STARTTLS protocol
-is opportunistic in nature, malicious and misconfigured intermediaries can
-interfere with the successful establishment of suitable encryption, and such
-interference is not always detectable by the receiving server. This document
-provides transparency into failures in the SMTP MTA Strict Transport Security
-policy (TODO: Add ref), negotiation of STARTTLS [@!RFC3207], and the DNS-Based
-Authentication of Named Entities (DANE, [@!RFC6698]).
+SMTP Mail Transfer Agents often conduct encrypted communication through the use
+of Transport Layer Security (TLS). Because the STARTTLS protocol employs
+opportunistic encryption, "Man-in-the-Middle" intermediaries can interfere with
+the successful establishment of suitable encryption in ways that may not be
+detectable by the receiving server. This document provides transparency into
+failures in SMTP MTA Strict Transport Security (TODO: Add ref), STARTTLS
+[@!RFC3207], and the DNS-Based Authentication of Named Entities (DANE,
+[@!RFC6698]).
 
 
 {mainmatter}
@@ -96,25 +96,22 @@ they appear in this document, are to be interpreted as described in [@!RFC2119].
 
 We also define the following terms for further use in this document:
 
-* STS Policy: A definition of the expected TLS availability and behavior, as
-  well as the desired actions for a given domain when a sending MTA encounters
-  different results.
-* Policy Domain: The domain against which an STS Policy is defined.
-* Sending MTA: The MTA initiating the delivery of an email message.
+  * STS Policy: A definition of the expected TLS availability and behavior, as
+    well as the desired actions for a given domain when a sending MTA encounters
+    different results.
+  * TLSRPT Policy: A policy detailing the endpoint for sending MTAs should to
+    deliver reports 
+  * Policy Domain: The domain against which an STS Policy is defined.
+  * Sending MTA: The MTA initiating the delivery of an email message.
 
 # Related Technologies
-
   * This document is intended as a companion to the specification for SMTP MTA
     Strict Transport Security (MTA-STS, TODO: Add ref).
-
   * The Public Key Pinning Extension for HTTP [@!RFC7469] contains a JSON-based
     definition for reporting individual pin validation failures.
-
   * The Domain-based Message Authentication, Reporting, and Conformance (DMARC)
     [@!RFC7489] contains an XML-based reporting format for aggregate and
     detailed email delivery errors.
-
-
 
 # Reporting Policy
 
@@ -130,19 +127,15 @@ distribution. See the section _Future_ _Work_ for more discussion.)
 Policies consist of the following directives:
 
    * `version`: This value MUST be equal to `TLSRPT1`.
-   
    * `aggregate-report-uri`: A URI specifying the endpoint to which aggregate
      information about policy failures should be sent (see the section
      _Reporting Schema_ for more information). Two URI schemes are supported:
      `mailto` and `https`.
-
 	 * In the case of `https`, reports should be submitted via POST
      ([@!RFC2818]) to the specified URI.
-
  	 * In the case of `mailto`, reports should be submitted to the specified
      email address. When sending failure reports via SMTP, sending MTAs MUST
      NOT honor SMTP STS or DANE TLSA failures.
-
    * `detailed-report-uri`: Future use. (There may also be a need for enabling
      more detailed "forensic" reporting during initial stages of a deployment.
      To address this, the authors consider the possibility of an optional
@@ -252,10 +245,10 @@ The list of result types will start with the minimal set below, and is expected
    verification mechanism is included as inspired by Section 7.1 from 
    [@!RFC7489].
 
-   When a sending MTA discovers an TLS-RPT policy in the DNS, and the
-   Organizational Domain at which that record was discovered is not
-   identical to the Organizational Domain of the host part of the
-   authority component of a [URI] specified in the "rua" or "ruf" tag,
+   When a sending MTA discovers a TLS-RPT policy in the DNS, and the
+   Organizational Domain at which that record was discovered is not identical to
+   the Organizational Domain of the host part of the authority component of a
+   [URI] specified in the "aggregate-report-uri" or "detailed-report-uri" tag,
    the following verification steps are to be taken:
 
    1.  Extract the host portion of the authority component of the URI.
@@ -269,7 +262,7 @@ The list of result types will start with the minimal set below, and is expected
 
    4.  Query the DNS for a TXT record at the constructed name.  If the
        result of this request is a temporary DNS error of some kind
-       (e.g., a timeout), the Mail Receiver MAY elect to temporarily
+       (e.g., a timeout), the sending domain MAY elect to temporarily
        fail the delivery so the verification test can be repeated later.
 
    5.  For each record returned, parse the result as a series of
@@ -284,11 +277,11 @@ The list of result types will start with the minimal set below, and is expected
 
    7.  If at least one TXT resource record remains in the set after
        parsing, then the external reporting arrangement was authorized
-       by the Report Receiver.
+       by the Policy Domain.
 
    8. If a "aggregate-report-uri" or "detailed-report-uri" tag is thus
    discovered, replace the corresponding value extracted with the one found in
-   this record. This permits the Report Receiver to override the report
+   this record. This permits the Policy Domain to override the report
    destination. However, to prevent loops or indirect abuse, the overriding URI
    MUST use the same destination host from the first step.
 
@@ -353,7 +346,11 @@ several security risks presented by the existence of this reporting channel:
     report, opening a vulnerability in the receiving domain. Implementers are
     advised to take precautions against evaluating the contents of the report.
 
-
+  * _Report snooping_: An attacker could create a bogus TLSRPT record to
+    receive statistics about a domain the attacker does not own. Since an
+    attacker able to poison DNS is already able to receive counts of SMTP
+    connections (and, in fact, actual SMTP message payloads) today, this does
+    not present a significant new vulnerability.
 
 
 # Appendix 1: XML Schema for Failure Reports
