@@ -226,8 +226,8 @@ distribution. See the section _Future_ _Work_ for more discussion.)
 
 Policies MUST specify the following fields:
 
-* v: Version (plain-text, required). Currently only "STS1" is supported.
-* m: Mode (plain-text, required). If "enforce", the receiving MTA requests that
+* version: Version (plain-text, required). Currently only "STS1" is supported.
+* mode: Mode (plain-text, required). If "enforce", the receiving MTA requests that
   messages be delivered only if they conform to the STS policy. If "report" the
   receiving MTA requests that failure reports be delivered, as specified by the
   `rua` parameter.
@@ -236,22 +236,22 @@ Policies MUST specify the following fields:
   this domain. For example, "*.example.com,*.example.net" indicates that mail
   for this domain might be handled by any MX whose hostname is a subdomain of
   "example.com" or "example.net."
-* a: The mechanism to use to authenticate this policy itself. See the section
+* authentication-mechanism: The mechanism to use to authenticate this policy itself. See the section
   _Policy_ _Discovery_ _&_ _Authentication_ for more details. Possible values
   are:
-  * webpki:URI, where URI points to an HTTPS resource at the recipient domain
+  * WebPKI: URI, where URI points to an HTTPS resource at the recipient domain
     that serves the same policy text.
   * dnssec: Indicating that the policy is expected to be served over DNSSEC.
-* c: Constraints on the recipient MX's TLS certificate (plain-text, required).
+* constraint: Constraints on the recipient MX's TLS certificate (plain-text, required).
   See the section _Policy_ _Validation_ for more details. Possible values are:
-  * webpki: Indicating that the TLS certificate presented by the recipient MX
+  * WebPKI: Indicating that the TLS certificate presented by the recipient MX
     will be validated according to the "web PKI" mechanism.
   * tlsa: Indicating that the TLS certificate presented by the recipient MX
     will match a (presumed to exist) DANE TLSA record.
 * max-age: Max lifetime of the policy (plain-text integer seconds). Well-behaved
   clients SHOULD cache a policy for up to this value from last policy fetch
   time.
-* rua: [@!RFC3986] URI(s) to which aggregate feedback MAY be sent
+* report-uri-aggregate: [@!RFC3986] URI(s) to which aggregate feedback MAY be sent
   (comma-separated plain-text list of email addresses or HTTPS endpoints,
   optional). For example, "mailto:postmaster@example.com" or
   `https://example.com/sts-report`.
@@ -293,13 +293,13 @@ The formal definition of the SMTP STS format, using [@!RFC5234], is as follows:
                        %61-7A /           ; A-Z
                        %2D                ; "-"
 
-    sts-a           = "a" *WSP "=" *WSP ( "webpki" / "dnssec")
+    sts-authentication           = "authentication" *WSP "=" *WSP ( "webpki" / "dnssec")
 
-    sts-c           = "c" *WSP "=" *WSP ( "webpki" / "tlsa")
+    sts-constraint           = "constraint" *WSP "=" *WSP ( "webpki" / "tlsa")
 
     sts-max-age           = "max-age" *WSP "=" *WSP 1*10DIGIT
 
-    sts-auri        = "rua" *WSP "=" *WSP
+    sts-auri        = "report-uri-aggregate" *WSP "=" *WSP
                        sts-uri *(*WSP "," *WSP sts-uri)
 
 A size limitation in a sts-uri, if provided, is interpreted as a
@@ -327,7 +327,7 @@ to apply old policies for up to this duration.
 
 ### Policy Updates
 
-For policies authenticated via "webpki", updating the policy requires that the
+For policies authenticated via "WebPKI", updating the policy requires that the
 owner make changes in two places: the _smtp_sts RR record in the Policy Domain's
 DNS zone and at the corresponding HTTPS endpoint. In the case of a
 race-condition if the policy update in HTTPS lags behind the DNS TXT record or
@@ -349,7 +349,7 @@ policy, and to prevent long-term denials of service, it is important that
 senders are able to authenticate a new policy retrieved for a recipient domain.
 There are two supported mechanisms for policy authentication:
 
-* Web PKI: In this mechanism, indicated by the "webpki" value of the "a" field,
+* Web PKI: In this mechanism, indicated by the "WebPKI" value of the "authentication-mechanism" field,
   the sender fetches a HTTPS resource from a host at `policy._smtp_sts` in the
   Policy Domain. For example, a=webpki indicates that the sender should fetch
   the resource from https://policy._smtp_sts.example.com/current. In order for
@@ -361,7 +361,7 @@ There are two supported mechanisms for policy authentication:
   also enables a third party mail service provider to host a policy for their
   users' domains.
 
-* DNSSEC: In this mechanism, indicated by the "dnssec" value of the "a" field,
+* DNSSEC: In this mechanism, indicated by the "dnssec" value of the "authentication-mechanism" field,
   the sender MUST retrieve the policy via a DNSSEC signed response for the
   _smtp_sts TXT record.
 
@@ -377,12 +377,12 @@ valid according to the semantics of the SMTP STS policy. Policies can specify
 certificate validity in one of two ways by setting the value of the "c" field in
 the policy description.
 
-* Web PKI: When the "c" field is set to "webpki", the certificate presented by
+* Web PKI: When the "constraint" field is set to "WebPKI", the certificate presented by
   the receiving MX MUST be valid for the MX name and chain to a root CA that is
   trusted by the sending MTA. The certificate MUST have a CN or SAN matching the
   MX hostname (as described in [@!RFC6125]) and be non-expired.
 
-* DANE TLSA: When the "c" field is set to "tlsa", the receiving MX MUST be
+* DANE TLSA: When the "constraint" field is set to "tlsa", the receiving MX MUST be
   covered by a DANE TLSA record for the recipient domain, and the presented
   certificate MUST be valid according to that record (as described by
   [@!RFC7672]).
@@ -441,7 +441,7 @@ the policy expiration time.
 # Failure Reporting
 
 Aggregate statistics on policy failures MAY be reported to the URI indicated
-in the "rua" field of the policy. SMTP STS reports contain information about
+in the "report-uri-aggregate" field of the policy. SMTP STS reports contain information about
 policy failures to allow diagnosis of misconfigurations and malicious activity.
 
 (There may also be a need for enabling more detailed "forensic" reporting during
@@ -597,10 +597,10 @@ are processed, in order to:
 * Determine how many messages would be affected by a strict policy
 
 ~~~~~~~~~
-_smtp_sts  IN TXT ( "v=STS1; m=report; "
+_smtp_sts  IN TXT ( "v=STS1; mode=report; "
                      "mx=*mail.example.com; "
-                     "a=dnssec; c=webpki; max-age=123456"
-                     "rua=mailto:sts-feedback@example.com" )
+                     "authentication=dnssec; constraint=WebPKI; max-age=123456"
+                     "report-uri-aggregate=mailto:sts-feedback@example.com" )
 ~~~~~~~~~
 
 ## Example 2
@@ -611,10 +611,10 @@ https://policy._smtp_sts.example.com/current and compare the content with the
 policy in the DNS. example.com is the recipient's domain.
 
 ~~~~~~~~~
-_smtp_sts  IN TXT ( "v=STS1; m=enforce; "
+_smtp_sts  IN TXT ( "v=STS1; mode=enforce; "
                      "mx=*mail.example.com; "
-                     "a=webpki; c=webpki; max-age=123456"
-                     "rua=mailto:sts-feedback@example.com" )
+                     "authentication=WebPKI; constraint=WebPCI; max-age=123456"
+                     "report-uri-aggregate=mailto:sts-feedback@example.com" )
 ~~~~~~~~~
 
 # Appendix 3: XML Schema for Failure Reports
