@@ -293,7 +293,7 @@ The formal definition of the SMTP STS format, using [@!RFC5234], is as follows:
                        %61-7A /           ; A-Z
                        %2D                ; "-"
 
-    sts-authentication           = "authentication" *WSP "=" *WSP ( "webpki" / "dnssec")
+    sts-authentication           = "authentication-mechanism" *WSP "=" *WSP ( "webpki" / "dnssec")
 
     sts-constraint           = "constraint" *WSP "=" *WSP ( "webpki" / "tlsa")
 
