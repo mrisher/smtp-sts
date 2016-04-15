@@ -755,21 +755,26 @@ _smtp_sts  IN TXT ( "version=STS1; mode=enforce; "
 # Appendix 5: DEEP Registration Elements
 
 Name: mx-mismatch
-Description: This indicates that the MX resolved for the recipient domain did not match the MX constraint specified in the policy.
+Description: This indicates that the MX resolved for the recipient domain 
+| did not match the MX constraint specified in the policy.
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document
 Change Controller:  IESG
    
 Name: certificate-mismatch
-Description This indicates that the certificate presented by the receiving MX did not match the MX hostname
+Description This indicates that the certificate presented by the receiving 
+| MX did not match the MX hostname
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document
 Change Controller:  IESG
 
 Name: invalid-certificate
-Description: This indicates that the certificate presented by the receiving MX did not validate according to the policy validation constraint. (Either it was not signed by a trusted CA or did not match the DANE TLSA record for the recipient MX.)
+Description: This indicates that the certificate presented by the receiving MX 
+| did not validate according to the policy validation constraint. (Either 
+| it was not signed by a trusted CA or did not match the DANE TLSA record 
+| for the recipient MX.)
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document
@@ -797,14 +802,16 @@ Submitter:  Authors of this document
 Change Controller:  IESG
 
 Name: dnssec-invalid
-Description: This indicates a failure to validate DNS records for a Policy Domain specifying "tlsa" validation or "dnssec" authentication.
+Description: This indicates a failure to validate DNS records for a Policy 
+| Domain specifying "tlsa" validation or "dnssec" authentication.
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document
 Change Controller:  IESG
 
 Name: sender-does-not-support-validation-method
-Description: This indicates the sending system can never validate using the requested validation mechanism.
+Description: This indicates the sending system can never validate using 
+| the requested validation mechanism.
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document
