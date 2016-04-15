@@ -6,8 +6,8 @@ TXT=$(SOURCES:.md=.txt)
 
 all: $(XML) $(TXT)
 
-$(XML): $(SOURCES)
+%.xml : %.md
 	$(MMARK) -xml2 -page $< > $@ 
 	
-$(TXT): $(XML)
-	$(XML2RFC) --text $< $@
+%.txt : %.xml
+	$(XML2RFC) $< --text $@
