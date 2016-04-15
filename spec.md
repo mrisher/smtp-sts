@@ -109,7 +109,7 @@ subject to downgrade attacks — and (b) server authenticity — because the tru
 relationship from email domain to MTA server identity is not cryptographically
 validated.
 
-While such "opportunistic" encryption protocols provide a high barrier against
+While such _opportunistic_ encryption protocols provide a high barrier against
 passive man-in-the-middle traffic interception, any attacker who can delete
 parts of the SMTP session (such as the "250 STARTTLS" response) or who can
 redirect the entire SMTP session (perhaps by overwriting the resolved MX record
@@ -130,8 +130,8 @@ The mechanism described is separated into four logical components:
    1. policy semantics: whether senders can expect a server for the
       recipient domain to support TLS encryption and how to validate the TLS
       certificate presented
-   2. policy authentication: how to determine the authenticity of a published
-      policy delivered via DNS
+   2. policy discovery & authentication: how to discover a domain's published
+      STS policy and determine the authenticity of that policy
    3. failure report format: a mechanism for informing recipient domains about
       aggregate failure statistics
    4. failure handling: what sending MTAs should do in the case of policy
@@ -171,10 +171,9 @@ In addition, SMTP STS introduces a mechanism for failure reporting and a
 report-only mode, enabling offline ("report-only") deployments and auditing for
 compliance.
 
-## Advantages When Used Without DANE
+### Advantages of SMTP STS when compared to DANE
 
-When deployed without a DANE TLSA record, SMTP STS offers the following
-advantages compared to DANE:
+SMTP STS offers the following advantages compared to DANE:
 
    * *Infrastructure:* In comparison to DANE, this proposal does not require
      DNSSEC be deployed on either the sending or receiving domain. In addition,
@@ -182,7 +181,7 @@ advantages compared to DANE:
      analysis of STARTTLS failures, enabling mail providers to gain insight into
      the security of their SMTP connections without the need to modify MTA
      codebases directly.
-   * *Offline- or report-only usage:* DANE does not provide a reporting
+   * *Offline or report-only usage:* DANE does not provide a reporting
      mechanism and does not have a concept of "report-only" for failures; as a
      result, a service provider cannot receive metrics on TLS acceptability
      without asking senders to enforce a given policy; similarly, senders who
@@ -190,16 +189,12 @@ advantages compared to DANE:
      recipients such metrics from an offline (and potentially easier-to-deploy)
      logs-analysis batch process.
 
-## Disadvantages When Used Without DANE
-
-When deployed alone (i.e. without a DANE record, and using Web PKI for
-certificate verification), SMTP STS offers the following disadvantages compared
-to DANE:
+### Advantages of DANE when compared to SMTP STS
 
 * Infrastructure: DANE may be easier for some providers to deploy. In
   particular, for providers who already support DNSSEC, SMTP STS would
-  additionally require they obtain a CA-signed x509 certificate for the
-  recipient domain.
+  additionally require they host a HTTPS webserver and obtain a CA-signed
+  X.509 certificate for the recipient domain.
 
 * Security: DANE offers an advantage against policy-lookup DoS attacks; that is,
   while a DNSSEC-signed NXDOMAIN response to a DANE lookup authoritatively
@@ -216,21 +211,21 @@ distribution. See the section _Future_ _Work_ for more discussion.)
 
 Policies MUST specify the following fields in JSON format:
 
-* version: (plain-text, required). Currently only "STS1" is supported.
-* mode:(plain-text, required). If "enforce", the receiving MTA requests that
-  messages be delivered only if they conform to the STS policy. If "report" the
-  receiving MTA requests that failure reports be delivered, as specified by the
-  `rua` parameter.
-* mx: MX patterns (comma-separated list of plain-text MX match patterns,
+* _version_: (plain-text, required). Currently only "STS1" is supported.
+* _mode_:(plain-text, required). If "enforce", the receiving MTA requests that
+  messages be delivered only if they conform to the STS policy. If "report-only"
+  the receiving MTA requests that failure reports be delivered, as specified
+  by the `rua` parameter.
+* _mx_: MX patterns (comma-separated list of plain-text MX match patterns,
   required). One or more comma-separated patterns matching the expected MX for
   this domain. For example, "*.example.com,*.example.net" indicates that mail
   for this domain might be handled by any MX whose hostname is a subdomain of
   "example.com" or "example.net."
-* expiry: Max lifetime of the policy (plain-text integer seconds). Well-behaved
+* _expiry_: Max lifetime of the policy (plain-text integer seconds). Well-behaved
   clients SHOULD cache a policy for up to this value from last policy fetch
   time.
-* policy_id: A short string used to track policy updates
-* rua: [@!RFC3986] URI(s) to which aggregate feedback MAY be sent
+* _policy_id_: A short string used to track policy updates
+* _rua_: [@!RFC3986] URI(s) to which aggregate feedback MAY be sent
   (comma-separated plain-text list of email addresses or HTTPS endpoints,
   optional). For example, `mailto:postmaster@example.com` or
   `https://example.com/sts-report`.
@@ -303,7 +298,7 @@ to apply old policies for up to this duration.
 ### Policy Updates
 
 For policies authenticated via Web PKI (HTTPS), updating the policy requires that
-the owner make changes in two places: the _smtp_sts RR record in the Policy
+the owner make changes in two places: the `_smtp_sts` RR record in the Policy
 Domain's DNS zone and at the corresponding HTTPS endpoint. In the case of a
 race-condition if the policy update in HTTPS lags behind the DNS TXT record or
 vice versa, the policy fetched during that period will fail to authenticate (and
@@ -349,18 +344,18 @@ When sending to an MX at a domain for which the sender has a valid non-expired
 SMTP STS policy, a sending MTA honoring SMTP STS MAY apply the result of a
 policy validation one of two ways:
 
-* Report-only: In this mode, sending MTAs merely send a report to the designated
+* _report-only_: In this mode, sending MTAs merely send a report to the designated
   report address indicating policy application failures. This can be done
   "offline", i.e. based on the MTA logs, and is thus a suitable low-risk option
   for MTAs who wish to enhance transparency of TLS tampering without making
   complicated changes to production mail-handling infrastructure.
 
-* Enforced: In this mode, sending MTAs SHOULD treat STS policy failures, in
+* _enforce_: In this mode, sending MTAs SHOULD treat STS policy failures, in
   which the policy action is "reject", as a mail delivery error, and SHOULD
   terminate the SMTP connection, not delivering any more mail to the recipient
   MTA.
 
-In enforced mode, however, sending MTAs MUST first check for a new
+In _enforce_ mode, however, sending MTAs MUST first check for a new
 _authenticated_ policy before actually treating a message failure as fatal.
 
 Thus the control flow for a sending MTA that does online policy application
@@ -373,10 +368,10 @@ consists of the following steps:
 4. If not valid and policy specifies rejection, perform the following
    steps:
 
-  * Check for a new (non-cached) _authenticated_ policy. If one exists, update
-    the current policy and go to step 2.
-  * If (none exists and cached policy is not expired) or
-       (the newly fetched policy also fails), treat the delivery as a failure.
+  * Check for a new (non-cached) _authenticated_ policy. 
+  * If one exists and the new policy is different, update the current policy and go to step 2.
+  * If one exists and the new policy is same as the cached policy, treat the delivery as a failure.
+  * If none exists and cached policy is not expired, treat the delivery as a failure.
 
 Understanding the details of step 4 is critical to understanding the behavior of
 the system as a whole.
