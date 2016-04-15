@@ -149,6 +149,8 @@ We also define the following terms for further use in this document:
   well as the desired actions for a given domain when a sending MTA encounters
   different results.
 * Policy Domain: The domain against which an STS Policy is defined.
+* Policy Authentication: Authentication of the STS policy retrieved for a recipient
+  domain by the sender
 
 # Related Technologies
 
@@ -162,21 +164,12 @@ for reporting TLS negotiation failures.
 
 The primary difference between the mechanism described here and DANE is that DANE
 requires the use of DNSSEC to authenticate DANE TLSA records, whereas SMTP STS
-relies on the certificate authority (CA) system and a trust-on-first-use (TOFU)
-approach to avoid interception. The TOFU model allows a degree of security
-similar to that of HPKP [@!RFC7469], reducing the complexity but without the
-guarantees on first use offered by DNSSEC. (For a thorough discussion of this
-trade-off, see the section _Security_ _Considerations_.)
+relies on the certificate authority (CA) system to avoid interception. (For a 
+thorough discussion of this trade-off, see the section _Security_ _Considerations_.)
 
 In addition, SMTP STS introduces a mechanism for failure reporting and a
 report-only mode, enabling offline ("report-only") deployments and auditing for
 compliance.
-
-## Advantages When Used with DANE
-
-SMTP STS can be deployed for a recipient domain that also publishes a DANE TLSA
-record for SMTP. In these cases, the SMTP STS policy can additionally declare a
-process for failure reporting.
 
 ## Advantages When Used Without DANE
 
@@ -215,19 +208,16 @@ to DANE:
 
 # Policy Semantics
 
-SMTP STS policies are distributed via DNS from the Policy Domain's zone either
-through a new resource record, or as TXT records (similar to DMARC policies)
-under the name "_smtp_sts". (Current implementations deploy as TXT records.) For
-example, for the Policy Domain "example.com", the recipient's SMTP STS policy
-can be retrieved from "_smtp_sts.example.com."
+SMTP STS policies are distributed via a _well known_ HTTPS endpoint in the
+Policy Domain. 
 
 (Future implementations may move to alternate methods of policy discovery or
 distribution. See the section _Future_ _Work_ for more discussion.)
 
-Policies MUST specify the following fields:
+Policies MUST specify the following fields in JSON format:
 
-* v: Version (plain-text, required). Currently only "STS1" is supported.
-* m: Mode (plain-text, required). If "enforce", the receiving MTA requests that
+* version: (plain-text, required). Currently only "STS1" is supported.
+* mode:(plain-text, required). If "enforce", the receiving MTA requests that
   messages be delivered only if they conform to the STS policy. If "report" the
   receiving MTA requests that failure reports be delivered, as specified by the
   `rua` parameter.
@@ -236,24 +226,13 @@ Policies MUST specify the following fields:
   this domain. For example, "*.example.com,*.example.net" indicates that mail
   for this domain might be handled by any MX whose hostname is a subdomain of
   "example.com" or "example.net."
-* a: The mechanism to use to authenticate this policy itself. See the section
-  _Policy_ _Discovery_ _&_ _Authentication_ for more details. Possible values
-  are:
-  * webpki:URI, where URI points to an HTTPS resource at the recipient domain
-    that serves the same policy text.
-  * dnssec: Indicating that the policy is expected to be served over DNSSEC.
-* c: Constraints on the recipient MX's TLS certificate (plain-text, required).
-  See the section _Policy_ _Validation_ for more details. Possible values are:
-  * webpki: Indicating that the TLS certificate presented by the recipient MX
-    will be validated according to the "web PKI" mechanism.
-  * tlsa: Indicating that the TLS certificate presented by the recipient MX
-    will match a (presumed to exist) DANE TLSA record.
-* e: Max lifetime of the policy (plain-text integer seconds). Well-behaved
+* expiry: Max lifetime of the policy (plain-text integer seconds). Well-behaved
   clients SHOULD cache a policy for up to this value from last policy fetch
   time.
+* policy_id: A short string used to track policy updates
 * rua: [@!RFC3986] URI(s) to which aggregate feedback MAY be sent
   (comma-separated plain-text list of email addresses or HTTPS endpoints,
-  optional). For example, "mailto:postmaster@example.com" or
+  optional). For example, `mailto:postmaster@example.com` or
   `https://example.com/sts-report`.
 
 ## Formal Definition
@@ -268,8 +247,6 @@ The formal definition of the SMTP STS format, using [@!RFC5234], is as follows:
 
     sts-record      = sts-version sts-sep sts-to
                        [sts-sep sts-mx]
-                       [sts-sep sts-a]
-                       [sts-sep sts-c]
                        [sts-sep sts-e]
                        [sts-sep sts-auri]
                        [sts-sep]
@@ -293,12 +270,10 @@ The formal definition of the SMTP STS format, using [@!RFC5234], is as follows:
                        %61-7A /           ; A-Z
                        %2D                ; "-"
 
-    sts-a           = "a" *WSP "=" *WSP ( "webpki" / "dnssec")
-
-    sts-c           = "c" *WSP "=" *WSP ( "webpki" / "tlsa")
-
     sts-e           = "e" *WSP "=" *WSP 1*10DIGIT
 
+    sts-id          = "e" *WSP "=" *WSP 1*10VCHAR
+    
     sts-auri        = "rua" *WSP "=" *WSP
                        sts-uri *(*WSP "," *WSP sts-uri)
 
@@ -327,71 +302,46 @@ to apply old policies for up to this duration.
 
 ### Policy Updates
 
-For policies authenticated via "webpki", updating the policy requires that the
-owner make changes in two places: the _smtp_sts RR record in the Policy Domain's
-DNS zone and at the corresponding HTTPS endpoint. In the case of a
+For policies authenticated via Web PKI (HTTPS), updating the policy requires that
+the owner make changes in two places: the _smtp_sts RR record in the Policy
+Domain's DNS zone and at the corresponding HTTPS endpoint. In the case of a
 race-condition if the policy update in HTTPS lags behind the DNS TXT record or
 vice versa, the policy fetched during that period will fail to authenticate (and
-is thus treated as though it did not exist, as described in _Policy_
-_Authentication_).  Senders who have a cached policy will thus fall back to that
-cached policy. Thus Policy Domains can expect an existing published policy to be
-used until an update is rolled out in both locations.
+is thus treated as though it did not exist, as described in _Policy
+Discovery & Authentication_). Senders who have a cached policy will thus fall 
+back to that cached policy. Thus Policy Domains can expect an existing published
+policy to be used until an update is rolled out in both locations.
 
 ## Policy Discovery & Authentication
 
-Senders discover a recipient domain's STS policy by making an attempt to fetch
-TXT records from the recipient domain's DNS zone with the name "_smtp_sts". If
-found, the policy is fetched and authenticated. The security of a domain
-implementing an SMTP STS policy against an active man-in-the-middle depends
-primarily upon the long-lived caching of policies.  However, to allow recipient
-domains to safely serve new policies _prior_ to the expiration of a cached
-policy, and to prevent long-term denials of service, it is important that
-senders are able to authenticate a new policy retrieved for a recipient domain.
-There are two supported mechanisms for policy authentication:
+Senders discover a recipient domain's STS policy, by making an attempt to fetch
+TXT records from the recipient domain's DNS zone with the name "_smtp_sts". A
+valid TXT record presence in "_smtp_sts.example.com" indicates that the
+recipent domain supports STS. To allow recipient domains to safely serve new 
+policies, it is important that senders are able to authenticate a new policy
+retrieved for a recipient domain.
 
-* Web PKI: In this mechanism, indicated by the "webpki" value of the "a" field,
-  the sender fetches a HTTPS resource from a host at `policy._smtp_sts` in the
-  Policy Domain. For example, a=webpki indicates that the sender should fetch
-  the resource from https://policy._smtp_sts.example.com/current. In order for
-  the policy to be valid, the HTTP response body served at this resource MUST
-  exactly match the policy initially loaded via the DNS TXT method, and MUST be
-  served from an HTTPS endpoint at the domain matching that of the recipient
-  domain. Since the policy is served from a special subdomain, MTA operators may
-  host a separate web server different from on their main domain. This model
-  also enables a third party mail service provider to host a policy for their
-  users' domains.
+Web PKI is the mechanism used for policy authentication. In this mechanism, the
+sender fetches a HTTPS resource (policy) from a host at `policy._smtp_sts` in the
+Policy Domain. The policy is served from a _well known_ URI -
+https://policy._smtp_sts.example.com/current. To consider the policy as valid,
+the _policy_id_ field in the policy MUST match the _id_ field in the DNS TXT record
+under `_smtp_sts`
 
-* DNSSEC: In this mechanism, indicated by the "dnssec" value of the "a" field,
-  the sender MUST retrieve the policy via a DNSSEC signed response for the
-  _smtp_sts TXT record.
-
-When fetching a new policy or updated policy,the new policy MUST be
-authenticated before use.
+When fetching a new policy or updating a policy, the new policy MUST be
+fully authenticated (HTTPS certificate validation + peer verification) before use.
+A policy which has not ever been successfully authenticated MUST not be used to
+reject mail.
 
 ## Policy Validation
 
 When sending to an MX at a domain for which the sender has a valid and
 non-expired SMTP STS policy, a sending MTA honoring SMTP STS SHOULD validate
-that the recipient MX supports STARTTLS and offers a TLS certificate which is
-valid according to the semantics of the SMTP STS policy. Policies can specify
-certificate validity in one of two ways by setting the value of the "c" field in
-the policy description.
-
-* Web PKI: When the "c" field is set to "webpki", the certificate presented by
-  the receiving MX MUST be valid for the MX name and chain to a root CA that is
-  trusted by the sending MTA. The certificate MUST have a CN or SAN matching the
-  MX hostname (as described in [@!RFC6125]) and be non-expired.
-
-* DANE TLSA: When the "c" field is set to "tlsa", the receiving MX MUST be
-  covered by a DANE TLSA record for the recipient domain, and the presented
-  certificate MUST be valid according to that record (as described by
-  [@!RFC7672]).
-
-A sending MTA who does not support the validation method required--for example,
-an MTA that does not have a DNSSEC-compatible resolver--MUST behave as though
-the policy did not validate. As described in the section on _Policy_
-_Application_, a policy which has not ever been successfully validated MUST not
-be used to reject mail.
+that the recipient MX supports STARTTLS, and offers a valid PKIX based TLS 
+certificate. The certificate presented by the receiving MX MUST be valid for
+the MX name and chain to a root CA that is trusted by the sending MTA. The
+certificate MUST have a CN or SAN matching the MX hostname (as described in
+[@!RFC6125]) and be non-expired.
 
 ## Policy Application
 
@@ -419,14 +369,14 @@ consists of the following steps:
 1. Check for cached non-expired policy. If none exists, fetch the latest,
    authenticate and cache it.
 2. Validate recipient MTA against policy. If valid, deliver mail.
-3. If policy invalid and policy specifies reporting, generate report.
-4. If policy invalid and policy specifies rejection, perform the following
+3. If not valid and the policy specifies reporting, generate report.
+4. If not valid and policy specifies rejection, perform the following
    steps:
 
   * Check for a new (non-cached) _authenticated_ policy. If one exists, update
-    the current policy and go to step 1.
-  * If none exists or the newly fetched policy also fails, treat the delivery
-    as a failure.
+    the current policy and go to step 2.
+  * If (none exists and cached policy is not expired) or
+       (the newly fetched policy also fails), treat the delivery as a failure.
 
 Understanding the details of step 4 is critical to understanding the behavior of
 the system as a whole.
@@ -512,17 +462,17 @@ classes of attacks considered:
   connections to the legitimate recipient server (for example, by altering BGP
   routing tables).
 
-SMTP Strict Transport Security relies on certificate validation via either TLS
-identity checking [@!RFC6125] or DANE TLSA [@!RFC7672]. Attackers who are able
-to obtain a valid certificate for the targeted recipient mail service (e.g. by
-compromising a certificate authority) are thus out of scope of this threat
-model.
+SMTP Strict Transport Security relies on certificate validation via PKIX based TLS
+identity checking [@!RFC6125]. Attackers who are able to obtain a valid certificate
+for the targeted recipient mail service (e.g. by compromising a certificate authority)
+are thus out of scope of this threat model.
 
-In the WebPKI constraint mode, an attacker who is able to block DNS responses can
-suppress the delivery of an STS Policy, making the Policy Domain appear not to have
-an STS Policy. The caching model described in _Policy_ _Expirations_ is designed to
-resist this attack, and there is discussion in the _Future_ _Work_ section around
-future distribution mechanisms that are robust against this attack.
+Since we use DNS TXT record for policy discovery, an attacker who is able to block
+DNS responses can suppress the discovery of an STS Policy, making the Policy Domain
+appear not to have an STS Policy. The caching model described in 
+_Policy_ _Expirations_ is designed to resist this attack, and there is discussion in
+the _Future_ _Work_ section around future distribution mechanisms that are robust
+against this attack.
 
 # Future Work
 
@@ -564,14 +514,14 @@ In addition, the authors leave currently open the following details:
 ~~~~~~~~~
 policy = policy_from_cache()
 if not policy or is_expired(policy):
-  policy = policy_from_dns()  // fetch and authenticate!
+  policy = policy_from_https_endpoint()  // fetch and authenticate!
   update_cache = true
 if policy:
   if invalid_mx_or_tls(policy):  // check MX and TLS cert
     if rua:
       generate_report()
     if p_reject():
-      policy = policy_from_dns()  // fetch and authenticate #2!
+      policy = policy_from_https_endpoint()  // fetch and authenticate #2!
       update_cache = true
       if invalid_mx_or_tls(policy):
         reject_message()
@@ -588,34 +538,33 @@ The owner of example.com wishes to begin using STS with a policy that will
 solicit aggregate feedback from receivers without affecting how the messages
 are processed, in order to:
 
+* Verify the identity of MXs that handle mail for this domain
+
 * Confirm that its legitimate messages are sent over TLS
 
 * Verify the validity of the certificates
 
-* Verify what ciphers are in use
-
 * Determine how many messages would be affected by a strict policy
 
+DNS STS policy indicator TXT record:
 ~~~~~~~~~
-_smtp_sts  IN TXT ( "v=STS1; m=report; "
-                     "mx=*mail.example.com; "
-                     "a=dnssec; c=webpki; e=123456"
-                     "rua=mailto:sts-feedback@example.com" )
+_smtp_sts  IN TXT ( "v=STSv1; id=randomstr; " )
 ~~~~~~~~~
 
-## Example 2
-
-Similar to Example 1 above, but in _enforce_ mode. Since the auth field 'a' is
-webpki, the sender will authenticate the policy by making a HTTPS request to:
-https://policy._smtp_sts.example.com/current and compare the content with the
-policy in the DNS. example.com is the recipient's domain.
-
+STS policy served from HTTPS endpoint of the policy (recipient) domain, and
+is authenticated using Web PKI mechanism.
 ~~~~~~~~~
-_smtp_sts  IN TXT ( "v=STS1; m=enforce; "
-                     "mx=*mail.example.com; "
-                     "a=webpki; c=webpki; e=123456"
-                     "rua=mailto:sts-feedback@example.com" )
+{
+  "version": "STS1",
+  "mode": "report-only",
+  "policy_id": "randomstr",
+  "mx": "*.mail.example.com",
+  "expiry": "123456",
+  "rua": "mailto:sts-feedback@example.com" 
+}
 ~~~~~~~~~
+
+The policy is authenticated using Web PKI mechanism. 
 
 # Appendix 3: XML Schema for Failure Reports
 ~~~~~~~~~
@@ -645,23 +594,12 @@ _smtp_sts  IN TXT ( "v=STS1; m=enforce; "
      </xs:sequence>
    </xs:complexType>
 
-
-   <!-- The constraints applied in a policy -->
-   <xs:simpleType name="ConstraintType">
-     <xs:restriction base="xs:string">
-       <xs:enumeration value="WebPKI"/>
-       <xs:enumeration value="TLSA"/>
-     </xs:restriction>
-   </xs:simpleType>
-
    <!-- The policy that was applied at send time. -->
    <xs:complexType name="AppliedPolicyType">
      <xs:all>
        <xs:element name="domain" type="xs:string"/>
-       <xs:element name="mx" type="xs:string"
-           minOccurs="1" />
-       <xs:element name="constraint" type="tns:ConstraintType"/>
-       <xs:element name="policy_id" type="xs:string"
+       <xs:element name="mx" type="xs:string" minOccurs="1"/>
+       <xs:element name="policy_id" type="xs:string"/>
      </xs:all>
    </xs:complexType>
 
@@ -670,10 +608,9 @@ _smtp_sts  IN TXT ( "v=STS1; m=enforce; "
      <xs:restriction base="xs:string">
        <xs:enumeration value="MxMismatch"/>
        <xs:enumeration value="InvalidCertificate"/>
+       <xs:enumeration value="HostnameMismatch"/>
        <xs:enumeration value="ExpiredCertificate"/>
        <xs:enumeration value="StarttlsNotSupported"/>
-       <xs:enumeration value="TlsaInvalid"/>
-       <xs:enumeration value="DnssecInvalid"/>
        <xs:enumeration value="SenderDoesNotSupportValidationMethod"/>
      </xs:restriction>
    </xs:simpleType>
@@ -733,7 +670,6 @@ _smtp_sts  IN TXT ( "v=STS1; m=enforce; "
   <applied_policy>
     <domain>company-y.com</domain>
     <mx>*.mx.mail.company-y.com</mx>
-    <constraint>WebPKI</constraint>
     <policy_id>33a0fe07d5c5359c</policy_id>
   </applied_policy>
    <enforcement_level>ReportOnly</enforcement_level>
