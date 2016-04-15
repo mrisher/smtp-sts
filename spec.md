@@ -236,7 +236,7 @@ Policies MUST specify the following fields:
   this domain. For example, "*.example.com,*.example.net" indicates that mail
   for this domain might be handled by any MX whose hostname is a subdomain of
   "example.com" or "example.net."
-* authentication-mechanism: The mechanism to use to authenticate this policy itself. See the section
+* authenticationMechanism: The mechanism to use to authenticate this policy itself. See the section
   _Policy_ _Discovery_ _&_ _Authentication_ for more details. Possible values
   are:
   * WebPKI: URI, where URI points to an HTTPS resource at the recipient domain
@@ -251,7 +251,7 @@ Policies MUST specify the following fields:
 * max-age: Max lifetime of the policy (plain-text integer seconds). Well-behaved
   clients SHOULD cache a policy for up to this value from last policy fetch
   time.
-* report-uri-aggregate: [@!RFC3986] URI(s) to which aggregate feedback MAY be sent
+* reportUriAggregate: [@!RFC3986] URI(s) to which aggregate feedback MAY be sent
   (comma-separated plain-text list of email addresses or HTTPS endpoints,
   optional). For example, "mailto:postmaster@example.com" or
   `https://example.com/sts-report`.
@@ -293,13 +293,13 @@ The formal definition of the SMTP STS format, using [@!RFC5234], is as follows:
                        %61-7A /           ; A-Z
                        %2D                ; "-"
 
-    sts-authentication           = "authentication-mechanism" *WSP "=" *WSP ( "webpki" / "dnssec")
+    sts-authentication           = "authenticationMechanism" *WSP "=" *WSP ( "webpki" / "dnssec")
 
     sts-constraint           = "constraint" *WSP "=" *WSP ( "webpki" / "tlsa")
 
     sts-max-age           = "max-age" *WSP "=" *WSP 1*10DIGIT
 
-    sts-auri        = "report-uri-aggregate" *WSP "=" *WSP
+    sts-auri        = "reportUriAggregate" *WSP "=" *WSP
                        sts-uri *(*WSP "," *WSP sts-uri)
 
 A size limitation in a sts-uri, if provided, is interpreted as a
@@ -349,7 +349,7 @@ policy, and to prevent long-term denials of service, it is important that
 senders are able to authenticate a new policy retrieved for a recipient domain.
 There are two supported mechanisms for policy authentication:
 
-* Web PKI: In this mechanism, indicated by the "WebPKI" value of the "authentication-mechanism" field,
+* Web PKI: In this mechanism, indicated by the "WebPKI" value of the "authenticationMechanism" field,
   the sender fetches a HTTPS resource from a host at `policy._smtp_sts` in the
   Policy Domain. For example, a=webpki indicates that the sender should fetch
   the resource from https://policy._smtp_sts.example.com/current. In order for
@@ -361,7 +361,7 @@ There are two supported mechanisms for policy authentication:
   also enables a third party mail service provider to host a policy for their
   users' domains.
 
-* DNSSEC: In this mechanism, indicated by the "dnssec" value of the "authentication-mechanism" field,
+* DNSSEC: In this mechanism, indicated by the "dnssec" value of the "authenticationMechanism" field,
   the sender MUST retrieve the policy via a DNSSEC signed response for the
   _smtp_sts TXT record.
 
@@ -441,7 +441,7 @@ the policy expiration time.
 # Failure Reporting
 
 Aggregate statistics on policy failures MAY be reported to the URI indicated
-in the "report-uri-aggregate" field of the policy. SMTP STS reports contain information about
+in the "reportUriAggregate" field of the policy. SMTP STS reports contain information about
 policy failures to allow diagnosis of misconfigurations and malicious activity.
 
 (There may also be a need for enabling more detailed "forensic" reporting during
@@ -597,10 +597,10 @@ are processed, in order to:
 * Determine how many messages would be affected by a strict policy
 
 ~~~~~~~~~
-_smtp_sts  IN TXT ( "v=STS1; mode=report; "
+_smtp_sts  IN TXT ( "version=STS1; mode=report; "
                      "mx=*mail.example.com; "
-                     "authentication=dnssec; constraint=WebPKI; max-age=123456"
-                     "report-uri-aggregate=mailto:sts-feedback@example.com" )
+                     "authenticationMechanism=dnssec; constraint=WebPKI; max-age=123456"
+                     "reportUriAggregate=mailto:sts-feedback@example.com" )
 ~~~~~~~~~
 
 ## Example 2
@@ -611,10 +611,10 @@ https://policy._smtp_sts.example.com/current and compare the content with the
 policy in the DNS. example.com is the recipient's domain.
 
 ~~~~~~~~~
-_smtp_sts  IN TXT ( "v=STS1; mode=enforce; "
+_smtp_sts  IN TXT ( "version=STS1; mode=enforce; "
                      "mx=*mail.example.com; "
-                     "authentication=WebPKI; constraint=WebPCI; max-age=123456"
-                     "report-uri-aggregate=mailto:sts-feedback@example.com" )
+                     "authenticationMechanism=WebPKI; constraint=WebPCI; max-age=123456"
+                     "reportUriAggregate=mailto:sts-feedback@example.com" )
 ~~~~~~~~~
 
 # Appendix 3: XML Schema for Failure Reports
