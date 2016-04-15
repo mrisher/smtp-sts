@@ -129,8 +129,8 @@ distribution. See the section _Future_ _Work_ for more discussion.)
 
 Policies consist of the following directives:
 
-   * `version`: This value MUST be equal to `TLSRPT1`.
-   * `aggregate-report-uri`: A URI specifying the endpoint to which aggregate
+   * `v`: This value MUST be equal to `TLSRPT1`.
+   * `rua`: A URI specifying the endpoint to which aggregate
      information about policy failures should be sent (see the section
      _Reporting Schema_ for more information). Two URI schemes are supported:
      `mailto` and `https`.
@@ -139,7 +139,7 @@ Policies consist of the following directives:
  	 * In the case of `mailto`, reports should be submitted to the specified
      email address. When sending failure reports via SMTP, sending MTAs MUST
      NOT honor SMTP STS or DANE TLSA failures.
-   * `detailed-report-uri`: Future use. (There may also be a need for enabling
+   * `ruf`: Future use. (There may also be a need for enabling
      more detailed "forensic" reporting during initial stages of a deployment.
      To address this, the authors consider the possibility of an optional
      additional "forensic reporting mode" in which more details--such as
@@ -152,14 +152,14 @@ Policies consist of the following directives:
 ### Report using MAILTO:
 
 ```_smtp_tlsrpt.mail.example.com. IN TXT \
-		"version:TLSRPT1;aggregate-report-uri:mailto:reports@example.com"
+		"v:TLSRPT1;rua:mailto:reports@example.com"
 ```
 
 ### Report using HTTPS:
 
 ```_smtp_tlsrpt.mail.example.com. IN TXT \
-		"version:TLSRPT1; \
-		aggregate-report-uri:https://reporting.example.com/v1/tlsrpt"
+		"v:TLSRPT1; \
+		rua:https://reporting.example.com/v1/tlsrpt"
 ```
 
 # Reporting Schema
@@ -247,7 +247,7 @@ SMTP TLS Reporting provides transparency into misconfigurations and attempts to
 intercept or tamper with mail between hosts who support STARTTLS. There are
 several security risks presented by the existence of this reporting channel:
 
-  * _Flooding of the_ `aggregate-report-uri` _endpoint_: An attacker could
+  * _Flooding of the Aggregate report URI (rua) endpoint_: An attacker could
     flood the endpoint and prevent the receiving domain from accepting
     additional reports. This type of Denial-of-Service attack would limit
     visibility into STARTTLS failures, leaving the receiving domain blind to an
