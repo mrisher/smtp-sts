@@ -804,10 +804,16 @@ Submitter:  Authors of this document
 Change Controller:  IESG
 
 Name: sender-does-not-support-validation-method
+
 Description: This indicates the sending system can never validate using the requested validation mechanism.
+
 Intended Usage:  COMMON
+
 Reference:  RFC XXXX (this document once published)
+
 Submitter:  Authors of this document
+
 Change Controller:  IESG
+
 
 {backmatter}
