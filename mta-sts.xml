@@ -262,8 +262,7 @@ different results.</t>
 <t>The DANE TLSA record <xref target="RFC7672"/> is similar, in that DANE is also designed to
 upgrade opportunistic encryption into required encryption. DANE requires DNSSEC
 <xref target="RFC4033"/> for the secure delivery of policies; the mechanism described here
-presents a variant for systems not yet supporting DNSSEC, and specifies a method
-for reporting TLS negotiation failures.
+presents a variant for systems not yet supporting DNSSEC.
 </t>
 
 <section anchor="differences-from-dane" title="Differences from DANE">
@@ -275,31 +274,16 @@ similar to that of HPKP <xref target="RFC7469"/>, reducing the complexity but wi
 guarantees on first use offered by DNSSEC. (For a thorough discussion of this
 trade-off, see the section <spanx style="emph">Security</spanx> <spanx style="emph">Considerations</spanx>.)
 </t>
-<t>In addition, SMTP STS introduces a mechanism for failure reporting and a
-report-only mode, enabling offline (&quot;report-only&quot;) deployments and auditing for
-compliance.
-</t>
 </section>
 
-<section anchor="advantages-when-used-with-dane" title="Advantages When Used with DANE">
-<t>SMTP STS can be deployed for a recipient domain that also publishes a DANE TLSA
-record for SMTP. In these cases, the SMTP STS policy can additionally declare a
-process for failure reporting.
-</t>
-</section>
-
-<section anchor="advantages-when-used-without-dane" title="Advantages When Used Without DANE">
+<section anchor="advantages-when-used-instead-of-dane" title="Advantages When Used Instead of DANE">
 <t>When deployed without a DANE TLSA record, SMTP STS offers the following
 advantages compared to DANE:
 </t>
 <t>
 <list style="symbols">
 <t><spanx style="emph">Infrastructure:</spanx> In comparison to DANE, this proposal does not require
- DNSSEC be deployed on either the sending or receiving domain. In addition,
- the reporting feature of SMTP STS can be deployed to perform offline
- analysis of STARTTLS failures, enabling mail providers to gain insight into
- the security of their SMTP connections without the need to modify MTA
- codebases directly.</t>
+ DNSSEC be deployed on either the sending or receiving domain.</t>
 <t><spanx style="emph">Offline- or report-only usage:</spanx> DANE does not provide a reporting
  mechanism and does not have a concept of &quot;report-only&quot; for failures; as a
  result, a service provider cannot receive metrics on TLS acceptability
@@ -311,10 +295,9 @@ advantages compared to DANE:
 </t>
 </section>
 
-<section anchor="disadvantages-when-used-without-dane" title="Disadvantages When Used Without DANE">
-<t>When deployed alone (i.e. without a DANE record, and using Web PKI for
-certificate verification), SMTP STS offers the following disadvantages compared
-to DANE:
+<section anchor="disadvantages-when-used-instead-of-dane" title="Disadvantages When Used Instead of DANE">
+<t>When deployed alone (i.e. without a DANE record), SMTP STS offers the following
+disadvantages compared to DANE:
 </t>
 <t>
 <list style="symbols">
@@ -374,10 +357,6 @@ will match a (presumed to exist) DANE TLSA record.</t>
 <t>e: Max lifetime of the policy (plain-text integer seconds). Well-behaved
 clients SHOULD cache a policy for up to this value from last policy fetch
 time.</t>
-<t>rua: <xref target="RFC3986"/> URI(s) to which aggregate feedback MAY be sent
-(comma-separated plain-text list of email addresses or HTTPS endpoints,
-optional). For example, &quot;mailto:postmaster@example.com&quot; or
-<spanx style="verb">https://example.com/sts-report</spanx>.</t>
 </list>
 </t>
 
@@ -583,62 +562,8 @@ the policy expiration time.
 </section>
 
 <section anchor="failure-reporting" title="Failure Reporting">
-<t>Aggregate statistics on policy failures MAY be reported to the URI indicated
-in the &quot;rua&quot; field of the policy. SMTP STS reports contain information about
-policy failures to allow diagnosis of misconfigurations and malicious activity.
-</t>
-<t>(There may also be a need for enabling more detailed &quot;forensic&quot; reporting during
-initial stages of a deployment. To address this, the authors consider the
-possibility of an optional additional &quot;forensic reporting mode&quot; in which more
-details--such as certificate chains and MTA banners--may be reported. See the
-section <spanx style="emph">Future</spanx> <spanx style="emph">Work</spanx> for more details.)
-</t>
-<t>Likely URI schemes include &quot;mailto&quot; and &quot;https&quot;. In the case of &quot;https&quot;, reports
-should be submitted via POST  (<xref target="RFC2818"/>) to the specified URI.
-</t>
-<t>Aggregate reports contain the following fields:
-</t>
-<t>
-<list style="symbols">
-<t>The SMTP STS policy applied (as a string)</t>
-<t>The beginning and end of the reporting period</t>
-</list>
-</t>
-<t>Repeated records contain the following fields:
-</t>
-<t>
-<list style="symbols">
-<t>Failure type: This list will start with the minimal set below, and is expected
-to grow over time based on real-world experience. The initial set is:
-<list style="symbols">
-<t>mx-mismatch: This indicates that the MX resolved for the recipient domain did
-not match the MX constraint specified in the policy.</t>
-<t>certificate-mismatch: This indicates that the certificate presented by the
-receiving MX did not match the MX hostname</t>
-<t>invalid-certificate: This indicates that the certificate presented by the
-receiving MX did not validate according to the policy validation constraint.
-(Either it was not signed by a trusted CA or did not match the DANE TLSA
-record for the recipient MX.)</t>
-<t>expired-certificate: This indicates that the certificate has expired.</t>
-<t>starttls-not-supported: This indicates that the recipient MX did not support
-STARTTLS.</t>
-<t>tlsa-invalid: This indicates a validation error for Policy Domain specifying
-&quot;tlsa&quot; validation.</t>
-<t>dnssec-invalid: This indicates a failure to validate DNS records for a
-Policy Domain specifying &quot;tlsa&quot; validation or &quot;dnssec&quot; authentication.</t>
-<t>sender-does-not-support-validation-method: This indicates the sending system
-can never validate using the requested validation mechanism.</t>
-</list></t>
-<t>Count: The number of times the error was encountered.</t>
-<t>Hostname: The hostname of the recipient MX.</t>
-</list>
-</t>
-<t>Note that the failure types are non-exclusive; an aggregate report MAY contain
-overlapping counts of failure types where a single send attempt encountered
-multiple errors.
-</t>
-<t>When sending failure reports via SMTP, sending MTAs MUST NOT honor SMTP STS or
-DANE TLSA failures.
+<t>Aggregate statistics on policy failures MAY be reported using the <spanx style="verb">TLSRPT</spanx>
+reporting specification (TODO: Add Ref).
 </t>
 </section>
 
@@ -709,14 +634,6 @@ sender-enforced model.</t>
 restrict TLS negotiation to specific ciphers or TLS versions.</t>
 </list>
 </t>
-<t>In addition, the authors leave currently open the following details:
-</t>
-<t>
-<list style="symbols">
-<t>Whether and how more detailed &quot;forensic reporting&quot; should be accomplished, as
-discussed in the section <spanx style="emph">Failure</spanx> <spanx style="emph">Reporting</spanx>.</t>
-</list>
-</t>
 </section>
 
 <section anchor="appendix-1-validation-pseudocode" title="Appendix 1: Validation Pseudocode">
@@ -775,158 +692,16 @@ policy in the DNS. example.com is the recipient's domain.
 <figure align="center"><artwork align="center">
 _smtp_sts  IN TXT ( "v=STS1; m=enforce; "
                      "mx=*mail.example.com; "
-                     "a=webpki; c=webpki; e=123456"
-                     "rua=mailto:sts-feedback@example.com" )
+                     "a=webpki; c=webpki; e=123456" )
 </artwork></figure>
 </section>
-</section>
-
-<section anchor="appendix-3-xml-schema-for-failure-reports" title="Appendix 3: XML Schema for Failure Reports">
-
-<figure align="center"><artwork align="center">
-
-&lt;?xml version="1.0"?&gt;
-&lt;xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://www.example.org/smtp-sts-xml/0.1"
-    xmlns:tns="http://www.example.org/smtp-sts-xml/0.1"&gt;
-   &lt;!-- The time range in UTC covered by messages in this report,
-        specified in seconds since epoch. --&gt;
-   &lt;xs:complexType name="DateRangeType"&gt;
-     &lt;xs:all&gt;
-       &lt;xs:element name="begin" type="xs:integer"/&gt;
-       &lt;xs:element name="end" type="xs:integer"/&gt;
-     &lt;/xs:all&gt;
-   &lt;/xs:complexType&gt;
-
-   &lt;!-- Report generator metadata. --&gt;
-   &lt;xs:complexType name="ReportMetadataType"&gt;
-     &lt;xs:sequence&gt;
-       &lt;xs:element name="org_name" type="xs:string"/&gt;
-       &lt;xs:element name="email" type="xs:string"/&gt;
-       &lt;xs:element name="extra_contact_info" type="xs:string"
-                   minOccurs="0"/&gt;
-       &lt;xs:element name="report_id" type="xs:string"/&gt;
-       &lt;xs:element name="date_range" type="tns:DateRangeType"/&gt;
-     &lt;/xs:sequence&gt;
-   &lt;/xs:complexType&gt;
-
-
-   &lt;!-- The constraints applied in a policy --&gt;
-   &lt;xs:simpleType name="ConstraintType"&gt;
-     &lt;xs:restriction base="xs:string"&gt;
-       &lt;xs:enumeration value="WebPKI"/&gt;
-       &lt;xs:enumeration value="TLSA"/&gt;
-     &lt;/xs:restriction&gt;
-   &lt;/xs:simpleType&gt;
-
-   &lt;!-- The policy that was applied at send time. --&gt;
-   &lt;xs:complexType name="AppliedPolicyType"&gt;
-     &lt;xs:all&gt;
-       &lt;xs:element name="domain" type="xs:string"/&gt;
-       &lt;xs:element name="mx" type="xs:string"
-           minOccurs="1" /&gt;
-       &lt;xs:element name="constraint" type="tns:ConstraintType"/&gt;
-       &lt;xs:element name="policy_id" type="xs:string"
-     &lt;/xs:all&gt;
-   &lt;/xs:complexType&gt;
-
-   &lt;!-- The possible failure types applied in a policy --&gt;
-   &lt;xs:simpleType name="FailureType"&gt;
-     &lt;xs:restriction base="xs:string"&gt;
-       &lt;xs:enumeration value="MxMismatch"/&gt;
-       &lt;xs:enumeration value="InvalidCertificate"/&gt;
-       &lt;xs:enumeration value="ExpiredCertificate"/&gt;
-       &lt;xs:enumeration value="StarttlsNotSupported"/&gt;
-       &lt;xs:enumeration value="TlsaInvalid"/&gt;
-       &lt;xs:enumeration value="DnssecInvalid"/&gt;
-       &lt;xs:enumeration value="SenderDoesNotSupportValidationMethod"/&gt;
-     &lt;/xs:restriction&gt;
-   &lt;/xs:simpleType&gt;
-
-   &lt;!-- The possible enforcement level: whether the reporter also drops
-        messages --&gt;
-   &lt;xs:simpleType name="EnforcementLevelType"&gt;
-     &lt;xs:restriction base="xs:string"&gt;
-       &lt;xs:enumeration value="ReportOnly"/&gt;
-       &lt;xs:enumeration value="Reject"/&gt;
-     &lt;/xs:restriction&gt;
-   &lt;/xs:simpleType&gt;
-
-   &lt;!-- Record for individual failure types. --&gt;
-   &lt;xs:complexType name="FailureRecordType"&gt;
-     &lt;xs:all&gt;
-       &lt;xs:element name="failure" type="tns:FailureType"/&gt;
-       &lt;xs:element name="count" type="xs:integer"/&gt;
-       &lt;xs:element name="hostname" type="xs:string"/&gt;
-       &lt;xs:element name="connectedIp" type="xs:string" minOccurs="0"/&gt;
-       &lt;xs:element name="sourceIp" type="xs:string" minOccurs="0"/&gt;
-     &lt;/xs:all&gt;
-   &lt;/xs:complexType&gt;
-
-    &lt;!-- Parent --&gt;
-   &lt;xs:element name="feedback"&gt;
-     &lt;xs:complexType&gt;
-       &lt;xs:sequence&gt;
-         &lt;xs:element name="version"
-                     type="xs:decimal"/&gt;
-         &lt;xs:element name="report_metadata"
-                     type="tns:ReportMetadataType"/&gt;
-         &lt;xs:element name="applied_policy"
-                     type="tns:AppliedPolicyType"/&gt;
-   &lt;xs:element name="enforcement_level"
-   type="tns:EnforcementLevelType"/&gt;
-         &lt;xs:element name="record" type="tns:FailureRecordType"
-                     maxOccurs="unbounded"/&gt;
-       &lt;/xs:sequence&gt;
-     &lt;/xs:complexType&gt;
-   &lt;/xs:element&gt;
-&lt;/xs:schema&gt;
-</artwork></figure>
-</section>
-
-<section anchor="appendix-4-example-report" title="Appendix 4: Example report">
-
-<figure align="center"><artwork align="center">
-&lt;feedback xmlns="http://www.example.org/smtp-sts-xml/0.1"&gt;
-  &lt;version&gt;1&lt;/version&gt;
-  &lt;report_metadata&gt;
-    &lt;org_name&gt;Company-X&lt;/org_name&gt;
-    &lt;email&gt;sts-reporting@company-x.com&lt;/email&gt;
-    &lt;extra_contact_info&gt;&lt;/extra_contact_info&gt;
-    &lt;report_id&gt;12345&lt;/report_id&gt;
-    &lt;date_range&gt;&lt;begin&gt;1439227624&lt;/begin&gt;
-    &lt;end&gt;1439313998&lt;/end&gt;&lt;/date_range&gt;
-    &lt;/report_metadata&gt;
-  &lt;applied_policy&gt;
-    &lt;domain&gt;company-y.com&lt;/domain&gt;
-    &lt;mx&gt;*.mx.mail.company-y.com&lt;/mx&gt;
-    &lt;constraint&gt;WebPKI&lt;/constraint&gt;
-    &lt;policy_id&gt;33a0fe07d5c5359c&lt;/policy_id&gt;
-  &lt;/applied_policy&gt;
-   &lt;enforcement_level&gt;ReportOnly&lt;/enforcement_level&gt;
-  &lt;record&gt;
-      &lt;failure&gt;ExpiredCertificate&lt;/failure&gt;
-      &lt;count&gt;13128&lt;/count&gt;
-      &lt;hostname&gt;mta7.mx.mail.company-y.com&lt;/hostname&gt;
-      &lt;connectedIp&gt;98.136.216.25&lt;/connectedIp&gt;
-  &lt;/record&gt;
-  &lt;record&gt;
-      &lt;failure&gt;StarttlsNotSupported&lt;/failure&gt;
-      &lt;count&gt;19&lt;/count&gt;
-      &lt;hostname&gt;mta7.mx.mail.company-y.com&lt;/hostname&gt;
-      &lt;connectedIp&gt;98.22.33.99&lt;/connectedIp&gt;
-  &lt;/record&gt;
-&lt;/feedback&gt;
-</artwork></figure>
 </section>
 
 </middle>
 <back>
 <references title="Normative References">
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"?>
-<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2818.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>
-<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3986.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4033.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5234.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6125.xml"?>
