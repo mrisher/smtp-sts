@@ -235,10 +235,6 @@ Policies MUST specify the following fields:
 * e: Max lifetime of the policy (plain-text integer seconds). Well-behaved
   clients SHOULD cache a policy for up to this value from last policy fetch
   time.
-* rua: [@!RFC3986] URI(s) to which aggregate feedback MAY be sent
-  (comma-separated plain-text list of email addresses or HTTPS endpoints,
-  optional). For example, "mailto:postmaster@example.com" or
-  `https://example.com/sts-report`.
 
 ## Formal Definition
 
