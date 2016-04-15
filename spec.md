@@ -753,7 +753,7 @@ _smtp_sts  IN TXT ( "version=STS1; mode=enforce; "
 ~~~~~~~~~
 
 # Appendix 5: DEEP Registration Elements
-
+```
 Name: mx-mismatch
 Description: This indicates that the MX resolved for the recipient domain 
     did not match the MX constraint specified in the policy.
@@ -761,7 +761,7 @@ Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document
 Change Controller:  IESG
-
+```
 ```
 Name: certificate-mismatch
 Description This indicates that the certificate presented by the receiving 
