@@ -83,7 +83,7 @@ in routing, STARTTLS negotiation, and both DANE [@!RFC7671] and STS (TODO: Add
 ref) policy validation errors.
 
 Implementers establish a policy by publishing a TXT record in the DNS which
-instructs comliant sending MTAs to deliver reports of delivery and STARTTLS
+instructs compliant sending MTAs to deliver reports of delivery and STARTTLS
 failures in the appropriate format to the specified endpoint.
 
 This document is intended as a companion to the specification for SMTP MTA 
@@ -172,10 +172,12 @@ Aggregate reports contain the following fields:
 	of the report
 	* A unique identifier for the report
 	* The reporting date range for the report
-* _Applied policy_, consisting of: 
+* _Policy_, consisting of: 
 	* One of the following policy types:
 		* The SMTP MTA STS policy applied (as a string)
 		* The DANE TLSA record applied (as a string)
+		* The literal string `no-policy-found`, if neither a TLSA nor MTA-STS
+		policy could be found.
 	* The domain for which the policy is applied
 	* The MX host
 	* An identifier for the policy (where applicable)
@@ -183,8 +185,6 @@ Aggregate reports contain the following fields:
   MTA hostname_, _message count_, and an optional _additional information_
   field containing a URI for recipients to review further information on a
   failure type.
-
-
 
 Note that the failure types are non-exclusive; an aggregate report MAY contain
 overlapping `counts` of failure types where a single send attempt encountered
@@ -214,23 +214,25 @@ The list of result types will start with the minimal set below, and is expected
   * `starttls-not-supported`: This indicates that the recipient MX did not
     support STARTTLS.
   * `invalid-certificate`: This indicates that the certificate presented by the
-    receiving MX did not validate according to the policy validation constraint.
-    (Either it was not signed by a trusted CA or did not match the DANE TLSA
-    record for the recipient MX.)
+    receiving MX did not validate.
+  * `certificate-mismatch`: This indicates that the certificate presented did 
+  	not adhere to the constraints specified in the STS or DANE policy, e.g. if 
+	the CN field did not match the hostname of the MX.
   * `expired-certificate`: This indicates that the certificate has expired.
 
+### Policy Failures
+	
 #### DANE-specific Policy Failures
-  * `tlsa-invalid`: This indicates a validation error for Policy Domain
-    specifying "tlsa" validation.
-  * `dnssec-invalid`: This indicates a failure to validate DNS records for a
-    Policy Domain with a published "tlsa" record.
+  * `tlsa-invalid`: This indicates a validation error in the TLSA record 
+  	associated with a DANE policy.
+  * `dnssec-invalid`: This indicates a failure to authenticate DNS records for a
+    Policy Domain with a published TLSA record.
 
 #### STS-specific Policy Failures
-  * `sts-invalid`: This indicates a validation error for Policy Domain
-    specifying "STS" validation.
-
-  * sender-does-not-support-validation-method: This indicates the sending system
-    can never validate using the requested validation mechanism.
+  * `sts-invalid`: This indicates a validation error for the overall MTA-STS 
+  	policy.
+  * `webpki-invalid`: This indicates that the MTA-STS policy could not be 
+  	authenticated using PKIX validation. 
 
 
 # Reporting Delegation
@@ -369,25 +371,24 @@ The JSON schema is derived from the HPKP JSON schema [@!RFC7469] (cf. Section 3)
   },
   "contact-info": email-address,
   "report-id": report-id,
-  "applied-policy": {
+  "policy": {
 	"policy-type": policy-type,
 	"policy-string": policy-string,
 	"policy-domain": domain,
-	"mx-host": mx-host-pattern,
-	"policy-id": policy-id
+	"mx-host": mx-host-pattern
 	},
   "report-items": [
 	{
 	  "result-type": result-type,
 	  "sending-mta-ip": ip-address,
-	  "receiving-mta-hostname": receiving-mta-hostname,
+	  "receiving-mx-hostname": receiving-mx-hostname,
 	  "message-count": message-count,
 	  "additional-information": additional-info-uri
 	}
   ]
 }
 ```
-Figure x: JSON Report Format
+Figure: JSON Report Format
 
   * `organization-name`: The name of the organization responsible for the
     report. It is provided as a string.
@@ -410,15 +411,14 @@ Figure x: JSON Report Format
     sent to `user@example.com` this field would contain `example.com`. It is
     provided as a string.
   * `mx-host-pattern`: The pattern of MX hostnames from the applied policy. It
-    is provided as a string.
-  * `policy-id`: The version number of the STS policy, or left blank for TLSA.
+    is provided as a string, and is interpreted in the same manner as the
+    "Checking of Wildcard Certificates" rules in Section 6.4.3 of [@!RFC6125].
   * `result-type`: A value from the _Result Types_ section above.
   * `ip-address`: The IP address of the sending MTA that attempted the STARTTLS
     connection. It is provided as a string representation of an IPv4 or IPv6
     address.
-  * `receiving-mta-hostname`: The hostname of the receiving MTA with which the
-    sending MTA referenced in the `ip-address` field attempted to negotiate a
-    STARTTLS connection.
+  * `receiving-mx-hostname`: The hostname of the receiving MTA MX record with
+    which the sending MTA attempted to negotiate a STARTTLS connection.
   * `message-count`: The number of (attempted) messages that match the relevant
     `result-type` for this section.
   * `additional-info-uri`: An optional URI pointing to additional information
@@ -436,27 +436,32 @@ Figure x: JSON Report Format
 	},
 	"contact-info": "sts-reporting@company-x.com",
 	"report-id": "5065427c-23d3-47ca-b6e0-946ea0e8c4be",
-	"applied-policy": {
+	"policy": {
 		"policy-type": "sts",
 		"policy-string": "TODO: Add me",
 		"policy-domain": "company-y.com",
-		"mx-host": "*.mx.mail.company-y.com",
-		"policy-id": "33a0fe07d5c5359c"
+		"mx-host": "*.mail.company-y.com"
 	},
 	"report-items": [{
 		"result-type": "ExpiredCertificate",
 		"sending-mta-ip": "98.136.216.25",
-		"receiving-mta-hostname": "mta7.mx.mail.company-y.com",
-		"message-count": 13128
+		"receiving-mx-hostname": "mx1.mail.company-y.com",
+		"message-count": 100
 	}, {
 		"result-type": "StarttlsNotSupported",
 		"sending-mta-ip": "98.22.33.99",
-		"receiving-mta-hostname": "mta7.mx.mail.company-y.com",
-		"message-count": 19,
+		"receiving-mx-hostname": "mx2.mail.company-y.com",
+		"message-count": 200,
 		"additional-information": "hxxps://reports.company-x.com/
                   report_info?id=5065427c-23d3#StarttlsNotSupported"
 	}]
 }
 ```
+Figure: Example JSON report for a messages from Company-X to Company-Y, where 
+100 messages were attempted to Company Y servers with an expired certificate 
+and 200 messages were attempted to Company Y servers that did not successfully
+respond to the `STARTTLS` command.
+
+
 
 {backmatter}
