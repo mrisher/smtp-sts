@@ -95,7 +95,7 @@
 
 SMTP STS is a mechanism enabling mail service providers to declare their ability
 to receive TLS-secured connections, to declare particular methods for
-certificate validation, and to request sending SMTP servers to report upon
+certificate validation, and to request that sending SMTP servers report upon
 and/or refuse to deliver messages that cannot be delivered securely.
 
 {mainmatter}
@@ -330,7 +330,7 @@ reject mail.
 ## Policy Validation
 
 When sending to an MX at a domain for which the sender has a valid and
-non-expired SMTP STS policy, a sending MTA honoring SMTP STS SHOULD validate
+non-expired SMTP STS policy, a sending MTA honoring SMTP STS MUST validate
 that the recipient MX supports STARTTLS, and offers a valid PKIX based TLS 
 certificate. The certificate presented by the receiving MX MUST be valid for
 the MX name and chain to a root CA that is trusted by the sending MTA. The
