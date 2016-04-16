@@ -363,9 +363,12 @@ consists of the following steps:
    steps:
 
   * Check for a new (non-cached) _authenticated_ policy. 
-  * If one exists and the new policy is different, update the current policy and go to step 2.
-  * If one exists and the new policy is same as the cached policy, treat the delivery as a failure.
-  * If none exists and cached policy is not expired, treat the delivery as a failure.
+  * If one exists and the new policy is different, update the current policy and
+    go to step 2.
+  * If one exists and the new policy is same as the cached policy, treat the
+    delivery as a failure.
+  * If none exists and cached policy is not expired, treat the delivery as a
+    failure.
 
 Understanding the details of step 4 is critical to understanding the behavior of
 the system as a whole.
@@ -473,8 +476,8 @@ if policy:
 ## Example 1
 
 The owner of example.com wishes to begin using STS with a policy that will
-solicit aggregate feedback from receivers without affecting how the messages
-are processed, in order to:
+solicit aggregate feedback from receivers without affecting how the messages are
+processed, in order to:
 
 * Verify the identity of MXs that handle mail for this domain
 
@@ -551,7 +554,8 @@ Change Controller:  IESG
 ```
 ```
 Name: tlsa-invalid
-Description: This indicates a validation error for Policy Domain specifying "tlsa" validation.
+Description: This indicates a validation error for Policy Domain specifying 
+  "tlsa" validation.
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document
@@ -559,8 +563,8 @@ Change Controller:  IESG
 ```
 ```
 Name: dnssec-invalid
-Description: This indicates a failure to validate DNS records for a Policy Domain specifying 
-    "tlsa" validation or "dnssec" authentication.
+Description: This indicates a failure to validate DNS records for a Policy 
+  Domain specifying "tlsa" validation or "dnssec" authentication.
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document
@@ -568,8 +572,8 @@ Change Controller:  IESG
 ```
 ```
 Name: sender-does-not-support-validation-method
-Description: This indicates the sending system can never validate using the requested 
-    validation mechanism.
+Description: This indicates the sending system can never validate using the 
+  requested validation mechanism.
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document

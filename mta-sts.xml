@@ -330,7 +330,7 @@ distribution. See the section <spanx style="emph">Future</spanx> <spanx style="e
 <list style="symbols">
 <t><spanx style="emph">version</spanx>: (plain-text, required). Currently only &quot;STS1&quot; is supported.</t>
 <t><spanx style="emph">mode</spanx>:(plain-text, required). If &quot;enforce&quot;, the receiving MTA requests that
-messages be delivered only if they conform to the STS policy. If &quot;report-only&quot;
+messages be delivered only if they conform to the STS policy. If &quot;report&quot;
 the receiving MTA requests that failure reports be delivered, as specified
 by the <spanx style="verb">rua</spanx> parameter.</t>
 <t><spanx style="emph">mx</spanx>: MX patterns (comma-separated list of plain-text MX match patterns,
@@ -338,18 +338,16 @@ required). One or more comma-separated patterns matching the expected MX for
 this domain. For example, &quot;<spanx style="emph">.example.com,</spanx>.example.net&quot; indicates that mail
 for this domain might be handled by any MX whose hostname is a subdomain of
 &quot;example.com&quot; or &quot;example.net.&quot;</t>
-<t><spanx style="emph">expiry</spanx>: Max lifetime of the policy (plain-text integer seconds). Well-behaved
+<t><spanx style="emph">max-age</spanx>: Max lifetime of the policy (plain-text integer seconds). Well-behaved
 clients SHOULD cache a policy for up to this value from last policy fetch
 time.</t>
 <t>_policy<spanx style="emph">id</spanx>: A short string used to track policy updates</t>
-<t><spanx style="emph">rua</spanx>: <xref target="RFC3986"/> URI(s) to which aggregate feedback MAY be sent
-(comma-separated plain-text list of email addresses or HTTPS endpoints,
-optional). For example, <spanx style="verb">mailto:postmaster@example.com</spanx> or
-<spanx style="verb">https://example.com/sts-report</spanx>.</t>
 </list>
 </t>
 
 <section anchor="formal-definition" title="Formal Definition">
+<t><spanx style="strong">TODO: This no longer aligns with policy</spanx>
+</t>
 <t>The formal definition of the SMTP STS format, using <xref target="RFC5234"/>, is as follows:
 </t>
 
@@ -385,12 +383,9 @@ dtext           =  %d30-39 /          ; 0-9
                    %61-7A /           ; A-Z
                    %2D                ; "-"
 
-sts-e           = "e" *WSP "=" *WSP 1*10DIGIT
+sts-max-age     = "max-age" *WSP "=" *WSP 1*10DIGIT
 
 sts-id          = "e" *WSP "=" *WSP 1*10VCHAR
-
-sts-auri        = "rua" *WSP "=" *WSP
-                   sts-uri *(*WSP "," *WSP sts-uri)
 </artwork></figure>
 <t>A size limitation in a sts-uri, if provided, is interpreted as a
 count of units followed by an OPTIONAL unit size (&quot;k&quot; for kilobytes,
@@ -405,7 +400,7 @@ megabyte is 2^20, etc.
 <t>In order to resist attackers inserting a fraudulent policy, SMTP STS policies
 are designed to be long-lived, with an expiry typically greater than two weeks.
 Policy validity is controlled by two separate expiration times: the lifetime
-indicated in the policy (&quot;e=&quot;) and the TTL on the DNS record itself. The policy
+indicated in the policy (&quot;max-age=&quot;) and the TTL on the DNS record itself. The policy
 expiration will ordinarily be longer than that of the DNS TTL, and senders
 SHOULD cache a policy (and apply it to all mail to the recipient domain) until
 the policy expiration.
@@ -471,7 +466,7 @@ policy validation one of two ways:
 </t>
 <t>
 <list style="symbols">
-<t><spanx style="emph">report-only</spanx>: In this mode, sending MTAs merely send a report to the designated
+<t><spanx style="emph">report</spanx>: In this mode, sending MTAs merely send a report to the designated
 report address indicating policy application failures. This can be done
 &quot;offline&quot;, i.e. based on the MTA logs, and is thus a suitable low-risk option
 for MTAs who wish to enhance transparency of TLS tampering without making
@@ -498,9 +493,12 @@ authenticate and cache it.</t>
 steps:
 <list style="symbols">
 <t>Check for a new (non-cached) <spanx style="emph">authenticated</spanx> policy.</t>
-<t>If one exists and the new policy is different, update the current policy and go to step 2.</t>
-<t>If one exists and the new policy is same as the cached policy, treat the delivery as a failure.</t>
-<t>If none exists and cached policy is not expired, treat the delivery as a failure.</t>
+<t>If one exists and the new policy is different, update the current policy and
+go to step 2.</t>
+<t>If one exists and the new policy is same as the cached policy, treat the
+delivery as a failure.</t>
+<t>If none exists and cached policy is not expired, treat the delivery as a
+failure.</t>
 </list></t>
 </list>
 </t>
@@ -618,8 +616,8 @@ if policy:
 
 <section anchor="example-1" title="Example 1">
 <t>The owner of example.com wishes to begin using STS with a policy that will
-solicit aggregate feedback from receivers without affecting how the messages
-are processed, in order to:
+solicit aggregate feedback from receivers without affecting how the messages are
+processed, in order to:
 </t>
 <t>
 <list style="symbols">
@@ -642,11 +640,10 @@ is authenticated using Web PKI mechanism.
 <figure align="center"><artwork align="center">
 {
   "version": "STS1",
-  "mode": "report-only",
+  "mode": "report",
   "policy_id": "randomstr",
   "mx": "*.mail.example.com",
-  "expiry": "123456",
-  "rua": "mailto:sts-feedback@example.com" 
+  "max-age": "123456"
 }
 </artwork></figure>
 <t>The policy is authenticated using Web PKI mechanism.
@@ -654,12 +651,94 @@ is authenticated using Web PKI mechanism.
 </section>
 </section>
 
+<section anchor="appendix-3-deep-registration-elements" title="Appendix 3: DEEP Registration Elements">
+
+<figure align="center"><artwork align="center">
+Name: mx-mismatch
+Description: This indicates that the MX resolved for the recipient domain 
+    did not match the MX constraint specified in the policy.
+Intended Usage:  COMMON
+Reference:  RFC XXXX (this document once published)
+Submitter:  Authors of this document
+Change Controller:  IESG
+</artwork></figure>
+
+<figure align="center"><artwork align="center">
+Name: certificate-mismatch
+Description This indicates that the certificate presented by the receiving 
+    MX did not match the MX hostname
+Intended Usage:  COMMON
+Reference:  RFC XXXX (this document once published)
+Submitter:  Authors of this document
+Change Controller:  IESG
+</artwork></figure>
+
+<figure align="center"><artwork align="center">
+Name: invalid-certificate
+Description: This indicates that the certificate presented by the receiving MX 
+    did not validate according to the policy validation constraint. (Either it 
+    was not signed by a trusted CA or did not match the DANE TLSA record for 
+    the recipient MX.)
+Intended Usage:  COMMON
+Reference:  RFC XXXX (this document once published)
+Submitter:  Authors of this document
+Change Controller:  IESG
+</artwork></figure>
+
+<figure align="center"><artwork align="center">
+Name: expired-certificate
+Description: This indicates that the certificate has expired.
+Intended Usage:  COMMON
+Reference:  RFC XXXX (this document once published)
+Submitter:  Authors of this document
+Change Controller:  IESG
+</artwork></figure>
+
+<figure align="center"><artwork align="center">
+Name: starttls-not-supported
+Description: This indicates that the recipient MX did not support STARTTLS.
+Intended Usage:  COMMON
+Reference:  RFC XXXX (this document once published)
+Submitter:  Authors of this document
+Change Controller:  IESG
+</artwork></figure>
+
+<figure align="center"><artwork align="center">
+Name: tlsa-invalid
+Description: This indicates a validation error for Policy Domain specifying 
+  "tlsa" validation.
+Intended Usage:  COMMON
+Reference:  RFC XXXX (this document once published)
+Submitter:  Authors of this document
+Change Controller:  IESG
+</artwork></figure>
+
+<figure align="center"><artwork align="center">
+Name: dnssec-invalid
+Description: This indicates a failure to validate DNS records for a Policy 
+  Domain specifying "tlsa" validation or "dnssec" authentication.
+Intended Usage:  COMMON
+Reference:  RFC XXXX (this document once published)
+Submitter:  Authors of this document
+Change Controller:  IESG
+</artwork></figure>
+
+<figure align="center"><artwork align="center">
+Name: sender-does-not-support-validation-method
+Description: This indicates the sending system can never validate using the 
+  requested validation mechanism.
+Intended Usage:  COMMON
+Reference:  RFC XXXX (this document once published)
+Submitter:  Authors of this document
+Change Controller:  IESG
+</artwork></figure>
+</section>
+
 </middle>
 <back>
 <references title="Normative References">
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>
-<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3986.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4033.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5234.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6125.xml"?>
