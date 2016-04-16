@@ -212,7 +212,7 @@ Policies MUST specify the following fields in JSON format:
 
 * _version_: (plain-text, required). Currently only "STS1" is supported.
 * _mode_:(plain-text, required). If "enforce", the receiving MTA requests that
-  messages be delivered only if they conform to the STS policy. If "report-only"
+  messages be delivered only if they conform to the STS policy. If "report"
   the receiving MTA requests that failure reports be delivered, as specified
   by the `rua` parameter.
 * _mx_: MX patterns (comma-separated list of plain-text MX match patterns,
@@ -220,16 +220,14 @@ Policies MUST specify the following fields in JSON format:
   this domain. For example, "*.example.com,*.example.net" indicates that mail
   for this domain might be handled by any MX whose hostname is a subdomain of
   "example.com" or "example.net."
-* _expiry_: Max lifetime of the policy (plain-text integer seconds). Well-behaved
+* _max-age_: Max lifetime of the policy (plain-text integer seconds). Well-behaved
   clients SHOULD cache a policy for up to this value from last policy fetch
   time.
 * _policy_id_: A short string used to track policy updates
-* _rua_: [@!RFC3986] URI(s) to which aggregate feedback MAY be sent
-  (comma-separated plain-text list of email addresses or HTTPS endpoints,
-  optional). For example, `mailto:postmaster@example.com` or
-  `https://example.com/sts-report`.
 
 ## Formal Definition
+
+**TODO: This no longer aligns with policy**
 
 The formal definition of the SMTP STS format, using [@!RFC5234], is as follows:
 
@@ -264,13 +262,10 @@ The formal definition of the SMTP STS format, using [@!RFC5234], is as follows:
                        %61-7A /           ; A-Z
                        %2D                ; "-"
 
-    sts-e           = "e" *WSP "=" *WSP 1*10DIGIT
+    sts-max-age     = "max-age" *WSP "=" *WSP 1*10DIGIT
 
     sts-id          = "e" *WSP "=" *WSP 1*10VCHAR
     
-    sts-auri        = "rua" *WSP "=" *WSP
-                       sts-uri *(*WSP "," *WSP sts-uri)
-
 A size limitation in a sts-uri, if provided, is interpreted as a
 count of units followed by an OPTIONAL unit size ("k" for kilobytes,
 "m" for megabytes, "g" for gigabytes, "t" for terabytes).  Without a
@@ -283,7 +278,7 @@ megabyte is 2^20, etc.
 In order to resist attackers inserting a fraudulent policy, SMTP STS policies
 are designed to be long-lived, with an expiry typically greater than two weeks.
 Policy validity is controlled by two separate expiration times: the lifetime
-indicated in the policy ("e=") and the TTL on the DNS record itself. The policy
+indicated in the policy ("max-age=") and the TTL on the DNS record itself. The policy
 expiration will ordinarily be longer than that of the DNS TTL, and senders
 SHOULD cache a policy (and apply it to all mail to the recipient domain) until
 the policy expiration.
@@ -343,7 +338,7 @@ When sending to an MX at a domain for which the sender has a valid non-expired
 SMTP STS policy, a sending MTA honoring SMTP STS MAY apply the result of a
 policy validation one of two ways:
 
-* _report-only_: In this mode, sending MTAs merely send a report to the designated
+* _report_: In this mode, sending MTAs merely send a report to the designated
   report address indicating policy application failures. This can be done
   "offline", i.e. based on the MTA logs, and is thus a suitable low-risk option
   for MTAs who wish to enhance transparency of TLS tampering without making
@@ -499,14 +494,86 @@ is authenticated using Web PKI mechanism.
 ~~~~~~~~~
 {
   "version": "STS1",
-  "mode": "report-only",
+  "mode": "report",
   "policy_id": "randomstr",
   "mx": "*.mail.example.com",
-  "expiry": "123456",
-  "rua": "mailto:sts-feedback@example.com" 
+  "max-age": "123456"
 }
 ~~~~~~~~~
 
 The policy is authenticated using Web PKI mechanism. 
+
+# Appendix 3: DEEP Registration Elements
+```
+Name: mx-mismatch
+Description: This indicates that the MX resolved for the recipient domain 
+    did not match the MX constraint specified in the policy.
+Intended Usage:  COMMON
+Reference:  RFC XXXX (this document once published)
+Submitter:  Authors of this document
+Change Controller:  IESG
+```
+```
+Name: certificate-mismatch
+Description This indicates that the certificate presented by the receiving 
+    MX did not match the MX hostname
+Intended Usage:  COMMON
+Reference:  RFC XXXX (this document once published)
+Submitter:  Authors of this document
+Change Controller:  IESG
+```
+```
+Name: invalid-certificate
+Description: This indicates that the certificate presented by the receiving MX 
+    did not validate according to the policy validation constraint. (Either it 
+    was not signed by a trusted CA or did not match the DANE TLSA record for 
+    the recipient MX.)
+Intended Usage:  COMMON
+Reference:  RFC XXXX (this document once published)
+Submitter:  Authors of this document
+Change Controller:  IESG
+```
+```
+Name: expired-certificate
+Description: This indicates that the certificate has expired.
+Intended Usage:  COMMON
+Reference:  RFC XXXX (this document once published)
+Submitter:  Authors of this document
+Change Controller:  IESG
+```
+```
+Name: starttls-not-supported
+Description: This indicates that the recipient MX did not support STARTTLS.
+Intended Usage:  COMMON
+Reference:  RFC XXXX (this document once published)
+Submitter:  Authors of this document
+Change Controller:  IESG
+```
+```
+Name: tlsa-invalid
+Description: This indicates a validation error for Policy Domain specifying "tlsa" validation.
+Intended Usage:  COMMON
+Reference:  RFC XXXX (this document once published)
+Submitter:  Authors of this document
+Change Controller:  IESG
+```
+```
+Name: dnssec-invalid
+Description: This indicates a failure to validate DNS records for a Policy Domain specifying 
+    "tlsa" validation or "dnssec" authentication.
+Intended Usage:  COMMON
+Reference:  RFC XXXX (this document once published)
+Submitter:  Authors of this document
+Change Controller:  IESG
+```
+```
+Name: sender-does-not-support-validation-method
+Description: This indicates the sending system can never validate using the requested 
+    validation mechanism.
+Intended Usage:  COMMON
+Reference:  RFC XXXX (this document once published)
+Submitter:  Authors of this document
+Change Controller:  IESG
+```
 
 {backmatter}
