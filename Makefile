@@ -1,4 +1,4 @@
-MMARK=../../mmark
+MMARK=mmark
 XML2RFC=xml2rfc
 SOURCES=mta-sts.md reporting.md
 XML=$(SOURCES:.md=.xml)
