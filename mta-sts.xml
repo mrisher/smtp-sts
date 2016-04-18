@@ -655,7 +655,7 @@ is authenticated using Web PKI mechanism.
 
 <figure align="center"><artwork align="center">
 Name: mx-mismatch
-Description: This indicates that the MX resolved for the recipient domain 
+Description: This indicates that the MX resolved for the recipient domain
     did not match the MX constraint specified in the policy.
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
@@ -665,7 +665,7 @@ Change Controller:  IESG
 
 <figure align="center"><artwork align="center">
 Name: certificate-mismatch
-Description This indicates that the certificate presented by the receiving 
+Description This indicates that the certificate presented by the receiving
     MX did not match the MX hostname
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
@@ -675,9 +675,9 @@ Change Controller:  IESG
 
 <figure align="center"><artwork align="center">
 Name: invalid-certificate
-Description: This indicates that the certificate presented by the receiving MX 
-    did not validate according to the policy validation constraint. (Either it 
-    was not signed by a trusted CA or did not match the DANE TLSA record for 
+Description: This indicates that the certificate presented by the receiving MX
+    did not validate according to the policy validation constraint. (Either it
+    was not signed by a trusted CA or did not match the DANE TLSA record for
     the recipient MX.)
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
@@ -705,7 +705,7 @@ Change Controller:  IESG
 
 <figure align="center"><artwork align="center">
 Name: tlsa-invalid
-Description: This indicates a validation error for Policy Domain specifying 
+Description: This indicates a validation error for Policy Domain specifying
   "tlsa" validation.
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
@@ -715,7 +715,7 @@ Change Controller:  IESG
 
 <figure align="center"><artwork align="center">
 Name: dnssec-invalid
-Description: This indicates a failure to validate DNS records for a Policy 
+Description: This indicates a failure to validate DNS records for a Policy
   Domain specifying "tlsa" validation or "dnssec" authentication.
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
@@ -725,7 +725,7 @@ Change Controller:  IESG
 
 <figure align="center"><artwork align="center">
 Name: sender-does-not-support-validation-method
-Description: This indicates the sending system can never validate using the 
+Description: This indicates the sending system can never validate using the
   requested validation mechanism.
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)

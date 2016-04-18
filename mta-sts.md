@@ -163,7 +163,7 @@ presents a variant for systems not yet supporting DNSSEC.
 
 The primary difference between the mechanism described here and DANE is that DANE
 requires the use of DNSSEC to authenticate DANE TLSA records, whereas SMTP STS
-relies on the certificate authority (CA) system to avoid interception. (For a 
+relies on the certificate authority (CA) system to avoid interception. (For a
 thorough discussion of this trade-off, see the section _Security_ _Considerations_.)
 
 In addition, SMTP STS introduces a mechanism for failure reporting and a
@@ -203,7 +203,7 @@ SMTP STS offers the following advantages compared to DANE:
 # Policy Semantics
 
 SMTP STS policies are distributed via a _well known_ HTTPS endpoint in the
-Policy Domain. 
+Policy Domain.
 
 (Future implementations may move to alternate methods of policy discovery or
 distribution. See the section _Future_ _Work_ for more discussion.)
@@ -265,7 +265,7 @@ The formal definition of the SMTP STS format, using [@!RFC5234], is as follows:
     sts-max-age     = "max-age" *WSP "=" *WSP 1*10DIGIT
 
     sts-id          = "e" *WSP "=" *WSP 1*10VCHAR
-    
+   
 A size limitation in a sts-uri, if provided, is interpreted as a
 count of units followed by an OPTIONAL unit size ("k" for kilobytes,
 "m" for megabytes, "g" for gigabytes, "t" for terabytes).  Without a
@@ -297,7 +297,7 @@ Domain's DNS zone and at the corresponding HTTPS endpoint. In the case of a
 race-condition if the policy update in HTTPS lags behind the DNS TXT record or
 vice versa, the policy fetched during that period will fail to authenticate (and
 is thus treated as though it did not exist, as described in _Policy
-Discovery & Authentication_). Senders who have a cached policy will thus fall 
+Discovery & Authentication_). Senders who have a cached policy will thus fall
 back to that cached policy. Thus Policy Domains can expect an existing published
 policy to be used until an update is rolled out in both locations.
 
@@ -306,7 +306,7 @@ policy to be used until an update is rolled out in both locations.
 Senders discover a recipient domain's STS policy, by making an attempt to fetch
 TXT records from the recipient domain's DNS zone with the name "_smtp_sts". A
 valid TXT record presence in "_smtp_sts.example.com" indicates that the
-recipent domain supports STS. To allow recipient domains to safely serve new 
+recipent domain supports STS. To allow recipient domains to safely serve new
 policies, it is important that senders are able to authenticate a new policy
 retrieved for a recipient domain.
 
@@ -326,7 +326,7 @@ reject mail.
 
 When sending to an MX at a domain for which the sender has a valid and
 non-expired SMTP STS policy, a sending MTA honoring SMTP STS MUST validate
-that the recipient MX supports STARTTLS, and offers a valid PKIX based TLS 
+that the recipient MX supports STARTTLS, and offers a valid PKIX based TLS
 certificate. The certificate presented by the receiving MX MUST be valid for
 the MX name and chain to a root CA that is trusted by the sending MTA. The
 certificate MUST have a CN or SAN matching the MX hostname (as described in
@@ -362,7 +362,7 @@ consists of the following steps:
 4. If not valid and policy specifies rejection, perform the following
    steps:
 
-  * Check for a new (non-cached) _authenticated_ policy. 
+  * Check for a new (non-cached) _authenticated_ policy.
   * If one exists and the new policy is different, update the current policy and
     go to step 2.
   * If one exists and the new policy is same as the cached policy, treat the
@@ -382,7 +382,7 @@ the policy expiration time.
 
 # Failure Reporting
 
-Aggregate statistics on policy failures MAY be reported using the `TLSRPT` 
+Aggregate statistics on policy failures MAY be reported using the `TLSRPT`
 reporting specification (TODO: Add Ref).
 
 
@@ -414,7 +414,7 @@ are thus out of scope of this threat model.
 
 Since we use DNS TXT record for policy discovery, an attacker who is able to block
 DNS responses can suppress the discovery of an STS Policy, making the Policy Domain
-appear not to have an STS Policy. The caching model described in 
+appear not to have an STS Policy. The caching model described in
 _Policy_ _Expirations_ is designed to resist this attack, and there is discussion in
 the _Future_ _Work_ section around future distribution mechanisms that are robust
 against this attack.
@@ -504,12 +504,12 @@ is authenticated using Web PKI mechanism.
 }
 ~~~~~~~~~
 
-The policy is authenticated using Web PKI mechanism. 
+The policy is authenticated using Web PKI mechanism.
 
 # Appendix 3: DEEP Registration Elements
 ```
 Name: mx-mismatch
-Description: This indicates that the MX resolved for the recipient domain 
+Description: This indicates that the MX resolved for the recipient domain
     did not match the MX constraint specified in the policy.
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
@@ -518,7 +518,7 @@ Change Controller:  IESG
 ```
 ```
 Name: certificate-mismatch
-Description This indicates that the certificate presented by the receiving 
+Description This indicates that the certificate presented by the receiving
     MX did not match the MX hostname
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
@@ -527,9 +527,9 @@ Change Controller:  IESG
 ```
 ```
 Name: invalid-certificate
-Description: This indicates that the certificate presented by the receiving MX 
-    did not validate according to the policy validation constraint. (Either it 
-    was not signed by a trusted CA or did not match the DANE TLSA record for 
+Description: This indicates that the certificate presented by the receiving MX
+    did not validate according to the policy validation constraint. (Either it
+    was not signed by a trusted CA or did not match the DANE TLSA record for
     the recipient MX.)
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
@@ -554,7 +554,7 @@ Change Controller:  IESG
 ```
 ```
 Name: tlsa-invalid
-Description: This indicates a validation error for Policy Domain specifying 
+Description: This indicates a validation error for Policy Domain specifying
   "tlsa" validation.
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
@@ -563,7 +563,7 @@ Change Controller:  IESG
 ```
 ```
 Name: dnssec-invalid
-Description: This indicates a failure to validate DNS records for a Policy 
+Description: This indicates a failure to validate DNS records for a Policy
   Domain specifying "tlsa" validation or "dnssec" authentication.
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
@@ -572,7 +572,7 @@ Change Controller:  IESG
 ```
 ```
 Name: sender-does-not-support-validation-method
-Description: This indicates the sending system can never validate using the 
+Description: This indicates the sending system can never validate using the
   requested validation mechanism.
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
