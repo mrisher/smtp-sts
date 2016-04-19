@@ -150,7 +150,7 @@ We also define the following terms for further use in this document:
   different results.
 * Policy Domain: The domain against which an STS Policy is defined.
 * Policy Authentication: Authentication of the STS policy retrieved for a recipient
-  domain by the sender
+  domain by the sender.
 
 # Related Technologies
 
@@ -211,9 +211,9 @@ distribution. See the section _Future_ _Work_ for more discussion.)
 Policies MUST specify the following fields in JSON format:
 
 * _version_: (plain-text, required). Currently only "STS1" is supported.
-* _mode_:(plain-text, required). If "enforce", the receiving MTA requests that
-  messages be delivered only if they conform to the STS policy. If "report"
-  the receiving MTA requests that failure reports be delivered, as specified
+* _mode_: (plain-text, required). If "enforce", the receiving MTA requests that
+  messages be delivered only if they conform to the STS policy. If "report" the
+  receiving MTA requests that failure reports be delivered, as specified
   by the `rua` parameter.
 * _mx_: MX patterns (comma-separated list of plain-text MX match patterns,
   required). One or more comma-separated patterns matching the expected MX for
@@ -223,7 +223,10 @@ Policies MUST specify the following fields in JSON format:
 * _max-age_: Max lifetime of the policy (plain-text integer seconds). Well-behaved
   clients SHOULD cache a policy for up to this value from last policy fetch
   time.
-* _policy_id_: A short string used to track policy updates
+* _policy_id_: A short string used to track policy updates. This string MUST
+  uniquely identify a given instance of a policy, such that senders can
+  determine when the policy has been updated by comparing to the `policy_id` of
+  a previously seen policy.
 
 ## Formal Definition
 
@@ -291,31 +294,29 @@ to apply old policies for up to this duration.
 
 ### Policy Updates
 
-For policies authenticated via Web PKI (HTTPS), updating the policy requires that
-the owner make changes in two places: the `_smtp_sts` RR record in the Policy
-Domain's DNS zone and at the corresponding HTTPS endpoint. In the case of a
-race-condition if the policy update in HTTPS lags behind the DNS TXT record or
-vice versa, the policy fetched during that period will fail to authenticate (and
-is thus treated as though it did not exist, as described in _Policy
-Discovery & Authentication_). Senders who have a cached policy will thus fall
-back to that cached policy. Thus Policy Domains can expect an existing published
-policy to be used until an update is rolled out in both locations.
+Updating the policy requires that the owner make changes in two places: the
+`_smtp_sts` RR record in the Policy Domain's DNS zone and at the corresponding
+HTTPS endpoint. In the case where the HTTPS endpoint has been updated but the
+TXT record has not been, senders will not know there is a new policy released
+and may thus continue to use old, previously cached versions.  Recipients thus
+can expect a policy to continue to be used by senders until both the HTTPS and
+TXT endpoints are updated and the TXT record's TTL has passed.
 
 ## Policy Discovery & Authentication
 
 Senders discover a recipient domain's STS policy, by making an attempt to fetch
 TXT records from the recipient domain's DNS zone with the name "_smtp_sts". A
-valid TXT record presence in "_smtp_sts.example.com" indicates that the
-recipent domain supports STS. To allow recipient domains to safely serve new
-policies, it is important that senders are able to authenticate a new policy
-retrieved for a recipient domain.
+valid TXT record presence in "_smtp_sts.example.com" indicates that the recipent
+domain supports STS.  To allow recipient domains to safely serve new policies,
+it is important that senders are able to authenticate a new policy retrieved for
+a recipient domain.
 
 Web PKI is the mechanism used for policy authentication. In this mechanism, the
-sender fetches a HTTPS resource (policy) from a host at `policy._smtp_sts` in the
-Policy Domain. The policy is served from a _well known_ URI -
+sender fetches a HTTPS resource (policy) from a host at `policy._smtp_sts` in
+the Policy Domain. The policy is served from a _well known_ URI -
 https://policy._smtp_sts.example.com/current. To consider the policy as valid,
-the _policy_id_ field in the policy MUST match the _id_ field in the DNS TXT record
-under `_smtp_sts`
+the _policy_id_ field in the policy MUST match the _id_ field in the DNS TXT
+record under `_smtp_sts`.
 
 When fetching a new policy or updating a policy, the new policy MUST be
 fully authenticated (HTTPS certificate validation + peer verification) before use.
@@ -489,7 +490,7 @@ processed, in order to:
 
 DNS STS policy indicator TXT record:
 ~~~~~~~~~
-_smtp_sts  IN TXT ( "v=STSv1; id=randomstr; " )
+_smtp_sts  IN TXT ( "v=STSv1; id=randomstr;" )
 ~~~~~~~~~
 
 STS policy served from HTTPS endpoint of the policy (recipient) domain, and
