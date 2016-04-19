@@ -272,7 +272,7 @@ Internet-Draft                  SMTP-STS                      April 2016
       expected MX for this domain.  For example, ["_.example.com",
       "_.example.net"] indicates that mail for this domain might be
       handled by any MX whose hostname is a subdomain of "example.com"
-      or "example.net."
+      or "example.net."  The semantics for these patterns should be the
 
 
 
@@ -281,6 +281,9 @@ Margolis, et al.        Expires October 20, 2016                [Page 5]
 
 Internet-Draft                  SMTP-STS                      April 2016
 
+
+      ones found in the "Checking of Wildcard Certificates" rules in
+      Section 6.4.3 of [RFC6125].
 
    o  _max-age_: Max lifetime of the policy (plain-text integer
       seconds).  Well-behaved clients SHOULD cache a policy for up to
@@ -306,9 +309,6 @@ Internet-Draft                  SMTP-STS                      April 2016
 
    The formal definition of the SMTP STS policy, using [RFC5234], is as
    follows:
-
-
-
 
 
 

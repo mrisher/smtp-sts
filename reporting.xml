@@ -335,6 +335,12 @@ authenticated using PKIX validation.</t>
 </section>
 </section>
 
+<section anchor="report-delivery" title="Report Delivery">
+<t>Note that, When sending failure reports via SMTP, sending MTAs MUST NOT
+honor SMTP STS or DANE TLSA failures.
+</t>
+</section>
+
 <section anchor="iana-considerations" title="IANA Considerations">
 <t>There are no IANA considerations at this time.
 </t>

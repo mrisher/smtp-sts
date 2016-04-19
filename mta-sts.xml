@@ -337,7 +337,9 @@ by the <spanx style="verb">rua</spanx> parameter.</t>
 more comma-separated patterns matching the expected MX for this domain. For
 example, [&quot;<spanx style="emph">.example.com&quot;, &quot;</spanx>.example.net&quot;] indicates that mail for this
 domain might be handled by any MX whose hostname is a subdomain of
-&quot;example.com&quot; or &quot;example.net.&quot;</t>
+&quot;example.com&quot; or &quot;example.net.&quot; The semantics for these patterns should be
+the ones found in the &quot;Checking of Wildcard Certificates&quot; rules in Section 6.4.3
+of <xref target="RFC6125"/>.</t>
 <t><spanx style="emph">max-age</spanx>: Max lifetime of the policy (plain-text integer seconds). Well-behaved
 clients SHOULD cache a policy for up to this value from last policy fetch
 time.</t>

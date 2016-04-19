@@ -87,11 +87,12 @@ Table of Contents
        4.1.2.  Routing Failures  . . . . . . . . . . . . . . . . . .   6
        4.1.3.  Negotiation Failures  . . . . . . . . . . . . . . . .   6
        4.1.4.  Policy Failures . . . . . . . . . . . . . . . . . . .   6
-   5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
-   6.  Security Considerations . . . . . . . . . . . . . . . . . . .   7
-   7.  Appendix 1: JSON Report Schema  . . . . . . . . . . . . . . .   7
-   8.  Appendix 2: Example JSON Report . . . . . . . . . . . . . . .   9
-   9.  Normative References  . . . . . . . . . . . . . . . . . . . .  10
+   5.  Report Delivery . . . . . . . . . . . . . . . . . . . . . . .   7
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   7
+   8.  Appendix 1: JSON Report Schema  . . . . . . . . . . . . . . .   7
+   9.  Appendix 2: Example JSON Report . . . . . . . . . . . . . . .   9
+   10. Normative References  . . . . . . . . . . . . . . . . . . . .  10
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  11
 
 1.  Introduction
@@ -104,7 +105,6 @@ Table of Contents
    (such as the "250 STARTTLS" response) or who can redirect the entire
    SMTP session (perhaps by overwriting the resolved MX record of the
    delivery domain) can perform such a downgrade or interception attack.
-
 
 
 
@@ -346,11 +346,16 @@ Internet-Draft                 SMTP-TLSRPT                    April 2016
    o  "webpki-invalid": This indicates that the MTA-STS policy could not
       be authenticated using PKIX validation.
 
-5.  IANA Considerations
+5.  Report Delivery
+
+   Note that, When sending failure reports via SMTP, sending MTAs MUST
+   NOT honor SMTP STS or DANE TLSA failures.
+
+6.  IANA Considerations
 
    There are no IANA considerations at this time.
 
-6.  Security Considerations
+7.  Security Considerations
 
    SMTP TLS Reporting provides transparency into misconfigurations and
    attempts to intercept or tamper with mail between hosts who support
@@ -375,15 +380,10 @@ Internet-Draft                 SMTP-TLSRPT                    April 2016
       payloads) today, this does not present a significant new
       vulnerability.
 
-7.  Appendix 1: JSON Report Schema
+8.  Appendix 1: JSON Report Schema
 
    The JSON schema is derived from the HPKP JSON schema [RFC7469] (cf.
    Section 3)
-
-
-
-
-
 
 
 
@@ -481,7 +481,7 @@ Internet-Draft                 SMTP-TLSRPT                    April 2016
       URI might host the complete certificate chain presented during an
       attempted STARTTLS session.
 
-8.  Appendix 2: Example JSON Report
+9.  Appendix 2: Example JSON Report
 
 
 
@@ -540,7 +540,7 @@ Internet-Draft                 SMTP-TLSRPT                    April 2016
    certificate and 200 messages were attempted to Company Y servers that
            did not successfully respond to the STARTTLS command.
 
-9.  Normative References
+10.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
