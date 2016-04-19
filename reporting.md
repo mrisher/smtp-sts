@@ -235,6 +235,11 @@ The list of result types will start with the minimal set below, and is expected
   	authenticated using PKIX validation. 
 
 
+# Report Delivery
+
+Note that, When sending failure reports via SMTP, sending MTAs MUST NOT 
+honor SMTP STS or DANE TLSA failures.
+
 
 # IANA Considerations
 
