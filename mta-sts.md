@@ -208,17 +208,17 @@ Policy Domain.
 (Future implementations may move to alternate methods of policy discovery or
 distribution. See the section _Future_ _Work_ for more discussion.)
 
-Policies MUST specify the following fields in JSON format:
+Policies MUST specify the following fields in JSON [@!RFC4627] format:
 
 * _version_: (plain-text, required). Currently only "STS1" is supported.
 * _mode_: (plain-text, required). If "enforce", the receiving MTA requests that
   messages be delivered only if they conform to the STS policy. If "report" the
   receiving MTA requests that failure reports be delivered, as specified
   by the `rua` parameter.
-* _mx_: MX patterns (comma-separated list of plain-text MX match patterns,
-  required). One or more comma-separated patterns matching the expected MX for
-  this domain. For example, "*.example.com,*.example.net" indicates that mail
-  for this domain might be handled by any MX whose hostname is a subdomain of
+* _mx_: MX patterns (list of plain-text MX match patterns, required). One or
+  more comma-separated patterns matching the expected MX for this domain. For
+  example, ["*.example.com", "*.example.net"] indicates that mail for this
+  domain might be handled by any MX whose hostname is a subdomain of
   "example.com" or "example.net."
 * _max-age_: Max lifetime of the policy (plain-text integer seconds). Well-behaved
   clients SHOULD cache a policy for up to this value from last policy fetch
@@ -230,33 +230,46 @@ Policies MUST specify the following fields in JSON format:
 
 ## Formal Definition
 
-**TODO: This no longer aligns with policy**
+### TXT Record
 
-The formal definition of the SMTP STS format, using [@!RFC5234], is as follows:
-
-    sts-uri         = URI [ "!" 1*DIGIT [ "k" / "m" / "g" / "t" ] ]
-                       ; "URI" is imported from [RFC3986]; commas (ASCII
-                       ; 0x2C) and exclamation points (ASCII 0x21)
-                       ; MUST be encoded; the numeric portion MUST fit
-                       ; within an unsigned 64-bit integer
-
-    sts-record      = sts-version sts-sep sts-to
-                       [sts-sep sts-mx]
-                       [sts-sep sts-e]
-                       [sts-sep sts-auri]
-                       [sts-sep]
-                       ; components other than sts-version and
-                       ; sts-m may appear in any order
+The formal definition of the `_smtp_sts` TXT record, defined using [@!RFC5234],
+is as follows:
 
     sts-version     = "v" *WSP "=" *WSP %x53 %x54 %x53 %x31
 
-    sts-sep         = *WSP %x3b *WSP
+    sts-id          = "id" *WSP "=" *WSP 1*20VCHAR
 
-    sts-m           = "to" *WSP "=" *WSP ( "enforce" / "report" )
+### SMTP STS Policy
 
-    sts-mx          = "mx" *WSP "=" *WSP sts-domain-list
+The formal definition of the SMTP STS policy, using [@!RFC5234], is as follows:
 
-    sts-domain-list = (domain-match *("," domain-match))
+    sts-record      = WSP %x7B WSP  ; { left curly bracket
+                      sts-element   ; comma-separated
+                      [             ; list
+                      WSP %x2c WSP  ; of
+                      sts-element   ; sts-elements
+                      ]
+                      WSP %x7d WSP  ; } right curly bracket
+     = %x22 "max
+    sts-element     = sts-version / sts-mode / sts-id / sts-mx / sts-max-age
+
+    sts-version     = %x22 "version" %x22 *WSP %x3a *WSP  ; "version":
+                      %x22 %x53 %x54 %x53 %x31            ; "STS1"
+
+    sts-mode        = %x22 "mode" %x22 *WSP %x3a *WSP     ; "mode":
+                      %x22 ("report" / "enforce") %x22    ; "report"/"enforce"
+
+    sts-id          = %x22 "policy_id" %x22 *WSP %x3a *WSP ; "policy_id":
+                      %x22 1*20VCHAR %x22                  ; some chars
+
+    sts-mx          = %x22 "mx" $x22 *WSP %x3a *WSP       ; "mx":
+                      %x5B                                ; [
+                      domain-match                        ; comma-separated list
+                      [WSP %x2c domain-match WSP]         ; of domain-matches
+                      %x5B                                ; ]
+
+    sts-max-age     = %x22 "max-age" %x22 $x3a *WSP       ; "max-age":
+                      %x22 1*10DIGIT %x22$                ; some digits
 
     domain-match    =  ["*."] 1*dtext *("." 1*dtext)
 
@@ -265,10 +278,6 @@ The formal definition of the SMTP STS format, using [@!RFC5234], is as follows:
                        %61-7A /           ; A-Z
                        %2D                ; "-"
 
-    sts-max-age     = "max-age" *WSP "=" *WSP 1*10DIGIT
-
-    sts-id          = "e" *WSP "=" *WSP 1*10VCHAR
-   
 A size limitation in a sts-uri, if provided, is interpreted as a
 count of units followed by an OPTIONAL unit size ("k" for kilobytes,
 "m" for megabytes, "g" for gigabytes, "t" for terabytes).  Without a
@@ -500,7 +509,7 @@ is authenticated using Web PKI mechanism.
   "version": "STS1",
   "mode": "report",
   "policy_id": "randomstr",
-  "mx": "*.mail.example.com",
+  "mx": ["*.mail.example.com"],
   "max-age": "123456"
 }
 ~~~~~~~~~
