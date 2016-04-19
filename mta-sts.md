@@ -215,10 +215,10 @@ Policies MUST specify the following fields in JSON [@!RFC4627] format:
   messages be delivered only if they conform to the STS policy. If "report"
   the receiving MTA requests that failure reports be delivered, as specified
   by the `rua` parameter.
-* _mx_: MX patterns (comma-separated list of plain-text MX match patterns,
-  required). One or more comma-separated patterns matching the expected MX for
-  this domain. For example, "*.example.com,*.example.net" indicates that mail
-  for this domain might be handled by any MX whose hostname is a subdomain of
+* _mx_: MX patterns (list of plain-text MX match patterns, required). One or
+  more comma-separated patterns matching the expected MX for this domain. For
+  example, ["*.example.com", "*.example.net"] indicates that mail for this
+  domain might be handled by any MX whose hostname is a subdomain of
   "example.com" or "example.net."
 * _max-age_: Max lifetime of the policy (plain-text integer seconds). Well-behaved
   clients SHOULD cache a policy for up to this value from last policy fetch
