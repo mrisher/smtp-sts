@@ -11,3 +11,7 @@ all: $(XML) $(TXT)
 	
 %.txt : %.xml
 	$(XML2RFC) $< --text $@
+
+clean:
+	rm $(XML)
+	rm $(TXT)
