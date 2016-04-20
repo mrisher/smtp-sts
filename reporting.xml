@@ -234,7 +234,7 @@ distribution. See the section <spanx style="emph">Future</spanx> <spanx style="e
 </t>
 <t>
 <list style="symbols">
-<t><spanx style="emph">Report metadata</spanx>:
+<t>Report metadata:
 <list style="symbols">
 <t>The organization responsible for the report
 <list style="symbols">
@@ -244,7 +244,7 @@ contents of the report</t>
 <t>A unique identifier for the report</t>
 <t>The reporting date range for the report</t>
 </list></t>
-<t><spanx style="emph">Policy</spanx>, consisting of:
+<t>Policy, consisting of:
 <list style="symbols">
 <t>One of the following policy types:
 <list style="symbols">
@@ -295,8 +295,8 @@ correctly.
 <list style="symbols">
 <t><spanx style="verb">mx-mismatch</spanx>: This indicates that the MX resolved for the recipient domain
 did not match the MX constraint specified in the policy.</t>
-<t><spanx style="verb">certificate-mismatch</spanx>: This indicates that the certificate presented by the
-receiving MX did not match the MX hostname.</t>
+<t><spanx style="verb">certificate-host-mismatch</spanx>: This indicates that the certificate presented
+by the receiving MX did not match the MX hostname.</t>
 </list>
 </t>
 </section>
@@ -308,9 +308,15 @@ receiving MX did not match the MX hostname.</t>
 support STARTTLS.</t>
 <t><spanx style="verb">invalid-certificate</spanx>: This indicates that the certificate presented by the
 receiving MX did not validate.</t>
-<t><spanx style="verb">certificate-mismatch</spanx>: This indicates that the certificate presented did
-not adhere to the constraints specified in the STS or DANE policy, e.g. if
-the CN field did not match the hostname of the MX.</t>
+<t><spanx style="verb">certificate-host-mismatch</spanx>: This indicates that the certificate presented
+did not adhere to the constraints specified in the STS or DANE policy, e.g.
+if the CN field did not match the hostname of the MX.</t>
+<t><spanx style="verb">certificate-name-constraints-not-permitted</spanx>: The certificate request
+contains a name that is not listed as permitted in the name constraints
+extension of the cert issuer.</t>
+<t><spanx style="verb">certificate-name-constraints-excluded</spanx>: The certificate request contains a
+name that is listed as excluded in the name constraints extension of the
+issuer.</t>
 <t><spanx style="verb">expired-certificate</spanx>: This indicates that the certificate has expired.</t>
 </list>
 </t>
@@ -361,18 +367,18 @@ several security risks presented by the existence of this reporting channel:
 </t>
 <t>
 <list style="symbols">
-<t><spanx style="emph">Flooding of the Aggregate report URI (rua) endpoint</spanx>: An attacker could
+<t>Flooding of the Aggregate report URI (rua) endpoint: An attacker could
 flood the endpoint and prevent the receiving domain from accepting
 additional reports. This type of Denial-of-Service attack would limit
 visibility into STARTTLS failures, leaving the receiving domain blind to an
 ongoing attack.</t>
-<t><spanx style="emph">Untrusted content</spanx>: An attacker could inject malicious code into the
+<t>Untrusted content: An attacker could inject malicious code into the
 report, opening a vulnerability in the receiving domain. Implementers are
 advised to take precautions against evaluating the contents of the report.</t>
-<t><spanx style="emph">Report snooping</spanx>: An attacker could create a bogus TLSRPT record to receive
+<t>Report snooping: An attacker could create a bogus TLSRPT record to receive
 statistics about a domain the attacker does not own. Since an attacker able
 to poison DNS is already able to receive counts of SMTP connections (and,
-absent DANE or MTA-STS poolicies, actual SMTP message payloads) today, this
+absent DANE or MTA-STS policies, actual SMTP message payloads) today, this
 does not present a significant new vulnerability.</t>
 </list>
 </t>

@@ -283,13 +283,13 @@ compliance.
 </t>
 <t>
 <list style="symbols">
-<t><spanx style="emph">Infrastructure:</spanx> In comparison to DANE, this proposal does not require
+<t>Infrastructure: In comparison to DANE, this proposal does not require
  DNSSEC be deployed on either the sending or receiving domain. In addition,
  the reporting feature of SMTP STS can be deployed to perform offline
  analysis of STARTTLS failures, enabling mail providers to gain insight into
  the security of their SMTP connections without the need to modify MTA
  codebases directly.</t>
-<t><spanx style="emph">Offline or report-only usage:</spanx> DANE does not provide a reporting
+<t>Offline or report-only usage: DANE does not provide a reporting
  mechanism and does not have a concept of &quot;report-only&quot; for failures; as a
  result, a service provider cannot receive metrics on TLS acceptability
  without asking senders to enforce a given policy; similarly, senders who
@@ -318,7 +318,7 @@ non-existence does not exist when looking up a policy over plain DNS.</t>
 </section>
 
 <section anchor="policy-semantics" title="Policy Semantics">
-<t>SMTP STS policies are distributed via a <spanx style="emph">well known</spanx> HTTPS endpoint in the
+<t>SMTP STS policies are distributed via a &quot;well known&quot; HTTPS endpoint in the
 Policy Domain.
 </t>
 <t>(Future implementations may move to alternate methods of policy discovery or
@@ -328,22 +328,22 @@ distribution. See the section <spanx style="emph">Future</spanx> <spanx style="e
 </t>
 <t>
 <list style="symbols">
-<t><spanx style="emph">version</spanx>: (plain-text, required). Currently only &quot;STS1&quot; is supported.</t>
-<t><spanx style="emph">mode</spanx>: (plain-text, required). If &quot;enforce&quot;, the receiving MTA requests that
+<t><spanx style="verb">version</spanx>: (plain-text, required). Currently only &quot;STS1&quot; is supported.</t>
+<t><spanx style="verb">mode</spanx>: (plain-text, required). If &quot;enforce&quot;, the receiving MTA requests that
 messages be delivered only if they conform to the STS policy. If &quot;report&quot; the
 receiving MTA requests that failure reports be delivered, as specified
 by the <spanx style="verb">rua</spanx> parameter.</t>
-<t><spanx style="emph">mx</spanx>: MX patterns (list of plain-text MX match patterns, required). One or
+<t><spanx style="verb">mx</spanx>: MX patterns (list of plain-text MX match patterns, required). One or
 more comma-separated patterns matching the expected MX for this domain. For
 example, [&quot;<spanx style="emph">.example.com&quot;, &quot;</spanx>.example.net&quot;] indicates that mail for this
 domain might be handled by any MX whose hostname is a subdomain of
 &quot;example.com&quot; or &quot;example.net.&quot; The semantics for these patterns should be
 the ones found in the &quot;Checking of Wildcard Certificates&quot; rules in Section 6.4.3
 of <xref target="RFC6125"/>.</t>
-<t><spanx style="emph">max-age</spanx>: Max lifetime of the policy (plain-text integer seconds). Well-behaved
+<t><spanx style="verb">max-age</spanx>: Max lifetime of the policy (plain-text integer seconds). Well-behaved
 clients SHOULD cache a policy for up to this value from last policy fetch
 time.</t>
-<t>_policy<spanx style="emph">id</spanx>: A short string used to track policy updates. This string MUST
+<t><spanx style="verb">policy_id</spanx>: A short string used to track policy updates. This string MUST
 uniquely identify a given instance of a policy, such that senders can
 determine when the policy has been updated by comparing to the <spanx style="verb">policy_id</spanx> of
 a previously seen policy.</t>
@@ -452,9 +452,9 @@ a recipient domain.
 </t>
 <t>Web PKI is the mechanism used for policy authentication. In this mechanism, the
 sender fetches a HTTPS resource (policy) from a host at <spanx style="verb">policy._smtp_sts</spanx> in
-the Policy Domain. The policy is served from a <spanx style="emph">well known</spanx> URI -
+the Policy Domain. The policy is served from a <spanx style="verb">well known</spanx> URI -
 <eref target="https://policy._smtp_sts.example.com/current"/>. To consider the policy as valid,
-the _policy<spanx style="emph">id</spanx> field in the policy MUST match the <spanx style="emph">id</spanx> field in the DNS TXT
+the <spanx style="verb">policy_id</spanx> field in the policy MUST match the <spanx style="verb">id</spanx> field in the DNS TXT
 record under <spanx style="verb">_smtp_sts</spanx>.
 </t>
 <t>When fetching a new policy or updating a policy, the new policy MUST be
@@ -482,19 +482,19 @@ policy validation one of two ways:
 </t>
 <t>
 <list style="symbols">
-<t><spanx style="emph">report</spanx>: In this mode, sending MTAs merely send a report to the designated
+<t><spanx style="verb">report</spanx>: In this mode, sending MTAs merely send a report to the designated
 report address indicating policy application failures. This can be done
 &quot;offline&quot;, i.e. based on the MTA logs, and is thus a suitable low-risk option
 for MTAs who wish to enhance transparency of TLS tampering without making
 complicated changes to production mail-handling infrastructure.</t>
-<t><spanx style="emph">enforce</spanx>: In this mode, sending MTAs SHOULD treat STS policy failures, in
+<t><spanx style="verb">enforce</spanx>: In this mode, sending MTAs SHOULD treat STS policy failures, in
 which the policy action is &quot;reject&quot;, as a mail delivery error, and SHOULD
 terminate the SMTP connection, not delivering any more mail to the recipient
 MTA.</t>
 </list>
 </t>
-<t>In <spanx style="emph">enforce</spanx> mode, however, sending MTAs MUST first check for a new
-<spanx style="emph">authenticated</spanx> policy before actually treating a message failure as fatal.
+<t>In <spanx style="verb">enforce</spanx> mode, however, sending MTAs MUST first check for a new
+authenticated policy before actually treating a message failure as fatal.
 </t>
 <t>Thus the control flow for a sending MTA that does online policy application
 consists of the following steps:
@@ -508,7 +508,7 @@ authenticate and cache it.</t>
 <t>If not valid and policy specifies rejection, perform the following
 steps:
 <list style="symbols">
-<t>Check for a new (non-cached) <spanx style="emph">authenticated</spanx> policy.</t>
+<t>Check for a new (non-cached) authenticated policy.</t>
 <t>If one exists and the new policy is different, update the current policy and
 go to step 2.</t>
 <t>If one exists and the new policy is same as the cached policy, treat the
@@ -678,9 +678,9 @@ Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document
 Change Controller:  IESG
 
-Name: certificate-mismatch
-Description: This indicates that the certificate presented by the receiving
-             MX did not match the MX hostname
+Name: certificate-name-mismatch
+Description: This indicates that the subject CNAME/SAN in the certificate
+             presented by the receiving MX did not match the MX hostname
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document
@@ -691,6 +691,22 @@ Description: This indicates that the certificate presented by the receiving MX
              did not validate according to the policy validation constraint.
              (Either it was not signed by a trusted CA or did not match the
              DANE TLSA record for the recipient MX.)
+Intended Usage:  COMMON
+Reference:  RFC XXXX (this document once published)
+Submitter:  Authors of this document
+Change Controller:  IESG
+
+Name: certificate-name-constraints-not-permitted
+Description: The certificate request contains a name that is not listed as
+             permitted in the name constraints extension of the cert issuer.
+Intended Usage:  COMMON
+Reference:  RFC XXXX (this document once published)
+Submitter:  Authors of this document
+Change Controller:  IESG
+
+Name: certificate-name-constraints-excluded
+Description: The certificate request contains a name that is listed as 
+             excluded in the name constraints extension of the issuer.
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document

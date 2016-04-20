@@ -98,10 +98,10 @@ Table of Contents
    9.  Appendix 2: Domain Owner STS example record . . . . . . . . .  12
      9.1.  Example 1 . . . . . . . . . . . . . . . . . . . . . . . .  12
    10. Appendix 3: DEEP Registration Elements  . . . . . . . . . . .  13
-   11. References  . . . . . . . . . . . . . . . . . . . . . . . . .  14
-     11.1.  Normative References . . . . . . . . . . . . . . . . . .  14
-     11.2.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  15
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  15
+   11. References  . . . . . . . . . . . . . . . . . . . . . . . . .  15
+     11.1.  Normative References . . . . . . . . . . . . . . . . . .  15
+     11.2.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  16
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
 
 
 
@@ -211,7 +211,7 @@ Internet-Draft                  SMTP-STS                      April 2016
 
    SMTP STS offers the following advantages compared to DANE:
 
-   o  _Infrastructure:_ In comparison to DANE, this proposal does not
+   o  Infrastructure: In comparison to DANE, this proposal does not
       require DNSSEC be deployed on either the sending or receiving
       domain.  In addition, the reporting feature of SMTP STS can be
       deployed to perform offline analysis of STARTTLS failures,
@@ -226,7 +226,7 @@ Margolis, et al.        Expires October 20, 2016                [Page 4]
 Internet-Draft                  SMTP-STS                      April 2016
 
 
-   o  _Offline or report-only usage:_ DANE does not provide a reporting
+   o  Offline or report-only usage: DANE does not provide a reporting
       mechanism and does not have a concept of "report-only" for
       failures; as a result, a service provider cannot receive metrics
       on TLS acceptability without asking senders to enforce a given
@@ -250,7 +250,7 @@ Internet-Draft                  SMTP-STS                      April 2016
 
 3.  Policy Semantics
 
-   SMTP STS policies are distributed via a _well known_ HTTPS endpoint
+   SMTP STS policies are distributed via a "well known" HTTPS endpoint
    in the Policy Domain.
 
    (Future implementations may move to alternate methods of policy
@@ -259,15 +259,15 @@ Internet-Draft                  SMTP-STS                      April 2016
 
    Policies MUST specify the following fields in JSON [RFC4627] format:
 
-   o  _version_: (plain-text, required).  Currently only "STS1" is
+   o  "version": (plain-text, required).  Currently only "STS1" is
       supported.
 
-   o  _mode_: (plain-text, required).  If "enforce", the receiving MTA
+   o  "mode": (plain-text, required).  If "enforce", the receiving MTA
       requests that messages be delivered only if they conform to the
       STS policy.  If "report" the receiving MTA requests that failure
       reports be delivered, as specified by the "rua" parameter.
 
-   o  _mx_: MX patterns (list of plain-text MX match patterns,
+   o  "mx": MX patterns (list of plain-text MX match patterns,
       required).  One or more comma-separated patterns matching the
       expected MX for this domain.  For example, ["_.example.com",
       "_.example.net"] indicates that mail for this domain might be
@@ -285,11 +285,11 @@ Internet-Draft                  SMTP-STS                      April 2016
       ones found in the "Checking of Wildcard Certificates" rules in
       Section 6.4.3 of [RFC6125].
 
-   o  _max-age_: Max lifetime of the policy (plain-text integer
+   o  "max-age": Max lifetime of the policy (plain-text integer
       seconds).  Well-behaved clients SHOULD cache a policy for up to
       this value from last policy fetch time.
 
-   o  _policy_id_: A short string used to track policy updates.  This
+   o  "policy_id": A short string used to track policy updates.  This
       string MUST uniquely identify a given instance of a policy, such
       that senders can determine when the policy has been updated by
       comparing to the "policy_id" of a previously seen policy.
@@ -430,8 +430,8 @@ Internet-Draft                  SMTP-STS                      April 2016
    Web PKI is the mechanism used for policy authentication.  In this
    mechanism, the sender fetches a HTTPS resource (policy) from a host
    at "policy._smtp_sts" in the Policy Domain.  The policy is served
-   from a _well known_ URI - [1].  To consider the policy as valid, the
-   _policy_id_ field in the policy MUST match the _id_ field in the DNS
+   from a "well known" URI - [1].  To consider the policy as valid, the
+   "policy_id" field in the policy MUST match the "id" field in the DNS
    TXT record under "_smtp_sts".
 
    When fetching a new policy or updating a policy, the new policy MUST
@@ -467,20 +467,20 @@ Internet-Draft                  SMTP-STS                      April 2016
    non-expired SMTP STS policy, a sending MTA honoring SMTP STS MAY
    apply the result of a policy validation one of two ways:
 
-   o  _report_: In this mode, sending MTAs merely send a report to the
+   o  "report": In this mode, sending MTAs merely send a report to the
       designated report address indicating policy application failures.
       This can be done "offline", i.e. based on the MTA logs, and is
       thus a suitable low-risk option for MTAs who wish to enhance
       transparency of TLS tampering without making complicated changes
       to production mail-handling infrastructure.
 
-   o  _enforce_: In this mode, sending MTAs SHOULD treat STS policy
+   o  "enforce": In this mode, sending MTAs SHOULD treat STS policy
       failures, in which the policy action is "reject", as a mail
       delivery error, and SHOULD terminate the SMTP connection, not
       delivering any more mail to the recipient MTA.
 
-   In _enforce_ mode, however, sending MTAs MUST first check for a new
-   _authenticated_ policy before actually treating a message failure as
+   In "enforce" mode, however, sending MTAs MUST first check for a new
+   authenticated policy before actually treating a message failure as
    fatal.
 
    Thus the control flow for a sending MTA that does online policy
@@ -496,7 +496,7 @@ Internet-Draft                  SMTP-STS                      April 2016
    4.  If not valid and policy specifies rejection, perform the
        following steps:
 
-       *  Check for a new (non-cached) _authenticated_ policy.
+       *  Check for a new (non-cached) authenticated policy.
 
 
 
@@ -694,9 +694,9 @@ Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document
 Change Controller:  IESG
 
-Name: certificate-mismatch
-Description: This indicates that the certificate presented by the receiving
-             MX did not match the MX hostname
+Name: certificate-name-mismatch
+Description: This indicates that the subject CNAME/SAN in the certificate
+             presented by the receiving MX did not match the MX hostname
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document
@@ -712,6 +712,30 @@ Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document
 Change Controller:  IESG
 
+Name: certificate-name-constraints-not-permitted
+Description: The certificate request contains a name that is not listed as
+             permitted in the name constraints extension of the cert issuer.
+Intended Usage:  COMMON
+Reference:  RFC XXXX (this document once published)
+Submitter:  Authors of this document
+Change Controller:  IESG
+
+Name: certificate-name-constraints-excluded
+Description: The certificate request contains a name that is listed as
+
+
+
+Margolis, et al.        Expires October 20, 2016               [Page 13]
+
+Internet-Draft                  SMTP-STS                      April 2016
+
+
+             excluded in the name constraints extension of the issuer.
+Intended Usage:  COMMON
+Reference:  RFC XXXX (this document once published)
+Submitter:  Authors of this document
+Change Controller:  IESG
+
 Name: expired-certificate
 Description: This indicates that the certificate has expired.
 Intended Usage:  COMMON
@@ -722,14 +746,6 @@ Change Controller:  IESG
 Name: starttls-not-supported
 Description: This indicates that the recipient MX did not support STARTTLS.
 Intended Usage:  COMMON
-
-
-
-Margolis, et al.        Expires October 20, 2016               [Page 13]
-
-Internet-Draft                  SMTP-STS                      April 2016
-
-
 Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document
 Change Controller:  IESG
@@ -758,6 +774,18 @@ Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document
 Change Controller:  IESG
 
+
+
+
+
+
+
+
+Margolis, et al.        Expires October 20, 2016               [Page 14]
+
+Internet-Draft                  SMTP-STS                      April 2016
+
+
 11.  References
 
 11.1.  Normative References
@@ -775,16 +803,6 @@ Change Controller:  IESG
               Rose, "DNS Security Introduction and Requirements", RFC
               4033, DOI 10.17487/RFC4033, March 2005,
               <http://www.rfc-editor.org/info/rfc4033>.
-
-
-
-
-
-
-Margolis, et al.        Expires October 20, 2016               [Page 14]
-
-Internet-Draft                  SMTP-STS                      April 2016
-
 
    [RFC4627]  Crockford, D., "The application/json Media Type for
               JavaScript Object Notation (JSON)", RFC 4627, DOI 10
@@ -817,6 +835,13 @@ Internet-Draft                  SMTP-STS                      April 2016
               .17487/RFC7672, October 2015,
               <http://www.rfc-editor.org/info/rfc7672>.
 
+
+
+Margolis, et al.        Expires October 20, 2016               [Page 15]
+
+Internet-Draft                  SMTP-STS                      April 2016
+
+
 11.2.  URIs
 
    [1] https://policy._smtp_sts.example.com/current
@@ -833,13 +858,6 @@ Authors' Addresses
    Google, Inc
 
    Email: risher (at) google (dot com)
-
-
-
-
-Margolis, et al.        Expires October 20, 2016               [Page 15]
-
-Internet-Draft                  SMTP-STS                      April 2016
 
 
    Nicolas Lidzborski
@@ -872,6 +890,14 @@ Internet-Draft                  SMTP-STS                      April 2016
    Email: alexander_brotman (at) cable.comcast (dot com)
 
 
+
+
+
+Margolis, et al.        Expires October 20, 2016               [Page 16]
+
+Internet-Draft                  SMTP-STS                      April 2016
+
+
    Janet Jones
    Microsoft, Inc
 
@@ -890,36 +916,10 @@ Internet-Draft                  SMTP-STS                      April 2016
    Email: klaus.umbach (at) 1und1 (dot de)
 
 
-
-
-
-Margolis, et al.        Expires October 20, 2016               [Page 16]
-
-Internet-Draft                  SMTP-STS                      April 2016
-
-
    Markus Laber
    1&1 Mail & Media Development & Technology GmbH
 
    Email: markus.laber (at) 1und1 (dot de)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
