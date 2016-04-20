@@ -167,13 +167,13 @@ Policies consist of the following directives:
 
 Aggregate reports contain the following fields:
 
-* _Report metadata_: 
+* Report metadata: 
 	* The organization responsible for the report
         * Contact information for one or more responsible parties for the
           contents of the report
 	* A unique identifier for the report
 	* The reporting date range for the report
-* _Policy_, consisting of: 
+* Policy, consisting of: 
 	* One of the following policy types:
 		* The SMTP MTA STS policy applied (as a string)
 		* The DANE TLSA record applied (as a string)
@@ -207,8 +207,8 @@ to grow over time based on real-world experience. The initial set is:
 ### Routing Failures
   * `mx-mismatch`: This indicates that the MX resolved for the recipient domain
     did not match the MX constraint specified in the policy.
-  * `certificate-mismatch`: This indicates that the certificate presented by the
-    receiving MX did not match the MX hostname.
+  * `certificate-host-mismatch`: This indicates that the certificate presented
+    by the receiving MX did not match the MX hostname.
 
 ### Negotiation Failures
 
@@ -216,9 +216,15 @@ to grow over time based on real-world experience. The initial set is:
     support STARTTLS.
   * `invalid-certificate`: This indicates that the certificate presented by the
     receiving MX did not validate.
-  * `certificate-mismatch`: This indicates that the certificate presented did
-    not adhere to the constraints specified in the STS or DANE policy, e.g. if
-    the CN field did not match the hostname of the MX.
+  * `certificate-host-mismatch`: This indicates that the certificate presented
+    did not adhere to the constraints specified in the STS or DANE policy, e.g.
+    if the CN field did not match the hostname of the MX.
+  * `certificate-name-constraints-not-permitted`: The certificate request
+    contains a name that is not listed as permitted in the name constraints
+    extension of the cert issuer.
+  * `certificate-name-constraints-excluded`: The certificate request contains a
+    name that is listed as excluded in the name constraints extension of the
+    issuer.
   * `expired-certificate`: This indicates that the certificate has expired.
 
 ### Policy Failures
@@ -253,13 +259,13 @@ SMTP TLS Reporting provides transparency into misconfigurations or attempts to
 intercept or tamper with mail between hosts who support STARTTLS. There are
 several security risks presented by the existence of this reporting channel:
 
-  * _Flooding of the Aggregate report URI (rua) endpoint_: An attacker could
+  * `Flooding of the Aggregate report URI (rua) endpoint`: An attacker could
     flood the endpoint and prevent the receiving domain from accepting
     additional reports. This type of Denial-of-Service attack would limit
     visibility into STARTTLS failures, leaving the receiving domain blind to an
     ongoing attack.
 
-  * _Untrusted content_: An attacker could inject malicious code into the
+  * `Untrusted content`: An attacker could inject malicious code into the
     report, opening a vulnerability in the receiving domain. Implementers are
     advised to take precautions against evaluating the contents of the report.
 
