@@ -175,13 +175,13 @@ compliance.
 
 SMTP MTA-STS offers the following advantages compared to DANE:
 
-   * *Infrastructure:* In comparison to DANE, this proposal does not require
+   * Infrastructure: In comparison to DANE, this proposal does not require
      DNSSEC be deployed on either the sending or receiving domain. In addition,
      the reporting feature of SMTP MTA-STS can be deployed to perform offline
      analysis of STARTTLS failures, enabling mail providers to gain insight into
      the security of their SMTP connections without the need to modify MTA
      codebases directly.
-   * *Offline or report-only usage:* DANE does not provide a reporting
+   * Offline or report-only usage: DANE does not provide a reporting
      mechanism and does not have a concept of "report-only" for failures; as a
      result, a service provider cannot receive metrics on TLS acceptability
      without asking senders to enforce a given policy; similarly, senders who
@@ -203,7 +203,7 @@ SMTP MTA-STS offers the following advantages compared to DANE:
 
 # Policy Semantics
 
-SMTP MTA-STS policies are distributed via a _well known_ HTTPS endpoint in the
+SMTP MTA-STS policies are distributed via a "well known" HTTPS endpoint in the
 Policy Domain.
 
 (Future implementations may move to alternate methods of policy discovery or
@@ -211,22 +211,22 @@ distribution. See the section _Future_ _Work_ for more discussion.)
 
 Policies MUST specify the following fields in JSON [@!RFC4627] format:
 
-* _version_: (plain-text, required). Currently only "STS1" is supported.
-* _mode_: (plain-text, required). If "enforce", the receiving MTA requests that
+* `version`: (plain-text, required). Currently only "STS1" is supported.
+* `mode`: (plain-text, required). If "enforce", the receiving MTA requests that
   messages be delivered only if they conform to the STS policy. If "report" the
   receiving MTA requests that failure reports be delivered, as specified
   by the `rua` parameter.
-* _mx_: MX patterns (list of plain-text MX match patterns, required). One or
+* `mx`: MX patterns (list of plain-text MX match patterns, required). One or
   more comma-separated patterns matching the expected MX for this domain. For
   example, ["*.example.com", "*.example.net"] indicates that mail for this
   domain might be handled by any MX whose hostname is a subdomain of
   "example.com" or "example.net." The semantics for these patterns should be
   the ones found in the "Checking of Wildcard Certificates" rules in Section 6.4.3
   of [@!RFC6125]. 
-* _max-age_: Max lifetime of the policy (plain-text integer seconds). Well-behaved
+* `max-age`: Max lifetime of the policy (plain-text integer seconds). Well-behaved
   clients SHOULD cache a policy for up to this value from last policy fetch
   time.
-* _policy_id_: A short string used to track policy updates. This string MUST
+* `policy_id`: A short string used to track policy updates. This string MUST
   uniquely identify a given instance of a policy, such that senders can
   determine when the policy has been updated by comparing to the `policy_id` of
   a previously seen policy.
@@ -325,10 +325,10 @@ it is important that senders are able to authenticate a new policy retrieved for
 a recipient domain.
 
 Web PKI is the mechanism used for policy authentication. In this mechanism, the
-sender fetches a HTTPS resource (policy) from a host at `policy._mta_sts` in
-the Policy Domain. The policy is served from a _well known_ URI -
-https://policy._mta_sts.example.com/current. To consider the policy as valid,
-the _policy_id_ field in the policy MUST match the _id_ field in the DNS TXT
+sender fetches a HTTPS resource (policy) from a host at `policy._mta_sts` in the
+Policy Domain. The policy is served from a "well known" URI:
+`https://policy._mta_sts.example.com/current`. To consider the policy as valid,
+the `policy_id` field in the policy MUST match the `id` field in the DNS TXT
 record under `_mta_sts`.
 
 When fetching a new policy or updating a policy, the new policy MUST be
@@ -352,19 +352,19 @@ When sending to an MX at a domain for which the sender has a valid non-expired
 SMTP MTA-STS policy, a sending MTA honoring SMTP MTA-STS MAY apply the result
 of a policy validation one of two ways:
 
-* _report_: In this mode, sending MTAs merely send a report to the designated
+* `report`: In this mode, sending MTAs merely send a report to the designated
   report address indicating policy application failures. This can be done
   "offline", i.e. based on the MTA logs, and is thus a suitable low-risk option
   for MTAs who wish to enhance transparency of TLS tampering without making
   complicated changes to production mail-handling infrastructure.
 
-* _enforce_: In this mode, sending MTAs SHOULD treat STS policy failures, in
+* `enforce`: In this mode, sending MTAs SHOULD treat STS policy failures, in
   which the policy action is "reject", as a mail delivery error, and SHOULD
   terminate the SMTP connection, not delivering any more mail to the recipient
   MTA.
 
-In _enforce_ mode, however, sending MTAs MUST first check for a new
-_authenticated_ policy before actually treating a message failure as fatal.
+In `enforce` mode, however, sending MTAs MUST first check for a new
+authenticated policy before actually treating a message failure as fatal.
 
 Thus the control flow for a sending MTA that does online policy application
 consists of the following steps:
@@ -376,7 +376,7 @@ consists of the following steps:
 4. If not valid and policy specifies rejection, perform the following
    steps:
 
-  * Check for a new (non-cached) _authenticated_ policy.
+  * Check for a new (non-cached) authenticated policy.
   * If one exists and the new policy is different, update the current policy and
     go to step 2.
   * If one exists and the new policy is same as the cached policy, treat the
@@ -531,9 +531,9 @@ Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document
 Change Controller:  IESG
 
-Name: certificate-mismatch
-Description: This indicates that the certificate presented by the receiving
-             MX did not match the MX hostname
+Name: certificate-name-mismatch
+Description: This indicates that the subject CNAME/SAN in the certificate
+             presented by the receiving MX did not match the MX hostname
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document
@@ -544,6 +544,22 @@ Description: This indicates that the certificate presented by the receiving MX
              did not validate according to the policy validation constraint.
              (Either it was not signed by a trusted CA or did not match the
              DANE TLSA record for the recipient MX.)
+Intended Usage:  COMMON
+Reference:  RFC XXXX (this document once published)
+Submitter:  Authors of this document
+Change Controller:  IESG
+
+Name: certificate-name-constraints-not-permitted
+Description: The certificate request contains a name that is not listed as
+             permitted in the name constraints extension of the cert issuer.
+Intended Usage:  COMMON
+Reference:  RFC XXXX (this document once published)
+Submitter:  Authors of this document
+Change Controller:  IESG
+
+Name: certificate-name-constraints-excluded
+Description: The certificate request contains a name that is listed as 
+             excluded in the name constraints extension of the issuer.
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document
