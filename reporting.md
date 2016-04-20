@@ -182,8 +182,8 @@ Aggregate reports contain the following fields:
 	* The domain for which the policy is applied
 	* The MX host
 	* An identifier for the policy (where applicable)
-* _Aggregate counts_, comprising _result type_, _sending MTA IP_, _receiving MTA
-  hostname_, _message count_, and an optional _additional information_ field
+* Aggregate counts, comprising result type, sending MTA IP, receiving MTA
+  hostname, message count, and an optional additional information field
   containing a URI for recipients to review further information on a failure
   type.
 

@@ -260,8 +260,8 @@ contents of the report</t>
 <t>The MX host</t>
 <t>An identifier for the policy (where applicable)</t>
 </list></t>
-<t><spanx style="emph">Aggregate counts</spanx>, comprising <spanx style="emph">result type</spanx>, <spanx style="emph">sending MTA IP</spanx>, <spanx style="emph">receiving MTA
-hostname</spanx>, <spanx style="emph">message count</spanx>, and an optional <spanx style="emph">additional information</spanx> field
+<t>Aggregate counts, comprising result type, sending MTA IP, receiving MTA
+hostname, message count, and an optional additional information field
 containing a URI for recipients to review further information on a failure
 type.</t>
 </list>
