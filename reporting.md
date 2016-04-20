@@ -259,20 +259,20 @@ SMTP TLS Reporting provides transparency into misconfigurations or attempts to
 intercept or tamper with mail between hosts who support STARTTLS. There are
 several security risks presented by the existence of this reporting channel:
 
-  * `Flooding of the Aggregate report URI (rua) endpoint`: An attacker could
+  * Flooding of the Aggregate report URI (rua) endpoint: An attacker could
     flood the endpoint and prevent the receiving domain from accepting
     additional reports. This type of Denial-of-Service attack would limit
     visibility into STARTTLS failures, leaving the receiving domain blind to an
     ongoing attack.
 
-  * `Untrusted content`: An attacker could inject malicious code into the
+  * Untrusted content: An attacker could inject malicious code into the
     report, opening a vulnerability in the receiving domain. Implementers are
     advised to take precautions against evaluating the contents of the report.
 
-  * _Report snooping_: An attacker could create a bogus TLSRPT record to receive
+  * Report snooping: An attacker could create a bogus TLSRPT record to receive
     statistics about a domain the attacker does not own. Since an attacker able
     to poison DNS is already able to receive counts of SMTP connections (and,
-    absent DANE or MTA-STS poolicies, actual SMTP message payloads) today, this
+    absent DANE or MTA-STS policies, actual SMTP message payloads) today, this
     does not present a significant new vulnerability.
 
 
