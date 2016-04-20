@@ -1,7 +1,7 @@
 %%%
 
-   Title = "SMTP Strict Transport Security"
-   abbrev = "SMTP-STS"
+   Title = "SMTP MTA Strict Transport Security"
+   abbrev = "MTA-STS"
    category = "std"
    docName = "draft-ietf-uta-mta-sts-00"
    ipr = "trust200902"
@@ -93,8 +93,8 @@
 
 .# Abstract
 
-SMTP STS is a mechanism enabling mail service providers to declare their ability
-to receive TLS-secured connections, to declare particular methods for
+SMTP MTA-STS is a mechanism enabling mail service providers to declare their
+ability to receive TLS-secured connections, to declare particular methods for
 certificate validation, and to request that sending SMTP servers report upon
 and/or refuse to deliver messages that cannot be delivered securely.
 
@@ -161,22 +161,23 @@ presents a variant for systems not yet supporting DNSSEC.
 
 ## Differences from DANE
 
-The primary difference between the mechanism described here and DANE is that DANE
-requires the use of DNSSEC to authenticate DANE TLSA records, whereas SMTP STS
-relies on the certificate authority (CA) system to avoid interception. (For a
-thorough discussion of this trade-off, see the section _Security_ _Considerations_.)
+The primary difference between the mechanism described here and DANE is that
+DANE requires the use of DNSSEC to authenticate DANE TLSA records, whereas SMTP
+STS relies on the certificate authority (CA) system to avoid interception. (For
+a thorough discussion of this trade-off, see the section _Security_
+_Considerations_.)
 
-In addition, SMTP STS introduces a mechanism for failure reporting and a
+In addition, SMTP MTA-STS introduces a mechanism for failure reporting and a
 report-only mode, enabling offline ("report-only") deployments and auditing for
 compliance.
 
-### Advantages of SMTP STS when compared to DANE
+### Advantages of SMTP MTA-STS when compared to DANE
 
-SMTP STS offers the following advantages compared to DANE:
+SMTP MTA-STS offers the following advantages compared to DANE:
 
    * *Infrastructure:* In comparison to DANE, this proposal does not require
      DNSSEC be deployed on either the sending or receiving domain. In addition,
-     the reporting feature of SMTP STS can be deployed to perform offline
+     the reporting feature of SMTP MTA-STS can be deployed to perform offline
      analysis of STARTTLS failures, enabling mail providers to gain insight into
      the security of their SMTP connections without the need to modify MTA
      codebases directly.
@@ -188,10 +189,10 @@ SMTP STS offers the following advantages compared to DANE:
      recipients such metrics from an offline (and potentially easier-to-deploy)
      logs-analysis batch process.
 
-### Advantages of DANE when compared to SMTP STS
+### Advantages of DANE when compared to SMTP MTA-STS
 
 * Infrastructure: DANE may be easier for some providers to deploy. In
-  particular, for providers who already support DNSSEC, SMTP STS would
+  particular, for providers who already support DNSSEC, SMTP MTA-STS would
   additionally require they host a HTTPS webserver and obtain a CA-signed
   X.509 certificate for the recipient domain.
 
@@ -202,7 +203,7 @@ SMTP STS offers the following advantages compared to DANE:
 
 # Policy Semantics
 
-SMTP STS policies are distributed via a _well known_ HTTPS endpoint in the
+SMTP MTA-STS policies are distributed via a _well known_ HTTPS endpoint in the
 Policy Domain.
 
 (Future implementations may move to alternate methods of policy discovery or
@@ -234,16 +235,17 @@ Policies MUST specify the following fields in JSON [@!RFC4627] format:
 
 ### TXT Record
 
-The formal definition of the `_smtp_sts` TXT record, defined using [@!RFC5234],
+The formal definition of the `_mta_sts` TXT record, defined using [@!RFC5234],
 is as follows:
 
     sts-version     = "v" *WSP "=" *WSP %x53 %x54 %x53 %x31
 
     sts-id          = "id" *WSP "=" *WSP 1*20VCHAR
 
-### SMTP STS Policy
+### SMTP MTA-STS Policy
 
-The formal definition of the SMTP STS policy, using [@!RFC5234], is as follows:
+The formal definition of the SMTP MTA-STS policy, using [@!RFC5234], is as
+follows:
 
     sts-record      = WSP %x7B WSP  ; { left curly bracket
                       sts-element   ; comma-separated
@@ -289,13 +291,13 @@ megabyte is 2^20, etc.
 
 ## Policy Expirations
 
-In order to resist attackers inserting a fraudulent policy, SMTP STS policies
-are designed to be long-lived, with an expiry typically greater than two weeks.
-Policy validity is controlled by two separate expiration times: the lifetime
-indicated in the policy ("max-age=") and the TTL on the DNS record itself. The policy
-expiration will ordinarily be longer than that of the DNS TTL, and senders
-SHOULD cache a policy (and apply it to all mail to the recipient domain) until
-the policy expiration.
+In order to resist attackers inserting a fraudulent policy, SMTP MTA-STS
+policies are designed to be long-lived, with an expiry typically greater than
+two weeks.  Policy validity is controlled by two separate expiration times: the
+lifetime indicated in the policy ("max-age=") and the TTL on the DNS record
+itself. The policy expiration will ordinarily be longer than that of the DNS
+TTL, and senders SHOULD cache a policy (and apply it to all mail to the
+recipient domain) until the policy expiration.
 
 An important consideration for domains publishing a policy is that senders will
 see a policy expiration as relative to the fetch of a policy cached by their
@@ -306,7 +308,7 @@ to apply old policies for up to this duration.
 ### Policy Updates
 
 Updating the policy requires that the owner make changes in two places: the
-`_smtp_sts` RR record in the Policy Domain's DNS zone and at the corresponding
+`_mta_sts` RR record in the Policy Domain's DNS zone and at the corresponding
 HTTPS endpoint. In the case where the HTTPS endpoint has been updated but the
 TXT record has not been, senders will not know there is a new policy released
 and may thus continue to use old, previously cached versions.  Recipients thus
@@ -316,18 +318,18 @@ TXT endpoints are updated and the TXT record's TTL has passed.
 ## Policy Discovery & Authentication
 
 Senders discover a recipient domain's STS policy, by making an attempt to fetch
-TXT records from the recipient domain's DNS zone with the name "_smtp_sts". A
-valid TXT record presence in "_smtp_sts.example.com" indicates that the recipent
+TXT records from the recipient domain's DNS zone with the name "_mta_sts". A
+valid TXT record presence in "_mta_sts.example.com" indicates that the recipent
 domain supports STS.  To allow recipient domains to safely serve new policies,
 it is important that senders are able to authenticate a new policy retrieved for
 a recipient domain.
 
 Web PKI is the mechanism used for policy authentication. In this mechanism, the
-sender fetches a HTTPS resource (policy) from a host at `policy._smtp_sts` in
+sender fetches a HTTPS resource (policy) from a host at `policy._mta_sts` in
 the Policy Domain. The policy is served from a _well known_ URI -
-https://policy._smtp_sts.example.com/current. To consider the policy as valid,
+https://policy._mta_sts.example.com/current. To consider the policy as valid,
 the _policy_id_ field in the policy MUST match the _id_ field in the DNS TXT
-record under `_smtp_sts`.
+record under `_mta_sts`.
 
 When fetching a new policy or updating a policy, the new policy MUST be
 fully authenticated (HTTPS certificate validation + peer verification) before use.
@@ -337,18 +339,18 @@ reject mail.
 ## Policy Validation
 
 When sending to an MX at a domain for which the sender has a valid and
-non-expired SMTP STS policy, a sending MTA honoring SMTP STS MUST validate
-that the recipient MX supports STARTTLS, and offers a valid PKIX based TLS
-certificate. The certificate presented by the receiving MX MUST be valid for
-the MX name and chain to a root CA that is trusted by the sending MTA. The
+non-expired SMTP MTA-STS policy, a sending MTA honoring SMTP MTA-STS MUST
+validate that the recipient MX supports STARTTLS, and offers a valid PKIX based
+TLS certificate. The certificate presented by the receiving MX MUST be valid
+for the MX name and chain to a root CA that is trusted by the sending MTA. The
 certificate MUST have a CN or SAN matching the MX hostname (as described in
 [@!RFC6125]) and be non-expired.
 
 ## Policy Application
 
 When sending to an MX at a domain for which the sender has a valid non-expired
-SMTP STS policy, a sending MTA honoring SMTP STS MAY apply the result of a
-policy validation one of two ways:
+SMTP MTA-STS policy, a sending MTA honoring SMTP MTA-STS MAY apply the result
+of a policy validation one of two ways:
 
 * _report_: In this mode, sending MTAs merely send a report to the designated
   report address indicating policy application failures. This can be done
@@ -424,12 +426,12 @@ identity checking [@!RFC6125]. Attackers who are able to obtain a valid certific
 for the targeted recipient mail service (e.g. by compromising a certificate authority)
 are thus out of scope of this threat model.
 
-Since we use DNS TXT record for policy discovery, an attacker who is able to block
-DNS responses can suppress the discovery of an STS Policy, making the Policy Domain
-appear not to have an STS Policy. The caching model described in
-_Policy_ _Expirations_ is designed to resist this attack, and there is discussion in
-the _Future_ _Work_ section around future distribution mechanisms that are robust
-against this attack.
+Since we use DNS TXT record for policy discovery, an attacker who is able to
+block DNS responses can suppress the discovery of an STS Policy, making the
+Policy Domain appear not to have an STS Policy. The caching model described in
+_Policy_ _Expirations_ is designed to resist this attack, and there is
+discussion in the _Future_ _Work_ section around future distribution mechanisms
+that are robust against this attack.
 
 # Future Work
 
@@ -501,7 +503,7 @@ processed, in order to:
 
 DNS STS policy indicator TXT record:
 ~~~~~~~~~
-_smtp_sts  IN TXT ( "v=STSv1; id=randomstr;" )
+_mta_sts  IN TXT ( "v=STSv1; id=randomstr;" )
 ~~~~~~~~~
 
 STS policy served from HTTPS endpoint of the policy (recipient) domain, and
