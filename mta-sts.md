@@ -210,22 +210,22 @@ distribution. See the section _Future_ _Work_ for more discussion.)
 
 Policies MUST specify the following fields in JSON [@!RFC4627] format:
 
-* version: (plain-text, required). Currently only "STS1" is supported.
-* mode: (plain-text, required). If "enforce", the receiving MTA requests that
+* `version`: (plain-text, required). Currently only "STS1" is supported.
+* `mode`: (plain-text, required). If "enforce", the receiving MTA requests that
   messages be delivered only if they conform to the STS policy. If "report" the
   receiving MTA requests that failure reports be delivered, as specified
   by the `rua` parameter.
-* mx: MX patterns (list of plain-text MX match patterns, required). One or
+* `mx`: MX patterns (list of plain-text MX match patterns, required). One or
   more comma-separated patterns matching the expected MX for this domain. For
   example, ["*.example.com", "*.example.net"] indicates that mail for this
   domain might be handled by any MX whose hostname is a subdomain of
   "example.com" or "example.net." The semantics for these patterns should be
   the ones found in the "Checking of Wildcard Certificates" rules in Section 6.4.3
   of [@!RFC6125]. 
-* max-age: Max lifetime of the policy (plain-text integer seconds). Well-behaved
+* `max-age`: Max lifetime of the policy (plain-text integer seconds). Well-behaved
   clients SHOULD cache a policy for up to this value from last policy fetch
   time.
-* policy_id: A short string used to track policy updates. This string MUST
+* `policy_id`: A short string used to track policy updates. This string MUST
   uniquely identify a given instance of a policy, such that senders can
   determine when the policy has been updated by comparing to the `policy_id` of
   a previously seen policy.
@@ -324,9 +324,9 @@ a recipient domain.
 
 Web PKI is the mechanism used for policy authentication. In this mechanism, the
 sender fetches a HTTPS resource (policy) from a host at `policy._smtp_sts` in
-the Policy Domain. The policy is served from a "well known" URI -
+the Policy Domain. The policy is served from a `well known` URI -
 https://policy._smtp_sts.example.com/current. To consider the policy as valid,
-the "policy_id" field in the policy MUST match the "id" field in the DNS TXT
+the `policy_id` field in the policy MUST match the `id` field in the DNS TXT
 record under `_smtp_sts`.
 
 When fetching a new policy or updating a policy, the new policy MUST be
@@ -350,18 +350,18 @@ When sending to an MX at a domain for which the sender has a valid non-expired
 SMTP STS policy, a sending MTA honoring SMTP STS MAY apply the result of a
 policy validation one of two ways:
 
-* report: In this mode, sending MTAs merely send a report to the designated
+* `report`: In this mode, sending MTAs merely send a report to the designated
   report address indicating policy application failures. This can be done
   "offline", i.e. based on the MTA logs, and is thus a suitable low-risk option
   for MTAs who wish to enhance transparency of TLS tampering without making
   complicated changes to production mail-handling infrastructure.
 
-* enforce: In this mode, sending MTAs SHOULD treat STS policy failures, in
+* `enforce`: In this mode, sending MTAs SHOULD treat STS policy failures, in
   which the policy action is "reject", as a mail delivery error, and SHOULD
   terminate the SMTP connection, not delivering any more mail to the recipient
   MTA.
 
-In "enforce" mode, however, sending MTAs MUST first check for a new
+In `enforce` mode, however, sending MTAs MUST first check for a new
 authenticated policy before actually treating a message failure as fatal.
 
 Thus the control flow for a sending MTA that does online policy application
