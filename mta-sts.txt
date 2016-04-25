@@ -136,7 +136,7 @@ Internet-Draft                   MTA-STS                      April 2016
    o  the expected identity of MXs that handle mail for this domain
 
    o  what an implementing sender should do with messages when TLS
-      cannot be be successfully negotiated
+      cannot be successfully negotiated
 
    The mechanism described is separated into four logical components:
 

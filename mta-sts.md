@@ -122,7 +122,7 @@ specifying:
    * how MTAs can validate the TLS server certificate presented during mail
      delivery
    * the expected identity of MXs that handle mail for this domain
-   * what an implementing sender should do with messages when TLS cannot be be
+   * what an implementing sender should do with messages when TLS cannot be
      successfully negotiated
 
 The mechanism described is separated into four logical components:

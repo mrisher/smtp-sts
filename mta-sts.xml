@@ -220,7 +220,7 @@ specifying:
 <t>how MTAs can validate the TLS server certificate presented during mail
  delivery</t>
 <t>the expected identity of MXs that handle mail for this domain</t>
-<t>what an implementing sender should do with messages when TLS cannot be be
+<t>what an implementing sender should do with messages when TLS cannot be
  successfully negotiated</t>
 </list>
 </t>
