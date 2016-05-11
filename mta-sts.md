@@ -325,9 +325,9 @@ it is important that senders are able to authenticate a new policy retrieved for
 a recipient domain.
 
 Web PKI is the mechanism used for policy authentication. In this mechanism, the
-sender fetches a HTTPS resource (policy) from a host at `policy._mta_sts` in the
+sender fetches a HTTPS resource (policy) from a host at `policy.mta-sts` in the
 Policy Domain. The policy is served from a "well known" URI:
-`https://policy._mta_sts.example.com/current`. To consider the policy as valid,
+`https://policy.mta-sts.example.com/current`. To consider the policy as valid,
 the `policy_id` field in the policy MUST match the `id` field in the DNS TXT
 record under `_mta_sts`.
 
