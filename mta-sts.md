@@ -223,7 +223,7 @@ Policies MUST specify the following fields in JSON [@!RFC4627] format:
   "example.com" or "example.net." The semantics for these patterns should be
   the ones found in the "Checking of Wildcard Certificates" rules in Section 6.4.3
   of [@!RFC6125]. 
-* `max_age`: Max lifetime of the policy (plain-text integer seconds). Well-behaved
+* `max-age`: Max lifetime of the policy (plain-text integer seconds). Well-behaved
   clients SHOULD cache a policy for up to this value from last policy fetch
   time.
 * `policy_id`: A short string used to track policy updates. This string MUST
@@ -258,7 +258,7 @@ follows:
     sts-element     = sts-version / sts-mode / sts-id / sts-mx / sts-max-age
 
     sts-version     = %x22 "version" %x22 *WSP %x3a *WSP  ; "version":
-                      %x22 %x53 %x54 %x53 %x31 %x22       ; "STS1"
+                      %x22 %x53 %x54 %x53 %x31            ; "STS1"
 
     sts-mode        = %x22 "mode" %x22 *WSP %x3a *WSP     ; "mode":
                       %x22 ("report" / "enforce") %x22    ; "report"/"enforce"
@@ -272,7 +272,7 @@ follows:
                       [WSP %x2c domain-match WSP]         ; of domain-matches
                       %x5B                                ; ]
 
-    sts-max-age     = %x22 "max_age" %x22 $x3a *WSP       ; "max_age":
+    sts-max-age     = %x22 "max-age" %x22 $x3a *WSP       ; "max-age":
                       %x22 1*10DIGIT %x22$                ; some digits
 
     domain-match    =  ["*."] 1*dtext *("." 1*dtext)
@@ -294,7 +294,7 @@ megabyte is 2^20, etc.
 In order to resist attackers inserting a fraudulent policy, SMTP MTA-STS
 policies are designed to be long-lived, with an expiry typically greater than
 two weeks.  Policy validity is controlled by two separate expiration times: the
-lifetime indicated in the policy ("max_age=") and the TTL on the DNS record
+lifetime indicated in the policy ("max-age=") and the TTL on the DNS record
 itself. The policy expiration will ordinarily be longer than that of the DNS
 TTL, and senders SHOULD cache a policy (and apply it to all mail to the
 recipient domain) until the policy expiration.
@@ -514,7 +514,7 @@ is authenticated using Web PKI mechanism.
   "mode": "report",
   "policy_id": "randomstr",
   "mx": ["*.mail.example.com"],
-  "max_age": "123456"
+  "max-age": "123456"
 }
 ~~~~~~~~~
 
