@@ -263,14 +263,14 @@ Internet-Draft                   MTA-STS                      April 2016
 
    o  "mx": MX patterns (list of plain-text MX match patterns,
       required).  One or more comma-separated patterns matching the
-      expected MX for this domain.  For example, ["_.example.com",
-      "_.example.net"] indicates that mail for this domain might be
+      expected MX for this domain.  For example, "["*.example.com",
+      "*.example.net"]" indicates that mail for this domain might be
       handled by any MX whose hostname is a subdomain of "example.com"
       or "example.net."  The semantics for these patterns should be the
       ones found in the "Checking of Wildcard Certificates" rules in
       Section 6.4.3 of [RFC6125].
 
-   o  "max-age": Max lifetime of the policy (plain-text integer
+   o  "max_age": Max lifetime of the policy (plain-text integer
       seconds).  Well-behaved clients SHOULD cache a policy for up to
       this value from last policy fetch time.
 
@@ -286,6 +286,10 @@ Internet-Draft                   MTA-STS                      April 2016
       string MUST uniquely identify a given instance of a policy, such
       that senders can determine when the policy has been updated by
       comparing to the "policy_id" of a previously seen policy.
+
+   A lenient parser SHOULD accept a policy file which is valid JSON
+   implementing a superset of this specification, in which case unknown
+   values SHALL be ignored.
 
 3.1.  Formal Definition
 
@@ -329,10 +333,6 @@ Internet-Draft                   MTA-STS                      April 2016
 
 
 
-
-
-
-
 Margolis, et al.        Expires October 20, 2016                [Page 6]
 
 Internet-Draft                   MTA-STS                      April 2016
@@ -346,7 +346,7 @@ sts-record      = WSP %x7B WSP  ; { left curly bracket
                   ]
                   WSP %x7d WSP  ; } right curly bracket
  = %x22 "max
-sts-element     = sts-version / sts-mode / sts-id / sts-mx / sts-max-age
+sts-element     = sts-version / sts-mode / sts-id / sts-mx / sts-max_age
 
 sts-version     = %x22 "version" %x22 *WSP %x3a *WSP  ; "version":
                   %x22 %x53 %x54 %x53 %x31            ; "STS1"
@@ -363,7 +363,7 @@ sts-mx          = %x22 "mx" $x22 *WSP %x3a *WSP       ; "mx":
                   [WSP %x2c domain-match WSP]         ; of domain-matches
                   %x5B                                ; ]
 
-sts-max-age     = %x22 "max-age" %x22 $x3a *WSP       ; "max-age":
+sts-max_age     = %x22 "max_age" %x22 $x3a *WSP       ; "max_age":
                   %x22 1*10DIGIT %x22$                ; some digits
 
 domain-match    =  ["*."] 1*dtext *("." 1*dtext)
@@ -394,7 +394,7 @@ Margolis, et al.        Expires October 20, 2016                [Page 7]
 Internet-Draft                   MTA-STS                      April 2016
 
 
-   ("max-age=") and the TTL on the DNS record itself.  The policy
+   ("max_age=") and the TTL on the DNS record itself.  The policy
    expiration will ordinarily be longer than that of the DNS TTL, and
    senders SHOULD cache a policy (and apply it to all mail to the
    recipient domain) until the policy expiration.
@@ -413,9 +413,9 @@ Internet-Draft                   MTA-STS                      April 2016
    at the corresponding HTTPS endpoint.  In the case where the HTTPS
    endpoint has been updated but the TXT record has not been, senders
    will not know there is a new policy released and may thus continue to
-   use old, previously cached versions.  Recipients thus can expect a
-   policy to continue to be used by senders until both the HTTPS and TXT
-   endpoints are updated and the TXT record's TTL has passed.
+   use old, previously cached versions.  Recipients should thus expect a
+   policy will continue to be used by senders until both the HTTPS and
+   TXT endpoints are updated and the TXT record's TTL has passed.
 
 3.3.  Policy Discovery & Authentication
 
@@ -437,7 +437,7 @@ Internet-Draft                   MTA-STS                      April 2016
    When fetching a new policy or updating a policy, the new policy MUST
    be fully authenticated (HTTPS certificate validation + peer
    verification) before use.  A policy which has not ever been
-   successfully authenticated MUST not be used to reject mail.
+   successfully authenticated MUST NOT be used to reject mail.
 
 
 
@@ -550,9 +550,9 @@ Internet-Draft                   MTA-STS                      April 2016
       might deliver the message to an impostor, who could then monitor
       and/or modify messages despite opportunistic TLS.  This
       impersonation could be accomplished by spoofing the DNS MX record
-      for the recipient domain, or by redirecting client connections to
-      the legitimate recipient server (for example, by altering BGP
-      routing tables).
+      for the recipient domain, or by redirecting client connections
+      intended for the legitimate recipient server (for example, by
+      altering BGP routing tables).
 
 
 
@@ -679,7 +679,7 @@ Internet-Draft                   MTA-STS                      April 2016
                         "mode": "report",
                         "policy_id": "randomstr",
                         "mx": ["*.mail.example.com"],
-                        "max-age": "123456"
+                        "max_age": "123456"
                       }
 
    The policy is authenticated using Web PKI mechanism.

@@ -212,18 +212,19 @@ distribution. See the section <spanx style="emph">Future</spanx> <spanx style="e
 <section anchor="example-reporting-policy" title="Example Reporting Policy">
 
 <section anchor="report-using-mailto" title="Report using MAILTO">
-<t>```_smtp_tlsrpt.mail.example.com. IN TXT 
-<vspace/>
-        &quot;v=TLSRPT1;rua=mailto=reports@example.com&quot;
-</t>
 
 <figure align="center"><artwork align="center">
+_smtp_tlsrpt.mail.example.com. IN TXT \
+	"v=TLSRPT1;rua=mailto=reports@example.com"
+</artwork></figure>
+</section>
 
-### Report using HTTPS
+<section anchor="report-using-https" title="Report using HTTPS">
 
-```_smtp_tlsrpt.mail.example.com. IN TXT \
-		"v=TLSRPT1; \
-		rua=https://reporting.example.com/v1/tlsrpt"
+<figure align="center"><artwork align="center">
+_smtp_tlsrpt.mail.example.com. IN TXT \
+	"v=TLSRPT1; \
+	rua=https://reporting.example.com/v1/tlsrpt"
 </artwork></figure>
 </section>
 </section>

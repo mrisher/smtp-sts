@@ -81,6 +81,7 @@ Table of Contents
    3.  Reporting Policy  . . . . . . . . . . . . . . . . . . . . . .   4
      3.1.  Example Reporting Policy  . . . . . . . . . . . . . . . .   4
        3.1.1.  Report using MAILTO . . . . . . . . . . . . . . . . .   4
+       3.1.2.  Report using HTTPS  . . . . . . . . . . . . . . . . .   5
    4.  Reporting Schema  . . . . . . . . . . . . . . . . . . . . . .   5
      4.1.  Result Types  . . . . . . . . . . . . . . . . . . . . . .   6
        4.1.1.  Success Type  . . . . . . . . . . . . . . . . . . . .   6
@@ -105,7 +106,6 @@ Table of Contents
    (such as the "250 STARTTLS" response) or redirect the entire SMTP
    session (perhaps by overwriting the resolved MX record of the
    delivery domain) can perform a downgrade or interception attack.
-
 
 
 
@@ -212,8 +212,8 @@ Internet-Draft                 SMTP-TLSRPT                    April 2016
 
 3.1.1.  Report using MAILTO
 
-   ```_smtp_tlsrpt.mail.example.com.  IN TXT
-   "v=TLSRPT1;rua=mailto=reports@example.com"
+              _smtp_tlsrpt.mail.example.com. IN TXT \
+                  "v=TLSRPT1;rua=mailto=reports@example.com"
 
 
 
@@ -226,11 +226,11 @@ Margolis, et al.        Expires October 20, 2016                [Page 4]
 Internet-Draft                 SMTP-TLSRPT                    April 2016
 
 
-           ### Report using HTTPS
+3.1.2.  Report using HTTPS
 
-           ```_smtp_tlsrpt.mail.example.com. IN TXT \
-                   "v=TLSRPT1; \
-                   rua=https://reporting.example.com/v1/tlsrpt"
+             _smtp_tlsrpt.mail.example.com. IN TXT \
+                 "v=TLSRPT1; \
+                 rua=https://reporting.example.com/v1/tlsrpt"
 
 4.  Reporting Schema
 

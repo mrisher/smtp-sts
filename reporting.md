@@ -152,15 +152,17 @@ Policies consist of the following directives:
 
 ### Report using MAILTO
 
-```_smtp_tlsrpt.mail.example.com. IN TXT \
-		"v=TLSRPT1;rua=mailto=reports@example.com"
+```
+_smtp_tlsrpt.mail.example.com. IN TXT \
+	"v=TLSRPT1;rua=mailto=reports@example.com"
 ```
 
 ### Report using HTTPS
 
-```_smtp_tlsrpt.mail.example.com. IN TXT \
-		"v=TLSRPT1; \
-		rua=https://reporting.example.com/v1/tlsrpt"
+```
+_smtp_tlsrpt.mail.example.com. IN TXT \
+	"v=TLSRPT1; \
+	rua=https://reporting.example.com/v1/tlsrpt"
 ```
 
 # Reporting Schema
