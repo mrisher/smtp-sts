@@ -223,7 +223,7 @@ Policies MUST specify the following fields in JSON [@!RFC4627] format:
   "example.com" or "example.net." The semantics for these patterns should be
   the ones found in the "Checking of Wildcard Certificates" rules in Section 6.4.3
   of [@!RFC6125]. 
-* `max-age`: Max lifetime of the policy (plain-text integer seconds). Well-behaved
+* `max_age`: Max lifetime of the policy (plain-text integer seconds). Well-behaved
   clients SHOULD cache a policy for up to this value from last policy fetch
   time.
 * `policy_id`: A short string used to track policy updates. This string MUST
@@ -231,6 +231,9 @@ Policies MUST specify the following fields in JSON [@!RFC4627] format:
   determine when the policy has been updated by comparing to the `policy_id` of
   a previously seen policy.
 
+A lenient parser SHOUlD accept a policy file which is valid json ([RFC4627])
+implementing a superset of this specification, in which case unknown values SHALL
+be ignored.
 ## Formal Definition
 
 ### TXT Record
@@ -272,7 +275,7 @@ follows:
                       [WSP %x2c domain-match WSP]         ; of domain-matches
                       %x5B                                ; ]
 
-    sts-max-age     = %x22 "max-age" %x22 $x3a *WSP       ; "max-age":
+    sts-max-age     = %x22 "max_age" %x22 $x3a *WSP       ; "max_age":
                       %x22 1*10DIGIT %x22$                ; some digits
 
     domain-match    =  ["*."] 1*dtext *("." 1*dtext)
@@ -294,7 +297,7 @@ megabyte is 2^20, etc.
 In order to resist attackers inserting a fraudulent policy, SMTP MTA-STS
 policies are designed to be long-lived, with an expiry typically greater than
 two weeks.  Policy validity is controlled by two separate expiration times: the
-lifetime indicated in the policy ("max-age=") and the TTL on the DNS record
+lifetime indicated in the policy ("max_age=") and the TTL on the DNS record
 itself. The policy expiration will ordinarily be longer than that of the DNS
 TTL, and senders SHOULD cache a policy (and apply it to all mail to the
 recipient domain) until the policy expiration.
@@ -311,9 +314,9 @@ Updating the policy requires that the owner make changes in two places: the
 `_mta_sts` RR record in the Policy Domain's DNS zone and at the corresponding
 HTTPS endpoint. In the case where the HTTPS endpoint has been updated but the
 TXT record has not been, senders will not know there is a new policy released
-and may thus continue to use old, previously cached versions.  Recipients thus
-can expect a policy to continue to be used by senders until both the HTTPS and
-TXT endpoints are updated and the TXT record's TTL has passed.
+and may thus continue to use old, previously cached versions. Recipients should
+thus expect that the policy will continue to be used by senders until both the
+HTTPS and TXT endpoints are updated and the TXT record's TTL has passed.
 
 ## Policy Discovery & Authentication
 
@@ -333,7 +336,7 @@ record under `_mta_sts`.
 
 When fetching a new policy or updating a policy, the new policy MUST be
 fully authenticated (HTTPS certificate validation + peer verification) before use.
-A policy which has not ever been successfully authenticated MUST not be used to
+A policy which has not ever been successfully authenticated MUST NOT be used to
 reject mail.
 
 ## Policy Validation
@@ -418,8 +421,8 @@ classes of attacks considered:
   the message to an impostor, who could then monitor and/or modify messages
   despite opportunistic TLS. This impersonation could be accomplished by
   spoofing the DNS MX record for the recipient domain, or by redirecting client
-  connections to the legitimate recipient server (for example, by altering BGP
-  routing tables).
+  connections that were meant to the legitimate recipient server (for example,
+  by altering BGP routing tables).
 
 SMTP Strict Transport Security relies on certificate validation via PKIX based TLS
 identity checking [@!RFC6125]. Attackers who are able to obtain a valid certificate
@@ -514,7 +517,7 @@ is authenticated using Web PKI mechanism.
   "mode": "report",
   "policy_id": "randomstr",
   "mx": ["*.mail.example.com"],
-  "max-age": "123456"
+  "max_age": "123456"
 }
 ~~~~~~~~~
 
