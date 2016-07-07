@@ -243,7 +243,7 @@ is as follows:
 
     sts-version     = "v" *WSP "=" *WSP %x53 %x54 %x53 %x31
 
-    sts-id          = "id" *WSP "=" *WSP 1*20VCHAR
+    sts-id          = "id" *WSP "=" *WSP 1*32VCHAR
 
 ### SMTP MTA-STS Policy
 
