@@ -204,12 +204,25 @@ SMTP MTA-STS offers the following advantages compared to DANE:
 # Policy Semantics
 
 SMTP MTA-STS policies are distributed via a "well known" HTTPS endpoint in the
-Policy Domain.
+Policy Domain. A corresponding TXT record in the DNS alerts sending MTAs to
+the presence of a policy file.
 
 (Future implementations may move to alternate methods of policy discovery or
 distribution. See the section _Future_ _Work_ for more discussion.)
 
-Policies MUST specify the following fields in JSON [@!RFC4627] format:
+**The MTA-STS TXT record MUST specify the following fields:**
+
+* `v`: (plain-text, required). Currently only "STS1" is supported.
+* `id`: (plain-text, required). A short string used to track policy updates.
+  This string MUST uniquely identify a given instance of a policy, such that 
+  senders can determine when the policy has been updated by comparing to the `id`
+  of a previously seen policy, and must also match the `policy_id` value of the
+  distributed policy.
+
+A lenient parser SHOULD accept a policy file implementing a superset of this
+specification, in which case unknown values SHALL be ignored.
+
+**Policies MUST specify the following fields in JSON [@!RFC4627] format:**
 
 * `version`: (plain-text, required). Currently only "STS1" is supported.
 * `mode`: (plain-text, required). If "enforce", the receiving MTA requests that
@@ -241,9 +254,12 @@ superset of this specification, in which case unknown values SHALL be ignored.
 The formal definition of the `_mta_sts` TXT record, defined using [@!RFC5234],
 is as follows:
 
+    sts-text-record = sts-version *WSP %x3B *WSP sts-id
+
     sts-version     = "v" *WSP "=" *WSP %x53 %x54 %x53 %x31
 
-    sts-id          = "id" *WSP "=" *WSP 1*32VCHAR
+    sts-id          = "id" *WSP "=" *WSP 1*32(ALPHA / DIGIT) 
+
 
 ### SMTP MTA-STS Policy
 
@@ -257,7 +273,7 @@ follows:
                       sts-element   ; sts-elements
                       ]
                       WSP %x7d WSP  ; } right curly bracket
-     = %x22 "max
+
     sts-element     = sts-version / sts-mode / sts-id / sts-mx / sts-max_age
 
     sts-version     = %x22 "version" %x22 *WSP %x3a *WSP  ; "version":
@@ -267,7 +283,7 @@ follows:
                       %x22 ("report" / "enforce") %x22    ; "report"/"enforce"
 
     sts-id          = %x22 "policy_id" %x22 *WSP %x3a *WSP ; "policy_id":
-                      %x22 1*32VCHAR %x22                  ; some chars
+                      %x22 1*32(ALPHA / DIGIT) %x22        ; some chars
 
     sts-mx          = %x22 "mx" $x22 *WSP %x3a *WSP       ; "mx":
                       %x5B                                ; [
@@ -282,10 +298,7 @@ follows:
                                                           ; an optional wildcard
                                                           ; followed by a label
 
-    dtext           =  %d30-39 /          ; 0-9
-                       %d41-5A /          ; a-z
-                       %61-7A /           ; A-Z
-                       %2D                ; "-"
+    dtext           = ALPHA / DIGIT / %2D                 ; A-Z, a-z, 0-9, "-" 
 
 A size limitation in a sts-uri, if provided, is interpreted as a
 count of units followed by an OPTIONAL unit size ("k" for kilobytes,
