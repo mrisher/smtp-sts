@@ -233,7 +233,7 @@ specification, in which case unknown values SHALL be ignored.
   more comma-separated patterns matching the expected MX for this domain. For
   example, `["*.example.com", "*.example.net"]` indicates that mail for this
   domain might be handled by any MX whose hostname is a subdomain of
-  "example.com" or "example.net." The semantics for these patterns should be the
+  "example.com" or "example.net". The semantics for these patterns should be the
   ones found in the "Checking of Wildcard Certificates" rules in Section 6.4.3
   of [@!RFC6125]. 
 * `max_age`: Max lifetime of the policy (plain-text integer seconds). Well-behaved

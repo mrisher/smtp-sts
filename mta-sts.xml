@@ -354,7 +354,7 @@ by the <spanx style="verb">rua</spanx> parameter.</t>
 more comma-separated patterns matching the expected MX for this domain. For
 example, <spanx style="verb">["*.example.com", "*.example.net"]</spanx> indicates that mail for this
 domain might be handled by any MX whose hostname is a subdomain of
-&quot;example.com&quot; or &quot;example.net.&quot; The semantics for these patterns should be the
+&quot;example.com&quot; or &quot;example.net&quot;. The semantics for these patterns should be the
 ones found in the &quot;Checking of Wildcard Certificates&quot; rules in Section 6.4.3
 of <xref target="RFC6125"/>.</t>
 <t><spanx style="verb">max_age</spanx>: Max lifetime of the policy (plain-text integer seconds). Well-behaved
@@ -417,11 +417,11 @@ sts-mx          = %x22 "mx" $x22 *WSP %x3a *WSP      ; "mx":
                   [WSP %x2c domain-match WSP]        ; of domain-matches
                   %x5B                               ; ]
 
-sts-max_age     = %x22 "max_age" %x22 $x3a *WSP      ; "max_age":
-                  %x22 1*10DIGIT %x22$               ; some digits
+sts-max_age     = %x22 "max_age" %x22 *WSP $x3a *WSP ; "max_age":
+                  1*10DIGIT                          ; some digits
 
-domain-match    = 1*(dtext / "*") *("." 1*dtext)     ; wildcard or label
-                                                     ; with 0+ more labels
+domain-match    = %x22 1*(dtext / "*") *("."         ; wildcard or label
+                  1*dtext) %x22                      ; with 0+ more labels
 
 dtext           = ALPHA / DIGIT / %2D                ; A-Z, a-z, 0-9, "-" 
 </artwork></figure>
