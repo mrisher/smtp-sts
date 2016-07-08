@@ -267,7 +267,7 @@ follows:
                       %x22 ("report" / "enforce") %x22    ; "report"/"enforce"
 
     sts-id          = %x22 "policy_id" %x22 *WSP %x3a *WSP ; "policy_id":
-                      %x22 1*20VCHAR %x22                  ; some chars
+                      %x22 1*32VCHAR %x22                  ; some chars
 
     sts-mx          = %x22 "mx" $x22 *WSP %x3a *WSP       ; "mx":
                       %x5B                                ; [
@@ -278,7 +278,9 @@ follows:
     sts-max_age     = %x22 "max_age" %x22 $x3a *WSP       ; "max_age":
                       %x22 1*10DIGIT %x22$                ; some digits
 
-    domain-match    =  ["*."] 1*dtext *("." 1*dtext)
+    domain-match    = (*dtext 0*1("*") *dtext) *("." 1*dtext)
+                                                          ; an optional wildcard
+                                                          ; followed by a label
 
     dtext           =  %d30-39 /          ; 0-9
                        %d41-5A /          ; a-z
