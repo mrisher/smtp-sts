@@ -291,11 +291,11 @@ follows:
                       [WSP %x2c domain-match WSP]        ; of domain-matches
                       %x5B                               ; ]
 
-    sts-max_age     = %x22 "max_age" %x22 $x3a *WSP      ; "max_age":
+    sts-max_age     = %x22 "max_age" %x22 *WSP $x3a *WSP ; "max_age":
                       1*10DIGIT                          ; some digits
 
-    domain-match    = 1*(dtext / "*") *("." 1*dtext)     ; wildcard or label
-                                                         ; with 0+ more labels
+    domain-match    = %x22 1*(dtext / "*") *("."         ; wildcard or label
+                      1*dtext) %x22                      ; with 0+ more labels
 
     dtext           = ALPHA / DIGIT / %2D                ; A-Z, a-z, 0-9, "-" 
 
