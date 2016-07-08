@@ -525,7 +525,8 @@ _mta_sts  IN TXT ( "v=STSv1; id=randomstr;" )
 ~~~~~~~~~
 
 STS policy served from HTTPS endpoint of the policy (recipient) domain, and
-is authenticated using Web PKI mechanism.
+is authenticated using Web PKI mechanism. The policy is fetched using HTTP
+GET method.
 ~~~~~~~~~
 {
   "version": "STS1",
