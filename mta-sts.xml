@@ -320,12 +320,28 @@ non-existence does not exist when looking up a policy over plain DNS.</t>
 
 <section anchor="policy-semantics" title="Policy Semantics">
 <t>SMTP MTA-STS policies are distributed via a &quot;well known&quot; HTTPS endpoint in the
-Policy Domain.
+Policy Domain. A corresponding TXT record in the DNS alerts sending MTAs to
+the presence of a policy file.
 </t>
 <t>(Future implementations may move to alternate methods of policy discovery or
 distribution. See the section <spanx style="emph">Future</spanx> <spanx style="emph">Work</spanx> for more discussion.)
 </t>
-<t>Policies MUST specify the following fields in JSON <xref target="RFC4627"/> format:
+<t><spanx style="strong">The MTA-STS TXT record MUST specify the following fields:</spanx>
+</t>
+<t>
+<list style="symbols">
+<t><spanx style="verb">v</spanx>: (plain-text, required). Currently only &quot;STS1&quot; is supported.</t>
+<t><spanx style="verb">id</spanx>: (plain-text, required). A short string used to track policy updates.
+This string MUST uniquely identify a given instance of a policy, such that
+senders can determine when the policy has been updated by comparing to the <spanx style="verb">id</spanx>
+of a previously seen policy, and must also match the <spanx style="verb">policy_id</spanx> value of the
+distributed policy.</t>
+</list>
+</t>
+<t>A lenient parser SHOULD accept a policy file implementing a superset of this
+specification, in which case unknown values SHALL be ignored.
+</t>
+<t><spanx style="strong">Policies MUST specify the following fields in JSON</spanx> <xref target="RFC4627"/> <spanx style="strong">format:</spanx>
 </t>
 <t>
 <list style="symbols">
@@ -362,9 +378,11 @@ is as follows:
 </t>
 
 <figure align="center"><artwork align="center">
+sts-text-record = sts-version *WSP %x3B *WSP sts-id
+
 sts-version     = "v" *WSP "=" *WSP %x53 %x54 %x53 %x31
 
-sts-id          = "id" *WSP "=" *WSP 1*20VCHAR
+sts-id          = "id" *WSP "=" *WSP 1*32(ALPHA / DIGIT) 
 </artwork></figure>
 </section>
 
@@ -381,7 +399,7 @@ sts-record      = WSP %x7B WSP  ; { left curly bracket
                   sts-element   ; sts-elements
                   ]
                   WSP %x7d WSP  ; } right curly bracket
- = %x22 "max
+
 sts-element     = sts-version / sts-mode / sts-id / sts-mx / sts-max_age
 
 sts-version     = %x22 "version" %x22 *WSP %x3a *WSP  ; "version":
@@ -391,7 +409,7 @@ sts-mode        = %x22 "mode" %x22 *WSP %x3a *WSP     ; "mode":
                   %x22 ("report" / "enforce") %x22    ; "report"/"enforce"
 
 sts-id          = %x22 "policy_id" %x22 *WSP %x3a *WSP ; "policy_id":
-                  %x22 1*20VCHAR %x22                  ; some chars
+                  %x22 1*32(ALPHA / DIGIT) %x22        ; some chars
 
 sts-mx          = %x22 "mx" $x22 *WSP %x3a *WSP       ; "mx":
                   %x5B                                ; [
@@ -402,12 +420,11 @@ sts-mx          = %x22 "mx" $x22 *WSP %x3a *WSP       ; "mx":
 sts-max_age     = %x22 "max_age" %x22 $x3a *WSP       ; "max_age":
                   %x22 1*10DIGIT %x22$                ; some digits
 
-domain-match    =  ["*."] 1*dtext *("." 1*dtext)
+domain-match    = (*dtext 0*1("*") *dtext) *("." 1*dtext)
+                                                      ; an optional wildcard
+                                                      ; followed by a label
 
-dtext           =  %d30-39 /          ; 0-9
-                   %d41-5A /          ; a-z
-                   %61-7A /           ; A-Z
-                   %2D                ; "-"
+dtext           = ALPHA / DIGIT / %2D                 ; A-Z, a-z, 0-9, "-" 
 </artwork></figure>
 <t>A size limitation in a sts-uri, if provided, is interpreted as a
 count of units followed by an OPTIONAL unit size (&quot;k&quot; for kilobytes,
@@ -458,9 +475,9 @@ a recipient domain.
 <t>Web PKI is the mechanism used for policy authentication. In this mechanism, the
 sender fetches a HTTPS resource (policy) from a host at <spanx style="verb">policy.mta-sts</spanx> in the
 Policy Domain. The policy is served from a &quot;well known&quot; URI:
-<spanx style="verb">https://policy.mta-sts.example.com/current</spanx>. To consider the policy as valid,
-the <spanx style="verb">policy_id</spanx> field in the policy MUST match the <spanx style="verb">id</spanx> field in the DNS TXT
-record under <spanx style="verb">_mta_sts</spanx>.
+<spanx style="verb">https://policy.mta-sts.example.com/.well-known/mta-sts/current</spanx>. To consider
+the policy as valid, the <spanx style="verb">policy_id</spanx> field in the policy MUST match the <spanx style="verb">id</spanx>
+field in the DNS TXT record under <spanx style="verb">_mta_sts</spanx>.
 </t>
 <t>When fetching a new policy or updating a policy, the new policy MUST be
 fully authenticated (HTTPS certificate validation + peer verification) before
@@ -664,7 +681,7 @@ is authenticated using Web PKI mechanism.
   "mode": "report",
   "policy_id": "randomstr",
   "mx": ["*.mail.example.com"],
-  "max_age": "123456"
+  "max_age": 123456
 }
 </artwork></figure>
 <t>The policy is authenticated using Web PKI mechanism.

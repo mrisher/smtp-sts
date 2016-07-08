@@ -79,8 +79,8 @@ Table of Contents
      1.1.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   3
    2.  Related Technologies  . . . . . . . . . . . . . . . . . . . .   3
    3.  Reporting Policy  . . . . . . . . . . . . . . . . . . . . . .   4
-     3.1.  Example Reporting Policy  . . . . . . . . . . . . . . . .   4
-       3.1.1.  Report using MAILTO . . . . . . . . . . . . . . . . .   4
+     3.1.  Example Reporting Policy  . . . . . . . . . . . . . . . .   5
+       3.1.1.  Report using MAILTO . . . . . . . . . . . . . . . . .   5
        3.1.2.  Report using HTTPS  . . . . . . . . . . . . . . . . .   5
    4.  Reporting Schema  . . . . . . . . . . . . . . . . . . . . . .   5
      4.1.  Result Types  . . . . . . . . . . . . . . . . . . . . . .   6
@@ -92,7 +92,7 @@ Table of Contents
    6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
    7.  Security Considerations . . . . . . . . . . . . . . . . . . .   7
    8.  Appendix 1: JSON Report Schema  . . . . . . . . . . . . . . .   8
-   9.  Appendix 2: Example JSON Report . . . . . . . . . . . . . . .   9
+   9.  Appendix 2: Example JSON Report . . . . . . . . . . . . . . .  10
    10. Normative References  . . . . . . . . . . . . . . . . . . . .  10
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  11
 
@@ -208,14 +208,14 @@ Internet-Draft                 SMTP-TLSRPT                    April 2016
       details--such as certificate chains and MTA banners--may be
       reported.  See the section _Future_ _Work_ for more details.)
 
-3.1.  Example Reporting Policy
+   The formal definition of the "_mta_sts" TXT record, defined using
+   [RFC5234], is as follows:
 
-3.1.1.  Report using MAILTO
+         sts-text-record = sts-version *WSP %x3B *WSP sts-id
 
-              _smtp_tlsrpt.mail.example.com. IN TXT \
-                  "v=TLSRPT1;rua=mailto=reports@example.com"
+         sts-version     = "v" *WSP "=" *WSP %x53 %x54 %x53 %x31
 
-
+         sts-id          = "id" *WSP "=" *WSP 1*32(ALPHA / DIGIT)
 
 
 
@@ -225,6 +225,13 @@ Margolis, et al.        Expires October 20, 2016                [Page 4]
 
 Internet-Draft                 SMTP-TLSRPT                    April 2016
 
+
+3.1.  Example Reporting Policy
+
+3.1.1.  Report using MAILTO
+
+              _smtp_tlsrpt.mail.example.com. IN TXT \
+                  "v=TLSRPT1;rua=mailto:reports@example.com"
 
 3.1.2.  Report using HTTPS
 
@@ -266,13 +273,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2016
 
    o  Aggregate counts, comprising result type, sending MTA IP,
       receiving MTA hostname, message count, and an optional additional
-      information field containing a URI for recipients to review
-      further information on a failure type.
-
-   Note that the failure types are non-exclusive; an aggregate report
-   MAY contain overlapping "counts" of failure types where a single send
-   attempt encountered multiple errors.
-
 
 
 
@@ -281,6 +281,13 @@ Margolis, et al.        Expires October 20, 2016                [Page 5]
 
 Internet-Draft                 SMTP-TLSRPT                    April 2016
 
+
+      information field containing a URI for recipients to review
+      further information on a failure type.
+
+   Note that the failure types are non-exclusive; an aggregate report
+   MAY contain overlapping "counts" of failure types where a single send
+   attempt encountered multiple errors.
 
 4.1.  Result Types
 
@@ -321,13 +328,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2016
       request contains a name that is not listed as permitted in the
       name constraints extension of the cert issuer.
 
-   o  "certificate-name-constraints-excluded": The certificate request
-      contains a name that is listed as excluded in the name constraints
-      extension of the issuer.
-
-   o  "expired-certificate": This indicates that the certificate has
-      expired.
-
 
 
 
@@ -337,6 +337,13 @@ Margolis, et al.        Expires October 20, 2016                [Page 6]
 
 Internet-Draft                 SMTP-TLSRPT                    April 2016
 
+
+   o  "certificate-name-constraints-excluded": The certificate request
+      contains a name that is listed as excluded in the name constraints
+      extension of the issuer.
+
+   o  "expired-certificate": This indicates that the certificate has
+      expired.
 
 4.1.4.  Policy Failures
 
@@ -378,14 +385,7 @@ Internet-Draft                 SMTP-TLSRPT                    April 2016
       attack would limit visibility into STARTTLS failures, leaving the
       receiving domain blind to an ongoing attack.
 
-   o  Untrusted content: An attacker could inject malicious code into
-      the report, opening a vulnerability in the receiving domain.
-      Implementers are advised to take precautions against evaluating
-      the contents of the report.
 
-   o  Report snooping: An attacker could create a bogus TLSRPT record to
-      receive statistics about a domain the attacker does not own.
-      Since an attacker able to poison DNS is already able to receive
 
 
 
@@ -394,6 +394,14 @@ Margolis, et al.        Expires October 20, 2016                [Page 7]
 Internet-Draft                 SMTP-TLSRPT                    April 2016
 
 
+   o  Untrusted content: An attacker could inject malicious code into
+      the report, opening a vulnerability in the receiving domain.
+      Implementers are advised to take precautions against evaluating
+      the contents of the report.
+
+   o  Report snooping: An attacker could create a bogus TLSRPT record to
+      receive statistics about a domain the attacker does not own.
+      Since an attacker able to poison DNS is already able to receive
       counts of SMTP connections (and, absent DANE or MTA-STS policies,
       actual SMTP message payloads) today, this does not present a
       significant new vulnerability.
@@ -433,14 +441,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2016
    o  "organization-name": The name of the organization responsible for
       the report.  It is provided as a string.
 
-   o  "date-time": The date-time indicates the start- and end-times for
-      the report range.  It is provided as a string formatted according
-      to Section 5.6, "Internet Date/Time Format", of [RFC3339].
-
-   o  "email-address": The contact information for a responsible party
-      of the report.  It is provided as a string formatted according to
-      Section 3.4.1, "Addr-Spec", of [RFC5322].
-
 
 
 
@@ -449,6 +449,14 @@ Margolis, et al.        Expires October 20, 2016                [Page 8]
 
 Internet-Draft                 SMTP-TLSRPT                    April 2016
 
+
+   o  "date-time": The date-time indicates the start- and end-times for
+      the report range.  It is provided as a string formatted according
+      to Section 5.6, "Internet Date/Time Format", of [RFC3339].
+
+   o  "email-address": The contact information for a responsible party
+      of the report.  It is provided as a string formatted according to
+      Section 3.4.1, "Addr-Spec", of [RFC5322].
 
    o  "report-id": A unique identifier for the report.  Report authors
       may use whatever scheme they prefer to generate a unique
@@ -490,14 +498,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2016
       URI might host the complete certificate chain presented during an
       attempted STARTTLS session.
 
-9.  Appendix 2: Example JSON Report
-
-
-
-
-
-
-
 
 
 
@@ -505,6 +505,8 @@ Margolis, et al.        Expires October 20, 2016                [Page 9]
 
 Internet-Draft                 SMTP-TLSRPT                    April 2016
 
+
+9.  Appendix 2: Example JSON Report
 
    {
        "organization-name": "Company-X",
@@ -551,9 +553,7 @@ Internet-Draft                 SMTP-TLSRPT                    April 2016
               Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
               February 2002, <http://www.rfc-editor.org/info/rfc3207>.
 
-   [RFC3339]  Klyne, G. and C. Newman, "Date and Time on the Internet:
-              Timestamps", RFC 3339, DOI 10.17487/RFC3339, July 2002,
-              <http://www.rfc-editor.org/info/rfc3339>.
+
 
 
 
@@ -561,6 +561,15 @@ Margolis, et al.        Expires October 20, 2016               [Page 10]
 
 Internet-Draft                 SMTP-TLSRPT                    April 2016
 
+
+   [RFC3339]  Klyne, G. and C. Newman, "Date and Time on the Internet:
+              Timestamps", RFC 3339, DOI 10.17487/RFC3339, July 2002,
+              <http://www.rfc-editor.org/info/rfc3339>.
+
+   [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
+              Specifications: ABNF", STD 68, RFC 5234, DOI 10.17487/
+              RFC5234, January 2008,
+              <http://www.rfc-editor.org/info/rfc5234>.
 
    [RFC5322]  Resnick, P., Ed., "Internet Message Format", RFC 5322, DOI
               10.17487/RFC5322, October 2008,
@@ -599,6 +608,16 @@ Authors' Addresses
    Email: dmargolis (at) google.com
 
 
+
+
+
+
+
+Margolis, et al.        Expires October 20, 2016               [Page 11]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2016
+
+
    Alexander Brotman
    Comcast, Inc
 
@@ -611,13 +630,6 @@ Authors' Addresses
    Email: rbinu (at) yahoo-inc (dot com)
 
 
-
-
-Margolis, et al.        Expires October 20, 2016               [Page 11]
-
-Internet-Draft                 SMTP-TLSRPT                    April 2016
-
-
    Janet Jones
    Microsoft, Inc
 
@@ -628,18 +640,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2016
    Google, Inc
 
    Email: risher (at) google (dot com)
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

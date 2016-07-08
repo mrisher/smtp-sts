@@ -222,7 +222,7 @@ distribution. See the section _Future_ _Work_ for more discussion.)
 A lenient parser SHOULD accept a policy file implementing a superset of this
 specification, in which case unknown values SHALL be ignored.
 
-**Policies MUST specify the following fields in JSON [@!RFC4627] format:**
+**Policies MUST specify the following fields in JSON** [@!RFC4627] **format:**
 
 * `version`: (plain-text, required). Currently only "STS1" is supported.
 * `mode`: (plain-text, required). If "enforce", the receiving MTA requests that
