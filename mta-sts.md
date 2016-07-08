@@ -292,7 +292,7 @@ follows:
                       %x5B                               ; ]
 
     sts-max_age     = %x22 "max_age" %x22 $x3a *WSP      ; "max_age":
-                      %x22 1*10DIGIT %x22$               ; some digits
+                      1*10DIGIT                          ; some digits
 
     domain-match    = 1*(dtext / "*") *("." 1*dtext)     ; wildcard or label
                                                          ; with 0+ more labels
