@@ -276,29 +276,28 @@ follows:
 
     sts-element     = sts-version / sts-mode / sts-id / sts-mx / sts-max_age
 
-    sts-version     = %x22 "version" %x22 *WSP %x3a *WSP  ; "version":
-                      %x22 %x53 %x54 %x53 %x31            ; "STS1"
+    sts-version     = %x22 "version" %x22 *WSP %x3a *WSP ; "version":
+                      %x22 %x53 %x54 %x53 %x31           ; "STS1"
 
-    sts-mode        = %x22 "mode" %x22 *WSP %x3a *WSP     ; "mode":
-                      %x22 ("report" / "enforce") %x22    ; "report"/"enforce"
+    sts-mode        = %x22 "mode" %x22 *WSP %x3a *WSP    ; "mode":
+                      %x22 ("report" / "enforce") %x22   ; "report"/"enforce"
 
     sts-id          = %x22 "policy_id" %x22 *WSP %x3a *WSP ; "policy_id":
                       %x22 1*32(ALPHA / DIGIT) %x22        ; some chars
 
-    sts-mx          = %x22 "mx" $x22 *WSP %x3a *WSP       ; "mx":
-                      %x5B                                ; [
-                      domain-match                        ; comma-separated list
-                      [WSP %x2c domain-match WSP]         ; of domain-matches
-                      %x5B                                ; ]
+    sts-mx          = %x22 "mx" $x22 *WSP %x3a *WSP      ; "mx":
+                      %x5B                               ; [
+                      domain-match                       ; comma-separated list
+                      [WSP %x2c domain-match WSP]        ; of domain-matches
+                      %x5B                               ; ]
 
-    sts-max_age     = %x22 "max_age" %x22 $x3a *WSP       ; "max_age":
-                      %x22 1*10DIGIT %x22$                ; some digits
+    sts-max_age     = %x22 "max_age" %x22 $x3a *WSP      ; "max_age":
+                      %x22 1*10DIGIT %x22$               ; some digits
 
-    domain-match    = (*dtext 0*1("*") *dtext) *("." 1*dtext)
-                                                          ; an optional wildcard
-                                                          ; followed by a label
+    domain-match    = 1*(dtext / "*") *("." 1*dtext)     ; wildcard or label
+                                                         ; with 0+ more labels
 
-    dtext           = ALPHA / DIGIT / %2D                 ; A-Z, a-z, 0-9, "-" 
+    dtext           = ALPHA / DIGIT / %2D                ; A-Z, a-z, 0-9, "-" 
 
 A size limitation in a sts-uri, if provided, is interpreted as a
 count of units followed by an OPTIONAL unit size ("k" for kilobytes,
