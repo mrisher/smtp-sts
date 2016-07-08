@@ -314,7 +314,7 @@ Internet-Draft                   MTA-STS                      April 2016
    The formal definition of the "_mta_sts" TXT record, defined using
    [RFC5234], is as follows:
 
-         sts-text-record = sts-version *WSP %x3B *WSP sts-id
+         sts-text-record = sts-version *WSP %x3b *WSP sts-id
 
          sts-version     = "v" *WSP "=" *WSP %x53 %x54 %x53 %x31
 
@@ -338,7 +338,7 @@ Margolis, et al.        Expires October 20, 2016                [Page 6]
 Internet-Draft                   MTA-STS                      April 2016
 
 
-sts-record      = WSP %x7B WSP  ; { left curly bracket
+sts-record      = WSP %x7b WSP  ; { left curly bracket
                   sts-element   ; comma-separated
                   [             ; list
                   WSP %x2c WSP  ; of
@@ -357,19 +357,19 @@ sts-mode        = %x22 "mode" %x22 *WSP %x3a *WSP    ; "mode":
 sts-id          = %x22 "policy_id" %x22 *WSP %x3a *WSP ; "policy_id":
                   %x22 1*32(ALPHA / DIGIT) %x22        ; some chars
 
-sts-mx          = %x22 "mx" $x22 *WSP %x3a *WSP      ; "mx":
+sts-mx          = %x22 "mx" %x22 *WSP %x3a *WSP      ; "mx":
                   %x5B                               ; [
                   domain-match                       ; comma-separated list
                   [WSP %x2c domain-match WSP]        ; of domain-matches
                   %x5B                               ; ]
 
-sts-max_age     = %x22 "max_age" %x22 *WSP $x3a *WSP ; "max_age":
+sts-max_age     = %x22 "max_age" %x22 *WSP %x3a *WSP ; "max_age":
                   1*10DIGIT                          ; some digits
 
 domain-match    = %x22 1*(dtext / "*") *("."         ; wildcard or label
                   1*dtext) %x22                      ; with 0+ more labels
 
-dtext           = ALPHA / DIGIT / %2D                ; A-Z, a-z, 0-9, "-"
+dtext           = ALPHA / DIGIT / %2d                ; A-Z, a-z, 0-9, "-"
 
    A size limitation in a sts-uri, if provided, is interpreted as a
    count of units followed by an OPTIONAL unit size ("k" for kilobytes,
