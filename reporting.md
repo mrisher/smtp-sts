@@ -131,7 +131,7 @@ distribution. See the section _Future_ _Work_ for more discussion.)
 
 Policies consist of the following directives:
 
-   * `v`: This value MUST be equal to `TLSRPT1`.
+   * `v`: This value MUST be equal to `TLSRPTv1`.
    * `rua`: A URI specifying the endpoint to which aggregate information about
      policy failures should be sent (see the section _Reporting_ _Schema_ for
      more information). Two URI schemes are supported: `mailto` and `https`.
@@ -152,7 +152,8 @@ is as follows:
 
     sts-text-record = sts-version *WSP %x3B *WSP sts-id
 
-    sts-version     = "v" *WSP "=" *WSP %x53 %x54 %x53 %x31
+    sts-version     = "v" *WSP "=" *WSP %x54 %x4C %x53 
+                      %x52 %x50 %x54 %x76 %x31
 
     sts-id          = "id" *WSP "=" *WSP 1*32(ALPHA / DIGIT)
 
@@ -163,14 +164,14 @@ is as follows:
 
 ```
 _smtp_tlsrpt.mail.example.com. IN TXT \
-	"v=TLSRPT1;rua=mailto:reports@example.com"
+	"v=TLSRPTv1;rua=mailto:reports@example.com"
 ```
 
 ### Report using HTTPS
 
 ```
 _smtp_tlsrpt.mail.example.com. IN TXT \
-	"v=TLSRPT1; \
+	"v=TLSRPTv1; \
 	rua=https://reporting.example.com/v1/tlsrpt"
 ```
 

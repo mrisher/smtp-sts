@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE rfc SYSTEM 'rfc2629.dtd' []>
-<rfc ipr="trust200902" category="std" docName="draft-ietf-uta-mta-sts-00">
+<rfc ipr="trust200902" category="std" docName="draft-ietf-uta-mta-sts-01">
 <?rfc toc="yes"?>
 <?rfc symrefs="yes"?>
 <?rfc sortrefs="yes"?>
@@ -177,7 +177,7 @@
 <uri></uri>
 </address>
 </author>
-<date year="2016" month="April" day="18"/>
+<date year="2016" month="July" day="8"/>
 
 <area>Applications</area>
 <workgroup>Using TLS in Applications</workgroup>
@@ -330,7 +330,7 @@ distribution. See the section <spanx style="emph">Future</spanx> <spanx style="e
 </t>
 <t>
 <list style="symbols">
-<t><spanx style="verb">v</spanx>: (plain-text, required). Currently only &quot;STS1&quot; is supported.</t>
+<t><spanx style="verb">v</spanx>: (plain-text, required). Currently only &quot;STSv1&quot; is supported.</t>
 <t><spanx style="verb">id</spanx>: (plain-text, required). A short string used to track policy updates.
 This string MUST uniquely identify a given instance of a policy, such that
 senders can determine when the policy has been updated by comparing to the <spanx style="verb">id</spanx>
@@ -345,7 +345,7 @@ specification, in which case unknown values SHALL be ignored.
 </t>
 <t>
 <list style="symbols">
-<t><spanx style="verb">version</spanx>: (plain-text, required). Currently only &quot;STS1&quot; is supported.</t>
+<t><spanx style="verb">version</spanx>: (plain-text, required). Currently only &quot;STSv1&quot; is supported.</t>
 <t><spanx style="verb">mode</spanx>: (plain-text, required). If &quot;enforce&quot;, the receiving MTA requests that
 messages be delivered only if they conform to the STS policy. If &quot;report&quot; the
 receiving MTA requests that failure reports be delivered, as specified
@@ -380,7 +380,8 @@ is as follows:
 <figure align="center"><artwork align="center">
 sts-text-record = sts-version *WSP %x3B *WSP sts-id
 
-sts-version     = "v" *WSP "=" *WSP %x53 %x54 %x53 %x31
+sts-version     = "v" *WSP "=" *WSP %x53 %x54        ; "STSv1" 
+                  %x53 %x76 %x31
 
 sts-id          = "id" *WSP "=" *WSP 1*32(ALPHA / DIGIT) 
 </artwork></figure>
@@ -403,7 +404,7 @@ sts-record      = WSP %x7B WSP  ; { left curly bracket
 sts-element     = sts-version / sts-mode / sts-id / sts-mx / sts-max_age
 
 sts-version     = %x22 "version" %x22 *WSP %x3a *WSP ; "version":
-                  %x22 %x53 %x54 %x53 %x31           ; "STS1"
+                  %x22 %x53 %x54 %x53 %x76 %x31      ; "STSv1"
 
 sts-mode        = %x22 "mode" %x22 *WSP %x3a *WSP    ; "mode":
                   %x22 ("report" / "enforce") %x22   ; "report"/"enforce"
@@ -677,7 +678,7 @@ GET method.
 
 <figure align="center"><artwork align="center">
 {
-  "version": "STS1",
+  "version": "STSv1",
   "mode": "report",
   "policy_id": "randomstr",
   "mx": ["*.mail.example.com"],

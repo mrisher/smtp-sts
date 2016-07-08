@@ -212,7 +212,7 @@ distribution. See the section _Future_ _Work_ for more discussion.)
 
 **The MTA-STS TXT record MUST specify the following fields:**
 
-* `v`: (plain-text, required). Currently only "STS1" is supported.
+* `v`: (plain-text, required). Currently only "STSv1" is supported.
 * `id`: (plain-text, required). A short string used to track policy updates.
   This string MUST uniquely identify a given instance of a policy, such that 
   senders can determine when the policy has been updated by comparing to the `id`
@@ -224,7 +224,7 @@ specification, in which case unknown values SHALL be ignored.
 
 **Policies MUST specify the following fields in JSON** [@!RFC4627] **format:**
 
-* `version`: (plain-text, required). Currently only "STS1" is supported.
+* `version`: (plain-text, required). Currently only "STSv1" is supported.
 * `mode`: (plain-text, required). If "enforce", the receiving MTA requests that
   messages be delivered only if they conform to the STS policy. If "report" the
   receiving MTA requests that failure reports be delivered, as specified
@@ -256,7 +256,8 @@ is as follows:
 
     sts-text-record = sts-version *WSP %x3B *WSP sts-id
 
-    sts-version     = "v" *WSP "=" *WSP %x53 %x54 %x53 %x31
+    sts-version     = "v" *WSP "=" *WSP %x53 %x54        ; "STSv1" 
+                      %x53 %x76 %x31
 
     sts-id          = "id" *WSP "=" *WSP 1*32(ALPHA / DIGIT) 
 
@@ -277,7 +278,7 @@ follows:
     sts-element     = sts-version / sts-mode / sts-id / sts-mx / sts-max_age
 
     sts-version     = %x22 "version" %x22 *WSP %x3a *WSP ; "version":
-                      %x22 %x53 %x54 %x53 %x31           ; "STS1"
+                      %x22 %x53 %x54 %x53 %x76 %x31      ; "STSv1"
 
     sts-mode        = %x22 "mode" %x22 *WSP %x3a *WSP    ; "mode":
                       %x22 ("report" / "enforce") %x22   ; "report"/"enforce"
@@ -528,7 +529,7 @@ is authenticated using Web PKI mechanism. The policy is fetched using HTTP
 GET method.
 ~~~~~~~~~
 {
-  "version": "STS1",
+  "version": "STSv1",
   "mode": "report",
   "policy_id": "randomstr",
   "mx": ["*.mail.example.com"],

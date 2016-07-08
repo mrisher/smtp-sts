@@ -5,7 +5,7 @@
 Using TLS in Applications                                    D. Margolis
 Internet-Draft                                                 M. Risher
 Intended status: Standards Track                           N. Lidzborski
-Expires: October 20, 2016                                      W. Chuang
+Expires: January 9, 2017                                       W. Chuang
                                                                  B. Long
                                                              Google, Inc
                                                          B. Ramakrishnan
@@ -19,11 +19,11 @@ Expires: October 20, 2016                                      W. Chuang
                                                                K. Umbach
                                                                 M. Laber
                           1&1 Mail & Media Development & Technology GmbH
-                                                          April 18, 2016
+                                                            July 8, 2016
 
 
                    SMTP MTA Strict Transport Security
-                       draft-ietf-uta-mta-sts-00
+                       draft-ietf-uta-mta-sts-01
 
 Abstract
 
@@ -48,14 +48,14 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on October 20, 2016.
+   This Internet-Draft will expire on January 9, 2017.
 
 
 
 
-Margolis, et al.        Expires October 20, 2016                [Page 1]
+Margolis, et al.         Expires January 9, 2017                [Page 1]
 
-Internet-Draft                   MTA-STS                      April 2016
+Internet-Draft                   MTA-STS                       July 2016
 
 
 Copyright Notice
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Margolis, et al.        Expires October 20, 2016                [Page 2]
+Margolis, et al.         Expires January 9, 2017                [Page 2]
 
-Internet-Draft                   MTA-STS                      April 2016
+Internet-Draft                   MTA-STS                       July 2016
 
 
    because opportunistic STARTTLS is subject to downgrade attacks -- and
@@ -165,9 +165,9 @@ Internet-Draft                   MTA-STS                      April 2016
 
 
 
-Margolis, et al.        Expires October 20, 2016                [Page 3]
+Margolis, et al.         Expires January 9, 2017                [Page 3]
 
-Internet-Draft                   MTA-STS                      April 2016
+Internet-Draft                   MTA-STS                       July 2016
 
 
    o  STS Policy: A definition of the expected TLS availability and
@@ -221,9 +221,9 @@ Internet-Draft                   MTA-STS                      April 2016
 
 
 
-Margolis, et al.        Expires October 20, 2016                [Page 4]
+Margolis, et al.         Expires January 9, 2017                [Page 4]
 
-Internet-Draft                   MTA-STS                      April 2016
+Internet-Draft                   MTA-STS                       July 2016
 
 
       from an offline (and potentially easier-to-deploy) logs-analysis
@@ -254,7 +254,7 @@ Internet-Draft                   MTA-STS                      April 2016
 
    *The MTA-STS TXT record MUST specify the following fields:*
 
-   o  "v": (plain-text, required).  Currently only "STS1" is supported.
+   o  "v": (plain-text, required).  Currently only "STSv1" is supported.
 
    o  "id": (plain-text, required).  A short string used to track policy
       updates.  This string MUST uniquely identify a given instance of a
@@ -268,7 +268,7 @@ Internet-Draft                   MTA-STS                      April 2016
    *Policies MUST specify the following fields in JSON* [RFC4627]
    *format:*
 
-   o  "version": (plain-text, required).  Currently only "STS1" is
+   o  "version": (plain-text, required).  Currently only "STSv1" is
       supported.
 
    o  "mode": (plain-text, required).  If "enforce", the receiving MTA
@@ -277,9 +277,9 @@ Internet-Draft                   MTA-STS                      April 2016
 
 
 
-Margolis, et al.        Expires October 20, 2016                [Page 5]
+Margolis, et al.         Expires January 9, 2017                [Page 5]
 
-Internet-Draft                   MTA-STS                      April 2016
+Internet-Draft                   MTA-STS                       July 2016
 
 
       STS policy.  If "report" the receiving MTA requests that failure
@@ -314,11 +314,12 @@ Internet-Draft                   MTA-STS                      April 2016
    The formal definition of the "_mta_sts" TXT record, defined using
    [RFC5234], is as follows:
 
-         sts-text-record = sts-version *WSP %x3B *WSP sts-id
+      sts-text-record = sts-version *WSP %x3B *WSP sts-id
 
-         sts-version     = "v" *WSP "=" *WSP %x53 %x54 %x53 %x31
+      sts-version     = "v" *WSP "=" *WSP %x53 %x54        ; "STSv1"
+                        %x53 %x76 %x31
 
-         sts-id          = "id" *WSP "=" *WSP 1*32(ALPHA / DIGIT)
+      sts-id          = "id" *WSP "=" *WSP 1*32(ALPHA / DIGIT)
 
 3.1.2.  SMTP MTA-STS Policy
 
@@ -332,10 +333,9 @@ Internet-Draft                   MTA-STS                      April 2016
 
 
 
-
-Margolis, et al.        Expires October 20, 2016                [Page 6]
+Margolis, et al.         Expires January 9, 2017                [Page 6]
 
-Internet-Draft                   MTA-STS                      April 2016
+Internet-Draft                   MTA-STS                       July 2016
 
 
 sts-record      = WSP %x7B WSP  ; { left curly bracket
@@ -349,7 +349,7 @@ sts-record      = WSP %x7B WSP  ; { left curly bracket
 sts-element     = sts-version / sts-mode / sts-id / sts-mx / sts-max_age
 
 sts-version     = %x22 "version" %x22 *WSP %x3a *WSP ; "version":
-                  %x22 %x53 %x54 %x53 %x31           ; "STS1"
+                  %x22 %x53 %x54 %x53 %x76 %x31      ; "STSv1"
 
 sts-mode        = %x22 "mode" %x22 *WSP %x3a *WSP    ; "mode":
                   %x22 ("report" / "enforce") %x22   ; "report"/"enforce"
@@ -389,9 +389,9 @@ dtext           = ALPHA / DIGIT / %2D                ; A-Z, a-z, 0-9, "-"
 
 
 
-Margolis, et al.        Expires October 20, 2016                [Page 7]
+Margolis, et al.         Expires January 9, 2017                [Page 7]
 
-Internet-Draft                   MTA-STS                      April 2016
+Internet-Draft                   MTA-STS                       July 2016
 
 
    senders SHOULD cache a policy (and apply it to all mail to the
@@ -445,9 +445,9 @@ Internet-Draft                   MTA-STS                      April 2016
 
 
 
-Margolis, et al.        Expires October 20, 2016                [Page 8]
+Margolis, et al.         Expires January 9, 2017                [Page 8]
 
-Internet-Draft                   MTA-STS                      April 2016
+Internet-Draft                   MTA-STS                       July 2016
 
 
 3.4.  Policy Validation
@@ -501,9 +501,9 @@ Internet-Draft                   MTA-STS                      April 2016
 
 
 
-Margolis, et al.        Expires October 20, 2016                [Page 9]
+Margolis, et al.         Expires January 9, 2017                [Page 9]
 
-Internet-Draft                   MTA-STS                      April 2016
+Internet-Draft                   MTA-STS                       July 2016
 
 
        *  If one exists and the new policy is different, update the
@@ -557,9 +557,9 @@ Internet-Draft                   MTA-STS                      April 2016
 
 
 
-Margolis, et al.        Expires October 20, 2016               [Page 10]
+Margolis, et al.         Expires January 9, 2017               [Page 10]
 
-Internet-Draft                   MTA-STS                      April 2016
+Internet-Draft                   MTA-STS                       July 2016
 
 
    SMTP Strict Transport Security relies on certificate validation via
@@ -613,9 +613,9 @@ Internet-Draft                   MTA-STS                      April 2016
 
 
 
-Margolis, et al.        Expires October 20, 2016               [Page 11]
+Margolis, et al.         Expires January 9, 2017               [Page 11]
 
-Internet-Draft                   MTA-STS                      April 2016
+Internet-Draft                   MTA-STS                       July 2016
 
 
    o  Cipher and TLS version restrictions: Policy publishers may also
@@ -669,13 +669,13 @@ if policy:
 
 
 
-Margolis, et al.        Expires October 20, 2016               [Page 12]
+Margolis, et al.         Expires January 9, 2017               [Page 12]
 
-Internet-Draft                   MTA-STS                      April 2016
+Internet-Draft                   MTA-STS                       July 2016
 
 
                       {
-                        "version": "STS1",
+                        "version": "STSv1",
                         "mode": "report",
                         "policy_id": "randomstr",
                         "mx": ["*.mail.example.com"],
@@ -725,9 +725,9 @@ Description: The certificate request contains a name that is listed as
 
 
 
-Margolis, et al.        Expires October 20, 2016               [Page 13]
+Margolis, et al.         Expires January 9, 2017               [Page 13]
 
-Internet-Draft                   MTA-STS                      April 2016
+Internet-Draft                   MTA-STS                       July 2016
 
 
              excluded in the name constraints extension of the issuer.
@@ -781,9 +781,9 @@ Change Controller:  IESG
 
 
 
-Margolis, et al.        Expires October 20, 2016               [Page 14]
+Margolis, et al.         Expires January 9, 2017               [Page 14]
 
-Internet-Draft                   MTA-STS                      April 2016
+Internet-Draft                   MTA-STS                       July 2016
 
 
 11.  Normative References
@@ -837,9 +837,9 @@ Internet-Draft                   MTA-STS                      April 2016
 
 
 
-Margolis, et al.        Expires October 20, 2016               [Page 15]
+Margolis, et al.         Expires January 9, 2017               [Page 15]
 
-Internet-Draft                   MTA-STS                      April 2016
+Internet-Draft                   MTA-STS                       July 2016
 
 
 Authors' Addresses
@@ -893,9 +893,9 @@ Authors' Addresses
 
 
 
-Margolis, et al.        Expires October 20, 2016               [Page 16]
+Margolis, et al.         Expires January 9, 2017               [Page 16]
 
-Internet-Draft                   MTA-STS                      April 2016
+Internet-Draft                   MTA-STS                       July 2016
 
 
    Franck Martin
@@ -949,4 +949,4 @@ Internet-Draft                   MTA-STS                      April 2016
 
 
 
-Margolis, et al.        Expires October 20, 2016               [Page 17]
+Margolis, et al.         Expires January 9, 2017               [Page 17]
