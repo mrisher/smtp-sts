@@ -147,6 +147,15 @@ Policies consist of the following directives:
      and MTA banners--may be reported. See the section _Future_ _Work_ for more
      details.)
 
+The formal definition of the `_mta_sts` TXT record, defined using [@!RFC5234],
+is as follows:
+
+    sts-text-record = sts-version *WSP %x3B *WSP sts-id
+
+    sts-version     = "v" *WSP "=" *WSP %x53 %x54 %x53 %x31
+
+    sts-id          = "id" *WSP "=" *WSP 1*32(ALPHA / DIGIT)
+
 
 ## Example Reporting Policy
 
