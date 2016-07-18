@@ -26,27 +26,6 @@
      [author.address]
      email="risher (at) google (dot com)"
    [[author]]
-   initials="N."
-   surname="Lidzborski"
-   fullname="Nicolas Lidzborski"
-   organization="Google, Inc"
-     [author.address]
-     email="nlidz (at) google (dot com)"
-   [[author]]
-   initials="W."
-   surname="Chuang"
-   fullname="Wei Chuang"
-   organization="Google, Inc"
-     [author.address]
-     email="weihaw (at) google (dot com)"
-   [[author]]
-   initials="B."
-   surname="Long"
-   fullname="Brandon Long"
-   organization="Google, Inc"
-     [author.address]
-     email="blong (at) google (dot com)"
-   [[author]]
    initials="B."
    surname="Ramakrishnan"
    fullname="Binu Ramakrishnan"
@@ -67,27 +46,6 @@
    organization="Microsoft, Inc"
      [author.address]
      email="janet.jones (at) microsoft (dot com)"
-   [[author]]
-   initials="F."
-   surname="Martin"
-   fullname="Franck Martin"
-   organization="LinkedIn"
-     [author.address]
-     email="fmartin (at) linkedin (dot com)"
-   [[author]]
-   initials="K."
-   surname="Umbach"
-   fullname="Klaus Umbach"
-   organization="1&1 Mail & Media Development & Technology GmbH"
-     [author.address]
-     email="klaus.umbach (at) 1und1 (dot de)"
-   [[author]]
-   initials="M."
-   surname="Laber"
-   fullname="Markus Laber"
-   organization="1&1 Mail & Media Development & Technology GmbH"
-     [author.address]
-     email="markus.laber (at) 1und1 (dot de)"
 
 %%%
 
@@ -481,6 +439,32 @@ The authors would like to suggest multiple considerations for future discussion.
 
 * Cipher and TLS version restrictions: Policy publishers may also wish to
   restrict TLS negotiation to specific ciphers or TLS versions.
+
+# Contributors
+
+Nicolas Lidzborski
+Google, Inc
+nlidz (at) google (dot com)
+
+Wei Chuang
+Google, Inc
+weihaw (at) google (dot com)
+
+Brandon Long
+Google, Inc
+blong (at) google (dot com)
+
+Franck Martin
+LinkedIn, Inc
+fmartin (at) linkedin (dot com)
+
+Klaus Umbach
+1&1 Mail & Media Development & Technology GmbH
+klaus.umbach (at) 1und1 (dot de)
+
+Markus Laber
+1&1 Mail & Media Development & Technology GmbH
+markus.laber (at) 1und1 (dot de)
 
 
 # Appendix 1: Validation Pseudocode

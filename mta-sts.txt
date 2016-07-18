@@ -4,21 +4,13 @@
 
 Using TLS in Applications                                    D. Margolis
 Internet-Draft                                                 M. Risher
-Intended status: Standards Track                           N. Lidzborski
-Expires: January 9, 2017                                       W. Chuang
-                                                                 B. Long
-                                                             Google, Inc
-                                                         B. Ramakrishnan
+Intended status: Standards Track                             Google, Inc
+Expires: January 9, 2017                                 B. Ramakrishnan
                                                              Yahoo!, Inc
                                                               A. Brotman
                                                             Comcast, Inc
                                                                 J. Jones
                                                           Microsoft, Inc
-                                                               F. Martin
-                                                                LinkedIn
-                                                               K. Umbach
-                                                                M. Laber
-                          1&1 Mail & Media Development & Technology GmbH
                                                             July 8, 2016
 
 
@@ -50,14 +42,6 @@ Status of This Memo
 
    This Internet-Draft will expire on January 9, 2017.
 
-
-
-
-Margolis, et al.         Expires January 9, 2017                [Page 1]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
 Copyright Notice
 
    Copyright (c) 2016 IETF Trust and the persons identified as the
@@ -66,6 +50,14 @@ Copyright Notice
    This document is subject to BCP 78 and the IETF Trust's Legal
    Provisions Relating to IETF Documents
    (http://trustee.ietf.org/license-info) in effect on the date of
+
+
+
+Margolis, et al.         Expires January 9, 2017                [Page 1]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
    publication of this document.  Please review these documents
    carefully, as they describe your rights and restrictions with respect
    to this document.  Code Components extracted from this document must
@@ -94,11 +86,12 @@ Table of Contents
    5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  10
    6.  Security Considerations . . . . . . . . . . . . . . . . . . .  10
    7.  Future Work . . . . . . . . . . . . . . . . . . . . . . . . .  11
-   8.  Appendix 1: Validation Pseudocode . . . . . . . . . . . . . .  12
-   9.  Appendix 2: Domain Owner STS example record . . . . . . . . .  12
-     9.1.  Example 1 . . . . . . . . . . . . . . . . . . . . . . . .  12
-   10. Appendix 3: DEEP Registration Elements  . . . . . . . . . . .  13
-   11. Normative References  . . . . . . . . . . . . . . . . . . . .  15
+   8.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  12
+   9.  Appendix 1: Validation Pseudocode . . . . . . . . . . . . . .  12
+   10. Appendix 2: Domain Owner STS example record . . . . . . . . .  12
+     10.1.  Example 1  . . . . . . . . . . . . . . . . . . . . . . .  12
+   11. Appendix 3: DEEP Registration Elements  . . . . . . . . . . .  13
+   12. Normative References  . . . . . . . . . . . . . . . . . . . .  15
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
 
 1.  Introduction
@@ -106,6 +99,13 @@ Table of Contents
    The STARTTLS extension to SMTP [RFC3207] allows SMTP clients and
    hosts to establish secure SMTP sessions over TLS.  In its current
    form, however, it fails to provide (a) message confidentiality --
+   because opportunistic STARTTLS is subject to downgrade attacks -- and
+   (b) server authenticity -- because the trust relationship from email
+   domain to MTA server identity is not cryptographically validated.
+
+   While such _opportunistic_ encryption protocols provide a high
+   barrier against passive man-in-the-middle traffic interception, any
+   attacker who can delete parts of the SMTP session (such as the "250
 
 
 
@@ -114,13 +114,6 @@ Margolis, et al.         Expires January 9, 2017                [Page 2]
 Internet-Draft                   MTA-STS                       July 2016
 
 
-   because opportunistic STARTTLS is subject to downgrade attacks -- and
-   (b) server authenticity -- because the trust relationship from email
-   domain to MTA server identity is not cryptographically validated.
-
-   While such _opportunistic_ encryption protocols provide a high
-   barrier against passive man-in-the-middle traffic interception, any
-   attacker who can delete parts of the SMTP session (such as the "250
    STARTTLS" response) or who can redirect the entire SMTP session
    (perhaps by overwriting the resolved MX record of the delivery
    domain) can perform such a downgrade or interception attack.
@@ -162,6 +155,13 @@ Internet-Draft                   MTA-STS                       July 2016
 
    We also define the following terms for further use in this document:
 
+   o  STS Policy: A definition of the expected TLS availability and
+      behavior, as well as the desired actions for a given domain when a
+      sending MTA encounters different results.
+
+   o  Policy Domain: The domain against which an STS Policy is defined.
+
+
 
 
 
@@ -169,12 +169,6 @@ Margolis, et al.         Expires January 9, 2017                [Page 3]
 
 Internet-Draft                   MTA-STS                       July 2016
 
-
-   o  STS Policy: A definition of the expected TLS availability and
-      behavior, as well as the desired actions for a given domain when a
-      sending MTA encounters different results.
-
-   o  Policy Domain: The domain against which an STS Policy is defined.
 
    o  Policy Authentication: Authentication of the STS policy retrieved
       for a recipient domain by the sender.
@@ -217,6 +211,12 @@ Internet-Draft                   MTA-STS                       July 2016
       on TLS acceptability without asking senders to enforce a given
       policy; similarly, senders who cannot enforce DANE constraints at
       send-time have no mechanism to provide recipients such metrics
+      from an offline (and potentially easier-to-deploy) logs-analysis
+      batch process.
+
+
+
+
 
 
 
@@ -225,9 +225,6 @@ Margolis, et al.         Expires January 9, 2017                [Page 4]
 
 Internet-Draft                   MTA-STS                       July 2016
 
-
-      from an offline (and potentially easier-to-deploy) logs-analysis
-      batch process.
 
 2.1.2.  Advantages of DANE when compared to SMTP MTA-STS
 
@@ -273,6 +270,9 @@ Internet-Draft                   MTA-STS                       July 2016
 
    o  "mode": (plain-text, required).  If "enforce", the receiving MTA
       requests that messages be delivered only if they conform to the
+      STS policy.  If "report" the receiving MTA requests that failure
+      reports be delivered, as specified by the "rua" parameter.
+
 
 
 
@@ -281,9 +281,6 @@ Margolis, et al.         Expires January 9, 2017                [Page 5]
 
 Internet-Draft                   MTA-STS                       July 2016
 
-
-      STS policy.  If "report" the receiving MTA requests that failure
-      reports be delivered, as specified by the "rua" parameter.
 
    o  "mx": MX patterns (list of plain-text MX match patterns,
       required).  One or more comma-separated patterns matching the
@@ -325,6 +322,9 @@ Internet-Draft                   MTA-STS                       July 2016
 
    The formal definition of the SMTP MTA-STS policy, using [RFC5234], is
    as follows:
+
+
+
 
 
 
@@ -622,7 +622,23 @@ Internet-Draft                   MTA-STS                       July 2016
       wish to restrict TLS negotiation to specific ciphers or TLS
       versions.
 
-8.  Appendix 1: Validation Pseudocode
+8.  Contributors
+
+   Nicolas Lidzborski Google, Inc nlidz (at) google (dot com)
+
+   Wei Chuang Google, Inc weihaw (at) google (dot com)
+
+   Brandon Long Google, Inc blong (at) google (dot com)
+
+   Franck Martin LinkedIn, Inc fmartin (at) linkedin (dot com)
+
+   Klaus Umbach 1&1 Mail & Media Development & Technology GmbH
+   klaus.umbach (at) 1und1 (dot de)
+
+   Markus Laber 1&1 Mail & Media Development & Technology GmbH
+   markus.laber (at) 1und1 (dot de)
+
+9.  Appendix 1: Validation Pseudocode
 
 policy = policy_from_cache()
 if not policy or is_expired(policy):
@@ -641,15 +657,22 @@ if policy:
   if update_cache:
     cache(policy)
 
-9.  Appendix 2: Domain Owner STS example record
+10.  Appendix 2: Domain Owner STS example record
 
-9.1.  Example 1
+10.1.  Example 1
 
    The owner of example.com wishes to begin using STS with a policy that
    will solicit aggregate feedback from receivers without affecting how
    the messages are processed, in order to:
 
    o  Verify the identity of MXs that handle mail for this domain
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 12]
+
+Internet-Draft                   MTA-STS                       July 2016
+
 
    o  Confirm that its legitimate messages are sent over TLS
 
@@ -665,15 +688,6 @@ if policy:
    domain, and is authenticated using Web PKI mechanism.  The policy is
    fetched using HTTP GET method.
 
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 12]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
                       {
                         "version": "STSv1",
                         "mode": "report",
@@ -684,7 +698,7 @@ Internet-Draft                   MTA-STS                       July 2016
 
    The policy is authenticated using Web PKI mechanism.
 
-10.  Appendix 3: DEEP Registration Elements
+11.  Appendix 3: DEEP Registration Elements
 
 Name: mx-mismatch
 Description: This indicates that the MX resolved for the recipient domain
@@ -708,6 +722,14 @@ Description: This indicates that the certificate presented by the receiving MX
              (Either it was not signed by a trusted CA or did not match the
              DANE TLSA record for the recipient MX.)
 Intended Usage:  COMMON
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 13]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
 Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document
 Change Controller:  IESG
@@ -722,14 +744,6 @@ Change Controller:  IESG
 
 Name: certificate-name-constraints-excluded
 Description: The certificate request contains a name that is listed as
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 13]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
              excluded in the name constraints extension of the issuer.
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
@@ -764,6 +778,14 @@ Description: This indicates a failure to validate DNS records for a Policy
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 14]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
 Change Controller:  IESG
 
 Name: sender-does-not-support-validation-method
@@ -774,19 +796,7 @@ Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document
 Change Controller:  IESG
 
-
-
-
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 14]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
-11.  Normative References
+12.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
@@ -823,6 +833,15 @@ Internet-Draft                   MTA-STS                       July 2016
               Transparency", RFC 6962, DOI 10.17487/RFC6962, June 2013,
               <http://www.rfc-editor.org/info/rfc6962>.
 
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 15]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
    [RFC7469]  Evans, C., Palmer, C., and R. Sleevi, "Public Key Pinning
               Extension for HTTP", RFC 7469, DOI 10.17487/RFC7469, April
               2015, <http://www.rfc-editor.org/info/rfc7469>.
@@ -832,15 +851,6 @@ Internet-Draft                   MTA-STS                       July 2016
               (DANE) Transport Layer Security (TLS)", RFC 7672, DOI 10
               .17487/RFC7672, October 2015,
               <http://www.rfc-editor.org/info/rfc7672>.
-
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 15]
-
-Internet-Draft                   MTA-STS                       July 2016
-
 
 Authors' Addresses
 
@@ -854,24 +864,6 @@ Authors' Addresses
    Google, Inc
 
    Email: risher (at) google (dot com)
-
-
-   Nicolas Lidzborski
-   Google, Inc
-
-   Email: nlidz (at) google (dot com)
-
-
-   Wei Chuang
-   Google, Inc
-
-   Email: weihaw (at) google (dot com)
-
-
-   Brandon Long
-   Google, Inc
-
-   Email: blong (at) google (dot com)
 
 
    Binu Ramakrishnan
@@ -893,60 +885,12 @@ Authors' Addresses
 
 
 
+
+
+
+
+
+
+
+
 Margolis, et al.         Expires January 9, 2017               [Page 16]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
-   Franck Martin
-   LinkedIn
-
-   Email: fmartin (at) linkedin (dot com)
-
-
-   Klaus Umbach
-   1&1 Mail & Media Development & Technology GmbH
-
-   Email: klaus.umbach (at) 1und1 (dot de)
-
-
-   Markus Laber
-   1&1 Mail & Media Development & Technology GmbH
-
-   Email: markus.laber (at) 1und1 (dot de)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 17]

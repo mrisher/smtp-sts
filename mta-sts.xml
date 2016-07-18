@@ -42,51 +42,6 @@
 <uri></uri>
 </address>
 </author>
-<author initials="N." surname="Lidzborski" fullname="Nicolas Lidzborski">
-<organization>Google, Inc</organization>
-<address>
-<postal>
-<street></street>
-<city></city>
-<code></code>
-<country></country>
-<region></region>
-</postal>
-<phone></phone>
-<email>nlidz (at) google (dot com)</email>
-<uri></uri>
-</address>
-</author>
-<author initials="W." surname="Chuang" fullname="Wei Chuang">
-<organization>Google, Inc</organization>
-<address>
-<postal>
-<street></street>
-<city></city>
-<code></code>
-<country></country>
-<region></region>
-</postal>
-<phone></phone>
-<email>weihaw (at) google (dot com)</email>
-<uri></uri>
-</address>
-</author>
-<author initials="B." surname="Long" fullname="Brandon Long">
-<organization>Google, Inc</organization>
-<address>
-<postal>
-<street></street>
-<city></city>
-<code></code>
-<country></country>
-<region></region>
-</postal>
-<phone></phone>
-<email>blong (at) google (dot com)</email>
-<uri></uri>
-</address>
-</author>
 <author initials="B." surname="Ramakrishnan" fullname="Binu Ramakrishnan">
 <organization>Yahoo!, Inc</organization>
 <address>
@@ -129,51 +84,6 @@
 </postal>
 <phone></phone>
 <email>janet.jones (at) microsoft (dot com)</email>
-<uri></uri>
-</address>
-</author>
-<author initials="F." surname="Martin" fullname="Franck Martin">
-<organization>LinkedIn</organization>
-<address>
-<postal>
-<street></street>
-<city></city>
-<code></code>
-<country></country>
-<region></region>
-</postal>
-<phone></phone>
-<email>fmartin (at) linkedin (dot com)</email>
-<uri></uri>
-</address>
-</author>
-<author initials="K." surname="Umbach" fullname="Klaus Umbach">
-<organization>1&amp;1 Mail &amp; Media Development &amp; Technology GmbH</organization>
-<address>
-<postal>
-<street></street>
-<city></city>
-<code></code>
-<country></country>
-<region></region>
-</postal>
-<phone></phone>
-<email>klaus.umbach (at) 1und1 (dot de)</email>
-<uri></uri>
-</address>
-</author>
-<author initials="M." surname="Laber" fullname="Markus Laber">
-<organization>1&amp;1 Mail &amp; Media Development &amp; Technology GmbH</organization>
-<address>
-<postal>
-<street></street>
-<city></city>
-<code></code>
-<country></country>
-<region></region>
-</postal>
-<phone></phone>
-<email>markus.laber (at) 1und1 (dot de)</email>
 <uri></uri>
 </address>
 </author>
@@ -625,6 +535,33 @@ sender-enforced model.</t>
 <t>Cipher and TLS version restrictions: Policy publishers may also wish to
 restrict TLS negotiation to specific ciphers or TLS versions.</t>
 </list>
+</t>
+</section>
+
+<section anchor="contributors" title="Contributors">
+<t>Nicolas Lidzborski
+Google, Inc
+nlidz (at) google (dot com)
+</t>
+<t>Wei Chuang
+Google, Inc
+weihaw (at) google (dot com)
+</t>
+<t>Brandon Long
+Google, Inc
+blong (at) google (dot com)
+</t>
+<t>Franck Martin
+LinkedIn, Inc
+fmartin (at) linkedin (dot com)
+</t>
+<t>Klaus Umbach
+1&amp;1 Mail &amp; Media Development &amp; Technology GmbH
+klaus.umbach (at) 1und1 (dot de)
+</t>
+<t>Markus Laber
+1&amp;1 Mail &amp; Media Development &amp; Technology GmbH
+markus.laber (at) 1und1 (dot de)
 </t>
 </section>
 
