@@ -165,9 +165,6 @@ SMTP MTA-STS policies are distributed via a "well known" HTTPS endpoint in the
 Policy Domain. A corresponding TXT record in the DNS alerts sending MTAs to
 the presence of a policy file.
 
-(Future implementations may move to alternate methods of policy discovery or
-distribution. See the section _Future_ _Work_ for more discussion.)
-
 **The MTA-STS TXT record MUST specify the following fields:**
 
 * `v`: (plain-text, required). Currently only "STSv1" is supported.
@@ -405,40 +402,7 @@ are thus out of scope of this threat model.
 Since we use DNS TXT record for policy discovery, an attacker who is able to
 block DNS responses can suppress the discovery of an STS Policy, making the
 Policy Domain appear not to have an STS Policy. The caching model described in
-_Policy_ _Expirations_ is designed to resist this attack, and there is
-discussion in the _Future_ _Work_ section around future distribution mechanisms
-that are robust against this attack.
-
-# Future Work
-
-The authors would like to suggest multiple considerations for future discussion.
-
-* Certificate pinning: One potential improvement in the robustness of the
-  certificate validation methods discussed would be the deployment of public-key
-  pinning as defined for HTTP in [@!RFC7469]. A policy extension supporting
-  these semantics would enable Policy Domains to specify certificates that MUST
-  appear in the MX certificate chain, thus providing resistence against
-  compromised CA or DNSSEC zone keys.
-
-* Policy distribution: As with Certificate Transparency ([@!RFC6962]), it may be
-  possible to provide a verifiable log of policy *observations* (meaning which
-  policies have been observed for a given Policy Domain). This would provide
-  insight into policy spoofing or faked policy non-existence. This may be
-  particularly useful for Policy Domains not using DNSSEC, since it would
-  provide sending MTAs an authoritative source for whether a policy is expected
-  for a given domain.
-
-* Receive-from restrictions: Policy publishers may wish to also indicate to
-  domains *receiving* mail from the Policy Domain that all such mail is expected
-  to be sent via TLS. This may allow policy publishers to receive reports
-  indicating sending MTA misconfigurations. However, the security properties of
-  a "receiver-enforced" system differ from those of the current design; in
-  particular, an active man-in-the-middle attacker may be able to exploit
-  misconfigured sending MTAs in a way that would not be possible today with a
-  sender-enforced model.
-
-* Cipher and TLS version restrictions: Policy publishers may also wish to
-  restrict TLS negotiation to specific ciphers or TLS versions.
+_Policy_ _Expirations_ is designed to resist this attack.
 
 # Contributors
 
