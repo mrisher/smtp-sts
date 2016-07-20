@@ -312,6 +312,7 @@ The JSON schema is derived from the HPKP JSON schema [@!RFC7469] (cf. Section 3)
       "result-type": result-type,
       "sending-mta-ip": ip-address,
       "receiving-mx-hostname": receiving-mx-hostname,
+      "receiving-mx-helo": receiving-mx-helo,
       "message-count": message-count,
       "additional-information": additional-info-uri
     }
@@ -349,6 +350,8 @@ Figure: JSON Report Format
     address in dot-decimal or colon-hexadecimal notation.
   * `receiving-mx-hostname`: The hostname of the receiving MTA MX record with
     which the sending MTA attempted to negotiate a STARTTLS connection.
+  * `receiving-mx-helo`: (optional) The HELO or EHLO string from the banner
+    announced during the reported session.
   * `message-count`: The number of (attempted) messages that match the relevant
     `result-type` for this section.
   * `additional-info-uri`: An optional URI pointing to additional information
