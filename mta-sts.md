@@ -409,6 +409,14 @@ _Policy_ _Expirations_ is designed to resist this attack, and there is
 discussion in the _Future_ _Work_ section around future distribution mechanisms
 that are robust against this attack.
 
+HTTP 302 redirects are not allowed while fetching policy from HTTPS endpoint.
+Redirection may not be required because of following reasons:
+1. By hosting policy on a sub-domain we allow the mail domain to outsource 
+   their policy serving to a 3rd party; if needed. 
+2. We still need per-domain policy - hence there is not real benefit in doing so. 
+   Or there should be an option for some kind of policy includes. 
+3. Additional complexity. following redirects may create security vulnerabilities
+
 # Future Work
 
 The authors would like to suggest multiple considerations for future discussion.
