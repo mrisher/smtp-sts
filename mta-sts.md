@@ -265,6 +265,27 @@ unit, the number is presumed to be a basic byte count.  Note that the
 units are considered to be powers of two; a kilobyte is 2^10, a
 megabyte is 2^20, etc.
 
+## Policy Discovery & Authentication
+
+Senders discover a recipient domain's STS policy, by making an attempt to fetch
+TXT records from the recipient domain's DNS zone with the name "_mta_sts". A
+valid TXT record presence in "_mta_sts.example.com" indicates that the recipent
+domain supports STS.  To allow recipient domains to safely serve new policies,
+it is important that senders are able to authenticate a new policy retrieved for
+a recipient domain.
+
+Web PKI is the mechanism used for policy authentication. In this mechanism, the
+sender fetches a HTTPS resource (policy) from a host at `policy.mta-sts` in the
+Policy Domain. The policy is served from a "well known" URI:
+`https://policy.mta-sts.example.com/.well-known/mta-sts/current.json`. To consider 
+the policy as valid, the `policy_id` field in the policy MUST match the `id` 
+field in the DNS TXT record under `_mta_sts`.
+
+When fetching a new policy or updating a policy, the new policy MUST be
+fully authenticated (HTTPS certificate validation + peer verification) before
+use.  A policy which has not ever been successfully authenticated MUST NOT be
+used to reject mail.
+
 ## Policy Expirations
 
 In order to resist attackers inserting a fraudulent policy, SMTP MTA-STS
@@ -287,30 +308,22 @@ Updating the policy requires that the owner make changes in two places: the
 `_mta_sts` RR record in the Policy Domain's DNS zone and at the corresponding
 HTTPS endpoint. In the case where the HTTPS endpoint has been updated but the
 TXT record has not been, senders will not know there is a new policy released
-and may thus continue to use old, previously cached versions.  Recipients should
+and may thus continue to use old, previously cached versions. Recipients should
 thus expect a policy will continue to be used by senders until both the HTTPS
 and TXT endpoints are updated and the TXT record's TTL has passed.
 
-## Policy Discovery & Authentication
+### Policy Rolling
 
-Senders discover a recipient domain's STS policy, by making an attempt to fetch
-TXT records from the recipient domain's DNS zone with the name "_mta_sts". A
-valid TXT record presence in "_mta_sts.example.com" indicates that the recipent
-domain supports STS.  To allow recipient domains to safely serve new policies,
-it is important that senders are able to authenticate a new policy retrieved for
-a recipient domain.
-
-Web PKI is the mechanism used for policy authentication. In this mechanism, the
-sender fetches a HTTPS resource (policy) from a host at `policy.mta-sts` in the
-Policy Domain. The policy is served from a "well known" URI:
-`https://policy.mta-sts.example.com/.well-known/mta-sts/current`. To consider 
-the policy as valid, the `policy_id` field in the policy MUST match the `id` 
-field in the DNS TXT record under `_mta_sts`.
-
-When fetching a new policy or updating a policy, the new policy MUST be
-fully authenticated (HTTPS certificate validation + peer verification) before
-use.  A policy which has not ever been successfully authenticated MUST NOT be
-used to reject mail.
+Since the policy is served from "current" location. As a consequence, this
+results in mismatch between `id` from DNS (possibly cached) and `policy_id` in
+the policy file when updated. To avoid sync issues between two places, the
+recipient domain may also serve the STS policy with the name $(id).json, and 
+the `id` is the one from DNS STS TXT record. In such cases `current` would
+act as a symlink to the latest version file. If the sender finds a mismatch
+with `id` from DNS and the `policy_id` in the `current` policy file, it tries
+to fetch the policy from $(id).json file. Once the `current` moves to a new
+version, the old policy version will be kept for a short period of time 
+(max_age + DNS TTL) and safely remove after that period.
 
 ## Policy Validation
 
@@ -408,6 +421,14 @@ Policy Domain appear not to have an STS Policy. The caching model described in
 _Policy_ _Expirations_ is designed to resist this attack, and there is
 discussion in the _Future_ _Work_ section around future distribution mechanisms
 that are robust against this attack.
+
+HTTP 302 redirects are not allowed while fetching policy from HTTPS endpoint.
+Redirection is not desired because of the following reasons:
+* By hosting policy on a sub-domain we allow the mail domain to outsource 
+   their policy serving to a 3rd party; if needed. 
+* We still need per-domain policy - hence there is not real benefit in doing so. 
+   Or there should be an option for some kind of policy includes. 
+* Additional complexity. following redirects may create security vulnerabilities
 
 # Future Work
 
