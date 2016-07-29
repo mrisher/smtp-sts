@@ -410,7 +410,7 @@ discussion in the _Future_ _Work_ section around future distribution mechanisms
 that are robust against this attack.
 
 HTTP 302 redirects are not allowed while fetching policy from HTTPS endpoint.
-Redirection may not be required because of following reasons:
+Redirection is not desired because of the following reasons:
 1. By hosting policy on a sub-domain we allow the mail domain to outsource 
    their policy serving to a 3rd party; if needed. 
 2. We still need per-domain policy - hence there is not real benefit in doing so. 
