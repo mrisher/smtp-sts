@@ -286,10 +286,24 @@ to apply old policies for up to this duration.
 Updating the policy requires that the owner make changes in two places: the
 `_mta_sts` RR record in the Policy Domain's DNS zone and at the corresponding
 HTTPS endpoint. In the case where the HTTPS endpoint has been updated but the
-TXT record has not been, senders will not know there is a new policy released
-and may thus continue to use old, previously cached versions.  Recipients should
-thus expect a policy will continue to be used by senders until both the HTTPS
-and TXT endpoints are updated and the TXT record's TTL has passed.
+TXT record has not been, senders will be unable to discover the presence of the
+new policy even in the event of a validation failure during a delivery attempt.
+
+Thus recipients must expect two cases of stale policy usage from senders:
+
+1. Senders may, until the policy `max_age` has passed, continue to use a cached
+   policy. There is no mechanism for guaranteed policy revocation should a
+   recipient wish to do so; as long as a cached policy continues to validate and
+   has not reached its `max_age`, it may still be used by senders.
+
+2. Until the DNS TTL for the `_mta_sts` record has expired, senders will be
+   unable to discover the presence of a new policy even if they fail to
+   validate the existing policy.
+
+The second point introduces a key consideration during policy rollovers: that
+when making changes to the recipient MTA, such as changing the MX name, recipients
+should ensure that the old MX remains valid against the old policy until the TXT
+record's TTL has passed.
 
 ## Policy Discovery & Authentication
 
