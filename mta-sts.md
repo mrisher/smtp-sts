@@ -165,9 +165,6 @@ SMTP MTA-STS policies are distributed via a "well known" HTTPS endpoint in the
 Policy Domain. A corresponding TXT record in the DNS alerts sending MTAs to
 the presence of a policy file.
 
-(Future implementations may move to alternate methods of policy discovery or
-distribution. See the section _Future_ _Work_ for more discussion.)
-
 **The MTA-STS TXT record MUST specify the following fields:**
 
 * `v`: (plain-text, required). Currently only "STSv1" is supported.
@@ -405,40 +402,7 @@ are thus out of scope of this threat model.
 Since we use DNS TXT record for policy discovery, an attacker who is able to
 block DNS responses can suppress the discovery of an STS Policy, making the
 Policy Domain appear not to have an STS Policy. The caching model described in
-_Policy_ _Expirations_ is designed to resist this attack, and there is
-discussion in the _Future_ _Work_ section around future distribution mechanisms
-that are robust against this attack.
-
-# Future Work
-
-The authors would like to suggest multiple considerations for future discussion.
-
-* Certificate pinning: One potential improvement in the robustness of the
-  certificate validation methods discussed would be the deployment of public-key
-  pinning as defined for HTTP in [@!RFC7469]. A policy extension supporting
-  these semantics would enable Policy Domains to specify certificates that MUST
-  appear in the MX certificate chain, thus providing resistence against
-  compromised CA or DNSSEC zone keys.
-
-* Policy distribution: As with Certificate Transparency ([@!RFC6962]), it may be
-  possible to provide a verifiable log of policy *observations* (meaning which
-  policies have been observed for a given Policy Domain). This would provide
-  insight into policy spoofing or faked policy non-existence. This may be
-  particularly useful for Policy Domains not using DNSSEC, since it would
-  provide sending MTAs an authoritative source for whether a policy is expected
-  for a given domain.
-
-* Receive-from restrictions: Policy publishers may wish to also indicate to
-  domains *receiving* mail from the Policy Domain that all such mail is expected
-  to be sent via TLS. This may allow policy publishers to receive reports
-  indicating sending MTA misconfigurations. However, the security properties of
-  a "receiver-enforced" system differ from those of the current design; in
-  particular, an active man-in-the-middle attacker may be able to exploit
-  misconfigured sending MTAs in a way that would not be possible today with a
-  sender-enforced model.
-
-* Cipher and TLS version restrictions: Policy publishers may also wish to
-  restrict TLS negotiation to specific ciphers or TLS versions.
+_Policy_ _Expirations_ is designed to resist this attack.
 
 # Contributors
 
@@ -522,89 +486,5 @@ GET method.
 ~~~~~~~~~
 
 The policy is authenticated using Web PKI mechanism.
-
-# Appendix 3: DEEP Registration Elements
-
-~~~~~~~~~
-Name: mx-mismatch
-Description: This indicates that the MX resolved for the recipient domain
-             did not match the MX constraint specified in the policy.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: certificate-name-mismatch
-Description: This indicates that the subject CNAME/SAN in the certificate
-             presented by the receiving MX did not match the MX hostname
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: invalid-certificate
-Description: This indicates that the certificate presented by the receiving MX
-             did not validate according to the policy validation constraint.
-             (Either it was not signed by a trusted CA or did not match the
-             DANE TLSA record for the recipient MX.)
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: certificate-name-constraints-not-permitted
-Description: The certificate request contains a name that is not listed as
-             permitted in the name constraints extension of the cert issuer.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: certificate-name-constraints-excluded
-Description: The certificate request contains a name that is listed as 
-             excluded in the name constraints extension of the issuer.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: expired-certificate
-Description: This indicates that the certificate has expired.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: starttls-not-supported
-Description: This indicates that the recipient MX did not support STARTTLS.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: tlsa-invalid
-Description: This indicates a validation error for Policy Domain specifying
-             "tlsa" validation.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: dnssec-invalid
-Description: This indicates a failure to validate DNS records for a Policy
-             Domain specifying "tlsa" validation or "dnssec" authentication.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: sender-does-not-support-validation-method
-Description: This indicates the sending system can never validate using the
-             requested validation mechanism.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-~~~~~~~~~
 
 {backmatter}
