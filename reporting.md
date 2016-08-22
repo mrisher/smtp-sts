@@ -122,9 +122,9 @@ We also define the following terms for further use in this document:
 # Reporting Policy
 
 SMTP TLSRPT policies are distributed via DNS from the Policy Domain's zone, as
-TXT records (similar to DMARC policies) under the name `_smtp_tlsrpt`. For
+TXT records (similar to DMARC policies) under the name `_smtp-tlsrpt`. For
 example, for the Policy Domain `example.com`, the recipient's SMTP STS policy
-can be retrieved from `_smtp_tlsrpt.example.com`.
+can be retrieved from `_smtp-tlsrpt.example.com`.
 
 Policies consist of the following directives:
 
@@ -143,7 +143,7 @@ Policies consist of the following directives:
      "forensic reporting mode" in which more details--such as certificate chains
      and MTA banners--may be reported.)
 
-The formal definition of the `_mta_sts` TXT record, defined using [@!RFC5234],
+The formal definition of the `_mta-sts` TXT record, defined using [@!RFC5234],
 is as follows:
 
     sts-text-record = sts-version *WSP %x3B *WSP sts-id
@@ -159,14 +159,14 @@ is as follows:
 ### Report using MAILTO
 
 ```
-_smtp_tlsrpt.mail.example.com. IN TXT \
+_smtp-tlsrpt.mail.example.com. IN TXT \
 	"v=TLSRPTv1;rua=mailto:reports@example.com"
 ```
 
 ### Report using HTTPS
 
 ```
-_smtp_tlsrpt.mail.example.com. IN TXT \
+_smtp-tlsrpt.mail.example.com. IN TXT \
 	"v=TLSRPTv1; \
 	rua=https://reporting.example.com/v1/tlsrpt"
 ```

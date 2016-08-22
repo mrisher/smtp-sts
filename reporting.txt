@@ -178,9 +178,9 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
 
    SMTP TLSRPT policies are distributed via DNS from the Policy Domain's
    zone, as TXT records (similar to DMARC policies) under the name
-   "_smtp_tlsrpt".  For example, for the Policy Domain "example.com",
-   the recipient's SMTP STS policy can be retrieved from
-   "_smtp_tlsrpt.example.com".
+   "_smtp-tlsrpt".  For example, for the Policy Domain "example.com",
+   the recipient's SMTP STS policy can be retrieved from "_smtp-
+   tlsrpt.example.com".
 
    Policies consist of the following directives:
 
@@ -204,7 +204,7 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
       details--such as certificate chains and MTA banners--may be
       reported.)
 
-   The formal definition of the "_mta_sts" TXT record, defined using
+   The formal definition of the "_mta-sts" TXT record, defined using
    [RFC5234], is as follows:
 
          sts-text-record = sts-version *WSP %x3B *WSP sts-id
@@ -230,12 +230,12 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
 
 3.1.1.  Report using MAILTO
 
-              _smtp_tlsrpt.mail.example.com. IN TXT \
+              _smtp-tlsrpt.mail.example.com. IN TXT \
                   "v=TLSRPTv1;rua=mailto:reports@example.com"
 
 3.1.2.  Report using HTTPS
 
-             _smtp_tlsrpt.mail.example.com. IN TXT \
+             _smtp-tlsrpt.mail.example.com. IN TXT \
                  "v=TLSRPTv1; \
                  rua=https://reporting.example.com/v1/tlsrpt"
 

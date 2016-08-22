@@ -280,7 +280,7 @@ superset of this specification, in which case unknown values SHALL be ignored.
 <section anchor="formal-definition" title="Formal Definition">
 
 <section anchor="txt-record" title="TXT Record">
-<t>The formal definition of the <spanx style="verb">_mta_sts</spanx> TXT record, defined using <xref target="RFC5234"/>,
+<t>The formal definition of the <spanx style="verb">_mta-sts</spanx> TXT record, defined using <xref target="RFC5234"/>,
 is as follows:
 </t>
 
@@ -361,7 +361,7 @@ to apply old policies for up to this duration.
 
 <section anchor="policy-updates" title="Policy Updates">
 <t>Updating the policy requires that the owner make changes in two places: the
-<spanx style="verb">_mta_sts</spanx> RR record in the Policy Domain's DNS zone and at the corresponding
+<spanx style="verb">_mta-sts</spanx> RR record in the Policy Domain's DNS zone and at the corresponding
 HTTPS endpoint. In the case where the HTTPS endpoint has been updated but the
 TXT record has not been, senders will not know there is a new policy released
 and may thus continue to use old, previously cached versions.  Recipients should
@@ -373,8 +373,8 @@ and TXT endpoints are updated and the TXT record's TTL has passed.
 
 <section anchor="policy-discovery--authentication" title="Policy Discovery &amp; Authentication">
 <t>Senders discover a recipient domain's STS policy, by making an attempt to fetch
-TXT records from the recipient domain's DNS zone with the name &quot;_mta_sts&quot;. A
-valid TXT record presence in &quot;_mta_sts.example.com&quot; indicates that the recipent
+TXT records from the recipient domain's DNS zone with the name &quot;_mta-sts&quot;. A
+valid TXT record presence in &quot;_mta-sts.example.com&quot; indicates that the recipent
 domain supports STS.  To allow recipient domains to safely serve new policies,
 it is important that senders are able to authenticate a new policy retrieved for
 a recipient domain.
@@ -384,7 +384,7 @@ sender fetches a HTTPS resource (policy) from a host at <spanx style="verb">poli
 Policy Domain. The policy is served from a &quot;well known&quot; URI:
 <spanx style="verb">https://policy.mta-sts.example.com/.well-known/mta-sts/current</spanx>. To consider
 the policy as valid, the <spanx style="verb">policy_id</spanx> field in the policy MUST match the <spanx style="verb">id</spanx>
-field in the DNS TXT record under <spanx style="verb">_mta_sts</spanx>.
+field in the DNS TXT record under <spanx style="verb">_mta-sts</spanx>.
 </t>
 <t>When fetching a new policy or updating a policy, the new policy MUST be
 fully authenticated (HTTPS certificate validation + peer verification) before
@@ -569,7 +569,7 @@ processed, in order to:
 </t>
 
 <figure align="center"><artwork align="center">
-_mta_sts  IN TXT ( "v=STSv1; id=randomstr;" )
+_mta-sts  IN TXT ( "v=STSv1; id=randomstr;" )
 </artwork></figure>
 <t>STS policy served from HTTPS endpoint of the policy (recipient) domain, and
 is authenticated using Web PKI mechanism. The policy is fetched using HTTP
@@ -588,91 +588,6 @@ GET method.
 <t>The policy is authenticated using Web PKI mechanism.
 </t>
 </section>
-</section>
-
-<section anchor="appendix-3-deep-registration-elements" title="Appendix 3: DEEP Registration Elements">
-
-<figure align="center"><artwork align="center">
-Name: mx-mismatch
-Description: This indicates that the MX resolved for the recipient domain
-             did not match the MX constraint specified in the policy.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: certificate-name-mismatch
-Description: This indicates that the subject CNAME/SAN in the certificate
-             presented by the receiving MX did not match the MX hostname
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: invalid-certificate
-Description: This indicates that the certificate presented by the receiving MX
-             did not validate according to the policy validation constraint.
-             (Either it was not signed by a trusted CA or did not match the
-             DANE TLSA record for the recipient MX.)
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: certificate-name-constraints-not-permitted
-Description: The certificate request contains a name that is not listed as
-             permitted in the name constraints extension of the cert issuer.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: certificate-name-constraints-excluded
-Description: The certificate request contains a name that is listed as 
-             excluded in the name constraints extension of the issuer.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: expired-certificate
-Description: This indicates that the certificate has expired.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: starttls-not-supported
-Description: This indicates that the recipient MX did not support STARTTLS.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: tlsa-invalid
-Description: This indicates a validation error for Policy Domain specifying
-             "tlsa" validation.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: dnssec-invalid
-Description: This indicates a failure to validate DNS records for a Policy
-             Domain specifying "tlsa" validation or "dnssec" authentication.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: sender-does-not-support-validation-method
-Description: This indicates the sending system can never validate using the
-             requested validation mechanism.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-</artwork></figure>
 </section>
 
 </middle>
