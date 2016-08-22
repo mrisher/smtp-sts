@@ -72,7 +72,7 @@ Table of Contents
    2.  Related Technologies  . . . . . . . . . . . . . . . . . . . .   4
      2.1.  Differences from DANE . . . . . . . . . . . . . . . . . .   4
        2.1.1.  Advantages of SMTP MTA-STS when compared to DANE  . .   4
-       2.1.2.  Advantages of DANE when compared to SMTP MTA-STS  . .   5
+       2.1.2.  Advantages of DANE when compared to SMTP MTA-STS  . .   4
    3.  Policy Semantics  . . . . . . . . . . . . . . . . . . . . . .   5
      3.1.  Formal Definition . . . . . . . . . . . . . . . . . . . .   6
        3.1.1.  TXT Record  . . . . . . . . . . . . . . . . . . . . .   6
@@ -85,14 +85,13 @@ Table of Contents
    4.  Failure Reporting . . . . . . . . . . . . . . . . . . . . . .  10
    5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  10
    6.  Security Considerations . . . . . . . . . . . . . . . . . . .  10
-   7.  Future Work . . . . . . . . . . . . . . . . . . . . . . . . .  11
-   8.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  12
-   9.  Appendix 1: Validation Pseudocode . . . . . . . . . . . . . .  12
-   10. Appendix 2: Domain Owner STS example record . . . . . . . . .  12
-     10.1.  Example 1  . . . . . . . . . . . . . . . . . . . . . . .  12
-   11. Appendix 3: DEEP Registration Elements  . . . . . . . . . . .  13
-   12. Normative References  . . . . . . . . . . . . . . . . . . . .  15
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
+   7.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  11
+   8.  Appendix 1: Validation Pseudocode . . . . . . . . . . . . . .  11
+   9.  Appendix 2: Domain Owner STS example record . . . . . . . . .  12
+     9.1.  Example 1 . . . . . . . . . . . . . . . . . . . . . . . .  12
+   10. Appendix 3: DEEP Registration Elements  . . . . . . . . . . .  12
+   11. Normative References  . . . . . . . . . . . . . . . . . . . .  14
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  15
 
 1.  Introduction
 
@@ -106,6 +105,7 @@ Table of Contents
    While such _opportunistic_ encryption protocols provide a high
    barrier against passive man-in-the-middle traffic interception, any
    attacker who can delete parts of the SMTP session (such as the "250
+   STARTTLS" response) or who can redirect the entire SMTP session
 
 
 
@@ -114,7 +114,6 @@ Margolis, et al.         Expires January 9, 2017                [Page 2]
 Internet-Draft                   MTA-STS                       July 2016
 
 
-   STARTTLS" response) or who can redirect the entire SMTP session
    (perhaps by overwriting the resolved MX record of the delivery
    domain) can perform such a downgrade or interception attack.
 
@@ -161,7 +160,8 @@ Internet-Draft                   MTA-STS                       July 2016
 
    o  Policy Domain: The domain against which an STS Policy is defined.
 
-
+   o  Policy Authentication: Authentication of the STS policy retrieved
+      for a recipient domain by the sender.
 
 
 
@@ -169,9 +169,6 @@ Margolis, et al.         Expires January 9, 2017                [Page 3]
 
 Internet-Draft                   MTA-STS                       July 2016
 
-
-   o  Policy Authentication: Authentication of the STS policy retrieved
-      for a recipient domain by the sender.
 
 2.  Related Technologies
 
@@ -214,9 +211,12 @@ Internet-Draft                   MTA-STS                       July 2016
       from an offline (and potentially easier-to-deploy) logs-analysis
       batch process.
 
+2.1.2.  Advantages of DANE when compared to SMTP MTA-STS
 
-
-
+   o  Infrastructure: DANE may be easier for some providers to deploy.
+      In particular, for providers who already support DNSSEC, SMTP MTA-
+      STS would additionally require they host a HTTPS webserver and
+      obtain a CA-signed X.509 certificate for the recipient domain.
 
 
 
@@ -225,13 +225,6 @@ Margolis, et al.         Expires January 9, 2017                [Page 4]
 
 Internet-Draft                   MTA-STS                       July 2016
 
-
-2.1.2.  Advantages of DANE when compared to SMTP MTA-STS
-
-   o  Infrastructure: DANE may be easier for some providers to deploy.
-      In particular, for providers who already support DNSSEC, SMTP MTA-
-      STS would additionally require they host a HTTPS webserver and
-      obtain a CA-signed X.509 certificate for the recipient domain.
 
    o  Security: DANE offers an advantage against policy-lookup DoS
       attacks; that is, while a DNSSEC-signed NXDOMAIN response to a
@@ -244,10 +237,6 @@ Internet-Draft                   MTA-STS                       July 2016
    SMTP MTA-STS policies are distributed via a "well known" HTTPS
    endpoint in the Policy Domain.  A corresponding TXT record in the DNS
    alerts sending MTAs to the presence of a policy file.
-
-   (Future implementations may move to alternate methods of policy
-   discovery or distribution.  See the section _Future_ _Work_ for more
-   discussion.)
 
    *The MTA-STS TXT record MUST specify the following fields:*
 
@@ -273,15 +262,6 @@ Internet-Draft                   MTA-STS                       July 2016
       STS policy.  If "report" the receiving MTA requests that failure
       reports be delivered, as specified by the "rua" parameter.
 
-
-
-
-
-Margolis, et al.         Expires January 9, 2017                [Page 5]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
    o  "mx": MX patterns (list of plain-text MX match patterns,
       required).  One or more comma-separated patterns matching the
       expected MX for this domain.  For example, "["*.example.com",
@@ -294,6 +274,13 @@ Internet-Draft                   MTA-STS                       July 2016
    o  "max_age": Max lifetime of the policy (plain-text integer
       seconds).  Well-behaved clients SHOULD cache a policy for up to
       this value from last policy fetch time.
+
+
+
+Margolis, et al.         Expires January 9, 2017                [Page 5]
+
+Internet-Draft                   MTA-STS                       July 2016
+
 
    o  "policy_id": A short string used to track policy updates.  This
       string MUST uniquely identify a given instance of a policy, such
@@ -322,6 +309,19 @@ Internet-Draft                   MTA-STS                       July 2016
 
    The formal definition of the SMTP MTA-STS policy, using [RFC5234], is
    as follows:
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -572,57 +572,9 @@ Internet-Draft                   MTA-STS                       July 2016
    able to block DNS responses can suppress the discovery of an STS
    Policy, making the Policy Domain appear not to have an STS Policy.
    The caching model described in _Policy_ _Expirations_ is designed to
-   resist this attack, and there is discussion in the _Future_ _Work_
-   section around future distribution mechanisms that are robust against
-   this attack.
+   resist this attack.
 
-7.  Future Work
-
-   The authors would like to suggest multiple considerations for future
-   discussion.
-
-   o  Certificate pinning: One potential improvement in the robustness
-      of the certificate validation methods discussed would be the
-      deployment of public-key pinning as defined for HTTP in [RFC7469].
-      A policy extension supporting these semantics would enable Policy
-      Domains to specify certificates that MUST appear in the MX
-      certificate chain, thus providing resistence against compromised
-      CA or DNSSEC zone keys.
-
-   o  Policy distribution: As with Certificate Transparency ([RFC6962]),
-      it may be possible to provide a verifiable log of policy
-      _observations_ (meaning which policies have been observed for a
-      given Policy Domain).  This would provide insight into policy
-      spoofing or faked policy non-existence.  This may be particularly
-      useful for Policy Domains not using DNSSEC, since it would provide
-      sending MTAs an authoritative source for whether a policy is
-      expected for a given domain.
-
-   o  Receive-from restrictions: Policy publishers may wish to also
-      indicate to domains _receiving_ mail from the Policy Domain that
-      all such mail is expected to be sent via TLS.  This may allow
-      policy publishers to receive reports indicating sending MTA
-      misconfigurations.  However, the security properties of a
-      "receiver-enforced" system differ from those of the current
-      design; in particular, an active man-in-the-middle attacker may be
-      able to exploit misconfigured sending MTAs in a way that would not
-      be possible today with a sender-enforced model.
-
-
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 11]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
-   o  Cipher and TLS version restrictions: Policy publishers may also
-      wish to restrict TLS negotiation to specific ciphers or TLS
-      versions.
-
-8.  Contributors
+7.  Contributors
 
    Nicolas Lidzborski Google, Inc nlidz (at) google (dot com)
 
@@ -638,7 +590,7 @@ Internet-Draft                   MTA-STS                       July 2016
    Markus Laber 1&1 Mail & Media Development & Technology GmbH
    markus.laber (at) 1und1 (dot de)
 
-9.  Appendix 1: Validation Pseudocode
+8.  Appendix 1: Validation Pseudocode
 
 policy = policy_from_cache()
 if not policy or is_expired(policy):
@@ -657,22 +609,24 @@ if policy:
   if update_cache:
     cache(policy)
 
-10.  Appendix 2: Domain Owner STS example record
 
-10.1.  Example 1
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 11]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
+9.  Appendix 2: Domain Owner STS example record
+
+9.1.  Example 1
 
    The owner of example.com wishes to begin using STS with a policy that
    will solicit aggregate feedback from receivers without affecting how
    the messages are processed, in order to:
 
    o  Verify the identity of MXs that handle mail for this domain
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 12]
-
-Internet-Draft                   MTA-STS                       July 2016
-
 
    o  Confirm that its legitimate messages are sent over TLS
 
@@ -698,7 +652,7 @@ Internet-Draft                   MTA-STS                       July 2016
 
    The policy is authenticated using Web PKI mechanism.
 
-11.  Appendix 3: DEEP Registration Elements
+10.  Appendix 3: DEEP Registration Elements
 
 Name: mx-mismatch
 Description: This indicates that the MX resolved for the recipient domain
@@ -712,6 +666,14 @@ Name: certificate-name-mismatch
 Description: This indicates that the subject CNAME/SAN in the certificate
              presented by the receiving MX did not match the MX hostname
 Intended Usage:  COMMON
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 12]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
 Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document
 Change Controller:  IESG
@@ -722,14 +684,6 @@ Description: This indicates that the certificate presented by the receiving MX
              (Either it was not signed by a trusted CA or did not match the
              DANE TLSA record for the recipient MX.)
 Intended Usage:  COMMON
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 13]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
 Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document
 Change Controller:  IESG
@@ -768,6 +722,14 @@ Name: tlsa-invalid
 Description: This indicates a validation error for Policy Domain specifying
              "tlsa" validation.
 Intended Usage:  COMMON
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 13]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
 Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document
 Change Controller:  IESG
@@ -778,14 +740,6 @@ Description: This indicates a failure to validate DNS records for a Policy
 Intended Usage:  COMMON
 Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 14]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
 Change Controller:  IESG
 
 Name: sender-does-not-support-validation-method
@@ -796,7 +750,7 @@ Reference:  RFC XXXX (this document once published)
 Submitter:  Authors of this document
 Change Controller:  IESG
 
-12.  Normative References
+11.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
@@ -822,29 +776,22 @@ Change Controller:  IESG
               RFC5234, January 2008,
               <http://www.rfc-editor.org/info/rfc5234>.
 
+
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 14]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
    [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
               Verification of Domain-Based Application Service Identity
               within Internet Public Key Infrastructure Using X.509
               (PKIX) Certificates in the Context of Transport Layer
               Security (TLS)", RFC 6125, DOI 10.17487/RFC6125, March
               2011, <http://www.rfc-editor.org/info/rfc6125>.
-
-   [RFC6962]  Laurie, B., Langley, A., and E. Kasper, "Certificate
-              Transparency", RFC 6962, DOI 10.17487/RFC6962, June 2013,
-              <http://www.rfc-editor.org/info/rfc6962>.
-
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 15]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
-   [RFC7469]  Evans, C., Palmer, C., and R. Sleevi, "Public Key Pinning
-              Extension for HTTP", RFC 7469, DOI 10.17487/RFC7469, April
-              2015, <http://www.rfc-editor.org/info/rfc7469>.
 
    [RFC7672]  Dukhovni, V. and W. Hardaker, "SMTP Security via
               Opportunistic DNS-Based Authentication of Named Entities
@@ -890,7 +837,4 @@ Authors' Addresses
 
 
 
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 16]
+Margolis, et al.         Expires January 9, 2017               [Page 15]

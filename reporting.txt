@@ -182,10 +182,6 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
    the recipient's SMTP STS policy can be retrieved from
    "_smtp_tlsrpt.example.com".
 
-   (Future implementations may move to alternate methods of policy
-   discovery or distribution.  See the section _Future_ _Work_ for more
-   discussion.)
-
    Policies consist of the following directives:
 
    o  "v": This value MUST be equal to "TLSRPTv1".
@@ -206,7 +202,7 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
       deployment.  To address this, the authors consider the possibility
       of an optional additional "forensic reporting mode" in which more
       details--such as certificate chains and MTA banners--may be
-      reported.  See the section _Future_ _Work_ for more details.)
+      reported.)
 
    The formal definition of the "_mta_sts" TXT record, defined using
    [RFC5234], is as follows:
@@ -217,6 +213,10 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
                            %x52 %x50 %x54 %x76 %x31
 
          sts-id          = "id" *WSP "=" *WSP 1*32(ALPHA / DIGIT)
+
+
+
+
 
 
 
@@ -430,6 +430,7 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
                  "result-type": result-type,
                  "sending-mta-ip": ip-address,
                  "receiving-mx-hostname": receiving-mx-hostname,
+                 "receiving-mx-helo": receiving-mx-helo,
                  "message-count": message-count,
                  "additional-information": additional-info-uri
                }
@@ -440,7 +441,6 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
 
    o  "organization-name": The name of the organization responsible for
       the report.  It is provided as a string.
-
 
 
 
@@ -490,14 +490,14 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
       record with which the sending MTA attempted to negotiate a
       STARTTLS connection.
 
+   o  "receiving-mx-helo": (optional) The HELO or EHLO string from the
+      banner announced during the reported session.
+
    o  "message-count": The number of (attempted) messages that match the
       relevant "result-type" for this section.
 
    o  "additional-info-uri": An optional URI pointing to additional
       information around the relevant "result-type".  For example, this
-      URI might host the complete certificate chain presented during an
-      attempted STARTTLS session.
-
 
 
 
@@ -505,6 +505,9 @@ Margolis, et al.         Expires January 9, 2017                [Page 9]
 
 Internet-Draft                 SMTP-TLSRPT                     July 2016
 
+
+      URI might host the complete certificate chain presented during an
+      attempted STARTTLS session.
 
 9.  Appendix 2: Example JSON Report
 
@@ -549,9 +552,6 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
               RFC2119, March 1997,
               <http://www.rfc-editor.org/info/rfc2119>.
 
-   [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
-              Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
-              February 2002, <http://www.rfc-editor.org/info/rfc3207>.
 
 
 
@@ -561,6 +561,10 @@ Margolis, et al.         Expires January 9, 2017               [Page 10]
 
 Internet-Draft                 SMTP-TLSRPT                     July 2016
 
+
+   [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
+              Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
+              February 2002, <http://www.rfc-editor.org/info/rfc3207>.
 
    [RFC3339]  Klyne, G. and C. Newman, "Date and Time on the Internet:
               Timestamps", RFC 3339, DOI 10.17487/RFC3339, July 2002,
@@ -609,10 +613,6 @@ Authors' Addresses
 
 
 
-
-
-
-
 Margolis, et al.         Expires January 9, 2017               [Page 11]
 
 Internet-Draft                 SMTP-TLSRPT                     July 2016
@@ -621,7 +621,7 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
    Alexander Brotman
    Comcast, Inc
 
-   Email: alexander_brotman (at) cable.comcast (dot com)
+   Email: alex_brotman (at) comcast.com
 
 
    Binu Ramakrishnan

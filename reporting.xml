@@ -38,7 +38,7 @@
 <region></region>
 </postal>
 <phone></phone>
-<email>alexander_brotman (at) cable.comcast (dot com)</email>
+<email>alex_brotman (at) comcast.com</email>
 <uri></uri>
 </address>
 </author>
@@ -181,9 +181,6 @@ TXT records (similar to DMARC policies) under the name <spanx style="verb">_smtp
 example, for the Policy Domain <spanx style="verb">example.com</spanx>, the recipient's SMTP STS policy
 can be retrieved from <spanx style="verb">_smtp_tlsrpt.example.com</spanx>.
 </t>
-<t>(Future implementations may move to alternate methods of policy discovery or
-distribution. See the section <spanx style="emph">Future</spanx> <spanx style="emph">Work</spanx> for more discussion.)
-</t>
 <t>Policies consist of the following directives:
 </t>
 <t>
@@ -204,8 +201,7 @@ distribution. See the section <spanx style="emph">Future</spanx> <spanx style="e
  &quot;forensic&quot; reporting during initial stages of a deployment. To address
  this, the authors consider the possibility of an optional additional
  &quot;forensic reporting mode&quot; in which more details--such as certificate chains
- and MTA banners--may be reported. See the section <spanx style="emph">Future</spanx> <spanx style="emph">Work</spanx> for more
- details.)</t>
+ and MTA banners--may be reported.)</t>
 </list>
 </t>
 <t>The formal definition of the <spanx style="verb">_mta_sts</spanx> TXT record, defined using <xref target="RFC5234"/>,
@@ -422,6 +418,7 @@ does not present a significant new vulnerability.</t>
       "result-type": result-type,
       "sending-mta-ip": ip-address,
       "receiving-mx-hostname": receiving-mx-hostname,
+      "receiving-mx-helo": receiving-mx-helo,
       "message-count": message-count,
       "additional-information": additional-info-uri
     }
@@ -459,6 +456,8 @@ connection. It is provided as a string representation of an IPv4 or IPv6
 address in dot-decimal or colon-hexadecimal notation.</t>
 <t><spanx style="verb">receiving-mx-hostname</spanx>: The hostname of the receiving MTA MX record with
 which the sending MTA attempted to negotiate a STARTTLS connection.</t>
+<t><spanx style="verb">receiving-mx-helo</spanx>: (optional) The HELO or EHLO string from the banner
+announced during the reported session.</t>
 <t><spanx style="verb">message-count</spanx>: The number of (attempted) messages that match the relevant
 <spanx style="verb">result-type</spanx> for this section.</t>
 <t><spanx style="verb">additional-info-uri</spanx>: An optional URI pointing to additional information

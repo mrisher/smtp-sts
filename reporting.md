@@ -126,9 +126,6 @@ TXT records (similar to DMARC policies) under the name `_smtp_tlsrpt`. For
 example, for the Policy Domain `example.com`, the recipient's SMTP STS policy
 can be retrieved from `_smtp_tlsrpt.example.com`.
 
-(Future implementations may move to alternate methods of policy discovery or
-distribution. See the section _Future_ _Work_ for more discussion.)
-
 Policies consist of the following directives:
 
    * `v`: This value MUST be equal to `TLSRPTv1`.
@@ -144,8 +141,7 @@ Policies consist of the following directives:
      "forensic" reporting during initial stages of a deployment. To address
      this, the authors consider the possibility of an optional additional
      "forensic reporting mode" in which more details--such as certificate chains
-     and MTA banners--may be reported. See the section _Future_ _Work_ for more
-     details.)
+     and MTA banners--may be reported.)
 
 The formal definition of the `_mta_sts` TXT record, defined using [@!RFC5234],
 is as follows:
