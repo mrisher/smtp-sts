@@ -109,17 +109,13 @@ and/or refuse to deliver messages that cannot be delivered securely.
 
 <section anchor="introduction" title="Introduction">
 <t>The STARTTLS extension to SMTP <xref target="RFC3207"/> allows SMTP clients and hosts to
-establish secure SMTP sessions over TLS. In its current form, however, it fails
-to provide (a) message confidentiality — because opportunistic STARTTLS is
-subject to downgrade attacks — and (b) server authenticity — because the trust
-relationship from email domain to MTA server identity is not cryptographically
-validated.
+establish negotiate the use of a TLS channel for secure mail transmission.
 </t>
 <t>While such <spanx style="emph">opportunistic</spanx> encryption protocols provide a high barrier against
 passive man-in-the-middle traffic interception, any attacker who can delete
 parts of the SMTP session (such as the &quot;250 STARTTLS&quot; response) or who can
 redirect the entire SMTP session (perhaps by overwriting the resolved MX record
-of the delivery domain) can perform such a downgrade or interception attack.
+of the delivery domain) can perform downgrade or interception attacks.
 </t>
 <t>This document defines a mechanism for recipient domains to publish policies
 specifying:
@@ -127,24 +123,19 @@ specifying:
 <t>
 <list style="symbols">
 <t>whether MTAs sending mail to this domain can expect TLS support</t>
-<t>how MTAs can validate the TLS server certificate presented during mail
- delivery</t>
-<t>the expected identity of MXs that handle mail for this domain</t>
-<t>what an implementing sender should do with messages when TLS cannot be
+<t>how to validate the names of the domain's MX hosts</t>
+<t>what a conforming client should do with messages when TLS cannot be
  successfully negotiated</t>
 </list>
 </t>
-<t>The mechanism described is separated into four logical components:
+<t>The mechanism described is separated into three logical components:
 </t>
 <t>
 <list style="numbers">
 <t>policy semantics: whether senders can expect a server for the
-  recipient domain to support TLS encryption and how to validate the TLS
-  certificate presented</t>
+  recipient domain to support TLS encryption</t>
 <t>policy discovery &amp; authentication: how to discover a domain's published
   STS policy and determine the authenticity of that policy</t>
-<t>failure report format: a mechanism for informing recipient domains about
-  aggregate failure statistics</t>
 <t>failure handling: what sending MTAs should do in the case of policy
   failures</t>
 </list>
@@ -588,91 +579,6 @@ GET method.
 <t>The policy is authenticated using Web PKI mechanism.
 </t>
 </section>
-</section>
-
-<section anchor="appendix-3-deep-registration-elements" title="Appendix 3: DEEP Registration Elements">
-
-<figure align="center"><artwork align="center">
-Name: mx-mismatch
-Description: This indicates that the MX resolved for the recipient domain
-             did not match the MX constraint specified in the policy.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: certificate-name-mismatch
-Description: This indicates that the subject CNAME/SAN in the certificate
-             presented by the receiving MX did not match the MX hostname
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: invalid-certificate
-Description: This indicates that the certificate presented by the receiving MX
-             did not validate according to the policy validation constraint.
-             (Either it was not signed by a trusted CA or did not match the
-             DANE TLSA record for the recipient MX.)
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: certificate-name-constraints-not-permitted
-Description: The certificate request contains a name that is not listed as
-             permitted in the name constraints extension of the cert issuer.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: certificate-name-constraints-excluded
-Description: The certificate request contains a name that is listed as 
-             excluded in the name constraints extension of the issuer.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: expired-certificate
-Description: This indicates that the certificate has expired.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: starttls-not-supported
-Description: This indicates that the recipient MX did not support STARTTLS.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: tlsa-invalid
-Description: This indicates a validation error for Policy Domain specifying
-             "tlsa" validation.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: dnssec-invalid
-Description: This indicates a failure to validate DNS records for a Policy
-             Domain specifying "tlsa" validation or "dnssec" authentication.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: sender-does-not-support-validation-method
-Description: This indicates the sending system can never validate using the
-             requested validation mechanism.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-</artwork></figure>
 </section>
 
 </middle>
