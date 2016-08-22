@@ -262,21 +262,19 @@ unit, the number is presumed to be a basic byte count.  Note that the
 units are considered to be powers of two; a kilobyte is 2^10, a
 megabyte is 2^20, etc.
 
-## Policy Expirations
+## Policy Expiration
 
 In order to resist attackers inserting a fraudulent policy, SMTP MTA-STS
 policies are designed to be long-lived, with an expiry typically greater than
-two weeks.  Policy validity is controlled by two separate expiration times: the
-lifetime indicated in the policy ("max_age=") and the TTL on the DNS record
-itself. The policy expiration will ordinarily be longer than that of the DNS
-TTL, and senders SHOULD cache a policy (and apply it to all mail to the
-recipient domain) until the policy expiration.
+two weeks.  Policy validity is controlled by the lifetime indicated in the
+policy ("max_age="). Senders SHOULD cache a policy (and apply it to all mail to
+the recipient domain) until the policy expiration.
 
-An important consideration for domains publishing a policy is that senders will
-see a policy expiration as relative to the fetch of a policy cached by their
-recursive resolver. Consequently, a sender MAY treat a policy as valid for up to
-{expiration time} + {DNS TTL}. Publishers SHOULD thus continue to expect senders
-to apply old policies for up to this duration.
+To mitigate the risks of long-lived cached policies (which otherwise may make it
+difficult for recipient domains to change infrastructure in ways which the
+policy forbids), domains can, at any time, publish an updated policy. As
+described in _Policy_ _Application_, senders MUST fetch a new policy before
+treating a validation failure as a permanent delivery failure. 
 
 ### Policy Updates
 
