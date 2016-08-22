@@ -89,9 +89,8 @@ Table of Contents
    8.  Appendix 1: Validation Pseudocode . . . . . . . . . . . . . .  11
    9.  Appendix 2: Domain Owner STS example record . . . . . . . . .  12
      9.1.  Example 1 . . . . . . . . . . . . . . . . . . . . . . . .  12
-   10. Appendix 3: DEEP Registration Elements  . . . . . . . . . . .  12
-   11. Normative References  . . . . . . . . . . . . . . . . . . . .  14
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  15
+   10. Normative References  . . . . . . . . . . . . . . . . . . . .  12
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  13
 
 1.  Introduction
 
@@ -106,6 +105,7 @@ Table of Contents
    barrier against passive man-in-the-middle traffic interception, any
    attacker who can delete parts of the SMTP session (such as the "250
    STARTTLS" response) or who can redirect the entire SMTP session
+
 
 
 
@@ -295,7 +295,7 @@ Internet-Draft                   MTA-STS                       July 2016
 
 3.1.1.  TXT Record
 
-   The formal definition of the "_mta_sts" TXT record, defined using
+   The formal definition of the "_mta-sts" TXT record, defined using
    [RFC5234], is as follows:
 
       sts-text-record = sts-version *WSP %x3B *WSP sts-id
@@ -407,7 +407,7 @@ Internet-Draft                   MTA-STS                       July 2016
 3.2.1.  Policy Updates
 
    Updating the policy requires that the owner make changes in two
-   places: the "_mta_sts" RR record in the Policy Domain's DNS zone and
+   places: the "_mta-sts" RR record in the Policy Domain's DNS zone and
    at the corresponding HTTPS endpoint.  In the case where the HTTPS
    endpoint has been updated but the TXT record has not been, senders
    will not know there is a new policy released and may thus continue to
@@ -419,11 +419,11 @@ Internet-Draft                   MTA-STS                       July 2016
 
    Senders discover a recipient domain's STS policy, by making an
    attempt to fetch TXT records from the recipient domain's DNS zone
-   with the name "_mta_sts".  A valid TXT record presence in
-   "_mta_sts.example.com" indicates that the recipent domain supports
-   STS.  To allow recipient domains to safely serve new policies, it is
-   important that senders are able to authenticate a new policy
-   retrieved for a recipient domain.
+   with the name "_mta-sts".  A valid TXT record presence in "_mta-
+   sts.example.com" indicates that the recipent domain supports STS.  To
+   allow recipient domains to safely serve new policies, it is important
+   that senders are able to authenticate a new policy retrieved for a
+   recipient domain.
 
    Web PKI is the mechanism used for policy authentication.  In this
    mechanism, the sender fetches a HTTPS resource (policy) from a host
@@ -431,7 +431,7 @@ Internet-Draft                   MTA-STS                       July 2016
    a "well known" URI: "https://policy.mta-sts.example.com/.well-known/
    mta-sts/current".  To consider the policy as valid, the "policy_id"
    field in the policy MUST match the "id" field in the DNS TXT record
-   under "_mta_sts".
+   under "_mta-sts".
 
    When fetching a new policy or updating a policy, the new policy MUST
    be fully authenticated (HTTPS certificate validation + peer
@@ -636,7 +636,7 @@ Internet-Draft                   MTA-STS                       July 2016
 
    DNS STS policy indicator TXT record:
 
-               _mta_sts  IN TXT ( "v=STSv1; id=randomstr;" )
+               _mta-sts  IN TXT ( "v=STSv1; id=randomstr;" )
 
    STS policy served from HTTPS endpoint of the policy (recipient)
    domain, and is authenticated using Web PKI mechanism.  The policy is
@@ -652,105 +652,7 @@ Internet-Draft                   MTA-STS                       July 2016
 
    The policy is authenticated using Web PKI mechanism.
 
-10.  Appendix 3: DEEP Registration Elements
-
-Name: mx-mismatch
-Description: This indicates that the MX resolved for the recipient domain
-             did not match the MX constraint specified in the policy.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: certificate-name-mismatch
-Description: This indicates that the subject CNAME/SAN in the certificate
-             presented by the receiving MX did not match the MX hostname
-Intended Usage:  COMMON
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 12]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: invalid-certificate
-Description: This indicates that the certificate presented by the receiving MX
-             did not validate according to the policy validation constraint.
-             (Either it was not signed by a trusted CA or did not match the
-             DANE TLSA record for the recipient MX.)
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: certificate-name-constraints-not-permitted
-Description: The certificate request contains a name that is not listed as
-             permitted in the name constraints extension of the cert issuer.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: certificate-name-constraints-excluded
-Description: The certificate request contains a name that is listed as
-             excluded in the name constraints extension of the issuer.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: expired-certificate
-Description: This indicates that the certificate has expired.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: starttls-not-supported
-Description: This indicates that the recipient MX did not support STARTTLS.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: tlsa-invalid
-Description: This indicates a validation error for Policy Domain specifying
-             "tlsa" validation.
-Intended Usage:  COMMON
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 13]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: dnssec-invalid
-Description: This indicates a failure to validate DNS records for a Policy
-             Domain specifying "tlsa" validation or "dnssec" authentication.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: sender-does-not-support-validation-method
-Description: This indicates the sending system can never validate using the
-             requested validation mechanism.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-11.  Normative References
+10.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
@@ -760,6 +662,17 @@ Change Controller:  IESG
    [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
               Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
               February 2002, <http://www.rfc-editor.org/info/rfc3207>.
+
+
+
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 12]
+
+Internet-Draft                   MTA-STS                       July 2016
+
 
    [RFC4033]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
               Rose, "DNS Security Introduction and Requirements", RFC
@@ -775,16 +688,6 @@ Change Controller:  IESG
               Specifications: ABNF", STD 68, RFC 5234, DOI 10.17487/
               RFC5234, January 2008,
               <http://www.rfc-editor.org/info/rfc5234>.
-
-
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 14]
-
-Internet-Draft                   MTA-STS                       July 2016
-
 
    [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
               Verification of Domain-Based Application Service Identity
@@ -819,6 +722,14 @@ Authors' Addresses
    Email: rbinu (at) yahoo-inc (dot com)
 
 
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 13]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
    Alexander Brotman
    Comcast, Inc
 
@@ -837,4 +748,37 @@ Authors' Addresses
 
 
 
-Margolis, et al.         Expires January 9, 2017               [Page 15]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 14]

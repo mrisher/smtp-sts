@@ -206,7 +206,7 @@ superset of this specification, in which case unknown values SHALL be ignored.
 
 ### TXT Record
 
-The formal definition of the `_mta_sts` TXT record, defined using [@!RFC5234],
+The formal definition of the `_mta-sts` TXT record, defined using [@!RFC5234],
 is as follows:
 
     sts-text-record = sts-version *WSP %x3B *WSP sts-id
@@ -281,7 +281,7 @@ to apply old policies for up to this duration.
 ### Policy Updates
 
 Updating the policy requires that the owner make changes in two places: the
-`_mta_sts` RR record in the Policy Domain's DNS zone and at the corresponding
+`_mta-sts` RR record in the Policy Domain's DNS zone and at the corresponding
 HTTPS endpoint. In the case where the HTTPS endpoint has been updated but the
 TXT record has not been, senders will not know there is a new policy released
 and may thus continue to use old, previously cached versions.  Recipients should
@@ -291,8 +291,8 @@ and TXT endpoints are updated and the TXT record's TTL has passed.
 ## Policy Discovery & Authentication
 
 Senders discover a recipient domain's STS policy, by making an attempt to fetch
-TXT records from the recipient domain's DNS zone with the name "_mta_sts". A
-valid TXT record presence in "_mta_sts.example.com" indicates that the recipent
+TXT records from the recipient domain's DNS zone with the name "_mta-sts". A
+valid TXT record presence in "_mta-sts.example.com" indicates that the recipent
 domain supports STS.  To allow recipient domains to safely serve new policies,
 it is important that senders are able to authenticate a new policy retrieved for
 a recipient domain.
@@ -302,7 +302,7 @@ sender fetches a HTTPS resource (policy) from a host at `policy.mta-sts` in the
 Policy Domain. The policy is served from a "well known" URI:
 `https://policy.mta-sts.example.com/.well-known/mta-sts/current`. To consider 
 the policy as valid, the `policy_id` field in the policy MUST match the `id` 
-field in the DNS TXT record under `_mta_sts`.
+field in the DNS TXT record under `_mta-sts`.
 
 When fetching a new policy or updating a policy, the new policy MUST be
 fully authenticated (HTTPS certificate validation + peer verification) before
@@ -469,7 +469,7 @@ processed, in order to:
 
 DNS STS policy indicator TXT record:
 ~~~~~~~~~
-_mta_sts  IN TXT ( "v=STSv1; id=randomstr;" )
+_mta-sts  IN TXT ( "v=STSv1; id=randomstr;" )
 ~~~~~~~~~
 
 STS policy served from HTTPS endpoint of the policy (recipient) domain, and
