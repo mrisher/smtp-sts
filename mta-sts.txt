@@ -95,7 +95,7 @@ Table of Contents
 1.  Introduction
 
    The STARTTLS extension to SMTP [RFC3207] allows SMTP clients and
-   hosts to establish negotiate the use of a TLS channel for secure mail
+   hosts to negotiate the use of a TLS channel for secure mail
    transmission.
 
    While such _opportunistic_ encryption protocols provide a high
