@@ -109,17 +109,13 @@ and/or refuse to deliver messages that cannot be delivered securely.
 
 <section anchor="introduction" title="Introduction">
 <t>The STARTTLS extension to SMTP <xref target="RFC3207"/> allows SMTP clients and hosts to
-establish secure SMTP sessions over TLS. In its current form, however, it fails
-to provide (a) message confidentiality — because opportunistic STARTTLS is
-subject to downgrade attacks — and (b) server authenticity — because the trust
-relationship from email domain to MTA server identity is not cryptographically
-validated.
+establish negotiate the use of a TLS channel for secure mail transmission.
 </t>
 <t>While such <spanx style="emph">opportunistic</spanx> encryption protocols provide a high barrier against
 passive man-in-the-middle traffic interception, any attacker who can delete
 parts of the SMTP session (such as the &quot;250 STARTTLS&quot; response) or who can
 redirect the entire SMTP session (perhaps by overwriting the resolved MX record
-of the delivery domain) can perform such a downgrade or interception attack.
+of the delivery domain) can perform downgrade or interception attacks.
 </t>
 <t>This document defines a mechanism for recipient domains to publish policies
 specifying:
@@ -127,24 +123,19 @@ specifying:
 <t>
 <list style="symbols">
 <t>whether MTAs sending mail to this domain can expect TLS support</t>
-<t>how MTAs can validate the TLS server certificate presented during mail
- delivery</t>
-<t>the expected identity of MXs that handle mail for this domain</t>
-<t>what an implementing sender should do with messages when TLS cannot be
+<t>how to validate the names of the domain's MX hosts</t>
+<t>what a conforming client should do with messages when TLS cannot be
  successfully negotiated</t>
 </list>
 </t>
-<t>The mechanism described is separated into four logical components:
+<t>The mechanism described is separated into three logical components:
 </t>
 <t>
 <list style="numbers">
 <t>policy semantics: whether senders can expect a server for the
-  recipient domain to support TLS encryption and how to validate the TLS
-  certificate presented</t>
+  recipient domain to support TLS encryption</t>
 <t>policy discovery &amp; authentication: how to discover a domain's published
   STS policy and determine the authenticity of that policy</t>
-<t>failure report format: a mechanism for informing recipient domains about
-  aggregate failure statistics</t>
 <t>failure handling: what sending MTAs should do in the case of policy
   failures</t>
 </list>

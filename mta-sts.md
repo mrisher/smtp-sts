@@ -61,38 +61,29 @@ and/or refuse to deliver messages that cannot be delivered securely.
 # Introduction
 
 The STARTTLS extension to SMTP [@!RFC3207] allows SMTP clients and hosts to
-establish secure SMTP sessions over TLS. In its current form, however, it fails
-to provide (a) message confidentiality — because opportunistic STARTTLS is
-subject to downgrade attacks — and (b) server authenticity — because the trust
-relationship from email domain to MTA server identity is not cryptographically
-validated.
+establish negotiate the use of a TLS channel for secure mail transmission.
 
 While such _opportunistic_ encryption protocols provide a high barrier against
 passive man-in-the-middle traffic interception, any attacker who can delete
 parts of the SMTP session (such as the "250 STARTTLS" response) or who can
 redirect the entire SMTP session (perhaps by overwriting the resolved MX record
-of the delivery domain) can perform such a downgrade or interception attack.
+of the delivery domain) can perform downgrade or interception attacks.
 
 This document defines a mechanism for recipient domains to publish policies
 specifying:
 
    * whether MTAs sending mail to this domain can expect TLS support
-   * how MTAs can validate the TLS server certificate presented during mail
-     delivery
-   * the expected identity of MXs that handle mail for this domain
-   * what an implementing sender should do with messages when TLS cannot be
+   * how to validate the names of the domain's MX hosts
+   * what a conforming client should do with messages when TLS cannot be
      successfully negotiated
 
-The mechanism described is separated into four logical components:
+The mechanism described is separated into three logical components:
 
    1. policy semantics: whether senders can expect a server for the
-      recipient domain to support TLS encryption and how to validate the TLS
-      certificate presented
+      recipient domain to support TLS encryption
    2. policy discovery & authentication: how to discover a domain's published
       STS policy and determine the authenticity of that policy
-   3. failure report format: a mechanism for informing recipient domains about
-      aggregate failure statistics
-   4. failure handling: what sending MTAs should do in the case of policy
+   3. failure handling: what sending MTAs should do in the case of policy
       failures
 
 ## Terminology
