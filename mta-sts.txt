@@ -69,7 +69,7 @@ Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.1.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   3
-   2.  Related Technologies  . . . . . . . . . . . . . . . . . . . .   4
+   2.  Related Technologies  . . . . . . . . . . . . . . . . . . . .   3
      2.1.  Differences from DANE . . . . . . . . . . . . . . . . . .   4
        2.1.1.  Advantages of SMTP MTA-STS when compared to DANE  . .   4
        2.1.2.  Advantages of DANE when compared to SMTP MTA-STS  . .   4
@@ -89,23 +89,23 @@ Table of Contents
    8.  Appendix 1: Validation Pseudocode . . . . . . . . . . . . . .  11
    9.  Appendix 2: Domain Owner STS example record . . . . . . . . .  12
      9.1.  Example 1 . . . . . . . . . . . . . . . . . . . . . . . .  12
-   10. Appendix 3: DEEP Registration Elements  . . . . . . . . . . .  12
-   11. Normative References  . . . . . . . . . . . . . . . . . . . .  14
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  15
+   10. Normative References  . . . . . . . . . . . . . . . . . . . .  12
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  13
 
 1.  Introduction
 
    The STARTTLS extension to SMTP [RFC3207] allows SMTP clients and
-   hosts to establish secure SMTP sessions over TLS.  In its current
-   form, however, it fails to provide (a) message confidentiality --
-   because opportunistic STARTTLS is subject to downgrade attacks -- and
-   (b) server authenticity -- because the trust relationship from email
-   domain to MTA server identity is not cryptographically validated.
+   hosts to establish negotiate the use of a TLS channel for secure mail
+   transmission.
 
    While such _opportunistic_ encryption protocols provide a high
    barrier against passive man-in-the-middle traffic interception, any
    attacker who can delete parts of the SMTP session (such as the "250
    STARTTLS" response) or who can redirect the entire SMTP session
+   (perhaps by overwriting the resolved MX record of the delivery
+   domain) can perform downgrade or interception attacks.
+
+
 
 
 
@@ -114,36 +114,26 @@ Margolis, et al.         Expires January 9, 2017                [Page 2]
 Internet-Draft                   MTA-STS                       July 2016
 
 
-   (perhaps by overwriting the resolved MX record of the delivery
-   domain) can perform such a downgrade or interception attack.
-
    This document defines a mechanism for recipient domains to publish
    policies specifying:
 
    o  whether MTAs sending mail to this domain can expect TLS support
 
-   o  how MTAs can validate the TLS server certificate presented during
-      mail delivery
+   o  how to validate the names of the domain's MX hosts
 
-   o  the expected identity of MXs that handle mail for this domain
+   o  what a conforming client should do with messages when TLS cannot
+      be successfully negotiated
 
-   o  what an implementing sender should do with messages when TLS
-      cannot be successfully negotiated
-
-   The mechanism described is separated into four logical components:
+   The mechanism described is separated into three logical components:
 
    1.  policy semantics: whether senders can expect a server for the
-       recipient domain to support TLS encryption and how to validate
-       the TLS certificate presented
+       recipient domain to support TLS encryption
 
    2.  policy discovery & authentication: how to discover a domain's
        published STS policy and determine the authenticity of that
        policy
 
-   3.  failure report format: a mechanism for informing recipient
-       domains about aggregate failure statistics
-
-   4.  failure handling: what sending MTAs should do in the case of
+   3.  failure handling: what sending MTAs should do in the case of
        policy failures
 
 1.1.  Terminology
@@ -163,13 +153,6 @@ Internet-Draft                   MTA-STS                       July 2016
    o  Policy Authentication: Authentication of the STS policy retrieved
       for a recipient domain by the sender.
 
-
-
-Margolis, et al.         Expires January 9, 2017                [Page 3]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
 2.  Related Technologies
 
    The DANE TLSA record [RFC7672] is similar, in that DANE is also
@@ -177,6 +160,15 @@ Internet-Draft                   MTA-STS                       July 2016
    encryption.  DANE requires DNSSEC [RFC4033] for the secure delivery
    of policies; the mechanism described here presents a variant for
    systems not yet supporting DNSSEC.
+
+
+
+
+
+Margolis, et al.         Expires January 9, 2017                [Page 3]
+
+Internet-Draft                   MTA-STS                       July 2016
+
 
 2.1.  Differences from DANE
 
@@ -218,6 +210,14 @@ Internet-Draft                   MTA-STS                       July 2016
       STS would additionally require they host a HTTPS webserver and
       obtain a CA-signed X.509 certificate for the recipient domain.
 
+   o  Security: DANE offers an advantage against policy-lookup DoS
+      attacks; that is, while a DNSSEC-signed NXDOMAIN response to a
+      DANE lookup authoritatively indicates the lack of a DANE record,
+      such an option to authenticate policy non-existence does not exist
+      when looking up a policy over plain DNS.
+
+
+
 
 
 
@@ -225,12 +225,6 @@ Margolis, et al.         Expires January 9, 2017                [Page 4]
 
 Internet-Draft                   MTA-STS                       July 2016
 
-
-   o  Security: DANE offers an advantage against policy-lookup DoS
-      attacks; that is, while a DNSSEC-signed NXDOMAIN response to a
-      DANE lookup authoritatively indicates the lack of a DANE record,
-      such an option to authenticate policy non-existence does not exist
-      when looking up a policy over plain DNS.
 
 3.  Policy Semantics
 
@@ -275,17 +269,18 @@ Internet-Draft                   MTA-STS                       July 2016
       seconds).  Well-behaved clients SHOULD cache a policy for up to
       this value from last policy fetch time.
 
+   o  "policy_id": A short string used to track policy updates.  This
+      string MUST uniquely identify a given instance of a policy, such
+      that senders can determine when the policy has been updated by
+      comparing to the "policy_id" of a previously seen policy.
+
+
 
 
 Margolis, et al.         Expires January 9, 2017                [Page 5]
 
 Internet-Draft                   MTA-STS                       July 2016
 
-
-   o  "policy_id": A short string used to track policy updates.  This
-      string MUST uniquely identify a given instance of a policy, such
-      that senders can determine when the policy has been updated by
-      comparing to the "policy_id" of a previously seen policy.
 
    A lenient parser SHOULD accept a policy file which is valid JSON
    implementing a superset of this specification, in which case unknown
@@ -309,6 +304,11 @@ Internet-Draft                   MTA-STS                       July 2016
 
    The formal definition of the SMTP MTA-STS policy, using [RFC5234], is
    as follows:
+
+
+
+
+
 
 
 
@@ -652,105 +652,7 @@ Internet-Draft                   MTA-STS                       July 2016
 
    The policy is authenticated using Web PKI mechanism.
 
-10.  Appendix 3: DEEP Registration Elements
-
-Name: mx-mismatch
-Description: This indicates that the MX resolved for the recipient domain
-             did not match the MX constraint specified in the policy.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: certificate-name-mismatch
-Description: This indicates that the subject CNAME/SAN in the certificate
-             presented by the receiving MX did not match the MX hostname
-Intended Usage:  COMMON
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 12]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: invalid-certificate
-Description: This indicates that the certificate presented by the receiving MX
-             did not validate according to the policy validation constraint.
-             (Either it was not signed by a trusted CA or did not match the
-             DANE TLSA record for the recipient MX.)
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: certificate-name-constraints-not-permitted
-Description: The certificate request contains a name that is not listed as
-             permitted in the name constraints extension of the cert issuer.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: certificate-name-constraints-excluded
-Description: The certificate request contains a name that is listed as
-             excluded in the name constraints extension of the issuer.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: expired-certificate
-Description: This indicates that the certificate has expired.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: starttls-not-supported
-Description: This indicates that the recipient MX did not support STARTTLS.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: tlsa-invalid
-Description: This indicates a validation error for Policy Domain specifying
-             "tlsa" validation.
-Intended Usage:  COMMON
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 13]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: dnssec-invalid
-Description: This indicates a failure to validate DNS records for a Policy
-             Domain specifying "tlsa" validation or "dnssec" authentication.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: sender-does-not-support-validation-method
-Description: This indicates the sending system can never validate using the
-             requested validation mechanism.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-11.  Normative References
+10.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
@@ -760,6 +662,17 @@ Change Controller:  IESG
    [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
               Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
               February 2002, <http://www.rfc-editor.org/info/rfc3207>.
+
+
+
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 12]
+
+Internet-Draft                   MTA-STS                       July 2016
+
 
    [RFC4033]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
               Rose, "DNS Security Introduction and Requirements", RFC
@@ -775,16 +688,6 @@ Change Controller:  IESG
               Specifications: ABNF", STD 68, RFC 5234, DOI 10.17487/
               RFC5234, January 2008,
               <http://www.rfc-editor.org/info/rfc5234>.
-
-
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 14]
-
-Internet-Draft                   MTA-STS                       July 2016
-
 
    [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
               Verification of Domain-Based Application Service Identity
@@ -819,6 +722,14 @@ Authors' Addresses
    Email: rbinu (at) yahoo-inc (dot com)
 
 
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 13]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
    Alexander Brotman
    Comcast, Inc
 
@@ -837,4 +748,37 @@ Authors' Addresses
 
 
 
-Margolis, et al.         Expires January 9, 2017               [Page 15]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 14]
