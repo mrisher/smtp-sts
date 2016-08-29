@@ -77,21 +77,20 @@ Table of Contents
      3.1.  Formal Definition . . . . . . . . . . . . . . . . . . . .   6
        3.1.1.  TXT Record  . . . . . . . . . . . . . . . . . . . . .   6
        3.1.2.  SMTP MTA-STS Policy . . . . . . . . . . . . . . . . .   6
-     3.2.  Policy Expirations  . . . . . . . . . . . . . . . . . . .   7
+     3.2.  Policy Expiration . . . . . . . . . . . . . . . . . . . .   7
        3.2.1.  Policy Updates  . . . . . . . . . . . . . . . . . . .   8
      3.3.  Policy Discovery & Authentication . . . . . . . . . . . .   8
-     3.4.  Policy Validation . . . . . . . . . . . . . . . . . . . .   9
+     3.4.  Policy Validation . . . . . . . . . . . . . . . . . . . .   8
      3.5.  Policy Application  . . . . . . . . . . . . . . . . . . .   9
    4.  Failure Reporting . . . . . . . . . . . . . . . . . . . . . .  10
    5.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  10
    6.  Security Considerations . . . . . . . . . . . . . . . . . . .  10
    7.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  11
    8.  Appendix 1: Validation Pseudocode . . . . . . . . . . . . . .  11
-   9.  Appendix 2: Domain Owner STS example record . . . . . . . . .  12
-     9.1.  Example 1 . . . . . . . . . . . . . . . . . . . . . . . .  12
-   10. Appendix 3: DEEP Registration Elements  . . . . . . . . . . .  12
-   11. Normative References  . . . . . . . . . . . . . . . . . . . .  14
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  15
+   9.  Appendix 2: Domain Owner STS example record . . . . . . . . .  11
+     9.1.  Example 1 . . . . . . . . . . . . . . . . . . . . . . . .  11
+   10. Normative References  . . . . . . . . . . . . . . . . . . . .  12
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  13
 
 1.  Introduction
 
@@ -106,6 +105,7 @@ Table of Contents
    barrier against passive man-in-the-middle traffic interception, any
    attacker who can delete parts of the SMTP session (such as the "250
    STARTTLS" response) or who can redirect the entire SMTP session
+
 
 
 
@@ -378,14 +378,14 @@ dtext           = ALPHA / DIGIT / %2D                ; A-Z, a-z, 0-9, "-"
    units are considered to be powers of two; a kilobyte is 2^10, a
    megabyte is 2^20, etc.
 
-3.2.  Policy Expirations
+3.2.  Policy Expiration
 
    In order to resist attackers inserting a fraudulent policy, SMTP MTA-
    STS policies are designed to be long-lived, with an expiry typically
-   greater than two weeks.  Policy validity is controlled by two
-   separate expiration times: the lifetime indicated in the policy
-   ("max_age=") and the TTL on the DNS record itself.  The policy
-   expiration will ordinarily be longer than that of the DNS TTL, and
+   greater than two weeks.  Policy validity is controlled by the
+   lifetime indicated in the policy ("max_age=").  Senders SHOULD cache
+   a policy (and apply it to all mail to the recipient domain) until the
+   policy expiration.
 
 
 
@@ -394,15 +394,12 @@ Margolis, et al.         Expires January 9, 2017                [Page 7]
 Internet-Draft                   MTA-STS                       July 2016
 
 
-   senders SHOULD cache a policy (and apply it to all mail to the
-   recipient domain) until the policy expiration.
-
-   An important consideration for domains publishing a policy is that
-   senders will see a policy expiration as relative to the fetch of a
-   policy cached by their recursive resolver.  Consequently, a sender
-   MAY treat a policy as valid for up to {expiration time} + {DNS TTL}.
-   Publishers SHOULD thus continue to expect senders to apply old
-   policies for up to this duration.
+   To mitigate the risks of long-lived cached policies (which otherwise
+   may make it difficult for recipient domains to change infrastructure
+   in ways which the policy forbids), domains can, at any time, publish
+   an updated policy.  As described in _Policy_ _Application_, senders
+   MUST fetch a new policy before treating a validation failure as a
+   permanent delivery failure.
 
 3.2.1.  Policy Updates
 
@@ -438,10 +435,13 @@ Internet-Draft                   MTA-STS                       July 2016
    verification) before use.  A policy which has not ever been
    successfully authenticated MUST NOT be used to reject mail.
 
+3.4.  Policy Validation
 
-
-
-
+   When sending to an MX at a domain for which the sender has a valid
+   and non-expired SMTP MTA-STS policy, a sending MTA honoring SMTP MTA-
+   STS MUST validate that the recipient MX supports STARTTLS, and offers
+   a valid PKIX based TLS certificate.  The certificate presented by the
+   receiving MX MUST be valid for the MX name and chain to a root CA
 
 
 
@@ -450,13 +450,6 @@ Margolis, et al.         Expires January 9, 2017                [Page 8]
 Internet-Draft                   MTA-STS                       July 2016
 
 
-3.4.  Policy Validation
-
-   When sending to an MX at a domain for which the sender has a valid
-   and non-expired SMTP MTA-STS policy, a sending MTA honoring SMTP MTA-
-   STS MUST validate that the recipient MX supports STARTTLS, and offers
-   a valid PKIX based TLS certificate.  The certificate presented by the
-   receiving MX MUST be valid for the MX name and chain to a root CA
    that is trusted by the sending MTA.  The certificate MUST have a CN
    or SAN matching the MX hostname (as described in [RFC6125]) and be
    non-expired.
@@ -498,6 +491,13 @@ Internet-Draft                   MTA-STS                       July 2016
 
        *  Check for a new (non-cached) authenticated policy.
 
+       *  If one exists and the new policy is different, update the
+          current policy and go to step 2.
+
+       *  If one exists and the new policy is same as the cached policy,
+          treat the delivery as a failure.
+
+
 
 
 
@@ -505,12 +505,6 @@ Margolis, et al.         Expires January 9, 2017                [Page 9]
 
 Internet-Draft                   MTA-STS                       July 2016
 
-
-       *  If one exists and the new policy is different, update the
-          current policy and go to step 2.
-
-       *  If one exists and the new policy is same as the cached policy,
-          treat the delivery as a failure.
 
        *  If none exists and cached policy is not expired, treat the
           delivery as a failure.
@@ -554,6 +548,12 @@ Internet-Draft                   MTA-STS                       July 2016
       intended for the legitimate recipient server (for example, by
       altering BGP routing tables).
 
+   SMTP Strict Transport Security relies on certificate validation via
+   PKIX based TLS identity checking [RFC6125].  Attackers who are able
+   to obtain a valid certificate for the targeted recipient mail service
+   (e.g. by compromising a certificate authority) are thus out of scope
+   of this threat model.
+
 
 
 
@@ -561,12 +561,6 @@ Margolis, et al.         Expires January 9, 2017               [Page 10]
 
 Internet-Draft                   MTA-STS                       July 2016
 
-
-   SMTP Strict Transport Security relies on certificate validation via
-   PKIX based TLS identity checking [RFC6125].  Attackers who are able
-   to obtain a valid certificate for the targeted recipient mail service
-   (e.g. by compromising a certificate authority) are thus out of scope
-   of this threat model.
 
    Since we use DNS TXT record for policy discovery, an attacker who is
    able to block DNS responses can suppress the discovery of an STS
@@ -609,15 +603,6 @@ if policy:
   if update_cache:
     cache(policy)
 
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 11]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
 9.  Appendix 2: Domain Owner STS example record
 
 9.1.  Example 1
@@ -625,6 +610,13 @@ Internet-Draft                   MTA-STS                       July 2016
    The owner of example.com wishes to begin using STS with a policy that
    will solicit aggregate feedback from receivers without affecting how
    the messages are processed, in order to:
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 11]
+
+Internet-Draft                   MTA-STS                       July 2016
+
 
    o  Verify the identity of MXs that handle mail for this domain
 
@@ -652,105 +644,7 @@ Internet-Draft                   MTA-STS                       July 2016
 
    The policy is authenticated using Web PKI mechanism.
 
-10.  Appendix 3: DEEP Registration Elements
-
-Name: mx-mismatch
-Description: This indicates that the MX resolved for the recipient domain
-             did not match the MX constraint specified in the policy.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: certificate-name-mismatch
-Description: This indicates that the subject CNAME/SAN in the certificate
-             presented by the receiving MX did not match the MX hostname
-Intended Usage:  COMMON
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 12]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: invalid-certificate
-Description: This indicates that the certificate presented by the receiving MX
-             did not validate according to the policy validation constraint.
-             (Either it was not signed by a trusted CA or did not match the
-             DANE TLSA record for the recipient MX.)
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: certificate-name-constraints-not-permitted
-Description: The certificate request contains a name that is not listed as
-             permitted in the name constraints extension of the cert issuer.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: certificate-name-constraints-excluded
-Description: The certificate request contains a name that is listed as
-             excluded in the name constraints extension of the issuer.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: expired-certificate
-Description: This indicates that the certificate has expired.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: starttls-not-supported
-Description: This indicates that the recipient MX did not support STARTTLS.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: tlsa-invalid
-Description: This indicates a validation error for Policy Domain specifying
-             "tlsa" validation.
-Intended Usage:  COMMON
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 13]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: dnssec-invalid
-Description: This indicates a failure to validate DNS records for a Policy
-             Domain specifying "tlsa" validation or "dnssec" authentication.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-Name: sender-does-not-support-validation-method
-Description: This indicates the sending system can never validate using the
-             requested validation mechanism.
-Intended Usage:  COMMON
-Reference:  RFC XXXX (this document once published)
-Submitter:  Authors of this document
-Change Controller:  IESG
-
-11.  Normative References
+10.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
@@ -771,20 +665,19 @@ Change Controller:  IESG
               .17487/RFC4627, July 2006,
               <http://www.rfc-editor.org/info/rfc4627>.
 
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 12]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
    [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
               Specifications: ABNF", STD 68, RFC 5234, DOI 10.17487/
               RFC5234, January 2008,
               <http://www.rfc-editor.org/info/rfc5234>.
-
-
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 14]
-
-Internet-Draft                   MTA-STS                       July 2016
-
 
    [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
               Verification of Domain-Based Application Service Identity
@@ -832,9 +725,4 @@ Authors' Addresses
 
 
 
-
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 15]
+Margolis, et al.         Expires January 9, 2017               [Page 13]
