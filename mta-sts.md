@@ -61,7 +61,7 @@ and/or refuse to deliver messages that cannot be delivered securely.
 # Introduction
 
 The STARTTLS extension to SMTP [@!RFC3207] allows SMTP clients and hosts to
-establish negotiate the use of a TLS channel for secure mail transmission.
+negotiate the use of a TLS channel for secure mail transmission.
 
 While such _opportunistic_ encryption protocols provide a high barrier against
 passive man-in-the-middle traffic interception, any attacker who can delete
