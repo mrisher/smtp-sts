@@ -418,7 +418,7 @@ processed, in order to:
 
 DNS STS policy indicator TXT record:
 ~~~~~~~~~
-_mta_sts  IN TXT ( "v=STSv1; id=randomstr;" )
+_mta_sts  IN TXT ( "v=STSv1; id=20160831085700Z;" )
 ~~~~~~~~~
 
 STS policy served from HTTPS endpoint of the policy (recipient) domain, and
