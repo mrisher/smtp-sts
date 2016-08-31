@@ -428,7 +428,6 @@ GET method.
 {
   "version": "STSv1",
   "mode": "report",
-  "policy_id": "randomstr",
   "mx": ["*.mail.example.com"],
   "max_age": 123456
 }
