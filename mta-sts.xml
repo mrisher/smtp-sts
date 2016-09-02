@@ -10,7 +10,7 @@
 <?rfc topblock="yes"?>
 <?rfc comments="no"?>
 <front>
-<title abbrev="MTA-STS">SMTP MTA Strict Transport Security</title>
+<title abbrev="MTA-STS">SMTP MTA Strict Transport Security (MTA-STS)</title>
 
 <author initials="D." surname="Margolis" fullname="Daniel Margolis">
 <organization>Google, Inc</organization>
@@ -153,7 +153,9 @@ they appear in this document, are to be interpreted as described in <xref target
 <t>STS Policy: A definition of the expected TLS availability and behavior, as
 well as the desired actions for a given domain when a sending MTA encounters
 different results.</t>
-<t>Policy Domain: The domain against which an STS Policy is defined.</t>
+<t>Policy Domain: The domain against which an STS Policy is defined. (For
+example, when sending mail to &quot;alice@example.com&quot;, the policy domain is
+&quot;example.com&quot;.)</t>
 <t>Policy Authentication: Authentication of the STS policy retrieved for a recipient
 domain by the sender.</t>
 </list>
@@ -185,7 +187,8 @@ deployments to detect policy failures.
 <section anchor="policy-semantics" title="Policy Semantics">
 <t>SMTP MTA-STS policies are distributed via a &quot;well known&quot; HTTPS endpoint in the
 Policy Domain. A corresponding TXT record in the DNS signals to sending MTAs the
-presence of a policy file.
+presence of a policy file. The character content of the TXT record is encoded as
+US-ASCII.
 </t>
 <t><spanx style="strong">The MTA-STS TXT record MUST specify the following fields:</spanx>
 </t>
@@ -197,9 +200,6 @@ This string MUST uniquely identify a given instance of a policy, such that
 senders can determine when the policy has been updated by comparing to the <spanx style="verb">id</spanx>
 of a previously seen policy.</t>
 </list>
-</t>
-<t>A lenient parser SHOULD accept a policy file implementing a superset of this
-specification, in which case unknown values SHALL be ignored.
 </t>
 <t><spanx style="strong">Policies MUST specify the following fields in JSON</spanx> <xref target="RFC4627"/> <spanx style="strong">format:</spanx>
 </t>
@@ -217,18 +217,25 @@ domain might be handled by any MX whose hostname is a subdomain of
 &quot;example.com&quot; or &quot;example.net&quot;. The semantics for these patterns should be the
 ones found in the &quot;Checking of Wildcard Certificates&quot; rules in Section 6.4.3
 of <xref target="RFC6125"/>.</t>
-<t><spanx style="verb">max_age</spanx>: Max lifetime of the policy (plain-text integer seconds). Well-behaved
-clients SHOULD cache a policy for up to this value from last policy fetch
-time.</t>
+<t><spanx style="verb">max_age</spanx>: Max lifetime of the policy (plain-text positive integer seconds).
+Well-behaved clients SHOULD cache a policy for up to this value from last
+policy fetch time.</t>
 </list>
 </t>
-<t>A lenient parser SHOULD accept a policy file which is valid JSON implementing a
+<t>A lenient parser SHOULD accept TXT record sand policy files which are
+syntactically valid (i.e. valid key-value pairs or valid JSON) implementing a
 superset of this specification, in which case unknown values SHALL be ignored.
 </t>
 
 <section anchor="formal-definition" title="Formal Definition">
 
 <section anchor="txt-record" title="TXT Record">
+<t>An example TXT record is as below:
+</t>
+
+<figure align="center"><artwork align="center">
+_mta_sts  IN TXT ( "v=STSv1; id=20160831085700Z;" )
+</artwork></figure>
 <t>The formal definition of the <spanx style="verb">_mta_sts</spanx> TXT record, defined using <xref target="RFC5234"/>,
 is as follows:
 </t>
@@ -244,6 +251,17 @@ sts-id          = "id" *WSP "=" *WSP 1*32(ALPHA / DIGIT)
 </section>
 
 <section anchor="smtp-mtasts-policy" title="SMTP MTA-STS Policy">
+<t>An example policy is as below:
+</t>
+
+<figure align="center"><artwork align="center">
+{
+  "version": "STSv1",
+  "mode": "enforce",
+  "mx": ["*.mail.example.com"],
+  "max_age": 123456
+}
+</artwork></figure>
 <t>The formal definition of the SMTP MTA-STS policy, using <xref target="RFC5234"/>, is as
 follows:
 </t>
@@ -315,10 +333,11 @@ record at <spanx style="verb">_mta_sts.example.com</spanx> indicates that the do
 supports MTA-STS.
 </t>
 <t>When sending to a recipient domain for which a valid TXT record exists, a
-compliant sender will then fetch an HTTPS resource containing the policy body
-from a host at the <spanx style="verb">policy.mta-sts</spanx> subdomain of the policy domain, using a
-&quot;well-known&quot; path of <spanx style="verb">.well-known/mta-sts/current</spanx>. For <spanx style="verb">example.com</spanx>, this
-would be <spanx style="verb">https://policy.mta-sts.example.com/.well-known/mta-sts/current</spanx>.
+compliant sender will then fetch via the GET method an HTTPS resource containing
+the policy body from a host at the <spanx style="verb">policy.mta-sts</spanx> subdomain of the policy
+domain, using a &quot;well-known&quot; path of <spanx style="verb">.well-known/mta-sts/current</spanx>. For
+<spanx style="verb">example.com</spanx>, this would be
+<spanx style="verb">https://policy.mta-sts.example.com/.well-known/mta-sts/current</spanx>.
 </t>
 <t>When fetching a new policy or updating a policy, the HTTPS endpoint MUST present
 a TLS certificate which is valid for the <spanx style="verb">policy.mta-sts</spanx> host (as described in
@@ -333,9 +352,10 @@ reject mail.
 <section anchor="policy-validation" title="Policy Validation">
 <t>When sending to an MX at a domain for which the sender has a valid and
 non-expired SMTP MTA-STS policy, a sending MTA honoring SMTP MTA-STS MUST
-validate that the recipient MX supports STARTTLS, and offers a valid PKIX based
-TLS certificate. The certificate presented by the receiving MX MUST be valid
-for the MX name and chain to a root CA that is trusted by the sending MTA. The
+validate that the recipient MX matches the <spanx style="verb">mx</spanx> pattern from the recipient
+domain's policy, supports STARTTLS, and offers a valid PKIX based TLS
+certificate. The certificate presented by the receiving MX MUST be valid for the
+MX name and chain to a root CA that is trusted by the sending MTA. The
 certificate MUST have a CN or SAN matching the MX hostname (as described in
 <xref target="RFC6125"/>) and be non-expired.
 </t>
@@ -348,12 +368,11 @@ described in the section <spanx style="emph">Policy</spanx> <spanx style="emph">
 
 <section anchor="policy-application" title="Policy Application">
 <t>When sending to an MX at a domain for which the sender has a valid, non-expired
-SMTP MTA-STS policy, a sending MTA honoring SMTP MTA-STS MAY apply the result
-of a policy validation one of two ways, depending on the value of the policy
-<spanx style="verb">mode</spanx> field:
+STS policy, a sending MTA honoring SMTP MTA-STS applies the result of a policy
+validation one of two ways, depending on the value of the policy <spanx style="verb">mode</spanx> field:
 </t>
 <t>
-<list style="symbols">
+<list style="numbers">
 <t><spanx style="verb">report</spanx>: In this mode, sending MTAs merely send a report (as described in the
 <spanx style="verb">TLSRPT</spanx> specification (TODO: add ref)) indicating policy application
 failures. This can be used for &quot;soft&quot; deployments, to ensure a policy will not
@@ -366,6 +385,12 @@ an updated, authenticated policy before <spanx style="emph">permanently</spanx> 
 is to ensure that failures only occur if a sending MTA is in fact validating
 against the most recent version of the recipient domain's policy.</t>
 </list>
+</t>
+<t>Note that despite the presence of an <spanx style="verb">enforce</spanx> policy, STS-aware sending MTAs
+may in some cases choose to deliver mail to non-validating MXes due to external
+reasons, such as an inability to enforce STS at send-time (i.e., some domains
+may validate STS policies offline and only choose to report failures) or
+concerns about the completeness of their own trusted CA list.
 </t>
 
 <section anchor="mx-preference-in-enforce-mode" title="MX Preference in Enforce Mode">
@@ -404,24 +429,22 @@ the <spanx style="verb">_mta_sts</spanx> TXT record).</t>
 </section>
 </section>
 
-<section anchor="failure-reporting" title="Failure Reporting">
-<t>Aggregate statistics on policy failures MAY be reported using the <spanx style="verb">TLSRPT</spanx>
-reporting specification (TODO: Add Ref).
-</t>
-</section>
-
 <section anchor="iana-considerations" title="IANA Considerations">
-<t>There are no IANA considerations at this time.
+<t>A new .well-known URI will be registered in the Well-Known URIs registry as
+described below:
+</t>
+<t>URI Suffix: mta-sts
+Change Controller: IETF
 </t>
 </section>
 
 <section anchor="security-considerations" title="Security Considerations">
-<t>SMTP Strict Transport Security protects against an active attacker who wishes to
-intercept or tamper with mail between hosts who support STARTTLS. There are two
-classes of attacks considered:
+<t>SMTP Strict Transport Security attempts to protect against an active attacker
+who wishes to intercept or tamper with mail between hosts who support STARTTLS.
+There are two classes of attacks considered:
 </t>
 <t>
-<list style="symbols">
+<list style="numbers">
 <t>Foiling TLS negotiation, for example by deleting the &quot;250 STARTTLS&quot; response
 from a server or altering TLS session negotiation. This would result in the
 SMTP session occurring over plaintext, despite both parties supporting TLS.</t>
@@ -436,7 +459,7 @@ altering BGP routing tables).</t>
 <t>SMTP Strict Transport Security relies on certificate validation via PKIX based TLS
 identity checking <xref target="RFC6125"/>. Attackers who are able to obtain a valid certificate
 for the targeted recipient mail service (e.g. by compromising a certificate authority)
-are thus out of scope of this threat model.
+are thus able to circumvent STS authentication.
 </t>
 <t>Since we use DNS TXT record for policy discovery, an attacker who is able to
 block DNS responses can suppress the discovery of an STS Policy, making the
