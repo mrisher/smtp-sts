@@ -292,10 +292,11 @@ of a policy validation one of two ways, depending on the value of the policy
 ### MX Preference in Enforce Mode
 
 When applying a policy specifying `enforce` mode, sending MTAs SHOULD select
-recipient MXs by first eliminating any non-matching (as specified by the policy)
-MX hosts from the candidate MX RRSet and then attempting delivery to matching
-hosts as indicated by their MX priority, until delivery succeeds or the MX
-candidate set is empty.
+recipient MXs by first eliminating any MXs at lower priority than the current
+host (if in the MX candidate set), then eliminating any non-matching (as
+specified by the STS policy) MX hosts from the candidate MX set, and then
+attempting delivery to matching hosts as indicated by their MX priority, until
+delivery succeeds or the MX candidate set is empty.
 
 If none of the attempted MX hosts validate according to the policy, the policy
 MUST be refreshed at least once, as described in _Policy_ _Discovery_ _&_
@@ -308,7 +309,7 @@ The control flow for a sending MTA consists of the following steps:
 1. Check for a cached, non-expired policy. If none exists and the `_mta_sts` TXT
    record is present for the recipient domain, fetch a new policy, authenticate,
    and cache it.
-2. Validate recipient MX or MXs against policy. If a valid MX is discovered,
+2. Validate candidate MX or MXs against policy. If a valid MX is discovered,
    deliver mail and mark cached policy as "successfully applied."
 3. If no valid recipient MX is found, the cached policy mode is `reject`, and
    the cached policy has previously been successfully applied, temporarily fail

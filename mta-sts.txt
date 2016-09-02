@@ -423,10 +423,12 @@ Internet-Draft                   MTA-STS                       July 2016
 3.5.1.  MX Preference in Enforce Mode
 
    When applying a policy specifying "enforce" mode, sending MTAs SHOULD
-   select recipient MXs by first eliminating any non-matching (as
-   specified by the policy) MX hosts from the candidate MX RRSet and
-   then attempting delivery to matching hosts as indicated by their MX
-   priority, until delivery succeeds or the MX candidate set is empty.
+   select recipient MXs by first eliminating any MXs at lower priority
+   than the current host (if in the MX candidate set), then eliminating
+   any non-matching (as specified by the STS policy) MX hosts from the
+   candidate MX set, and then attempting delivery to matching hosts as
+   indicated by their MX priority, until delivery succeeds or the MX
+   candidate set is empty.
 
    If none of the attempted MX hosts validate according to the policy,
    the policy MUST be refreshed at least once, as described in _Policy_
@@ -443,14 +445,12 @@ Internet-Draft                   MTA-STS                       July 2016
 
 
 
-
-
 Margolis, et al.         Expires January 9, 2017                [Page 8]
 
 Internet-Draft                   MTA-STS                       July 2016
 
 
-   2.  Validate recipient MX or MXs against policy.  If a valid MX is
+   2.  Validate candidate MX or MXs against policy.  If a valid MX is
        discovered, deliver mail and mark cached policy as "successfully
        applied."
 
@@ -579,7 +579,6 @@ Internet-Draft                   MTA-STS                       July 2016
                       {
                         "version": "STSv1",
                         "mode": "report",
-                        "policy_id": "randomstr",
                         "mx": ["*.mail.example.com"],
                         "max_age": 123456
                       }
@@ -607,9 +606,10 @@ Internet-Draft                   MTA-STS                       July 2016
               .17487/RFC4627, July 2006,
               <http://www.rfc-editor.org/info/rfc4627>.
 
-
-
-
+   [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
+              Specifications: ABNF", STD 68, RFC 5234, DOI 10.17487/
+              RFC5234, January 2008,
+              <http://www.rfc-editor.org/info/rfc5234>.
 
 
 
@@ -617,11 +617,6 @@ Margolis, et al.         Expires January 9, 2017               [Page 11]
 
 Internet-Draft                   MTA-STS                       July 2016
 
-
-   [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
-              Specifications: ABNF", STD 68, RFC 5234, DOI 10.17487/
-              RFC5234, January 2008,
-              <http://www.rfc-editor.org/info/rfc5234>.
 
    [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
               Verification of Domain-Based Application Service Identity
@@ -666,6 +661,11 @@ Authors' Addresses
    Microsoft, Inc
 
    Email: janet.jones (at) microsoft (dot com)
+
+
+
+
+
 
 
 

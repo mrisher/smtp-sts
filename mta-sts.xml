@@ -370,10 +370,11 @@ against the most recent version of the recipient domain's policy.</t>
 
 <section anchor="mx-preference-in-enforce-mode" title="MX Preference in Enforce Mode">
 <t>When applying a policy specifying <spanx style="verb">enforce</spanx> mode, sending MTAs SHOULD select
-recipient MXs by first eliminating any non-matching (as specified by the policy)
-MX hosts from the candidate MX RRSet and then attempting delivery to matching
-hosts as indicated by their MX priority, until delivery succeeds or the MX
-candidate set is empty.
+recipient MXs by first eliminating any MXs at lower priority than the current
+host (if in the MX candidate set), then eliminating any non-matching (as
+specified by the STS policy) MX hosts from the candidate MX set, and then
+attempting delivery to matching hosts as indicated by their MX priority, until
+delivery succeeds or the MX candidate set is empty.
 </t>
 <t>If none of the attempted MX hosts validate according to the policy, the policy
 MUST be refreshed at least once, as described in <spanx style="emph">Policy</spanx> <spanx style="emph">Discovery</spanx> <spanx style="emph">&amp;</spanx>
@@ -389,7 +390,7 @@ MUST be refreshed at least once, as described in <spanx style="emph">Policy</spa
 <t>Check for a cached, non-expired policy. If none exists and the <spanx style="verb">_mta_sts</spanx> TXT
 record is present for the recipient domain, fetch a new policy, authenticate,
 and cache it.</t>
-<t>Validate recipient MX or MXs against policy. If a valid MX is discovered,
+<t>Validate candidate MX or MXs against policy. If a valid MX is discovered,
 deliver mail and mark cached policy as &quot;successfully applied.&quot;</t>
 <t>If no valid recipient MX is found, the cached policy mode is <spanx style="verb">reject</spanx>, and
 the cached policy has previously been successfully applied, temporarily fail
@@ -523,7 +524,6 @@ GET method.
 {
   "version": "STSv1",
   "mode": "report",
-  "policy_id": "randomstr",
   "mx": ["*.mail.example.com"],
   "max_age": 123456
 }
