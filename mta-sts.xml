@@ -513,7 +513,7 @@ processed, in order to:
 </t>
 
 <figure align="center"><artwork align="center">
-_mta_sts  IN TXT ( "v=STSv1; id=randomstr;" )
+_mta_sts  IN TXT ( "v=STSv1; id=20160831085700Z;" )
 </artwork></figure>
 <t>STS policy served from HTTPS endpoint of the policy (recipient) domain, and
 is authenticated using Web PKI mechanism. The policy is fetched using HTTP
