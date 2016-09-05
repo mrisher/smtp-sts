@@ -1,7 +1,7 @@
 # smtp-sts
 SMTP Strict Transport Security
 
-Working drafts for https://tools.ietf.org/html/draft-margolis-smtp-sts-00.
+Working drafts for https://datatracker.ietf.org/doc/draft-ietf-uta-mta-sts/ and https://datatracker.ietf.org/doc/draft-ietf-uta-smtp-tlsrpt/
 
 ## Contributing
 
