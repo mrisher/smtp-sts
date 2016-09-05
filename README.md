@@ -1,5 +1,4 @@
-# smtp-sts
-SMTP Strict Transport Security
+# SMTP Strict Transport Security and TLS Reporting
 
 Working drafts for https://datatracker.ietf.org/doc/draft-ietf-uta-mta-sts/ and https://datatracker.ietf.org/doc/draft-ietf-uta-smtp-tlsrpt/
 
