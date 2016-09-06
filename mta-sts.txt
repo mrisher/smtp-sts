@@ -583,8 +583,8 @@ Internet-Draft                   MTA-STS                       July 2016
             _mta_sts  IN TXT ( "v=STSv1; id=20160831085700Z;" )
 
    STS policy served from HTTPS endpoint of the policy (recipient)
-   domain, and is authenticated using Web PKI mechanism.  The policy is
-   fetched using HTTP GET method.
+   domain, and is authenticated using the Web PKI mechanism.  The policy
+   is fetched using HTTP GET method.
 
                       {
                         "version": "STSv1",
@@ -593,7 +593,6 @@ Internet-Draft                   MTA-STS                       July 2016
                         "max_age": 123456
                       }
 
-   The policy is authenticated using Web PKI mechanism.
 
 9.  Normative References
 
@@ -610,6 +609,7 @@ Internet-Draft                   MTA-STS                       July 2016
               Rose, "DNS Security Introduction and Requirements", RFC
               4033, DOI 10.17487/RFC4033, March 2005,
               <http://www.rfc-editor.org/info/rfc4033>.
+
 
 
 

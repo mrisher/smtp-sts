@@ -405,8 +405,8 @@ Markus Laber
 1&1 Mail & Media Development & Technology GmbH
 markus.laber (at) 1und1 (dot de)
 
-
 # Appendix 1: Validation Pseudocode
+
 ~~~~~~~~~
 policy = policy_from_cache()
 if not policy or is_expired(policy):
@@ -448,8 +448,9 @@ _mta_sts  IN TXT ( "v=STSv1; id=20160831085700Z;" )
 ~~~~~~~~~
 
 STS policy served from HTTPS endpoint of the policy (recipient) domain, and
-is authenticated using Web PKI mechanism. The policy is fetched using HTTP
+is authenticated using the Web PKI mechanism. The policy is fetched using HTTP
 GET method.
+
 ~~~~~~~~~
 {
   "version": "STSv1",
@@ -457,8 +458,7 @@ GET method.
   "mx": ["*.mail.example.com"],
   "max_age": 123456
 }
-~~~~~~~~~
 
-The policy is authenticated using Web PKI mechanism.
+~~~~~~~~~
 
 {backmatter}

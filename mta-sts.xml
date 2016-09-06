@@ -539,7 +539,7 @@ processed, in order to:
 _mta_sts  IN TXT ( "v=STSv1; id=20160831085700Z;" )
 </artwork></figure>
 <t>STS policy served from HTTPS endpoint of the policy (recipient) domain, and
-is authenticated using Web PKI mechanism. The policy is fetched using HTTP
+is authenticated using the Web PKI mechanism. The policy is fetched using HTTP
 GET method.
 </t>
 
@@ -550,9 +550,8 @@ GET method.
   "mx": ["*.mail.example.com"],
   "max_age": 123456
 }
+
 </artwork></figure>
-<t>The policy is authenticated using Web PKI mechanism.
-</t>
 </section>
 </section>
 
