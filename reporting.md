@@ -159,14 +159,14 @@ is as follows:
 ### Report using MAILTO
 
 ```
-_smtp_tlsrpt.mail.example.com. IN TXT \
+_smtp_tlsrpt.example.com. IN TXT \
 	"v=TLSRPTv1;rua=mailto:reports@example.com"
 ```
 
 ### Report using HTTPS
 
 ```
-_smtp_tlsrpt.mail.example.com. IN TXT \
+_smtp_tlsrpt.example.com. IN TXT \
 	"v=TLSRPTv1; \
 	rua=https://reporting.example.com/v1/tlsrpt"
 ```
