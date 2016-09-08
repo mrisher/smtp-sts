@@ -10,7 +10,7 @@
 <?rfc topblock="yes"?>
 <?rfc comments="no"?>
 <front>
-<title abbrev="MTA-STS">SMTP MTA Strict Transport Security</title>
+<title abbrev="MTA-STS">SMTP MTA Strict Transport Security (MTA-STS)</title>
 
 <author initials="D." surname="Margolis" fullname="Daniel Margolis">
 <organization>Google, Inc</organization>
@@ -109,7 +109,7 @@ and/or refuse to deliver messages that cannot be delivered securely.
 
 <section anchor="introduction" title="Introduction">
 <t>The STARTTLS extension to SMTP <xref target="RFC3207"/> allows SMTP clients and hosts to
-establish negotiate the use of a TLS channel for secure mail transmission.
+negotiate the use of a TLS channel for secure mail transmission.
 </t>
 <t>While such <spanx style="emph">opportunistic</spanx> encryption protocols provide a high barrier against
 passive man-in-the-middle traffic interception, any attacker who can delete
@@ -153,7 +153,9 @@ they appear in this document, are to be interpreted as described in <xref target
 <t>STS Policy: A definition of the expected TLS availability and behavior, as
 well as the desired actions for a given domain when a sending MTA encounters
 different results.</t>
-<t>Policy Domain: The domain against which an STS Policy is defined.</t>
+<t>Policy Domain: The domain against which an STS Policy is defined. (For
+example, when sending mail to &quot;alice@example.com&quot;, the policy domain is
+&quot;example.com&quot;.)</t>
 <t>Policy Authentication: Authentication of the STS policy retrieved for a recipient
 domain by the sender.</t>
 </list>
@@ -163,66 +165,30 @@ domain by the sender.</t>
 
 <section anchor="related-technologies" title="Related Technologies">
 <t>The DANE TLSA record <xref target="RFC7672"/> is similar, in that DANE is also designed to
-upgrade opportunistic encryption into required encryption. DANE requires DNSSEC
-<xref target="RFC4033"/> for the secure delivery of policies; the mechanism described here
-presents a variant for systems not yet supporting DNSSEC.
+upgrade opportunistic, unauthenticated encryption into required, authenticated
+encryption. DANE requires DNSSEC <xref target="RFC4033"/> for authentication; the mechanism
+described here instead relies on certificate authorities (CAs) and does not
+require DNSSEC.
 </t>
 
 <section anchor="differences-from-dane" title="Differences from DANE">
 <t>The primary difference between the mechanism described here and DANE is that
 DANE requires the use of DNSSEC to authenticate DANE TLSA records, whereas SMTP
-STS relies on the certificate authority (CA) system to avoid interception. (For
-a thorough discussion of this trade-off, see the section <spanx style="emph">Security</spanx>
+MTA-STS relies on the certificate authority (CA) system to avoid interception.
+(For a thorough discussion of this trade-off, see the section <spanx style="emph">Security</spanx>
 <spanx style="emph">Considerations</spanx>.)
 </t>
-<t>In addition, SMTP MTA-STS introduces a mechanism for failure reporting and a
-report-only mode, enabling offline (&quot;report-only&quot;) deployments and auditing for
-compliance.
+<t>In addition, SMTP MTA-STS provides an optional report-only mode, enabling soft
+deployments to detect policy failures.
 </t>
-
-<section anchor="advantages-of-smtp-mtasts-when-compared-to-dane" title="Advantages of SMTP MTA-STS when compared to DANE">
-<t>SMTP MTA-STS offers the following advantages compared to DANE:
-</t>
-<t>
-<list style="symbols">
-<t>Infrastructure: In comparison to DANE, this proposal does not require
- DNSSEC be deployed on either the sending or receiving domain. In addition,
- the reporting feature of SMTP MTA-STS can be deployed to perform offline
- analysis of STARTTLS failures, enabling mail providers to gain insight into
- the security of their SMTP connections without the need to modify MTA
- codebases directly.</t>
-<t>Offline or report-only usage: DANE does not provide a reporting
- mechanism and does not have a concept of &quot;report-only&quot; for failures; as a
- result, a service provider cannot receive metrics on TLS acceptability
- without asking senders to enforce a given policy; similarly, senders who
- cannot enforce DANE constraints at send-time have no mechanism to provide
- recipients such metrics from an offline (and potentially easier-to-deploy)
- logs-analysis batch process.</t>
-</list>
-</t>
-</section>
-
-<section anchor="advantages-of-dane-when-compared-to-smtp-mtasts" title="Advantages of DANE when compared to SMTP MTA-STS">
-<t>
-<list style="symbols">
-<t>Infrastructure: DANE may be easier for some providers to deploy. In
-particular, for providers who already support DNSSEC, SMTP MTA-STS would
-additionally require they host a HTTPS webserver and obtain a CA-signed
-X.509 certificate for the recipient domain.</t>
-<t>Security: DANE offers an advantage against policy-lookup DoS attacks; that is,
-while a DNSSEC-signed NXDOMAIN response to a DANE lookup authoritatively
-indicates the lack of a DANE record, such an option to authenticate policy
-non-existence does not exist when looking up a policy over plain DNS.</t>
-</list>
-</t>
-</section>
 </section>
 </section>
 
 <section anchor="policy-semantics" title="Policy Semantics">
 <t>SMTP MTA-STS policies are distributed via a &quot;well known&quot; HTTPS endpoint in the
-Policy Domain. A corresponding TXT record in the DNS alerts sending MTAs to
-the presence of a policy file.
+Policy Domain. A corresponding TXT record in the DNS signals to sending MTAs the
+presence of a policy file. The character content of the TXT record is encoded as
+US-ASCII.
 </t>
 <t><spanx style="strong">The MTA-STS TXT record MUST specify the following fields:</spanx>
 </t>
@@ -232,12 +198,8 @@ the presence of a policy file.
 <t><spanx style="verb">id</spanx>: (plain-text, required). A short string used to track policy updates.
 This string MUST uniquely identify a given instance of a policy, such that
 senders can determine when the policy has been updated by comparing to the <spanx style="verb">id</spanx>
-of a previously seen policy, and must also match the <spanx style="verb">policy_id</spanx> value of the
-distributed policy.</t>
+of a previously seen policy.</t>
 </list>
-</t>
-<t>A lenient parser SHOULD accept a policy file implementing a superset of this
-specification, in which case unknown values SHALL be ignored.
 </t>
 <t><spanx style="strong">Policies MUST specify the following fields in JSON</spanx> <xref target="RFC4627"/> <spanx style="strong">format:</spanx>
 </t>
@@ -255,22 +217,25 @@ domain might be handled by any MX whose hostname is a subdomain of
 &quot;example.com&quot; or &quot;example.net&quot;. The semantics for these patterns should be the
 ones found in the &quot;Checking of Wildcard Certificates&quot; rules in Section 6.4.3
 of <xref target="RFC6125"/>.</t>
-<t><spanx style="verb">max_age</spanx>: Max lifetime of the policy (plain-text integer seconds). Well-behaved
-clients SHOULD cache a policy for up to this value from last policy fetch
-time.</t>
-<t><spanx style="verb">policy_id</spanx>: A short string used to track policy updates. This string MUST
-uniquely identify a given instance of a policy, such that senders can
-determine when the policy has been updated by comparing to the <spanx style="verb">policy_id</spanx> of
-a previously seen policy.</t>
+<t><spanx style="verb">max_age</spanx>: Max lifetime of the policy (plain-text positive integer seconds).
+Well-behaved clients SHOULD cache a policy for up to this value from last
+policy fetch time.</t>
 </list>
 </t>
-<t>A lenient parser SHOULD accept a policy file which is valid JSON implementing a
+<t>A lenient parser SHOULD accept TXT record sand policy files which are
+syntactically valid (i.e. valid key-value pairs or valid JSON) implementing a
 superset of this specification, in which case unknown values SHALL be ignored.
 </t>
 
 <section anchor="formal-definition" title="Formal Definition">
 
 <section anchor="txt-record" title="TXT Record">
+<t>An example TXT record is as below:
+</t>
+
+<figure align="center"><artwork align="center">
+_mta_sts  IN TXT ( "v=STSv1; id=20160831085700Z;" )
+</artwork></figure>
 <t>The formal definition of the <spanx style="verb">_mta_sts</spanx> TXT record, defined using <xref target="RFC5234"/>,
 is as follows:
 </t>
@@ -286,6 +251,17 @@ sts-id          = "id" *WSP "=" *WSP 1*32(ALPHA / DIGIT)
 </section>
 
 <section anchor="smtp-mtasts-policy" title="SMTP MTA-STS Policy">
+<t>An example policy is as below:
+</t>
+
+<figure align="center"><artwork align="center">
+{
+  "version": "STSv1",
+  "mode": "enforce",
+  "mx": ["*.mail.example.com"],
+  "max_age": 123456
+}
+</artwork></figure>
 <t>The formal definition of the SMTP MTA-STS policy, using <xref target="RFC5234"/>, is as
 follows:
 </t>
@@ -307,9 +283,6 @@ sts-version     = %x22 "version" %x22 *WSP %x3a *WSP ; "version":
 sts-mode        = %x22 "mode" %x22 *WSP %x3a *WSP    ; "mode":
                   %x22 ("report" / "enforce") %x22   ; "report"/"enforce"
 
-sts-id          = %x22 "policy_id" %x22 *WSP %x3a *WSP ; "policy_id":
-                  %x22 1*32(ALPHA / DIGIT) %x22        ; some chars
-
 sts-mx          = %x22 "mx" $x22 *WSP %x3a *WSP      ; "mx":
                   %x5B                               ; [
                   domain-match                       ; comma-separated list
@@ -324,13 +297,6 @@ domain-match    = %x22 1*(dtext / "*") *("."         ; wildcard or label
 
 dtext           = ALPHA / DIGIT / %2D                ; A-Z, a-z, 0-9, "-" 
 </artwork></figure>
-<t>A size limitation in a sts-uri, if provided, is interpreted as a
-count of units followed by an OPTIONAL unit size (&quot;k&quot; for kilobytes,
-&quot;m&quot; for megabytes, &quot;g&quot; for gigabytes, &quot;t&quot; for terabytes).  Without a
-unit, the number is presumed to be a basic byte count.  Note that the
-units are considered to be powers of two; a kilobyte is 2^10, a
-megabyte is 2^20, etc.
-</t>
 </section>
 </section>
 
@@ -350,7 +316,7 @@ treating a validation failure as a permanent delivery failure.
 
 <section anchor="policy-updates" title="Policy Updates">
 <t>Updating the policy requires that the owner make changes in two places: the
-<spanx style="verb">_mta_sts</spanx> RR record in the Policy Domain's DNS zone and at the corresponding
+<spanx style="verb">_mta_sts</spanx> TXT record in the Policy Domain's DNS zone and at the corresponding
 HTTPS endpoint. In the case where the HTTPS endpoint has been updated but the
 TXT record has not been, senders will not know there is a new policy released
 and may thus continue to use old, previously cached versions.  Recipients should
@@ -361,112 +327,124 @@ and TXT endpoints are updated and the TXT record's TTL has passed.
 </section>
 
 <section anchor="policy-discovery--authentication" title="Policy Discovery &amp; Authentication">
-<t>Senders discover a recipient domain's STS policy, by making an attempt to fetch
-TXT records from the recipient domain's DNS zone with the name &quot;_mta_sts&quot;. A
-valid TXT record presence in &quot;_mta_sts.example.com&quot; indicates that the recipent
-domain supports STS.  To allow recipient domains to safely serve new policies,
-it is important that senders are able to authenticate a new policy retrieved for
-a recipient domain.
+<t>Senders discover a recipient domain's MTA-STS policy by fetching a TXT record
+from the recipient domain's DNS zone with the name <spanx style="verb">_mta_sts</spanx>. A valid TXT
+record at <spanx style="verb">_mta_sts.example.com</spanx> indicates that the domain <spanx style="verb">example.com</spanx>
+supports MTA-STS.
 </t>
-<t>Web PKI is the mechanism used for policy authentication. In this mechanism, the
-sender fetches a HTTPS resource (policy) from a host at <spanx style="verb">policy.mta-sts</spanx> in the
-Policy Domain. The policy is served from a &quot;well known&quot; URI:
-<spanx style="verb">https://policy.mta-sts.example.com/.well-known/mta-sts/current</spanx>. To consider
-the policy as valid, the <spanx style="verb">policy_id</spanx> field in the policy MUST match the <spanx style="verb">id</spanx>
-field in the DNS TXT record under <spanx style="verb">_mta_sts</spanx>.
+<t>When sending to a recipient domain for which a valid TXT record exists, a
+compliant sender will then fetch via the GET method an HTTPS resource containing
+the policy body from a host at the <spanx style="verb">policy.mta-sts</spanx> subdomain of the policy
+domain, using a &quot;well-known&quot; path of <spanx style="verb">.well-known/mta-sts/current</spanx>. For
+<spanx style="verb">example.com</spanx>, this would be
+<spanx style="verb">https://policy.mta-sts.example.com/.well-known/mta-sts/current</spanx>.
 </t>
-<t>When fetching a new policy or updating a policy, the new policy MUST be
-fully authenticated (HTTPS certificate validation + peer verification) before
-use.  A policy which has not ever been successfully authenticated MUST NOT be
-used to reject mail.
+<t>When fetching a new policy or updating a policy, the HTTPS endpoint MUST present
+a TLS certificate which is valid for the <spanx style="verb">policy.mta-sts</spanx> host (as described in
+<xref target="RFC6125"/>), chain to a root CA that is trusted by the sending CA, and be
+non-expired.
+</t>
+<t>A policy which has not ever been successfully authenticated MUST NOT be used to
+reject mail.
 </t>
 </section>
 
 <section anchor="policy-validation" title="Policy Validation">
 <t>When sending to an MX at a domain for which the sender has a valid and
 non-expired SMTP MTA-STS policy, a sending MTA honoring SMTP MTA-STS MUST
-validate that the recipient MX supports STARTTLS, and offers a valid PKIX based
-TLS certificate. The certificate presented by the receiving MX MUST be valid
-for the MX name and chain to a root CA that is trusted by the sending MTA. The
+validate that the recipient MX matches the <spanx style="verb">mx</spanx> pattern from the recipient
+domain's policy, supports STARTTLS, and offers a valid PKIX based TLS
+certificate. The certificate presented by the receiving MX MUST be valid for the
+MX name and chain to a root CA that is trusted by the sending MTA. The
 certificate MUST have a CN or SAN matching the MX hostname (as described in
 <xref target="RFC6125"/>) and be non-expired.
+</t>
+<t>Note that this section does not dictate the behavior of sending MTAs when
+policies fail to validate; in particular, validation failures of policies which
+specify &quot;report only&quot; mode MUST NOT be interpreted as delivery failures, as
+described in the section <spanx style="emph">Policy</spanx> <spanx style="emph">Application</spanx>.
 </t>
 </section>
 
 <section anchor="policy-application" title="Policy Application">
-<t>When sending to an MX at a domain for which the sender has a valid non-expired
-SMTP MTA-STS policy, a sending MTA honoring SMTP MTA-STS MAY apply the result
-of a policy validation one of two ways:
-</t>
-<t>
-<list style="symbols">
-<t><spanx style="verb">report</spanx>: In this mode, sending MTAs merely send a report to the designated
-report address indicating policy application failures. This can be done
-&quot;offline&quot;, i.e. based on the MTA logs, and is thus a suitable low-risk option
-for MTAs who wish to enhance transparency of TLS tampering without making
-complicated changes to production mail-handling infrastructure.</t>
-<t><spanx style="verb">enforce</spanx>: In this mode, sending MTAs SHOULD treat STS policy failures, in
-which the policy action is &quot;reject&quot;, as a mail delivery error, and SHOULD
-terminate the SMTP connection, not delivering any more mail to the recipient
-MTA.</t>
-</list>
-</t>
-<t>In <spanx style="verb">enforce</spanx> mode, however, sending MTAs MUST first check for a new
-authenticated policy before actually treating a message failure as fatal.
-</t>
-<t>Thus the control flow for a sending MTA that does online policy application
-consists of the following steps:
+<t>When sending to an MX at a domain for which the sender has a valid, non-expired
+STS policy, a sending MTA honoring SMTP MTA-STS applies the result of a policy
+validation one of two ways, depending on the value of the policy <spanx style="verb">mode</spanx> field:
 </t>
 <t>
 <list style="numbers">
-<t>Check for cached non-expired policy. If none exists, fetch the latest,
-authenticate and cache it.</t>
-<t>Validate recipient MTA against policy. If valid, deliver mail.</t>
-<t>If not valid and the policy specifies reporting, generate report.</t>
-<t>If not valid and policy specifies rejection, perform the following
-steps:
-<list style="symbols">
-<t>Check for a new (non-cached) authenticated policy.</t>
-<t>If one exists and the new policy is different, update the current policy and
-go to step 2.</t>
-<t>If one exists and the new policy is same as the cached policy, treat the
-delivery as a failure.</t>
-<t>If none exists and cached policy is not expired, treat the delivery as a
-failure.</t>
-</list></t>
+<t><spanx style="verb">report</spanx>: In this mode, sending MTAs merely send a report (as described in the
+<spanx style="verb">TLSRPT</spanx> specification (TODO: add ref)) indicating policy application
+failures. This can be used for &quot;soft&quot; deployments, to ensure a policy will not
+cause domain-wide mail delivery failures while being adopted or during
+infrastructure changes.</t>
+<t><spanx style="verb">enforce</spanx>: In this mode, sending MTAs SHOULD treat STS policy failures as a
+mail delivery error, and SHOULD not deliver the message to this host. However,
+note that MTAs that honor <spanx style="verb">enforce</spanx> mode MUST first check for the existing of
+an updated, authenticated policy before <spanx style="emph">permanently</spanx> failing deliveries. This
+is to ensure that failures only occur if a sending MTA is in fact validating
+against the most recent version of the recipient domain's policy.</t>
 </list>
 </t>
-<t>Understanding the details of step 4 is critical to understanding the behavior of
-the system as a whole.
+<t>Note that despite the presence of an <spanx style="verb">enforce</spanx> policy, STS-aware sending MTAs
+may in some cases choose to deliver mail to non-validating MXes due to external
+reasons, such as an inability to enforce STS at send-time (i.e., some domains
+may validate STS policies offline and only choose to report failures) or
+concerns about the completeness of their own trusted CA list.
 </t>
-<t>Remember that each policy has an expiration time (which SHOULD be long, on the
-order of days or months) and a validation method. With these two mechanisms and
-the procedure specified in step 4, recipients who publish a policy have, in
-effect, a means of updating a cached policy at arbitrary intervals, without the
-risks (of a man-in-the-middle attack) they would incur if they were to shorten
-the policy expiration time.
+
+<section anchor="mx-preference-in-enforce-mode" title="MX Preference in Enforce Mode">
+<t>When applying a policy specifying <spanx style="verb">enforce</spanx> mode, sending MTAs SHOULD select
+recipient MXs by first eliminating any MXs at lower priority than the current
+host (if in the MX candidate set), then eliminating any non-matching (as
+specified by the STS policy) MX hosts from the candidate MX set, and then
+attempting delivery to matching hosts as indicated by their MX priority, until
+delivery succeeds or the MX candidate set is empty.
 </t>
-</section>
+<t>If none of the attempted MX hosts validate according to the policy, the policy
+MUST be refreshed at least once, as described in <spanx style="emph">Policy</spanx> <spanx style="emph">Discovery</spanx> <spanx style="emph">&amp;</spanx>
+<spanx style="emph">Authentication</spanx>, before a message should be permanently rejected.
+</t>
 </section>
 
-<section anchor="failure-reporting" title="Failure Reporting">
-<t>Aggregate statistics on policy failures MAY be reported using the <spanx style="verb">TLSRPT</spanx>
-reporting specification (TODO: Add Ref).
+<section anchor="policy-application-control-flow" title="Policy Application Control Flow">
+<t>The control flow for a sending MTA consists of the following steps:
 </t>
+<t>
+<list style="numbers">
+<t>Check for a cached, non-expired policy. If none exists and the <spanx style="verb">_mta_sts</spanx> TXT
+record is present for the recipient domain, fetch a new policy, authenticate,
+and cache it.</t>
+<t>Validate candidate MX or MXs against policy. If a valid MX is discovered,
+deliver mail and mark cached policy as &quot;successfully applied.&quot;</t>
+<t>If no valid recipient MX is found, the cached policy mode is <spanx style="verb">reject</spanx>, and
+the cached policy has previously been successfully applied, temporarily fail
+the message.</t>
+<t>Upon message retries, a message MAY be permanently failed following first
+checking for the presence of a new policy (as indicated by the <spanx style="verb">id</spanx> field in
+the <spanx style="verb">_mta_sts</spanx> TXT record).</t>
+</list>
+</t>
+</section>
+</section>
 </section>
 
 <section anchor="iana-considerations" title="IANA Considerations">
-<t>There are no IANA considerations at this time.
+<t>A new .well-known URI will be registered in the Well-Known URIs registry as
+described below:
+</t>
+<t>URI Suffix: mta-sts
+Change Controller: IETF
 </t>
 </section>
 
 <section anchor="security-considerations" title="Security Considerations">
-<t>SMTP Strict Transport Security protects against an active attacker who wishes to
-intercept or tamper with mail between hosts who support STARTTLS. There are two
-classes of attacks considered:
+<t>SMTP Strict Transport Security attempts to protect against an active attacker
+who wishes to intercept or tamper with mail between hosts who support STARTTLS.
+There are two classes of attacks considered:
 </t>
 <t>
-<list style="symbols">
+<list style="numbers">
 <t>Foiling TLS negotiation, for example by deleting the &quot;250 STARTTLS&quot; response
 from a server or altering TLS session negotiation. This would result in the
 SMTP session occurring over plaintext, despite both parties supporting TLS.</t>
@@ -481,7 +459,7 @@ altering BGP routing tables).</t>
 <t>SMTP Strict Transport Security relies on certificate validation via PKIX based TLS
 identity checking <xref target="RFC6125"/>. Attackers who are able to obtain a valid certificate
 for the targeted recipient mail service (e.g. by compromising a certificate authority)
-are thus out of scope of this threat model.
+are thus able to circumvent STS authentication.
 </t>
 <t>Since we use DNS TXT record for policy discovery, an attacker who is able to
 block DNS responses can suppress the discovery of an STS Policy, making the
@@ -558,10 +536,10 @@ processed, in order to:
 </t>
 
 <figure align="center"><artwork align="center">
-_mta_sts  IN TXT ( "v=STSv1; id=randomstr;" )
+_mta_sts  IN TXT ( "v=STSv1; id=20160831085700Z;" )
 </artwork></figure>
 <t>STS policy served from HTTPS endpoint of the policy (recipient) domain, and
-is authenticated using Web PKI mechanism. The policy is fetched using HTTP
+is authenticated using the Web PKI mechanism. The policy is fetched using HTTP
 GET method.
 </t>
 
@@ -569,13 +547,11 @@ GET method.
 {
   "version": "STSv1",
   "mode": "report",
-  "policy_id": "randomstr",
   "mx": ["*.mail.example.com"],
   "max_age": 123456
 }
+
 </artwork></figure>
-<t>The policy is authenticated using Web PKI mechanism.
-</t>
 </section>
 </section>
 
