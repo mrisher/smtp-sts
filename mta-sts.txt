@@ -78,9 +78,9 @@ Table of Contents
      3.2.  Policy Expiration . . . . . . . . . . . . . . . . . . . .   6
        3.2.1.  Policy Updates  . . . . . . . . . . . . . . . . . . .   7
      3.3.  Policy Discovery & Authentication . . . . . . . . . . . .   7
-     3.4.  Policy Validation . . . . . . . . . . . . . . . . . . . .   7
+     3.4.  Policy Validation . . . . . . . . . . . . . . . . . . . .   8
      3.5.  Policy Application  . . . . . . . . . . . . . . . . . . .   8
-       3.5.1.  MX Preference in Enforce Mode . . . . . . . . . . . .   8
+       3.5.1.  MX Preference in Enforce Mode . . . . . . . . . . . .   9
        3.5.2.  Policy Application Control Flow . . . . . . . . . . .   9
    4.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
    5.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
@@ -338,6 +338,10 @@ Margolis, et al.         Expires January 9, 2017                [Page 6]
 Internet-Draft                   MTA-STS                       July 2016
 
 
+   Senders MUST treat a policy with a max_age of 0 as a revocation: they
+   should purge any previously cached policy and proceed to deliver mail
+   to the recipient domain as though it never had an STS policy.
+
 3.2.1.  Policy Updates
 
    Updating the policy requires that the owner make changes in two
@@ -379,13 +383,9 @@ Internet-Draft                   MTA-STS                       July 2016
    or longer per version ID, to avoid overwhelming resource-constrained
    recipients with cascading failures.
 
-3.4.  Policy Validation
 
-   When sending to an MX at a domain for which the sender has a valid
-   and non-expired SMTP MTA-STS policy, a sending MTA honoring SMTP MTA-
-   STS MUST validate that the recipient MX matches the "mx" pattern from
-   the recipient domain's policy, supports STARTTLS, and offers a valid
-   PKIX based TLS certificate.  The certificate presented by the
+
+
 
 
 
@@ -394,6 +394,13 @@ Margolis, et al.         Expires January 9, 2017                [Page 7]
 Internet-Draft                   MTA-STS                       July 2016
 
 
+3.4.  Policy Validation
+
+   When sending to an MX at a domain for which the sender has a valid
+   and non-expired SMTP MTA-STS policy, a sending MTA honoring SMTP MTA-
+   STS MUST validate that the recipient MX matches the "mx" pattern from
+   the recipient domain's policy, supports STARTTLS, and offers a valid
+   PKIX based TLS certificate.  The certificate presented by the
    receiving MX MUST be valid for the MX name and chain to a root CA
    that is trusted by the sending MTA.  The certificate MUST have a CN
    or SAN matching the MX hostname (as described in [RFC6125]) and be
@@ -419,14 +426,13 @@ Internet-Draft                   MTA-STS                       July 2016
        mail delivery failures while being adopted or during
        infrastructure changes.
 
-   2.  "enforce": In this mode, sending MTAs SHOULD treat STS policy
-       failures as a mail delivery error, and SHOULD not deliver the
-       message to this host.  However, note that MTAs that honor
-       "enforce" mode MUST first check for the existing of an updated,
-       authenticated policy before _permanently_ failing deliveries.
-       This is to ensure that failures only occur if a sending MTA is in
-       fact validating against the most recent version of the recipient
-       domain's policy.
+   2.  "enforce": In this mode, sending MTAs treat STS policy failures
+       as a mail delivery error, and MUST NOT deliver the message to
+       this host.  However, note that MTAs that honor "enforce" mode
+       MUST first check for the existing of an updated, authenticated
+       policy before _permanently_ failing messages.  This is to ensure
+       that failures only occur if a sending MTA is in fact validating
+       against the most recent version of the recipient domain's policy.
 
    Note that despite the presence of an "enforce" policy, STS-aware
    sending MTAs may in some cases choose to deliver mail to non-
@@ -435,13 +441,7 @@ Internet-Draft                   MTA-STS                       July 2016
    policies offline and only choose to report failures) or concerns
    about the completeness of their own trusted CA list.
 
-3.5.1.  MX Preference in Enforce Mode
 
-   When applying a policy specifying "enforce" mode, sending MTAs SHOULD
-   select recipient MXs by first eliminating any MXs at lower priority
-   than the current host (if in the MX candidate set), then eliminating
-   any non-matching (as specified by the STS policy) MX hosts from the
-   candidate MX set, and then attempting delivery to matching hosts as
 
 
 
@@ -450,6 +450,13 @@ Margolis, et al.         Expires January 9, 2017                [Page 8]
 Internet-Draft                   MTA-STS                       July 2016
 
 
+3.5.1.  MX Preference in Enforce Mode
+
+   When applying a policy specifying "enforce" mode, sending MTAs SHOULD
+   select recipient MXs by first eliminating any MXs at lower priority
+   than the current host (if in the MX candidate set), then eliminating
+   any non-matching (as specified by the STS policy) MX hosts from the
+   candidate MX set, and then attempting delivery to matching hosts as
    indicated by their MX priority, until delivery succeeds or the MX
    candidate set is empty.
 
@@ -491,13 +498,6 @@ Internet-Draft                   MTA-STS                       July 2016
    attacker who wishes to intercept or tamper with mail between hosts
    who support STARTTLS.  There are two classes of attacks considered:
 
-   1.  Foiling TLS negotiation, for example by deleting the "250
-       STARTTLS" response from a server or altering TLS session
-       negotiation.  This would result in the SMTP session occurring
-       over plaintext, despite both parties supporting TLS.
-
-   2.  Impersonating the destination mail server, whereby the sender
-       might deliver the message to an impostor, who could then monitor
 
 
 
@@ -506,6 +506,13 @@ Margolis, et al.         Expires January 9, 2017                [Page 9]
 Internet-Draft                   MTA-STS                       July 2016
 
 
+   1.  Foiling TLS negotiation, for example by deleting the "250
+       STARTTLS" response from a server or altering TLS session
+       negotiation.  This would result in the SMTP session occurring
+       over plaintext, despite both parties supporting TLS.
+
+   2.  Impersonating the destination mail server, whereby the sender
+       might deliver the message to an impostor, who could then monitor
        and/or modify messages despite opportunistic TLS.  This
        impersonation could be accomplished by spoofing the DNS MX record
        for the recipient domain, or by redirecting client connections
@@ -541,13 +548,6 @@ Internet-Draft                   MTA-STS                       July 2016
    markus.laber (at) 1und1 (dot de)
 
 7.  Appendix 1: Validation Pseudocode
-
-
-
-
-
-
-
 
 
 

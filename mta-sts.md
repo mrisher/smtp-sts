@@ -242,6 +242,10 @@ policy forbids), domains can, at any time, publish an updated policy. As
 described in _Policy_ _Application_, senders MUST fetch a new policy before
 treating a validation failure as a permanent delivery failure. 
 
+Senders MUST treat a policy with a max_age of 0 as a revocation: they should
+purge any previously cached policy and proceed to deliver mail to the recipient
+domain as though it never had an STS policy.
+
 ### Policy Updates
 
 Updating the policy requires that the owner make changes in two places: the
@@ -308,11 +312,11 @@ validation one of two ways, depending on the value of the policy `mode` field:
    cause domain-wide mail delivery failures while being adopted or during
    infrastructure changes.
 
-2. `enforce`: In this mode, sending MTAs SHOULD treat STS policy failures as a
-   mail delivery error, and SHOULD not deliver the message to this host. However,
-   note that MTAs that honor `enforce` mode MUST first check for the existing of
-   an updated, authenticated policy before *permanently* failing deliveries. This
-   is to ensure that failures only occur if a sending MTA is in fact validating
+2. `enforce`: In this mode, sending MTAs treat STS policy failures as a mail
+   delivery error, and MUST NOT deliver the message to this host. However, note
+   that MTAs that honor `enforce` mode MUST first check for the existing of an
+   updated, authenticated policy before *permanently* failing messages. This is
+   to ensure that failures only occur if a sending MTA is in fact validating
    against the most recent version of the recipient domain's policy.
 
 Note that despite the presence of an `enforce` policy, STS-aware sending MTAs
