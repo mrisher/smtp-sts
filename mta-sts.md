@@ -262,8 +262,8 @@ supports MTA-STS.
 When sending to a recipient domain for which a valid TXT record exists, a
 compliant sender will then fetch via the GET method an HTTPS resource containing
 the policy body from a host at the `policy.mta-sts` subdomain of the policy
-domain, using a "well-known" path of `.well-known/mta-sts/current`. For
-`example.com`, this would be
+domain, using an [@!RFC5785] "well-known" path of `.well-known/mta-sts/current`.
+For `example.com`, this would be
 `https://policy.mta-sts.example.com/.well-known/mta-sts/current`.
 
 When fetching a new policy or updating a policy, the HTTPS endpoint MUST present

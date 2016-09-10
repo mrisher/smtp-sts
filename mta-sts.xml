@@ -335,8 +335,8 @@ supports MTA-STS.
 <t>When sending to a recipient domain for which a valid TXT record exists, a
 compliant sender will then fetch via the GET method an HTTPS resource containing
 the policy body from a host at the <spanx style="verb">policy.mta-sts</spanx> subdomain of the policy
-domain, using a &quot;well-known&quot; path of <spanx style="verb">.well-known/mta-sts/current</spanx>. For
-<spanx style="verb">example.com</spanx>, this would be
+domain, using an <xref target="RFC5785"/> &quot;well-known&quot; path of <spanx style="verb">.well-known/mta-sts/current</spanx>.
+For <spanx style="verb">example.com</spanx>, this would be
 <spanx style="verb">https://policy.mta-sts.example.com/.well-known/mta-sts/current</spanx>.
 </t>
 <t>When fetching a new policy or updating a policy, the HTTPS endpoint MUST present
@@ -563,6 +563,7 @@ GET method.
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4033.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4627.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5234.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5785.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6125.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7672.xml"?>
 </references>

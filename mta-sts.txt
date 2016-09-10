@@ -359,9 +359,10 @@ Internet-Draft                   MTA-STS                       July 2016
    When sending to a recipient domain for which a valid TXT record
    exists, a compliant sender will then fetch via the GET method an
    HTTPS resource containing the policy body from a host at the "policy
-   .mta-sts" subdomain of the policy domain, using a "well-known" path
-   of ".well-known/mta-sts/current".  For "example.com", this would be
-   "https://policy.mta-sts.example.com/.well-known/mta-sts/current".
+   .mta-sts" subdomain of the policy domain, using an [RFC5785] "well-
+   known" path of ".well-known/mta-sts/current".  For "example.com",
+   this would be "https://policy.mta-sts.example.com/.well-known/mta-
+   sts/current".
 
    When fetching a new policy or updating a policy, the HTTPS endpoint
    MUST present a TLS certificate which is valid for the "policy.mta-
@@ -385,7 +386,6 @@ Internet-Draft                   MTA-STS                       July 2016
 
    Note that this section does not dictate the behavior of sending MTAs
    when policies fail to validate; in particular, validation failures of
-   policies which specify "report only" mode MUST NOT be interpreted as
 
 
 
@@ -394,6 +394,7 @@ Margolis, et al.         Expires January 9, 2017                [Page 7]
 Internet-Draft                   MTA-STS                       July 2016
 
 
+   policies which specify "report only" mode MUST NOT be interpreted as
    delivery failures, as described in the section _Policy_
    _Application_.
 
@@ -441,7 +442,6 @@ Internet-Draft                   MTA-STS                       July 2016
    the policy MUST be refreshed at least once, as described in _Policy_
    _Discovery_ _&_ _Authentication_, before a message should be
    permanently rejected.
-
 
 
 
@@ -628,6 +628,11 @@ Internet-Draft                   MTA-STS                       July 2016
               RFC5234, January 2008,
               <http://www.rfc-editor.org/info/rfc5234>.
 
+   [RFC5785]  Nottingham, M. and E. Hammer-Lahav, "Defining Well-Known
+              Uniform Resource Identifiers (URIs)", RFC 5785, DOI 10
+              .17487/RFC5785, April 2010,
+              <http://www.rfc-editor.org/info/rfc5785>.
+
    [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
               Verification of Domain-Based Application Service Identity
               within Internet Public Key Infrastructure Using X.509
@@ -661,11 +666,6 @@ Authors' Addresses
    Email: rbinu (at) yahoo-inc (dot com)
 
 
-   Alexander Brotman
-   Comcast, Inc
-
-   Email: alexander_brotman (at) cable.comcast (dot com)
-
 
 
 
@@ -674,16 +674,16 @@ Margolis, et al.         Expires January 9, 2017               [Page 12]
 Internet-Draft                   MTA-STS                       July 2016
 
 
+   Alexander Brotman
+   Comcast, Inc
+
+   Email: alexander_brotman (at) cable.comcast (dot com)
+
+
    Janet Jones
    Microsoft, Inc
 
    Email: janet.jones (at) microsoft (dot com)
-
-
-
-
-
-
 
 
 
