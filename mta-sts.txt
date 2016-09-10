@@ -88,8 +88,8 @@ Table of Contents
    7.  Appendix 1: Validation Pseudocode . . . . . . . . . . . . . .  10
    8.  Appendix 2: Domain Owner STS example record . . . . . . . . .  11
      8.1.  Example 1 . . . . . . . . . . . . . . . . . . . . . . . .  11
-   9.  Normative References  . . . . . . . . . . . . . . . . . . . .  11
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  12
+   9.  Normative References  . . . . . . . . . . . . . . . . . . . .  12
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  13
 
 1.  Introduction
 
@@ -372,6 +372,13 @@ Internet-Draft                   MTA-STS                       July 2016
    A policy which has not ever been successfully authenticated MUST NOT
    be used to reject mail.
 
+   Senders may wish to rate-limit the frequency of attempts to fetch the
+   HTTPS endpoint even if a valid TXT record for the recipient domain
+   exists.  In the case that the HTTPS GET fails, we suggest
+   implementions may limit further attempts to a period of five minutes
+   or longer per version ID, to avoid overwhelming resource-constrained
+   recipients with cascading failures.
+
 3.4.  Policy Validation
 
    When sending to an MX at a domain for which the sender has a valid
@@ -379,13 +386,6 @@ Internet-Draft                   MTA-STS                       July 2016
    STS MUST validate that the recipient MX matches the "mx" pattern from
    the recipient domain's policy, supports STARTTLS, and offers a valid
    PKIX based TLS certificate.  The certificate presented by the
-   receiving MX MUST be valid for the MX name and chain to a root CA
-   that is trusted by the sending MTA.  The certificate MUST have a CN
-   or SAN matching the MX hostname (as described in [RFC6125]) and be
-   non-expired.
-
-   Note that this section does not dictate the behavior of sending MTAs
-   when policies fail to validate; in particular, validation failures of
 
 
 
@@ -394,6 +394,13 @@ Margolis, et al.         Expires January 9, 2017                [Page 7]
 Internet-Draft                   MTA-STS                       July 2016
 
 
+   receiving MX MUST be valid for the MX name and chain to a root CA
+   that is trusted by the sending MTA.  The certificate MUST have a CN
+   or SAN matching the MX hostname (as described in [RFC6125]) and be
+   non-expired.
+
+   Note that this section does not dictate the behavior of sending MTAs
+   when policies fail to validate; in particular, validation failures of
    policies which specify "report only" mode MUST NOT be interpreted as
    delivery failures, as described in the section _Policy_
    _Application_.
@@ -435,13 +442,6 @@ Internet-Draft                   MTA-STS                       July 2016
    than the current host (if in the MX candidate set), then eliminating
    any non-matching (as specified by the STS policy) MX hosts from the
    candidate MX set, and then attempting delivery to matching hosts as
-   indicated by their MX priority, until delivery succeeds or the MX
-   candidate set is empty.
-
-   If none of the attempted MX hosts validate according to the policy,
-   the policy MUST be refreshed at least once, as described in _Policy_
-   _Discovery_ _&_ _Authentication_, before a message should be
-   permanently rejected.
 
 
 
@@ -449,6 +449,14 @@ Margolis, et al.         Expires January 9, 2017                [Page 8]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+   indicated by their MX priority, until delivery succeeds or the MX
+   candidate set is empty.
+
+   If none of the attempted MX hosts validate according to the policy,
+   the policy MUST be refreshed at least once, as described in _Policy_
+   _Discovery_ _&_ _Authentication_, before a message should be
+   permanently rejected.
 
 3.5.2.  Policy Application Control Flow
 
@@ -490,14 +498,6 @@ Internet-Draft                   MTA-STS                       July 2016
 
    2.  Impersonating the destination mail server, whereby the sender
        might deliver the message to an impostor, who could then monitor
-       and/or modify messages despite opportunistic TLS.  This
-       impersonation could be accomplished by spoofing the DNS MX record
-       for the recipient domain, or by redirecting client connections
-       intended for the legitimate recipient server (for example, by
-       altering BGP routing tables).
-
-   SMTP Strict Transport Security relies on certificate validation via
-   PKIX based TLS identity checking [RFC6125].  Attackers who are able
 
 
 
@@ -506,6 +506,14 @@ Margolis, et al.         Expires January 9, 2017                [Page 9]
 Internet-Draft                   MTA-STS                       July 2016
 
 
+       and/or modify messages despite opportunistic TLS.  This
+       impersonation could be accomplished by spoofing the DNS MX record
+       for the recipient domain, or by redirecting client connections
+       intended for the legitimate recipient server (for example, by
+       altering BGP routing tables).
+
+   SMTP Strict Transport Security relies on certificate validation via
+   PKIX based TLS identity checking [RFC6125].  Attackers who are able
    to obtain a valid certificate for the targeted recipient mail service
    (e.g. by compromising a certificate authority) are thus able to
    circumvent STS authentication.
@@ -534,6 +542,26 @@ Internet-Draft                   MTA-STS                       July 2016
 
 7.  Appendix 1: Validation Pseudocode
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 10]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
 policy = policy_from_cache()
 if not policy or is_expired(policy):
   policy = policy_from_https_endpoint()  // fetch and authenticate!
@@ -550,17 +578,6 @@ if policy:
         update_cache = false
   if update_cache:
     cache(policy)
-
-
-
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 10]
-
-Internet-Draft                   MTA-STS                       July 2016
-
 
 8.  Appendix 2: Domain Owner STS example record
 
@@ -594,6 +611,13 @@ Internet-Draft                   MTA-STS                       July 2016
                       }
 
 
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 11]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
 9.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
@@ -609,14 +633,6 @@ Internet-Draft                   MTA-STS                       July 2016
               Rose, "DNS Security Introduction and Requirements", RFC
               4033, DOI 10.17487/RFC4033, March 2005,
               <http://www.rfc-editor.org/info/rfc4033>.
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 11]
-
-Internet-Draft                   MTA-STS                       July 2016
-
 
    [RFC4627]  Crockford, D., "The application/json Media Type for
               JavaScript Object Notation (JSON)", RFC 4627, DOI 10
@@ -646,6 +662,18 @@ Internet-Draft                   MTA-STS                       July 2016
               .17487/RFC7672, October 2015,
               <http://www.rfc-editor.org/info/rfc7672>.
 
+
+
+
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 12]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
 Authors' Addresses
 
    Daniel Margolis
@@ -666,14 +694,6 @@ Authors' Addresses
    Email: rbinu (at) yahoo-inc (dot com)
 
 
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 12]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
    Alexander Brotman
    Comcast, Inc
 
@@ -684,26 +704,6 @@ Internet-Draft                   MTA-STS                       July 2016
    Microsoft, Inc
 
    Email: janet.jones (at) microsoft (dot com)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

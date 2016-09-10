@@ -274,6 +274,12 @@ non-expired.
 A policy which has not ever been successfully authenticated MUST NOT be used to
 reject mail.
 
+Senders may wish to rate-limit the frequency of attempts to fetch the HTTPS
+endpoint even if a valid TXT record for the recipient domain exists. In the case
+that the HTTPS GET fails, we suggest implementions may limit further attempts to
+a period of five minutes or longer per version ID, to avoid overwhelming
+resource-constrained recipients with cascading failures.
+
 ## Policy Validation
 
 When sending to an MX at a domain for which the sender has a valid and
