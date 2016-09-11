@@ -147,10 +147,11 @@ US-ASCII.
 * `mx`: MX patterns (list of plain-text MX match patterns, required). One or
   more comma-separated patterns matching the expected MX for this domain. For
   example, `["*.example.com", "*.example.net"]` indicates that mail for this
-  domain might be handled by any MX whose hostname is a subdomain of
-  "example.com" or "example.net". The semantics for these patterns should be the
-  ones found in the "Checking of Wildcard Certificates" rules in Section 6.4.3
-  of [@!RFC6125]. 
+  domain might be handled by any MX with a hostname at `example.com` or
+  `example.net`, though _not_ hosts at subdomains. For example,
+  `mx1.example.com` and `mx2.example.net` are both valid matches, but not
+  `1234.dhcp.example.com`. The semantics for these patterns are those found in
+  Section 3.1 of [@!RFC2818].
 * `max_age`: Max lifetime of the policy (plain-text positive integer seconds).
   Well-behaved clients SHOULD cache a policy for up to this value from last
   policy fetch time.

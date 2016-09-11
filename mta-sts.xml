@@ -213,10 +213,11 @@ by the <spanx style="verb">rua</spanx> parameter.</t>
 <t><spanx style="verb">mx</spanx>: MX patterns (list of plain-text MX match patterns, required). One or
 more comma-separated patterns matching the expected MX for this domain. For
 example, <spanx style="verb">["*.example.com", "*.example.net"]</spanx> indicates that mail for this
-domain might be handled by any MX whose hostname is a subdomain of
-&quot;example.com&quot; or &quot;example.net&quot;. The semantics for these patterns should be the
-ones found in the &quot;Checking of Wildcard Certificates&quot; rules in Section 6.4.3
-of <xref target="RFC6125"/>.</t>
+domain might be handled by any MX with a hostname at <spanx style="verb">example.com</spanx> or
+<spanx style="verb">example.net</spanx>, though <spanx style="emph">not</spanx> hosts at subdomains. For example,
+<spanx style="verb">mx1.example.com</spanx> and <spanx style="verb">mx2.example.net</spanx> are both valid matches, but not
+<spanx style="verb">1234.dhcp.example.com</spanx>. The semantics for these patterns are those found in
+Section 3.1 of <xref target="RFC2818"/>.</t>
 <t><spanx style="verb">max_age</spanx>: Max lifetime of the policy (plain-text positive integer seconds).
 Well-behaved clients SHOULD cache a policy for up to this value from last
 policy fetch time.</t>
@@ -618,6 +619,7 @@ GET method.
 <back>
 <references title="Normative References">
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2818.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4033.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4627.xml"?>
