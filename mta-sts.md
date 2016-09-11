@@ -134,7 +134,8 @@ US-ASCII.
 * `id`: (plain-text, required). A short string used to track policy updates.
   This string MUST uniquely identify a given instance of a policy, such that 
   senders can determine when the policy has been updated by comparing to the `id`
-  of a previously seen policy.
+  of a previously seen policy. There is no implied ordering of `id` fields
+  between revisions.
 
 **Policies MUST specify the following fields in JSON** [@!RFC4627] **format:**
 

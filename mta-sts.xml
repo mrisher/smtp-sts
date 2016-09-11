@@ -197,7 +197,8 @@ US-ASCII.
 <t><spanx style="verb">id</spanx>: (plain-text, required). A short string used to track policy updates.
 This string MUST uniquely identify a given instance of a policy, such that
 senders can determine when the policy has been updated by comparing to the <spanx style="verb">id</spanx>
-of a previously seen policy.</t>
+of a previously seen policy. There is no implied ordering of <spanx style="verb">id</spanx> fields
+between revisions.</t>
 </list>
 </t>
 <t><spanx style="strong">Policies MUST specify the following fields in JSON</spanx> <xref target="RFC4627"/> <spanx style="strong">format:</spanx>
