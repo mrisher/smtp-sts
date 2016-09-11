@@ -338,13 +338,13 @@ supports MTA-STS.
 </t>
 <t>When sending to a recipient domain for which a valid TXT record exists, a
 compliant sender will then fetch via the GET method an HTTPS resource containing
-the policy body from a host at the <spanx style="verb">policy.mta-sts</spanx> subdomain of the policy
-domain, using an <xref target="RFC5785"/> &quot;well-known&quot; path of <spanx style="verb">.well-known/mta-sts/current</spanx>.
-For <spanx style="verb">example.com</spanx>, this would be
-<spanx style="verb">https://policy.mta-sts.example.com/.well-known/mta-sts/current</spanx>.
+the policy body from a host at the <spanx style="verb">mta-sts</spanx> host of the policy domain, using an
+<xref target="RFC5785"/> &quot;well-known&quot; path of <spanx style="verb">.well-known/mta-sts/current</spanx>.  For
+<spanx style="verb">example.com</spanx>, this would be
+<spanx style="verb">https://mta-sts.example.com/.well-known/mta-sts/current</spanx>.
 </t>
 <t>When fetching a new policy or updating a policy, the HTTPS endpoint MUST present
-a TLS certificate which is valid for the <spanx style="verb">policy.mta-sts</spanx> host (as described in
+a TLS certificate which is valid for the <spanx style="verb">mta-sts</spanx> host (as described in
 <xref target="RFC6125"/>), chain to a root CA that is trusted by the sending CA, and be
 non-expired.
 </t>
