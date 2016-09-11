@@ -90,7 +90,9 @@ Table of Contents
    6.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  11
    7.  Appendix 1: Domain Owner STS example record . . . . . . . . .  12
      7.1.  Example 1 . . . . . . . . . . . . . . . . . . . . . . . .  12
-   8.  Normative References  . . . . . . . . . . . . . . . . . . . .  12
+   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  12
+     8.1.  Normative References  . . . . . . . . . . . . . . . . . .  12
+     8.2.  URIs  . . . . . . . . . . . . . . . . . . . . . . . . . .  13
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  13
 
 1.  Introduction
@@ -103,8 +105,6 @@ Table of Contents
    barrier against passive man-in-the-middle traffic interception, any
    attacker who can delete parts of the SMTP session (such as the "250
    STARTTLS" response) or who can redirect the entire SMTP session
-   (perhaps by overwriting the resolved MX record of the delivery
-   domain) can perform downgrade or interception attacks.
 
 
 
@@ -113,6 +113,9 @@ Margolis, et al.         Expires January 9, 2017                [Page 2]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+   (perhaps by overwriting the resolved MX record of the delivery
+   domain) can perform downgrade or interception attacks.
 
    This document defines a mechanism for recipient domains to publish
    policies specifying:
@@ -159,9 +162,6 @@ Internet-Draft                   MTA-STS                       July 2016
    The DANE TLSA record [RFC7672] is similar, in that DANE is also
    designed to upgrade opportunistic, unauthenticated encryption into
    required, authenticated encryption.  DANE requires DNSSEC [RFC4033]
-   for authentication; the mechanism described here instead relies on
-   certificate authorities (CAs) and does not require DNSSEC.
-
 
 
 
@@ -169,6 +169,9 @@ Margolis, et al.         Expires January 9, 2017                [Page 3]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+   for authentication; the mechanism described here instead relies on
+   certificate authorities (CAs) and does not require DNSSEC.
 
 2.1.  Differences from DANE
 
@@ -215,9 +218,6 @@ Internet-Draft                   MTA-STS                       July 2016
       "*.example.net"]" indicates that mail for this domain might be
       handled by any MX with a hostname at "example.com" or
       "example.net", though _not_ hosts at subdomains.  For example,
-      "mx1.example.com" and "mx2.example.net" are both valid matches,
-      but not "1234.dhcp.example.com".  The semantics for these patterns
-
 
 
 
@@ -226,6 +226,8 @@ Margolis, et al.         Expires January 9, 2017                [Page 4]
 Internet-Draft                   MTA-STS                       July 2016
 
 
+      "mx1.example.com" and "mx2.example.net" are both valid matches,
+      but not "1234.dhcp.example.com".  The semantics for these patterns
       are those found in the "Checking of Wildcard Certificates" rules
       in Section 6.4.3 of [RFC6125].
 
@@ -269,8 +271,6 @@ Internet-Draft                   MTA-STS                       July 2016
 
    The formal definition of the SMTP MTA-STS policy, using [RFC5234], is
    as follows:
-
-
 
 
 
@@ -622,35 +622,29 @@ Internet-Draft                   MTA-STS                       July 2016
 
 7.1.  Example 1
 
-   The owner of example.com wishes to begin using STS with a policy that
-   will solicit aggregate feedback from receivers without affecting how
-   the messages are processed, in order to:
+   The owner of "example.com" wishes to begin using STS with a policy
+   that will solicit reports from receivers without affecting how the
+   messages are processed, in order to verify the identity of MXs that
+   handle mail for "example.com", confirm that TLS is correctly used,
+   and ensure that certificates presented by the recipient MX validate.
 
-   o  Verify the identity of MXs that handle mail for this domain
-
-   o  Confirm that its legitimate messages are sent over TLS
-
-   o  Verify the validity of the certificates
-
-   o  Determine how many messages would be affected by a strict policy
-
-   DNS STS policy indicator TXT record:
+   STS policy indicator TXT RR:
 
             _mta_sts  IN TXT ( "v=STSv1; id=20160831085700Z;" )
 
-   STS policy served from HTTPS endpoint of the policy (recipient)
-   domain, and is authenticated using the Web PKI mechanism.  The policy
-   is fetched using HTTP GET method.
+   STS Policy JSON served as the response body at [1]
 
-                      {
-                        "version": "STSv1",
-                        "mode": "report",
-                        "mx": ["*.mail.example.com"],
-                        "max_age": 123456
-                      }
+              {
+                "version": "STSv1",
+                "mode": "report",
+                "mx": ["mx1.example.com", "mx2.example.com"],
+                "max_age": 123456
+              }
 
 
-8.  Normative References
+8.  References
+
+8.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
@@ -665,6 +659,12 @@ Internet-Draft                   MTA-STS                       July 2016
               Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
               February 2002, <http://www.rfc-editor.org/info/rfc3207>.
 
+   [RFC4033]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+              Rose, "DNS Security Introduction and Requirements", RFC
+              4033, DOI 10.17487/RFC4033, March 2005,
+              <http://www.rfc-editor.org/info/rfc4033>.
+
+
 
 
 
@@ -673,11 +673,6 @@ Margolis, et al.         Expires January 9, 2017               [Page 12]
 
 Internet-Draft                   MTA-STS                       July 2016
 
-
-   [RFC4033]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
-              Rose, "DNS Security Introduction and Requirements", RFC
-              4033, DOI 10.17487/RFC4033, March 2005,
-              <http://www.rfc-editor.org/info/rfc4033>.
 
    [RFC4627]  Crockford, D., "The application/json Media Type for
               JavaScript Object Notation (JSON)", RFC 4627, DOI 10
@@ -707,6 +702,10 @@ Internet-Draft                   MTA-STS                       July 2016
               .17487/RFC7672, October 2015,
               <http://www.rfc-editor.org/info/rfc7672>.
 
+8.2.  URIs
+
+   [1] https://mta-sts.example.com/.well-known/mta-sts.json:
+
 Authors' Addresses
 
    Daniel Margolis
@@ -719,6 +718,7 @@ Authors' Addresses
    Google, Inc
 
    Email: risher (at) google (dot com)
+
 
 
 

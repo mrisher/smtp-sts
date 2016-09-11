@@ -475,32 +475,24 @@ markus.laber (at) 1und1 (dot de)
 
 ## Example 1
 
-The owner of example.com wishes to begin using STS with a policy that will
-solicit aggregate feedback from receivers without affecting how the messages are
-processed, in order to:
+The owner of `example.com` wishes to begin using STS with a policy that will
+solicit reports from receivers without affecting how the messages are
+processed, in order to verify the identity of MXs that handle mail for
+`example.com`, confirm that TLS is correctly used, and ensure that certificates
+presented by the recipient MX validate.
 
-* Verify the identity of MXs that handle mail for this domain
-
-* Confirm that its legitimate messages are sent over TLS
-
-* Verify the validity of the certificates
-
-* Determine how many messages would be affected by a strict policy
-
-DNS STS policy indicator TXT record:
+STS policy indicator TXT RR:
 ~~~~~~~~~
 _mta_sts  IN TXT ( "v=STSv1; id=20160831085700Z;" )
 ~~~~~~~~~
 
-STS policy served from HTTPS endpoint of the policy (recipient) domain, and
-is authenticated using the Web PKI mechanism. The policy is fetched using HTTP
-GET method.
-
+STS Policy JSON served as the response body at
+https://mta-sts.example.com/.well-known/mta-sts.json:
 ~~~~~~~~~
 {
   "version": "STSv1",
   "mode": "report",
-  "mx": ["*.mail.example.com"],
+  "mx": ["mx1.example.com", "mx2.example.com"],
   "max_age": 123456
 }
 
