@@ -150,10 +150,9 @@ they appear in this document, are to be interpreted as described in <xref target
 </t>
 <t>
 <list style="symbols">
-<t>STS Policy: A definition of the expected TLS availability and behavior, as
-well as the desired actions for a given domain when a sending MTA encounters
-different results.</t>
-<t>Policy Domain: The domain against which an STS Policy is defined. (For
+<t>STS Policy: A committment by the Policy Domain to support PKIX authenticated
+TLS for the specified MX hosts.</t>
+<t>Policy Domain: The domain for which an STS Policy is defined. (For
 example, when sending mail to &quot;alice@example.com&quot;, the policy domain is
 &quot;example.com&quot;.)</t>
 <t>Policy Authentication: Authentication of the STS policy retrieved for a recipient

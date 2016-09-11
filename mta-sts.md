@@ -94,10 +94,9 @@ they appear in this document, are to be interpreted as described in [@!RFC2119].
 
 We also define the following terms for further use in this document:
 
-* STS Policy: A definition of the expected TLS availability and behavior, as
-  well as the desired actions for a given domain when a sending MTA encounters
-  different results.
-* Policy Domain: The domain against which an STS Policy is defined. (For
+* STS Policy: A committment by the Policy Domain to support PKIX authenticated
+  TLS for the specified MX hosts.
+* Policy Domain: The domain for which an STS Policy is defined. (For
   example, when sending mail to "alice@example.com", the policy domain is
   "example.com".)
 * Policy Authentication: Authentication of the STS policy retrieved for a recipient
