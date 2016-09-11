@@ -574,14 +574,14 @@ markus.laber (at) 1und1 (dot de)
   boolean was_successfully_applied
   string version_id
 }
-~~~~~~~~
-
-Delivery to a given domain looks like
-
 </artwork></figure>
-<t>function attempt_policy(policy) {
+<t>Delivery to a given domain looks like
+</t>
+
+<figure align="center"><artwork align="center">
+function attempt_policy(policy) {
   for each MX in MX candidates {
-    if MX matches policy &quot;mx&quot; list {
+    if MX matches policy "mx" list {
       connect to MX
       if MX certificate is valid {
         deliver to MX
@@ -591,68 +591,66 @@ Delivery to a given domain looks like
   }
   return False
 }
-</t>
-<t>if unexpired policies exists in cache {
+
+if unexpired policies exists in cache {
   for policy in unexpired policies {
     if attempt_policy(policy) {
-      set policy &quot;was_successfully_applied&quot; to True
+      set policy "was_successfully_applied" to True
       remove any older policies from cache
       return
     }
   }
-  if any unexpired policies &quot;was_successfully_applied&quot; and mode is &quot;enforce&quot; {
+  if any unexpired policies "was_successfully_applied" and mode is "enforce" {
     temp fail message
   }
 }
-</t>
-<t>if TXT record exists for recipient domain and
+
+if TXT record exists for recipient domain and
    (domain not in cache or
     cached policy version_id != TXT version_id) {
   attempt to fetch new policy via HTTPS
-  set policy &quot;was_successfully_applied&quot; to False
+  set policy "was_successfully_applied" to False
   prepend policy to cached list of policies for recipient domain
 }
-</t>
+</artwork></figure>
+</section>
 
-<figure align="center"><artwork align="center">
+<section anchor="appendix-2-domain-owner-sts-example-record" title="Appendix 2: Domain Owner STS example record">
 
-# Appendix 2: Domain Owner STS example record
-
-## Example 1
-
-The owner of example.com wishes to begin using STS with a policy that will
+<section anchor="example-1" title="Example 1">
+<t>The owner of example.com wishes to begin using STS with a policy that will
 solicit aggregate feedback from receivers without affecting how the messages are
 processed, in order to:
-
-* Verify the identity of MXs that handle mail for this domain
-
-* Confirm that its legitimate messages are sent over TLS
-
-* Verify the validity of the certificates
-
-* Determine how many messages would be affected by a strict policy
-
-DNS STS policy indicator TXT record:
-</artwork></figure>
-<t>_mta_sts  IN TXT ( &quot;v=STSv1; id=20160831085700Z;&quot; )
+</t>
+<t>
+<list style="symbols">
+<t>Verify the identity of MXs that handle mail for this domain</t>
+<t>Confirm that its legitimate messages are sent over TLS</t>
+<t>Verify the validity of the certificates</t>
+<t>Determine how many messages would be affected by a strict policy</t>
+</list>
+</t>
+<t>DNS STS policy indicator TXT record:
 </t>
 
 <figure align="center"><artwork align="center">
-
-STS policy served from HTTPS endpoint of the policy (recipient) domain, and
+_mta_sts  IN TXT ( "v=STSv1; id=20160831085700Z;" )
+</artwork></figure>
+<t>STS policy served from HTTPS endpoint of the policy (recipient) domain, and
 is authenticated using the Web PKI mechanism. The policy is fetched using HTTP
 GET method.
+</t>
+
+<figure align="center"><artwork align="center">
+{
+  "version": "STSv1",
+  "mode": "report",
+  "mx": ["*.mail.example.com"],
+  "max_age": 123456
+}
 
 </artwork></figure>
-<t>{
-  &quot;version&quot;: &quot;STSv1&quot;,
-  &quot;mode&quot;: &quot;report&quot;,
-  &quot;mx&quot;: [&quot;*.mail.example.com&quot;],
-  &quot;max_age&quot;: 123456
-}
-</t>
-<t>~~~~~~~~~
-</t>
+</section>
 </section>
 
 </middle>

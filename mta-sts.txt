@@ -89,7 +89,9 @@ Table of Contents
    5.  Security Considerations . . . . . . . . . . . . . . . . . . .  10
    6.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  11
    7.  Appendix 1: Delivery Pseudocode . . . . . . . . . . . . . . .  12
-   8.  Normative References  . . . . . . . . . . . . . . . . . . . .  13
+   8.  Appendix 2: Domain Owner STS example record . . . . . . . . .  13
+     8.1.  Example 1 . . . . . . . . . . . . . . . . . . . . . . . .  13
+   9.  Normative References  . . . . . . . . . . . . . . . . . . . .  13
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  14
 
 1.  Introduction
@@ -104,8 +106,6 @@ Table of Contents
    STARTTLS" response) or who can redirect the entire SMTP session
    (perhaps by overwriting the resolved MX record of the delivery
    domain) can perform downgrade or interception attacks.
-
-
 
 
 
@@ -622,49 +622,49 @@ Internet-Draft                   MTA-STS                       July 2016
 
    Assume a persistent per-recipient-domain cache of an ordered list of
 
-                   {
-                     STSPolicy policy
-                     boolean was_successfully_applied
-                     string version_id
-                   }
-                   ~~~~~~~~
+                    {
+                      STSPolicy policy
+                      boolean was_successfully_applied
+                      string version_id
+                    }
 
-                   Delivery to a given domain looks like
+   Delivery to a given domain looks like
+
+function attempt_policy(policy) {
+  for each MX in MX candidates {
+    if MX matches policy "mx" list {
+      connect to MX
+      if MX certificate is valid {
+        deliver to MX
+        return True
+      }
+    }
+  }
+  return False
+}
+
+if unexpired policies exists in cache {
+  for policy in unexpired policies {
+    if attempt_policy(policy) {
+      set policy "was_successfully_applied" to True
+      remove any older policies from cache
+      return
+    }
+  }
+  if any unexpired policies "was_successfully_applied" and mode is "enforce" {
+    temp fail message
+  }
+}
+
+if TXT record exists for recipient domain and
+   (domain not in cache or
+    cached policy version_id != TXT version_id) {
+  attempt to fetch new policy via HTTPS
+  set policy "was_successfully_applied" to False
+  prepend policy to cached list of policies for recipient domain
+}
 
 
-   function attempt_policy(policy) { for each MX in MX candidates { if
-   MX matches policy "mx" list { connect to MX if MX certificate is
-   valid { deliver to MX return True } } } return False }
-
-   if unexpired policies exists in cache { for policy in unexpired
-   policies { if attempt_policy(policy) { set policy
-   "was_successfully_applied" to True remove any older policies from
-   cache return } } if any unexpired policies "was_successfully_applied"
-   and mode is "enforce" { temp fail message } }
-
-   if TXT record exists for recipient domain and (domain not in cache or
-   cached policy version_id != TXT version_id) { attempt to fetch new
-   policy via HTTPS set policy "was_successfully_applied" to False
-   prepend policy to cached list of policies for recipient domain }
-
-
-# Appendix 2: Domain Owner STS example record
-
-## Example 1
-
-The owner of example.com wishes to begin using STS with a policy that will
-solicit aggregate feedback from receivers without affecting how the messages are
-processed, in order to:
-
-* Verify the identity of MXs that handle mail for this domain
-
-* Confirm that its legitimate messages are sent over TLS
-
-* Verify the validity of the certificates
-
-* Determine how many messages would be affected by a strict policy
-
-DNS STS policy indicator TXT record:
 
 
 
@@ -674,20 +674,39 @@ Margolis, et al.         Expires January 9, 2017               [Page 12]
 Internet-Draft                   MTA-STS                       July 2016
 
 
-   _mta_sts IN TXT ( "v=STSv1; id=20160831085700Z;" )
+8.  Appendix 2: Domain Owner STS example record
+
+8.1.  Example 1
+
+   The owner of example.com wishes to begin using STS with a policy that
+   will solicit aggregate feedback from receivers without affecting how
+   the messages are processed, in order to:
+
+   o  Verify the identity of MXs that handle mail for this domain
+
+   o  Confirm that its legitimate messages are sent over TLS
+
+   o  Verify the validity of the certificates
+
+   o  Determine how many messages would be affected by a strict policy
+
+   DNS STS policy indicator TXT record:
+
+            _mta_sts  IN TXT ( "v=STSv1; id=20160831085700Z;" )
+
+   STS policy served from HTTPS endpoint of the policy (recipient)
+   domain, and is authenticated using the Web PKI mechanism.  The policy
+   is fetched using HTTP GET method.
+
+                      {
+                        "version": "STSv1",
+                        "mode": "report",
+                        "mx": ["*.mail.example.com"],
+                        "max_age": 123456
+                      }
 
 
-STS policy served from HTTPS endpoint of the policy (recipient) domain, and
-is authenticated using the Web PKI mechanism. The policy is fetched using HTTP
-GET method.
-
-
-   { "version": "STSv1", "mode": "report", "mx": ["*.mail.example.com"],
-   "max_age": 123456 }
-
-   ~~~~~~~~~
-
-8.  Normative References
+9.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
@@ -701,6 +720,15 @@ GET method.
    [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
               Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
               February 2002, <http://www.rfc-editor.org/info/rfc3207>.
+
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 13]
+
+Internet-Draft                   MTA-STS                       July 2016
+
 
    [RFC4033]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
               Rose, "DNS Security Introduction and Requirements", RFC
@@ -721,14 +749,6 @@ GET method.
               Uniform Resource Identifiers (URIs)", RFC 5785, DOI 10
               .17487/RFC5785, April 2010,
               <http://www.rfc-editor.org/info/rfc5785>.
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 13]
-
-Internet-Draft                   MTA-STS                       July 2016
-
 
    [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
               Verification of Domain-Based Application Service Identity
@@ -757,6 +777,15 @@ Authors' Addresses
    Email: risher (at) google (dot com)
 
 
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 14]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
    Binu Ramakrishnan
    Yahoo!, Inc
 
@@ -781,4 +810,31 @@ Authors' Addresses
 
 
 
-Margolis, et al.         Expires January 9, 2017               [Page 14]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 15]

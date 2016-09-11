@@ -474,18 +474,17 @@ markus.laber (at) 1und1 (dot de)
 # Appendix 1: Delivery Pseudocode
 
 Assume a persistent per-recipient-domain cache of an ordered list of
-~~~~~~~~~
+```
 {
   STSPolicy policy
   boolean was_successfully_applied
   string version_id
 }
-~~~~~~~~
+```
 
 Delivery to a given domain looks like
 
-~~~~~~~~~
-
+```
 function attempt_policy(policy) {
   for each MX in MX candidates {
     if MX matches policy "mx" list {
@@ -519,8 +518,7 @@ if TXT record exists for recipient domain and
   set policy "was_successfully_applied" to False
   prepend policy to cached list of policies for recipient domain
 }
-
-~~~~~~~~~
+```
 
 # Appendix 2: Domain Owner STS example record
 
