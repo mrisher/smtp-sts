@@ -266,9 +266,9 @@ supports MTA-STS.
 When sending to a recipient domain for which a valid TXT record exists, a
 compliant sender will then fetch via the GET method an HTTPS resource containing
 the policy body from a host at the `mta-sts` host of the policy domain, using an
-[@!RFC5785] "well-known" path of `.well-known/mta-sts/current`.  For
+[@!RFC5785] "well-known" path of `.well-known/mta-sts.json`.  For
 `example.com`, this would be
-`https://mta-sts.example.com/.well-known/mta-sts/current`.
+`https://mta-sts.example.com/.well-known/mta-sts.json`.
 
 When fetching a new policy or updating a policy, the HTTPS endpoint MUST present
 a TLS certificate which is valid for the `mta-sts` host (as described in
@@ -361,7 +361,7 @@ The control flow for a sending MTA consists of the following steps:
 A new .well-known URI will be registered in the Well-Known URIs registry as
 described below:
 
-URI Suffix: mta-sts
+URI Suffix: mta-sts.json
 Change Controller: IETF
 
 # Security Considerations

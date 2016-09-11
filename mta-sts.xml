@@ -339,9 +339,9 @@ supports MTA-STS.
 <t>When sending to a recipient domain for which a valid TXT record exists, a
 compliant sender will then fetch via the GET method an HTTPS resource containing
 the policy body from a host at the <spanx style="verb">mta-sts</spanx> host of the policy domain, using an
-<xref target="RFC5785"/> &quot;well-known&quot; path of <spanx style="verb">.well-known/mta-sts/current</spanx>.  For
+<xref target="RFC5785"/> &quot;well-known&quot; path of <spanx style="verb">.well-known/mta-sts.json</spanx>.  For
 <spanx style="verb">example.com</spanx>, this would be
-<spanx style="verb">https://mta-sts.example.com/.well-known/mta-sts/current</spanx>.
+<spanx style="verb">https://mta-sts.example.com/.well-known/mta-sts.json</spanx>.
 </t>
 <t>When fetching a new policy or updating a policy, the HTTPS endpoint MUST present
 a TLS certificate which is valid for the <spanx style="verb">mta-sts</spanx> host (as described in
@@ -445,7 +445,7 @@ the <spanx style="verb">_mta_sts</spanx> TXT record).</t>
 <t>A new .well-known URI will be registered in the Well-Known URIs registry as
 described below:
 </t>
-<t>URI Suffix: mta-sts
+<t>URI Suffix: mta-sts.json
 Change Controller: IETF
 </t>
 </section>

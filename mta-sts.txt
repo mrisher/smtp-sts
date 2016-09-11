@@ -364,8 +364,8 @@ Internet-Draft                   MTA-STS                       July 2016
    exists, a compliant sender will then fetch via the GET method an
    HTTPS resource containing the policy body from a host at the "mta-
    sts" host of the policy domain, using an [RFC5785] "well-known" path
-   of ".well-known/mta-sts/current".  For "example.com", this would be
-   "https://mta-sts.example.com/.well-known/mta-sts/current".
+   of ".well-known/mta-sts.json".  For "example.com", this would be
+   "https://mta-sts.example.com/.well-known/mta-sts.json".
 
    When fetching a new policy or updating a policy, the HTTPS endpoint
    MUST present a TLS certificate which is valid for the "mta-sts" host
@@ -490,7 +490,7 @@ Internet-Draft                   MTA-STS                       July 2016
    A new .well-known URI will be registered in the Well-Known URIs
    registry as described below:
 
-   URI Suffix: mta-sts Change Controller: IETF
+   URI Suffix: mta-sts.json Change Controller: IETF
 
 5.  Security Considerations
 
