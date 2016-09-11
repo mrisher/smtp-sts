@@ -564,64 +564,94 @@ markus.laber (at) 1und1 (dot de)
 </t>
 </section>
 
-<section anchor="appendix-1-validation-pseudocode" title="Appendix 1: Validation Pseudocode">
-
-<figure align="center"><artwork align="center">
-policy = policy_from_cache()
-if not policy or is_expired(policy):
-  policy = policy_from_https_endpoint()  // fetch and authenticate!
-  update_cache = true
-if policy:
-  if invalid_mx_or_tls(policy):  // check MX and TLS cert
-    if rua:
-      generate_report()
-    if p_reject():
-      policy = policy_from_https_endpoint()  // fetch and authenticate #2!
-      update_cache = true
-      if invalid_mx_or_tls(policy):
-        reject_message()
-        update_cache = false
-  if update_cache:
-    cache(policy)
-</artwork></figure>
-</section>
-
-<section anchor="appendix-2-domain-owner-sts-example-record" title="Appendix 2: Domain Owner STS example record">
-
-<section anchor="example-1" title="Example 1">
-<t>The owner of example.com wishes to begin using STS with a policy that will
-solicit aggregate feedback from receivers without affecting how the messages are
-processed, in order to:
-</t>
-<t>
-<list style="symbols">
-<t>Verify the identity of MXs that handle mail for this domain</t>
-<t>Confirm that its legitimate messages are sent over TLS</t>
-<t>Verify the validity of the certificates</t>
-<t>Determine how many messages would be affected by a strict policy</t>
-</list>
-</t>
-<t>DNS STS policy indicator TXT record:
-</t>
-
-<figure align="center"><artwork align="center">
-_mta_sts  IN TXT ( "v=STSv1; id=20160831085700Z;" )
-</artwork></figure>
-<t>STS policy served from HTTPS endpoint of the policy (recipient) domain, and
-is authenticated using the Web PKI mechanism. The policy is fetched using HTTP
-GET method.
+<section anchor="appendix-1-delivery-pseudocode" title="Appendix 1: Delivery Pseudocode">
+<t>Assume a persistent per-recipient-domain cache of an ordered list of
 </t>
 
 <figure align="center"><artwork align="center">
 {
-  "version": "STSv1",
-  "mode": "report",
-  "mx": ["*.mail.example.com"],
-  "max_age": 123456
+  STSPolicy policy
+  boolean was_successfully_applied
+  string version_id
 }
+~~~~~~~~
+
+Delivery to a given domain looks like
 
 </artwork></figure>
-</section>
+<t>function attempt_policy(policy) {
+  for each MX in MX candidates {
+    if MX matches policy &quot;mx&quot; list {
+      connect to MX
+      if MX certificate is valid {
+        deliver to MX
+        return True
+      }
+    }
+  }
+  return False
+}
+</t>
+<t>if unexpired policies exists in cache {
+  for policy in unexpired policies {
+    if attempt_policy(policy) {
+      set policy &quot;was_successfully_applied&quot; to True
+      return
+    }
+  }
+  if any unexpired policies &quot;was_successfully_applied&quot; and mode is &quot;enforce&quot; {
+    temp fail message
+  }
+}
+</t>
+<t>if TXT record exists for recipient domain and
+   (domain not in cache or
+    cached policy version_id != TXT version_id) {
+  attempt to fetch new policy via HTTPS
+  set policy &quot;was_successfully_applied&quot; to False
+  prepend policy to cached list of policies for recipient domain
+}
+</t>
+
+<figure align="center"><artwork align="center">
+
+# Appendix 2: Domain Owner STS example record
+
+## Example 1
+
+The owner of example.com wishes to begin using STS with a policy that will
+solicit aggregate feedback from receivers without affecting how the messages are
+processed, in order to:
+
+* Verify the identity of MXs that handle mail for this domain
+
+* Confirm that its legitimate messages are sent over TLS
+
+* Verify the validity of the certificates
+
+* Determine how many messages would be affected by a strict policy
+
+DNS STS policy indicator TXT record:
+</artwork></figure>
+<t>_mta_sts  IN TXT ( &quot;v=STSv1; id=20160831085700Z;&quot; )
+</t>
+
+<figure align="center"><artwork align="center">
+
+STS policy served from HTTPS endpoint of the policy (recipient) domain, and
+is authenticated using the Web PKI mechanism. The policy is fetched using HTTP
+GET method.
+
+</artwork></figure>
+<t>{
+  &quot;version&quot;: &quot;STSv1&quot;,
+  &quot;mode&quot;: &quot;report&quot;,
+  &quot;mx&quot;: [&quot;*.mail.example.com&quot;],
+  &quot;max_age&quot;: 123456
+}
+</t>
+<t>~~~~~~~~~
+</t>
 </section>
 
 </middle>

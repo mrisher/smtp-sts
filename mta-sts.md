@@ -471,25 +471,54 @@ Markus Laber
 1&1 Mail & Media Development & Technology GmbH
 markus.laber (at) 1und1 (dot de)
 
-# Appendix 1: Validation Pseudocode
+# Appendix 1: Delivery Pseudocode
+
+Assume a persistent per-recipient-domain cache of an ordered list of
+~~~~~~~~~
+{
+  STSPolicy policy
+  boolean was_successfully_applied
+  string version_id
+}
+~~~~~~~~
+
+Delivery to a given domain looks like
 
 ~~~~~~~~~
-policy = policy_from_cache()
-if not policy or is_expired(policy):
-  policy = policy_from_https_endpoint()  // fetch and authenticate!
-  update_cache = true
-if policy:
-  if invalid_mx_or_tls(policy):  // check MX and TLS cert
-    if rua:
-      generate_report()
-    if p_reject():
-      policy = policy_from_https_endpoint()  // fetch and authenticate #2!
-      update_cache = true
-      if invalid_mx_or_tls(policy):
-        reject_message()
-        update_cache = false
-  if update_cache:
-    cache(policy)
+
+function attempt_policy(policy) {
+  for each MX in MX candidates {
+    if MX matches policy "mx" list {
+      connect to MX
+      if MX certificate is valid {
+        deliver to MX
+        return True
+      }
+    }
+  }
+  return False
+}
+
+if unexpired policies exists in cache {
+  for policy in unexpired policies {
+    if attempt_policy(policy) {
+      set policy "was_successfully_applied" to True
+      return
+    }
+  }
+  if any unexpired policies "was_successfully_applied" and mode is "enforce" {
+    temp fail message
+  }
+}
+
+if TXT record exists for recipient domain and
+   (domain not in cache or
+    cached policy version_id != TXT version_id) {
+  attempt to fetch new policy via HTTPS
+  set policy "was_successfully_applied" to False
+  prepend policy to cached list of policies for recipient domain
+}
+
 ~~~~~~~~~
 
 # Appendix 2: Domain Owner STS example record
