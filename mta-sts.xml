@@ -595,6 +595,37 @@ _mta_sts  IN TXT ( "v=STSv1; id=20160831085700Z;" )
 </section>
 </section>
 
+<section anchor="appendix-2-sending-mta-state-machine" title="Appendix 2: Sending MTA State Machine">
+<t>It is helpful to think of the different states of a sending MTA and a receiving
+domain to better understand the possible conditions imposed by implementation of
+MTA STS.
+</t>
+<t>
+<list style="numbers">
+<t>Policy exists in sender's cache for recipient domain, is unexpired, mode is
+<spanx style="verb">enforce</spanx>, and it has been successfully applied during message delivery
+before. This implies messages will only be delivered to an MX that validates
+according to the policy unless and until a new policy is served.</t>
+<t>Policy exists in sender's cache for recipient domain, is unexpired, mode is
+<spanx style="verb">enforce</spanx>, but no policy exists in the cache which has been successfully
+applied before. This implies messages can be delivered to an MX that does not
+validate according to the cached policy.</t>
+<t>Multiple policies exist in sender's cache for recipient domain. One or more
+policy exists with mode <spanx style="verb">report</spanx> and was successfully applied before; one
+or more policy exists with mode <spanx style="verb">enforce</spanx> and was not successfully applied
+before. This implies that messages can be delivered to an MX that does not
+validate according to the cached policy.</t>
+</list>
+</t>
+<t>Because of the reliance on caching, it is possible that race conditions exist
+around cache lookup versus updates. The implication of such race conditions is
+that senders may mistakenly temp-fail a message based on an old (but still
+unexpired) cache entry even as the cache is being updated for the recipient
+domain. Fortunately, such mistakes will be rectified the next time delivery is
+attempted for this message.
+</t>
+</section>
+
 </middle>
 <back>
 <references title="Normative References">

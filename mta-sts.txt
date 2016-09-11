@@ -90,10 +90,11 @@ Table of Contents
    6.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  11
    7.  Appendix 1: Domain Owner STS example record . . . . . . . . .  12
      7.1.  Example 1 . . . . . . . . . . . . . . . . . . . . . . . .  12
-   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  12
-     8.1.  Normative References  . . . . . . . . . . . . . . . . . .  12
-     8.2.  URIs  . . . . . . . . . . . . . . . . . . . . . . . . . .  13
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  13
+   8.  Appendix 2: Sending MTA State Machine . . . . . . . . . . . .  12
+   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  13
+     9.1.  Normative References  . . . . . . . . . . . . . . . . . .  13
+     9.2.  URIs  . . . . . . . . . . . . . . . . . . . . . . . . . .  14
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  14
 
 1.  Introduction
 
@@ -105,7 +106,6 @@ Table of Contents
    barrier against passive man-in-the-middle traffic interception, any
    attacker who can delete parts of the SMTP session (such as the "250
    STARTTLS" response) or who can redirect the entire SMTP session
-
 
 
 
@@ -642,9 +642,49 @@ Internet-Draft                   MTA-STS                       July 2016
               }
 
 
-8.  References
+8.  Appendix 2: Sending MTA State Machine
 
-8.1.  Normative References
+   It is helpful to think of the different states of a sending MTA and a
+   receiving domain to better understand the possible conditions imposed
+   by implementation of MTA STS.
+
+   1.  Policy exists in sender's cache for recipient domain, is
+       unexpired, mode is "enforce", and it has been successfully
+       applied during message delivery before.  This implies messages
+       will only be delivered to an MX that validates according to the
+       policy unless and until a new policy is served.
+
+   2.  Policy exists in sender's cache for recipient domain, is
+       unexpired, mode is "enforce", but no policy exists in the cache
+       which has been successfully applied before.  This implies
+       messages can be delivered to an MX that does not validate
+       according to the cached policy.
+
+   3.  Multiple policies exist in sender's cache for recipient domain.
+       One or more policy exists with mode "report" and was successfully
+       applied before; one or more policy exists with mode "enforce" and
+       was not successfully applied before.  This implies that messages
+       can be delivered to an MX that does not validate according to the
+       cached policy.
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 12]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
+   Because of the reliance on caching, it is possible that race
+   conditions exist around cache lookup versus updates.  The implication
+   of such race conditions is that senders may mistakenly temp-fail a
+   message based on an old (but still unexpired) cache entry even as the
+   cache is being updated for the recipient domain.  Fortunately, such
+   mistakes will be rectified the next time delivery is attempted for
+   this message.
+
+9.  References
+
+9.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
@@ -664,16 +704,6 @@ Internet-Draft                   MTA-STS                       July 2016
               4033, DOI 10.17487/RFC4033, March 2005,
               <http://www.rfc-editor.org/info/rfc4033>.
 
-
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 12]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
    [RFC4627]  Crockford, D., "The application/json Media Type for
               JavaScript Object Notation (JSON)", RFC 4627, DOI 10
               .17487/RFC4627, July 2006,
@@ -689,6 +719,17 @@ Internet-Draft                   MTA-STS                       July 2016
               .17487/RFC5785, April 2010,
               <http://www.rfc-editor.org/info/rfc5785>.
 
+
+
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 13]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
    [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
               Verification of Domain-Based Application Service Identity
               within Internet Public Key Infrastructure Using X.509
@@ -702,7 +743,7 @@ Internet-Draft                   MTA-STS                       July 2016
               .17487/RFC7672, October 2015,
               <http://www.rfc-editor.org/info/rfc7672>.
 
-8.2.  URIs
+9.2.  URIs
 
    [1] https://mta-sts.example.com/.well-known/mta-sts.json:
 
@@ -718,16 +759,6 @@ Authors' Addresses
    Google, Inc
 
    Email: risher (at) google (dot com)
-
-
-
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 13]
-
-Internet-Draft                   MTA-STS                       July 2016
 
 
    Binu Ramakrishnan
@@ -746,37 +777,6 @@ Internet-Draft                   MTA-STS                       July 2016
    Microsoft, Inc
 
    Email: janet.jones (at) microsoft (dot com)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

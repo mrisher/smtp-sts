@@ -498,4 +498,34 @@ https://mta-sts.example.com/.well-known/mta-sts.json:
 
 ~~~~~~~~~
 
+# Appendix 2: Sending MTA State Machine
+
+It is helpful to think of the different states of a sending MTA and a receiving
+domain to better understand the possible conditions imposed by implementation of
+MTA STS.
+
+1. Policy exists in sender's cache for recipient domain, is unexpired, mode is
+   `enforce`, and it has been successfully applied during message delivery
+   before. This implies messages will only be delivered to an MX that validates
+   according to the policy unless and until a new policy is served.
+
+2. Policy exists in sender's cache for recipient domain, is unexpired, mode is
+   `enforce`, but no policy exists in the cache which has been successfully
+   applied before. This implies messages can be delivered to an MX that does not
+   validate according to the cached policy.
+
+3. Multiple policies exist in sender's cache for recipient domain. One or more
+   policy exists with mode `report` and was successfully applied before; one
+   or more policy exists with mode `enforce` and was not successfully applied
+   before. This implies that messages can be delivered to an MX that does not
+   validate according to the cached policy.
+
+Because of the reliance on caching, it is possible that race conditions exist
+around cache lookup versus updates. The implication of such race conditions is
+that senders may mistakenly temp-fail a message based on an old (but still
+unexpired) cache entry even as the cache is being updated for the recipient
+domain. Fortunately, such mistakes will be rectified the next time delivery is
+attempted for this message.
+
+
 {backmatter}
