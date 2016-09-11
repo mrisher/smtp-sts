@@ -378,15 +378,21 @@ as the policy domain for the purposes of policy discovery and application.
 non-expired SMTP MTA-STS policy, a sending MTA honoring SMTP MTA-STS MUST
 validate that the recipient MX matches the <spanx style="verb">mx</spanx> pattern from the recipient
 domain's policy, supports STARTTLS, and offers a valid PKIX based TLS
-certificate. The certificate presented by the receiving MX MUST be valid for the
-MX name and chain to a root CA that is trusted by the sending MTA. The
-certificate MUST have a CN or SAN matching the MX hostname (as described in
-<xref target="RFC6125"/>) and be non-expired.
+certificate.
 </t>
-<t>Note that this section does not dictate the behavior of sending MTAs when
-policies fail to validate; in particular, validation failures of policies which
-specify &quot;report only&quot; mode MUST NOT be interpreted as delivery failures, as
-described in the section <spanx style="emph">Policy</spanx> <spanx style="emph">Application</spanx>.
+<t>The certificate presented by the receiving MX MUST be valid for the MX name and
+chain to a root CA that is trusted by the sending MTA. The certificate MUST have
+a CN or SAN matching the MX hostname (as described in <xref target="RFC6125"/>) and be
+non-expired.
+</t>
+<t>In the case of an &quot;implicit&quot; MX record (as specified in <xref target="RFC2821"/>) where no MX
+RR exists for the recipient domain but there is an A RR, the MX hostname is
+assumed to be that of the A RR and should be validated as such.
+</t>
+<t>This section does not dictate the behavior of sending MTAs when policies fail to
+validate; in particular, validation failures of policies which specify &quot;report
+only&quot; mode MUST NOT be interpreted as delivery failures, as described in the
+section <spanx style="emph">Policy</spanx> <spanx style="emph">Application</spanx>.
 </t>
 </section>
 
@@ -622,6 +628,7 @@ GET method.
 <back>
 <references title="Normative References">
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2821.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4033.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4627.xml"?>

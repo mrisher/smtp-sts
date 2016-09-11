@@ -301,15 +301,21 @@ When sending to an MX at a domain for which the sender has a valid and
 non-expired SMTP MTA-STS policy, a sending MTA honoring SMTP MTA-STS MUST
 validate that the recipient MX matches the `mx` pattern from the recipient
 domain's policy, supports STARTTLS, and offers a valid PKIX based TLS
-certificate. The certificate presented by the receiving MX MUST be valid for the
-MX name and chain to a root CA that is trusted by the sending MTA. The
-certificate MUST have a CN or SAN matching the MX hostname (as described in
-[@!RFC6125]) and be non-expired.
+certificate.
 
-Note that this section does not dictate the behavior of sending MTAs when
-policies fail to validate; in particular, validation failures of policies which
-specify "report only" mode MUST NOT be interpreted as delivery failures, as
-described in the section _Policy_ _Application_.
+The certificate presented by the receiving MX MUST be valid for the MX name and
+chain to a root CA that is trusted by the sending MTA. The certificate MUST have
+a CN or SAN matching the MX hostname (as described in [@!RFC6125]) and be
+non-expired.
+
+In the case of an "implicit" MX record (as specified in [@!RFC2821]) where no MX
+RR exists for the recipient domain but there is an A RR, the MX hostname is
+assumed to be that of the A RR and should be validated as such.
+
+This section does not dictate the behavior of sending MTAs when policies fail to
+validate; in particular, validation failures of policies which specify "report
+only" mode MUST NOT be interpreted as delivery failures, as described in the
+section _Policy_ _Application_.
 
 ## Policy Application
 

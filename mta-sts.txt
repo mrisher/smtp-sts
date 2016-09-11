@@ -407,14 +407,20 @@ Internet-Draft                   MTA-STS                       July 2016
    and non-expired SMTP MTA-STS policy, a sending MTA honoring SMTP MTA-
    STS MUST validate that the recipient MX matches the "mx" pattern from
    the recipient domain's policy, supports STARTTLS, and offers a valid
-   PKIX based TLS certificate.  The certificate presented by the
-   receiving MX MUST be valid for the MX name and chain to a root CA
-   that is trusted by the sending MTA.  The certificate MUST have a CN
-   or SAN matching the MX hostname (as described in [RFC6125]) and be
-   non-expired.
+   PKIX based TLS certificate.
 
-   Note that this section does not dictate the behavior of sending MTAs
-   when policies fail to validate; in particular, validation failures of
+   The certificate presented by the receiving MX MUST be valid for the
+   MX name and chain to a root CA that is trusted by the sending MTA.
+   The certificate MUST have a CN or SAN matching the MX hostname (as
+   described in [RFC6125]) and be non-expired.
+
+   In the case of an "implicit" MX record (as specified in [RFC2821])
+   where no MX RR exists for the recipient domain but there is an A RR,
+   the MX hostname is assumed to be that of the A RR and should be
+   validated as such.
+
+   This section does not dictate the behavior of sending MTAs when
+   policies fail to validate; in particular, validation failures of
    policies which specify "report only" mode MUST NOT be interpreted as
    delivery failures, as described in the section _Policy_
    _Application_.
@@ -436,12 +442,6 @@ Internet-Draft                   MTA-STS                       July 2016
    2.  "enforce": In this mode, sending MTAs treat STS policy failures
        as a mail delivery error, and MUST NOT deliver the message to
        this host.  However, note that MTAs that honor "enforce" mode
-       MUST first check for the existing of an updated, authenticated
-       policy before _permanently_ failing messages.  This is to ensure
-       that failures only occur if a sending MTA is in fact validating
-       against the most recent version of the recipient domain's policy.
-
-
 
 
 
@@ -449,6 +449,11 @@ Margolis, et al.         Expires January 9, 2017                [Page 8]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+       MUST first check for the existing of an updated, authenticated
+       policy before _permanently_ failing messages.  This is to ensure
+       that failures only occur if a sending MTA is in fact validating
+       against the most recent version of the recipient domain's policy.
 
    Note that despite the presence of an "enforce" policy, STS-aware
    sending MTAs may in some cases choose to deliver mail to non-
@@ -493,11 +498,6 @@ Internet-Draft                   MTA-STS                       July 2016
        "reject", and the cached policy has previously been successfully
        applied, temporarily fail the message.
 
-   4.  Upon message retries, a message MAY be permanently failed
-       following first checking for the presence of a new policy (as
-       indicated by the "id" field in the "_mta_sts" TXT record).
-
-
 
 
 
@@ -505,6 +505,10 @@ Margolis, et al.         Expires January 9, 2017                [Page 9]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+   4.  Upon message retries, a message MAY be permanently failed
+       following first checking for the presence of a new policy (as
+       indicated by the "id" field in the "_mta_sts" TXT record).
 
 4.  IANA Considerations
 
@@ -551,10 +555,6 @@ Internet-Draft                   MTA-STS                       July 2016
    additionally advertise a new SMTP STS policy with never-satisfied
    "mx" constraints and a long "max_age".
 
-   This attack is mitigated in part by the ability of a victim domain to
-   (at any time) publish a new policy updating or revoking the cached,
-   malicious policy; this does, however, require the victim domain to
-
 
 
 Margolis, et al.         Expires January 9, 2017               [Page 10]
@@ -562,6 +562,9 @@ Margolis, et al.         Expires January 9, 2017               [Page 10]
 Internet-Draft                   MTA-STS                       July 2016
 
 
+   This attack is mitigated in part by the ability of a victim domain to
+   (at any time) publish a new policy updating or revoking the cached,
+   malicious policy; this does, however, require the victim domain to
    both obtain a valid CA-signed certificate and to understand and
    properly configure SMTP STS.
 
@@ -606,9 +609,6 @@ Internet-Draft                   MTA-STS                       July 2016
 
    Markus Laber 1&1 Mail & Media Development & Technology GmbH
    markus.laber (at) 1und1 (dot de)
-
-
-
 
 
 
@@ -689,6 +689,10 @@ Internet-Draft                   MTA-STS                       July 2016
               RFC2119, March 1997,
               <http://www.rfc-editor.org/info/rfc2119>.
 
+   [RFC2821]  Klensin, J., Ed., "Simple Mail Transfer Protocol", RFC
+              2821, DOI 10.17487/RFC2821, April 2001,
+              <http://www.rfc-editor.org/info/rfc2821>.
+
    [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
               Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
               February 2002, <http://www.rfc-editor.org/info/rfc3207>.
@@ -713,12 +717,8 @@ Internet-Draft                   MTA-STS                       July 2016
               .17487/RFC5785, April 2010,
               <http://www.rfc-editor.org/info/rfc5785>.
 
-   [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
-              Verification of Domain-Based Application Service Identity
-              within Internet Public Key Infrastructure Using X.509
-              (PKIX) Certificates in the Context of Transport Layer
-              Security (TLS)", RFC 6125, DOI 10.17487/RFC6125, March
-              2011, <http://www.rfc-editor.org/info/rfc6125>.
+
+
 
 
 
@@ -729,6 +729,13 @@ Margolis, et al.         Expires January 9, 2017               [Page 13]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+   [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
+              Verification of Domain-Based Application Service Identity
+              within Internet Public Key Infrastructure Using X.509
+              (PKIX) Certificates in the Context of Transport Layer
+              Security (TLS)", RFC 6125, DOI 10.17487/RFC6125, March
+              2011, <http://www.rfc-editor.org/info/rfc6125>.
 
    [RFC7672]  Dukhovni, V. and W. Hardaker, "SMTP Security via
               Opportunistic DNS-Based Authentication of Named Entities
@@ -766,13 +773,6 @@ Authors' Addresses
    Microsoft, Inc
 
    Email: janet.jones (at) microsoft (dot com)
-
-
-
-
-
-
-
 
 
 
