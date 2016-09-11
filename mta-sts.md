@@ -52,9 +52,10 @@
 .# Abstract
 
 SMTP MTA-STS is a mechanism enabling mail service providers to declare their
-ability to receive TLS-secured connections, to declare particular methods for
-certificate validation, and to request that sending SMTP servers report upon
-and/or refuse to deliver messages that cannot be delivered securely.
+ability to receive TLS-secured connections, an expectated validity of
+certificates presented by their MX hosts, and to request that sending SMTP
+servers report upon and/or refuse to deliver messages that cannot be delivered
+securely.
 
 {mainmatter}
 
@@ -73,17 +74,18 @@ This document defines a mechanism for recipient domains to publish policies
 specifying:
 
    * whether MTAs sending mail to this domain can expect TLS support
-   * how to validate the names of the domain's MX hosts
+   * expected validity of server certificates presented by the domain's MX hosts
    * what a conforming client should do with messages when TLS cannot be
      successfully negotiated
 
-The mechanism described is separated into three logical components:
+The mechanism described is separated into four logical components:
 
    1. policy semantics: whether senders can expect a server for the
       recipient domain to support TLS encryption
    2. policy discovery & authentication: how to discover a domain's published
-      STS policy and determine the authenticity of that policy
-   3. failure handling: what sending MTAs should do in the case of policy
+      policy
+   3. policy validation: how to authenticate the published policy
+   4. failure handling: what sending MTAs should do in the case of policy
       failures
 
 ## Terminology
@@ -108,15 +110,8 @@ The DANE TLSA record [@!RFC7672] is similar, in that DANE is also designed to
 upgrade opportunistic, unauthenticated encryption into required, authenticated
 encryption. DANE requires DNSSEC [@!RFC4033] for authentication; the mechanism
 described here instead relies on certificate authorities (CAs) and does not
-require DNSSEC.
-
-## Differences from DANE
-
-The primary difference between the mechanism described here and DANE is that
-DANE requires the use of DNSSEC to authenticate DANE TLSA records, whereas SMTP
-MTA-STS relies on the certificate authority (CA) system to avoid interception.
-(For a thorough discussion of this trade-off, see the section _Security_
-_Considerations_.)
+require DNSSEC.  For a thorough discussion of this trade-off, see the section
+_Security_ _Considerations_.
 
 In addition, SMTP MTA-STS provides an optional report-only mode, enabling soft
 deployments to detect policy failures.
@@ -128,7 +123,7 @@ Policy Domain. A corresponding TXT record in the DNS signals to sending MTAs the
 presence of a policy file. The character content of the TXT record is encoded as
 US-ASCII.
 
-**The MTA-STS TXT record MUST specify the following fields:**
+The MTA-STS TXT record MUST specify the following fields:
 
 * `v`: (plain-text, required). Currently only "STSv1" is supported.
 * `id`: (plain-text, required). A short string used to track policy updates.
@@ -137,21 +132,15 @@ US-ASCII.
   of a previously seen policy. There is no implied ordering of `id` fields
   between revisions.
 
-**Policies MUST specify the following fields in JSON** [@!RFC4627] **format:**
+Policies MUST specify the following fields in JSON [@!RFC4627] format:
 
 * `version`: (plain-text, required). Currently only "STSv1" is supported.
-* `mode`: (plain-text, required). If "enforce", the receiving MTA requests that
-  messages be delivered only if they conform to the STS policy. If "report" the
-  receiving MTA requests that failure reports be delivered, as specified
-  by the `rua` parameter.
+* `mode`: (plain-text, required). Either "enforce" or "report", indicating the
+  expected behavior of a sending MTA in the case of a policy validation failure.
 * `mx`: MX patterns (list of plain-text MX match patterns, required). One or
-  more comma-separated patterns matching the expected MX for this domain. For
-  example, `["*.example.com", "*.example.net"]` indicates that mail for this
-  domain might be handled by any MX with a hostname at `example.com` or
-  `example.net`, though _not_ hosts at subdomains. For example,
-  `mx1.example.com` and `mx2.example.net` are both valid matches, but not
-  `1234.dhcp.example.com`. The semantics for these patterns are those found in
-  the "Checking of Wildcard Certificates" rules in Section 6.4.3 of [RFC6125].
+  more patterns matching the expected MX for this domain. For example,
+  `["*.example.com", "*.example.net"]` indicates that mail for this domain might
+  be handled by any MX with a hostname at `example.com` or `example.net`.
 * `max_age`: Max lifetime of the policy (plain-text positive integer seconds).
   Well-behaved clients SHOULD cache a policy for up to this value from last
   policy fetch time.
@@ -259,7 +248,7 @@ Senders MUST treat a policy with a max_age of 0 as a revocation: they should
 purge any previously cached policy and proceed to deliver mail to the recipient
 domain as though it never had an STS policy.
 
-## Policy Discovery & Authentication
+# Policy Discovery & Authentication
 
 Senders discover a recipient domain's MTA-STS policy by fetching a TXT record
 with the name generated by prefixing `_mta_sts` to the recipient domain. A valid
@@ -273,7 +262,7 @@ the policy body from a host at the `mta-sts` host of the policy domain, using an
 `example.com`, this would be
 `https://mta-sts.example.com/.well-known/mta-sts.json`.
 
-### HTTPS Policy Fetching
+## HTTPS Policy Fetching
 
 When fetching a new policy or updating a policy, the HTTPS endpoint MUST present
 a TLS certificate which is valid for the `mta-sts` host (as described in
@@ -289,42 +278,59 @@ that the HTTPS GET fails, we suggest implementions may limit further attempts to
 a period of five minutes or longer per version ID, to avoid overwhelming
 resource-constrained recipients with cascading failures.
 
-### Policy Selection for Smart Hosts
+## Policy Selection for Smart Hosts
 
 When sending mail via a "smart host"--an intermediate SMTP relay rather than the
 message recipient's server--compliant senders MUST treat the smart host domain
 as the policy domain for the purposes of policy discovery and application.
 
-## Policy Validation
+# Policy Validation
 
 When sending to an MX at a domain for which the sender has a valid and
 non-expired SMTP MTA-STS policy, a sending MTA honoring SMTP MTA-STS MUST
-validate that the recipient MX matches the `mx` pattern from the recipient
-domain's policy, supports STARTTLS, and offers a valid PKIX based TLS
+validate:
+
+1. That the recipient MX matches the `mx` pattern from the recipient
+domain's policy.
+2. That the recipient MX supports STARTTLS and offers a valid PKIX based TLS
 certificate.
-
-The certificate presented by the receiving MX MUST be valid for the MX name and
-chain to a root CA that is trusted by the sending MTA. The certificate MUST have
-a CN or SAN matching the MX hostname (as described in [@!RFC6125]) and be
-non-expired.
-
-In the case of an "implicit" MX record (as specified in [@!RFC2821]) where no MX
-RR exists for the recipient domain but there is an A RR, the MX hostname is
-assumed to be that of the A RR and should be validated as such.
 
 This section does not dictate the behavior of sending MTAs when policies fail to
 validate; in particular, validation failures of policies which specify "report
 only" mode MUST NOT be interpreted as delivery failures, as described in the
 section _Policy_ _Application_.
 
-## Policy Application
+## MX Matching
+
+When delivering mail for the Policy Domain to a recipient MX host, the sender
+validates the MX match against the `mx` pattern from the applied policy. The
+semantics for these patterns are those found in section 6.4 of [@!RFC6125].
+
+Patterns may contain a wildcard character `*` which matches any single domain
+name component or component fragment, though only as the leftmost component in a
+pattern. For example, `*.example.com` is a valid pattern, but
+`foo.*.example.com` is not. Given the pattern `*.example.com`, `mx1.example.com`
+is a valid MX host, but `1234.dhcp.example.com` is not.
+
+## MX Certificate Validation
+
+The certificate presented by the receiving MX MUST be valid for the MX hostname
+and chain to a root CA that is trusted by the sending MTA. The certificate MUST
+have a CN or SAN matching the MX hostname (as described in [@!RFC6125]) and be
+non-expired.
+
+In the case of an "implicit" MX record (as specified in [@!RFC2821]) where no MX
+RR exists for the recipient domain but there is an A RR, the MX hostname is
+assumed to be that of the A RR and should be validated as such.
+
+# Policy Application
 
 When sending to an MX at a domain for which the sender has a valid, non-expired
 STS policy, a sending MTA honoring SMTP MTA-STS applies the result of a policy
 validation one of two ways, depending on the value of the policy `mode` field:
 
 1. `report`: In this mode, sending MTAs merely send a report (as described in the
-   `TLSRPT` specification (TODO: add ref)) indicating policy application
+   TLSRPT specification (TODO: add ref)) indicating policy application
    failures. This can be used for "soft" deployments, to ensure a policy will not
    cause domain-wide mail delivery failures while being adopted or during
    infrastructure changes.
@@ -347,20 +353,22 @@ successfully validated when delivering at least one message to the Policy
 Domain. This is to limit the risk of misconfigurations when deploying new
 policies.
 
-### MX Preference in Enforce Mode
+## MX Preference
 
-When applying a policy specifying `enforce` mode, sending MTAs SHOULD select
-recipient MXs by first eliminating any MXs at lower priority than the current
-host (if in the MX candidate set), then eliminating any non-matching (as
-specified by the STS policy) MX hosts from the candidate MX set, and then
-attempting delivery to matching hosts as indicated by their MX priority, until
-delivery succeeds or the MX candidate set is empty.
+When applying a policy, sending MTAs SHOULD select recipient MXs by first
+eliminating any MXs at lower priority than the current host (if in the MX
+candidate set), then eliminating any non-matching (as specified by the STS
+policy) MX hosts from the candidate MX set, and then attempting delivery to
+matching hosts as indicated by their MX priority, until delivery succeeds or the
+MX candidate set is empty.
 
 If none of the attempted MX hosts validate according to the policy, the policy
 MUST be refreshed at least once, as described in _Policy_ _Discovery_ _&_
-_Authentication_, before a message should be permanently rejected.
+_Authentication_, before a message should be permanently rejected. (In the case
+of policies in "report" mode, the sending MTA may simply fall back to the
+original candidate MX set.)
 
-### Policy Application Control Flow
+## Policy Application Control Flow
 
 The control flow for a sending MTA consists of the following steps:
 
