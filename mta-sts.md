@@ -275,6 +275,8 @@ a TLS certificate which is valid for the `policy.mta-sts` host (as described in
 [@!RFC6125]), chain to a root CA that is trusted by the sending CA, and be
 non-expired.
 
+HTTP 3xx redirects MUST NOT be followed.
+
 A policy which has not ever been successfully authenticated MUST NOT be used to
 reject mail.
 

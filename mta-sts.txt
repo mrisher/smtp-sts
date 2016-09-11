@@ -373,6 +373,8 @@ Internet-Draft                   MTA-STS                       July 2016
    sts" host (as described in [RFC6125]), chain to a root CA that is
    trusted by the sending CA, and be non-expired.
 
+   HTTP 3xx redirects MUST NOT be followed.
+
    A policy which has not ever been successfully authenticated MUST NOT
    be used to reject mail.
 
@@ -382,8 +384,6 @@ Internet-Draft                   MTA-STS                       July 2016
    implementions may limit further attempts to a period of five minutes
    or longer per version ID, to avoid overwhelming resource-constrained
    recipients with cascading failures.
-
-
 
 
 

@@ -348,6 +348,8 @@ a TLS certificate which is valid for the <spanx style="verb">policy.mta-sts</spa
 <xref target="RFC6125"/>), chain to a root CA that is trusted by the sending CA, and be
 non-expired.
 </t>
+<t>HTTP 3xx redirects MUST NOT be followed.
+</t>
 <t>A policy which has not ever been successfully authenticated MUST NOT be used to
 reject mail.
 </t>
