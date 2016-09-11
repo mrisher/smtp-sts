@@ -564,29 +564,7 @@ markus.laber (at) 1und1 (dot de)
 </t>
 </section>
 
-<section anchor="appendix-1-validation-pseudocode" title="Appendix 1: Validation Pseudocode">
-
-<figure align="center"><artwork align="center">
-policy = policy_from_cache()
-if not policy or is_expired(policy):
-  policy = policy_from_https_endpoint()  // fetch and authenticate!
-  update_cache = true
-if policy:
-  if invalid_mx_or_tls(policy):  // check MX and TLS cert
-    if rua:
-      generate_report()
-    if p_reject():
-      policy = policy_from_https_endpoint()  // fetch and authenticate #2!
-      update_cache = true
-      if invalid_mx_or_tls(policy):
-        reject_message()
-        update_cache = false
-  if update_cache:
-    cache(policy)
-</artwork></figure>
-</section>
-
-<section anchor="appendix-2-domain-owner-sts-example-record" title="Appendix 2: Domain Owner STS example record">
+<section anchor="appendix-1-domain-owner-sts-example-record" title="Appendix 1: Domain Owner STS example record">
 
 <section anchor="example-1" title="Example 1">
 <t>The owner of example.com wishes to begin using STS with a policy that will

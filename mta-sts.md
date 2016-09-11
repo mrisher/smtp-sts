@@ -471,28 +471,7 @@ Markus Laber
 1&1 Mail & Media Development & Technology GmbH
 markus.laber (at) 1und1 (dot de)
 
-# Appendix 1: Validation Pseudocode
-
-~~~~~~~~~
-policy = policy_from_cache()
-if not policy or is_expired(policy):
-  policy = policy_from_https_endpoint()  // fetch and authenticate!
-  update_cache = true
-if policy:
-  if invalid_mx_or_tls(policy):  // check MX and TLS cert
-    if rua:
-      generate_report()
-    if p_reject():
-      policy = policy_from_https_endpoint()  // fetch and authenticate #2!
-      update_cache = true
-      if invalid_mx_or_tls(policy):
-        reject_message()
-        update_cache = false
-  if update_cache:
-    cache(policy)
-~~~~~~~~~
-
-# Appendix 2: Domain Owner STS example record
+# Appendix 1: Domain Owner STS example record
 
 ## Example 1
 
