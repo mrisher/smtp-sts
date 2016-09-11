@@ -638,9 +638,9 @@ Internet-Draft                   MTA-STS                       July 2016
 
    if unexpired policies exists in cache { for policy in unexpired
    policies { if attempt_policy(policy) { set policy
-   "was_successfully_applied" to True return } } if any unexpired
-   policies "was_successfully_applied" and mode is "enforce" { temp fail
-   message } }
+   "was_successfully_applied" to True remove any older policies from
+   cache return } } if any unexpired policies "was_successfully_applied"
+   and mode is "enforce" { temp fail message } }
 
    if TXT record exists for recipient domain and (domain not in cache or
    cached policy version_id != TXT version_id) { attempt to fetch new

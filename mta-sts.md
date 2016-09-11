@@ -503,6 +503,7 @@ if unexpired policies exists in cache {
   for policy in unexpired policies {
     if attempt_policy(policy) {
       set policy "was_successfully_applied" to True
+      remove any older policies from cache
       return
     }
   }

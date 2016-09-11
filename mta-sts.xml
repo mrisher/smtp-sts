@@ -596,6 +596,7 @@ Delivery to a given domain looks like
   for policy in unexpired policies {
     if attempt_policy(policy) {
       set policy &quot;was_successfully_applied&quot; to True
+      remove any older policies from cache
       return
     }
   }
