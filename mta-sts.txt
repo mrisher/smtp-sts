@@ -77,15 +77,18 @@ Table of Contents
        3.1.2.  SMTP MTA-STS Policy . . . . . . . . . . . . . . . . .   5
      3.2.  Policy Expiration . . . . . . . . . . . . . . . . . . . .   6
        3.2.1.  Policy Updates  . . . . . . . . . . . . . . . . . . .   7
+       3.2.2.  Policy Revocation . . . . . . . . . . . . . . . . . .   7
      3.3.  Policy Discovery & Authentication . . . . . . . . . . . .   7
+       3.3.1.  HTTPS Policy Fetching . . . . . . . . . . . . . . . .   7
+       3.3.2.  Policy Selection for Smart Hosts  . . . . . . . . . .   8
      3.4.  Policy Validation . . . . . . . . . . . . . . . . . . . .   8
      3.5.  Policy Application  . . . . . . . . . . . . . . . . . . .   8
        3.5.1.  MX Preference in Enforce Mode . . . . . . . . . . . .   9
        3.5.2.  Policy Application Control Flow . . . . . . . . . . .   9
-   4.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
-   5.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
+   4.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  10
+   5.  Security Considerations . . . . . . . . . . . . . . . . . . .  10
    6.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  10
-   7.  Appendix 1: Validation Pseudocode . . . . . . . . . . . . . .  10
+   7.  Appendix 1: Validation Pseudocode . . . . . . . . . . . . . .  11
    8.  Appendix 2: Domain Owner STS example record . . . . . . . . .  11
      8.1.  Example 1 . . . . . . . . . . . . . . . . . . . . . . . .  11
    9.  Normative References  . . . . . . . . . . . . . . . . . . . .  12
@@ -104,15 +107,15 @@ Table of Contents
    (perhaps by overwriting the resolved MX record of the delivery
    domain) can perform downgrade or interception attacks.
 
-   This document defines a mechanism for recipient domains to publish
-   policies specifying:
-
 
 
 Margolis, et al.         Expires January 9, 2017                [Page 2]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+   This document defines a mechanism for recipient domains to publish
+   policies specifying:
 
    o  whether MTAs sending mail to this domain can expect TLS support
 
@@ -159,9 +162,6 @@ Internet-Draft                   MTA-STS                       July 2016
    required, authenticated encryption.  DANE requires DNSSEC [RFC4033]
    for authentication; the mechanism described here instead relies on
    certificate authorities (CAs) and does not require DNSSEC.
-
-
-
 
 
 
@@ -338,10 +338,6 @@ Margolis, et al.         Expires January 9, 2017                [Page 6]
 Internet-Draft                   MTA-STS                       July 2016
 
 
-   Senders MUST treat a policy with a max_age of 0 as a revocation: they
-   should purge any previously cached policy and proceed to deliver mail
-   to the recipient domain as though it never had an STS policy.
-
 3.2.1.  Policy Updates
 
    Updating the policy requires that the owner make changes in two
@@ -352,6 +348,12 @@ Internet-Draft                   MTA-STS                       July 2016
    use old, previously cached versions.  Recipients should thus expect a
    policy will continue to be used by senders until both the HTTPS and
    TXT endpoints are updated and the TXT record's TTL has passed.
+
+3.2.2.  Policy Revocation
+
+   Senders MUST treat a policy with a max_age of 0 as a revocation: they
+   should purge any previously cached policy and proceed to deliver mail
+   to the recipient domain as though it never had an STS policy.
 
 3.3.  Policy Discovery & Authentication
 
@@ -367,6 +369,11 @@ Internet-Draft                   MTA-STS                       July 2016
    of ".well-known/mta-sts.json".  For "example.com", this would be
    "https://mta-sts.example.com/.well-known/mta-sts.json".
 
+   A policy which has not ever been successfully authenticated MUST NOT
+   be used to reject mail.
+
+3.3.1.  HTTPS Policy Fetching
+
    When fetching a new policy or updating a policy, the HTTPS endpoint
    MUST present a TLS certificate which is valid for the "mta-sts" host
    (as described in [RFC6125]), chain to a root CA that is trusted by
@@ -374,17 +381,10 @@ Internet-Draft                   MTA-STS                       July 2016
 
    HTTP 3xx redirects MUST NOT be followed.
 
-   A policy which has not ever been successfully authenticated MUST NOT
-   be used to reject mail.
-
    Senders may wish to rate-limit the frequency of attempts to fetch the
    HTTPS endpoint even if a valid TXT record for the recipient domain
    exists.  In the case that the HTTPS GET fails, we suggest
    implementions may limit further attempts to a period of five minutes
-   or longer per version ID, to avoid overwhelming resource-constrained
-   recipients with cascading failures.
-
-
 
 
 
@@ -393,6 +393,16 @@ Margolis, et al.         Expires January 9, 2017                [Page 7]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+   or longer per version ID, to avoid overwhelming resource-constrained
+   recipients with cascading failures.
+
+3.3.2.  Policy Selection for Smart Hosts
+
+   When sending mail via a "smart host"--an intermediate SMTP relay
+   rather than the message recipient's server--compliant senders MUST
+   treat the smart host domain as the policy domain for the purposes of
+   policy discovery and application.
 
 3.4.  Policy Validation
 
@@ -431,6 +441,15 @@ Internet-Draft                   MTA-STS                       July 2016
        this host.  However, note that MTAs that honor "enforce" mode
        MUST first check for the existing of an updated, authenticated
        policy before _permanently_ failing messages.  This is to ensure
+
+
+
+
+Margolis, et al.         Expires January 9, 2017                [Page 8]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
        that failures only occur if a sending MTA is in fact validating
        against the most recent version of the recipient domain's policy.
 
@@ -440,15 +459,6 @@ Internet-Draft                   MTA-STS                       July 2016
    enforce STS at send-time (i.e., some domains may validate STS
    policies offline and only choose to report failures) or concerns
    about the completeness of their own trusted CA list.
-
-
-
-
-
-Margolis, et al.         Expires January 9, 2017                [Page 8]
-
-Internet-Draft                   MTA-STS                       July 2016
-
 
 3.5.1.  MX Preference in Enforce Mode
 
@@ -485,6 +495,17 @@ Internet-Draft                   MTA-STS                       July 2016
        following first checking for the presence of a new policy (as
        indicated by the "id" field in the "_mta_sts" TXT record).
 
+
+
+
+
+
+
+Margolis, et al.         Expires January 9, 2017                [Page 9]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
 4.  IANA Considerations
 
    A new .well-known URI will be registered in the Well-Known URIs
@@ -497,14 +518,6 @@ Internet-Draft                   MTA-STS                       July 2016
    SMTP Strict Transport Security attempts to protect against an active
    attacker who wishes to intercept or tamper with mail between hosts
    who support STARTTLS.  There are two classes of attacks considered:
-
-
-
-
-Margolis, et al.         Expires January 9, 2017                [Page 9]
-
-Internet-Draft                   MTA-STS                       July 2016
-
 
    1.  Foiling TLS negotiation, for example by deleting the "250
        STARTTLS" response from a server or altering TLS session
@@ -541,19 +554,6 @@ Internet-Draft                   MTA-STS                       July 2016
 
    Franck Martin LinkedIn, Inc fmartin (at) linkedin (dot com)
 
-   Klaus Umbach 1&1 Mail & Media Development & Technology GmbH
-   klaus.umbach (at) 1und1 (dot de)
-
-   Markus Laber 1&1 Mail & Media Development & Technology GmbH
-   markus.laber (at) 1und1 (dot de)
-
-7.  Appendix 1: Validation Pseudocode
-
-
-
-
-
-
 
 
 
@@ -561,6 +561,14 @@ Margolis, et al.         Expires January 9, 2017               [Page 10]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+   Klaus Umbach 1&1 Mail & Media Development & Technology GmbH
+   klaus.umbach (at) 1und1 (dot de)
+
+   Markus Laber 1&1 Mail & Media Development & Technology GmbH
+   markus.laber (at) 1und1 (dot de)
+
+7.  Appendix 1: Validation Pseudocode
 
 policy = policy_from_cache()
 if not policy or is_expired(policy):
@@ -603,19 +611,19 @@ if policy:
    domain, and is authenticated using the Web PKI mechanism.  The policy
    is fetched using HTTP GET method.
 
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 11]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
                       {
                         "version": "STSv1",
                         "mode": "report",
                         "mx": ["*.mail.example.com"],
                         "max_age": 123456
                       }
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 11]
-
-Internet-Draft                   MTA-STS                       July 2016
 
 
 9.  Normative References
@@ -656,14 +664,6 @@ Internet-Draft                   MTA-STS                       July 2016
               Security (TLS)", RFC 6125, DOI 10.17487/RFC6125, March
               2011, <http://www.rfc-editor.org/info/rfc6125>.
 
-   [RFC7672]  Dukhovni, V. and W. Hardaker, "SMTP Security via
-              Opportunistic DNS-Based Authentication of Named Entities
-              (DANE) Transport Layer Security (TLS)", RFC 7672, DOI 10
-              .17487/RFC7672, October 2015,
-              <http://www.rfc-editor.org/info/rfc7672>.
-
-
-
 
 
 
@@ -673,6 +673,12 @@ Margolis, et al.         Expires January 9, 2017               [Page 12]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+   [RFC7672]  Dukhovni, V. and W. Hardaker, "SMTP Security via
+              Opportunistic DNS-Based Authentication of Named Entities
+              (DANE) Transport Layer Security (TLS)", RFC 7672, DOI 10
+              .17487/RFC7672, October 2015,
+              <http://www.rfc-editor.org/info/rfc7672>.
 
 Authors' Addresses
 
@@ -704,12 +710,6 @@ Authors' Addresses
    Microsoft, Inc
 
    Email: janet.jones (at) microsoft (dot com)
-
-
-
-
-
-
 
 
 

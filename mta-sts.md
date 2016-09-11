@@ -242,10 +242,6 @@ policy forbids), domains can, at any time, publish an updated policy. As
 described in _Policy_ _Application_, senders MUST fetch a new policy before
 treating a validation failure as a permanent delivery failure. 
 
-Senders MUST treat a policy with a max_age of 0 as a revocation: they should
-purge any previously cached policy and proceed to deliver mail to the recipient
-domain as though it never had an STS policy.
-
 ### Policy Updates
 
 Updating the policy requires that the owner make changes in two places: the
@@ -255,6 +251,12 @@ TXT record has not been, senders will not know there is a new policy released
 and may thus continue to use old, previously cached versions.  Recipients should
 thus expect a policy will continue to be used by senders until both the HTTPS
 and TXT endpoints are updated and the TXT record's TTL has passed.
+
+### Policy Revocation
+
+Senders MUST treat a policy with a max_age of 0 as a revocation: they should
+purge any previously cached policy and proceed to deliver mail to the recipient
+domain as though it never had an STS policy.
 
 ## Policy Discovery & Authentication
 
@@ -270,6 +272,11 @@ the policy body from a host at the `mta-sts` host of the policy domain, using an
 `example.com`, this would be
 `https://mta-sts.example.com/.well-known/mta-sts.json`.
 
+A policy which has not ever been successfully authenticated MUST NOT be used to
+reject mail.
+
+### HTTPS Policy Fetching
+
 When fetching a new policy or updating a policy, the HTTPS endpoint MUST present
 a TLS certificate which is valid for the `mta-sts` host (as described in
 [@!RFC6125]), chain to a root CA that is trusted by the sending CA, and be
@@ -277,14 +284,17 @@ non-expired.
 
 HTTP 3xx redirects MUST NOT be followed.
 
-A policy which has not ever been successfully authenticated MUST NOT be used to
-reject mail.
-
 Senders may wish to rate-limit the frequency of attempts to fetch the HTTPS
 endpoint even if a valid TXT record for the recipient domain exists. In the case
 that the HTTPS GET fails, we suggest implementions may limit further attempts to
 a period of five minutes or longer per version ID, to avoid overwhelming
 resource-constrained recipients with cascading failures.
+
+### Policy Selection for Smart Hosts
+
+When sending mail via a "smart host"--an intermediate SMTP relay rather than the
+message recipient's server--compliant senders MUST treat the smart host domain
+as the policy domain for the purposes of policy discovery and application.
 
 ## Policy Validation
 
