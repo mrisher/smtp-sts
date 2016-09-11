@@ -87,12 +87,12 @@ Table of Contents
        3.5.2.  Policy Application Control Flow . . . . . . . . . . .   9
    4.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  10
    5.  Security Considerations . . . . . . . . . . . . . . . . . . .  10
-   6.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  10
-   7.  Appendix 1: Validation Pseudocode . . . . . . . . . . . . . .  11
-   8.  Appendix 2: Domain Owner STS example record . . . . . . . . .  11
-     8.1.  Example 1 . . . . . . . . . . . . . . . . . . . . . . . .  11
-   9.  Normative References  . . . . . . . . . . . . . . . . . . . .  12
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  13
+   6.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  11
+   7.  Appendix 1: Validation Pseudocode . . . . . . . . . . . . . .  12
+   8.  Appendix 2: Domain Owner STS example record . . . . . . . . .  12
+     8.1.  Example 1 . . . . . . . . . . . . . . . . . . . . . . . .  12
+   9.  Normative References  . . . . . . . . . . . . . . . . . . . .  13
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  14
 
 1.  Introduction
 
@@ -544,6 +544,53 @@ Internet-Draft                   MTA-STS                       July 2016
    The caching model described in _Policy_ _Expirations_ is designed to
    resist this attack.
 
+   We additionally consider the Denial of Service risk posed by an
+   attacker who can modify the DNS records for a victim domain.  Absent
+   SMTP STS, such an attacker can cause a sending MTA to cache invalid
+   MX records for a long TTL.  With SMTP STS, the attacker can
+   additionally advertise a new SMTP STS policy with never-satisfied
+   "mx" constraints and a long "max_age".
+
+   This attack is mitigated in part by the ability of a victim domain to
+   (at any time) publish a new policy updating or revoking the cached,
+   malicious policy; this does, however, require the victim domain to
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 10]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
+   both obtain a valid CA-signed certificate and to understand and
+   properly configure SMTP STS.
+
+   Similarly, we consider the possibilty of domains that deliberately
+   allow untrusted users to serve untrusted content on user-specified
+   subdomains.  In some cases (e.g. the service Tumblr.com) this takes
+   the form of providing HTTPS hosting of user-registered subdomains; in
+   other cases (e.g. dynamic DNS providers) this takes the form of
+   allowing untrusted users to register custom DNS records at the
+   provider's domain.
+
+   In these cases, there is a risk that untrusted users would be able to
+   serve custom content at the "mta-sts" host, including serving an
+   illegitimate SMTP STS policy.  We believe this attack is mitigated in
+   part by the need for the attacker to also serve the "_mta_sts" TXT
+   record on the same domain--something not, to our knowledge, widely
+   provided to untrusted users--and by the aforementioned ability for a
+   victim domain to revoke an invalid policy at any future date.
+
+   Even if an attacker cannot modify a served policy, the potential
+   exists for configurations that allow attackers on the same domain to
+   receive mail for that domain.  For example, an easy configuration
+   option when authoring an STS Policy for "example.com" is to set the
+   "mx" equal to "*.example.com"; recipient domains must consider in
+   this case the risk that any user possessing a valid hostname and CA-
+   signed certificate (for example, "dhcp-123.example.com") will, from
+   the perspective of STS Policy validation, be a valid MX host for that
+   domain.
+
 6.  Contributors
 
    Nicolas Lidzborski Google, Inc nlidz (at) google (dot com)
@@ -554,19 +601,22 @@ Internet-Draft                   MTA-STS                       July 2016
 
    Franck Martin LinkedIn, Inc fmartin (at) linkedin (dot com)
 
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 10]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
    Klaus Umbach 1&1 Mail & Media Development & Technology GmbH
    klaus.umbach (at) 1und1 (dot de)
 
    Markus Laber 1&1 Mail & Media Development & Technology GmbH
    markus.laber (at) 1und1 (dot de)
+
+
+
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 11]
+
+Internet-Draft                   MTA-STS                       July 2016
+
 
 7.  Appendix 1: Validation Pseudocode
 
@@ -613,7 +663,13 @@ if policy:
 
 
 
-Margolis, et al.         Expires January 9, 2017               [Page 11]
+
+
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 12]
 
 Internet-Draft                   MTA-STS                       July 2016
 
@@ -669,7 +725,7 @@ Internet-Draft                   MTA-STS                       July 2016
 
 
 
-Margolis, et al.         Expires January 9, 2017               [Page 12]
+Margolis, et al.         Expires January 9, 2017               [Page 13]
 
 Internet-Draft                   MTA-STS                       July 2016
 
@@ -725,4 +781,4 @@ Authors' Addresses
 
 
 
-Margolis, et al.         Expires January 9, 2017               [Page 13]
+Margolis, et al.         Expires January 9, 2017               [Page 14]

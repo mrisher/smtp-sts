@@ -491,6 +491,40 @@ block DNS responses can suppress the discovery of an STS Policy, making the
 Policy Domain appear not to have an STS Policy. The caching model described in
 <spanx style="emph">Policy</spanx> <spanx style="emph">Expirations</spanx> is designed to resist this attack.
 </t>
+<t>We additionally consider the Denial of Service risk posed by an attacker who can
+modify the DNS records for a victim domain. Absent SMTP STS, such an attacker
+can cause a sending MTA to cache invalid MX records for a long TTL. With SMTP
+STS, the attacker can additionally advertise a new SMTP STS policy with
+never-satisfied <spanx style="verb">mx</spanx> constraints and a long <spanx style="verb">max_age</spanx>.
+</t>
+<t>This attack is mitigated in part by the ability of a victim domain to (at any
+time) publish a new policy updating or revoking the cached, malicious policy;
+this does, however, require the victim domain to both obtain a valid CA-signed
+certificate and to understand and properly configure SMTP STS.
+</t>
+<t>Similarly, we consider the possibilty of domains that deliberately allow
+untrusted users to serve untrusted content on user-specified subdomains. In some
+cases (e.g. the service Tumblr.com) this takes the form of providing HTTPS
+hosting of user-registered subdomains; in other cases (e.g. dynamic DNS
+providers) this takes the form of allowing untrusted users to register custom
+DNS records at the provider's domain.
+</t>
+<t>In these cases, there is a risk that untrusted users would be able to serve
+custom content at the <spanx style="verb">mta-sts</spanx> host, including serving an illegitimate SMTP STS
+policy.  We believe this attack is mitigated in part by the need for the
+attacker to also serve the <spanx style="verb">_mta_sts</spanx> TXT record on the same domain--something
+not, to our knowledge, widely provided to untrusted users--and by the
+aforementioned ability for a victim domain to revoke an invalid policy at any
+future date.
+</t>
+<t>Even if an attacker cannot modify a served policy, the potential exists for
+configurations that allow attackers on the same domain to receive mail for that
+domain. For example, an easy configuration option when authoring an STS Policy
+for <spanx style="verb">example.com</spanx> is to set the <spanx style="verb">mx</spanx> equal to <spanx style="verb">*.example.com</spanx>; recipient domains
+must consider in this case the risk that any user possessing a valid hostname
+and CA-signed certificate (for example, <spanx style="verb">dhcp-123.example.com</spanx>) will, from the
+perspective of STS Policy validation, be a valid MX host for that domain.
+</t>
 </section>
 
 <section anchor="contributors" title="Contributors">
