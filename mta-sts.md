@@ -265,13 +265,13 @@ supports MTA-STS.
 
 When sending to a recipient domain for which a valid TXT record exists, a
 compliant sender will then fetch via the GET method an HTTPS resource containing
-the policy body from a host at the `policy.mta-sts` subdomain of the policy
-domain, using an [@!RFC5785] "well-known" path of `.well-known/mta-sts/current`.
-For `example.com`, this would be
-`https://policy.mta-sts.example.com/.well-known/mta-sts/current`.
+the policy body from a host at the `mta-sts` host of the policy domain, using an
+[@!RFC5785] "well-known" path of `.well-known/mta-sts/current`.  For
+`example.com`, this would be
+`https://mta-sts.example.com/.well-known/mta-sts/current`.
 
 When fetching a new policy or updating a policy, the HTTPS endpoint MUST present
-a TLS certificate which is valid for the `policy.mta-sts` host (as described in
+a TLS certificate which is valid for the `mta-sts` host (as described in
 [@!RFC6125]), chain to a root CA that is trusted by the sending CA, and be
 non-expired.
 
