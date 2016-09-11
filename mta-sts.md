@@ -151,7 +151,7 @@ US-ASCII.
   `example.net`, though _not_ hosts at subdomains. For example,
   `mx1.example.com` and `mx2.example.net` are both valid matches, but not
   `1234.dhcp.example.com`. The semantics for these patterns are those found in
-  Section 3.1 of [@!RFC2818].
+  the "Checking of Wildcard Certificates" rules in Section 6.4.3 of [RFC6125].
 * `max_age`: Max lifetime of the policy (plain-text positive integer seconds).
   Well-behaved clients SHOULD cache a policy for up to this value from last
   policy fetch time.

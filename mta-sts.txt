@@ -217,7 +217,7 @@ Internet-Draft                   MTA-STS                       July 2016
       "example.net", though _not_ hosts at subdomains.  For example,
       "mx1.example.com" and "mx2.example.net" are both valid matches,
       but not "1234.dhcp.example.com".  The semantics for these patterns
-      are those found in Section 3.1 of [RFC2818].
+
 
 
 
@@ -225,6 +225,9 @@ Margolis, et al.         Expires January 9, 2017                [Page 4]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+      are those found in the "Checking of Wildcard Certificates" rules
+      in Section 6.4.3 of [RFC6125].
 
    o  "max_age": Max lifetime of the policy (plain-text positive integer
       seconds).  Well-behaved clients SHOULD cache a policy for up to
@@ -266,9 +269,6 @@ Internet-Draft                   MTA-STS                       July 2016
 
    The formal definition of the SMTP MTA-STS policy, using [RFC5234], is
    as follows:
-
-
-
 
 
 
@@ -689,10 +689,6 @@ Internet-Draft                   MTA-STS                       July 2016
               RFC2119, March 1997,
               <http://www.rfc-editor.org/info/rfc2119>.
 
-   [RFC2818]  Rescorla, E., "HTTP Over TLS", RFC 2818, DOI 10.17487/
-              RFC2818, May 2000,
-              <http://www.rfc-editor.org/info/rfc2818>.
-
    [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
               Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
               February 2002, <http://www.rfc-editor.org/info/rfc3207>.
@@ -717,8 +713,12 @@ Internet-Draft                   MTA-STS                       July 2016
               .17487/RFC5785, April 2010,
               <http://www.rfc-editor.org/info/rfc5785>.
 
-
-
+   [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
+              Verification of Domain-Based Application Service Identity
+              within Internet Public Key Infrastructure Using X.509
+              (PKIX) Certificates in the Context of Transport Layer
+              Security (TLS)", RFC 6125, DOI 10.17487/RFC6125, March
+              2011, <http://www.rfc-editor.org/info/rfc6125>.
 
 
 
@@ -729,13 +729,6 @@ Margolis, et al.         Expires January 9, 2017               [Page 13]
 
 Internet-Draft                   MTA-STS                       July 2016
 
-
-   [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
-              Verification of Domain-Based Application Service Identity
-              within Internet Public Key Infrastructure Using X.509
-              (PKIX) Certificates in the Context of Transport Layer
-              Security (TLS)", RFC 6125, DOI 10.17487/RFC6125, March
-              2011, <http://www.rfc-editor.org/info/rfc6125>.
 
    [RFC7672]  Dukhovni, V. and W. Hardaker, "SMTP Security via
               Opportunistic DNS-Based Authentication of Named Entities
@@ -773,6 +766,13 @@ Authors' Addresses
    Microsoft, Inc
 
    Email: janet.jones (at) microsoft (dot com)
+
+
+
+
+
+
+
 
 
 
