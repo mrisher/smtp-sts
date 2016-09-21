@@ -136,7 +136,7 @@ routing, STARTTLS negotiation, and both DANE <xref target="RFC6698"/> and MTA-ST
 ref) policy validation errors, and standard TXT record that recipient domains
 can use to indicate where reports in this format should be sent.
 </t>
-<t>This document is intended as a companion to the specification for SMTP MTA
+<t>This document is intended as a companion to the specification for SMTP MTAe
 Strict Transport Security (MTA-STS, TODO: Add ref).
 </t>
 
@@ -190,14 +190,13 @@ recipient's SMTP STS policy can be retrieved from <spanx style="verb">_smtp_tlsr
 <t><spanx style="verb">rua</spanx>: A URI specifying the endpoint to which aggregate information about
  policy failures should be sent (see the section <spanx style="emph">Reporting</spanx> <spanx style="emph">Schema</spanx> for
  more information). Two URI schemes are supported: <spanx style="verb">mailto</spanx> and <spanx style="verb">https</spanx>.
-
-<figure align="center"><artwork align="center">
- * In the case of `https`, reports should be submitted via POST
-   ([@!RFC2818]) to the specified URI.
- * In the case of `mailto`, reports should be submitted to the specified
+<list style="symbols">
+<t>In the case of <spanx style="verb">https</spanx>, reports should be submitted via POST
+   (<xref target="RFC2818"/>) to the specified URI.</t>
+<t>In the case of <spanx style="verb">mailto</spanx>, reports should be submitted to the specified
    email address. When sending failure reports via SMTP, sending MTAs
-   MUST NOT honor SMTP STS or DANE TLSA failures.
-</artwork></figure></t>
+   MUST NOT honor SMTP STS or DANE TLSA failures.</t>
+</list></t>
 <t><spanx style="verb">ruf</spanx>: Future use. (There may also be a need for enabling more detailed
  &quot;forensic&quot; reporting during initial stages of a deployment. To address
  this, the authors consider the possibility of an optional additional
@@ -211,18 +210,18 @@ recipient's SMTP STS policy can be retrieved from <spanx style="verb">_smtp_tlsr
 </t>
 
 <figure align="center"><artwork align="center">
-tlsrpt-record       = tlsrpt-version *WSP %x3B tlsrpt-rua
+    tlsrpt-record    = tlsrpt-version *WSP %x3B tlsrpt-rua
 
-tlsrpt-version      = "v" *WSP "=" *WSP %x54 %x4C %x53 
-                      %x52 %x50 %x54 %x76 %x31
+    tlsrpt-version   = "v" *WSP "=" *WSP %x54 %x4C %x53
+                       %x52 %x50 %x54 %x76 %x31
 
-tlsrpt-rua          = "rua" *WSP "=" *WSP tlsrpt-uri
+    tlsrpt-rua       = "rua" *WSP "=" *WSP tlsrpt-uri
 
-tlsrpt-uri          = URI
-                    ; "URI" is imported from [@!RFC3986]; commas (ASCII
-                    ; 0x2C) and exclamation points (ASCII 0x21)
-                    ; MUST be encoded; the numeric portion MUST fit
-                    ; within an unsigned 64-bit integer
+    tlsrpt-uri       = URI
+                     ; "URI" is imported from [@!RFC3986]; commas (ASCII
+                     ; 0x2C) and exclamation points (ASCII 0x21)
+                     ; MUST be encoded; the numeric portion MUST fit
+                     ; within an unsigned 64-bit integer
 </artwork></figure>
 </section>
 
@@ -236,26 +235,19 @@ tlsrpt-uri          = URI
 <list style="symbols">
 <t>Report metadata:
 <list style="symbols">
-<t>The organization responsible for the report
-<list style="symbols">
+<t>The organization responsible for the report</t>
 <t>Contact information for one or more responsible parties for the
 contents of the report</t>
-</list></t>
 <t>A unique identifier for the report</t>
 <t>The reporting date range for the report</t>
 </list></t>
 <t>Policy, consisting of:
 <list style="symbols">
-<t>One of the following policy types:
-<list style="symbols">
+<t>One of the following policy types:</t>
 <t>The SMTP MTA STS policy applied (as a string)</t>
-<t>The DANE TLSA record applied (as a string)
-    * The literal string <spanx style="verb">no-policy-found</spanx>, if neither a TLSA nor
-
-<figure align="center"><artwork align="center">
-  MTA-STS policy could be found.
-</artwork></figure></t>
-</list></t>
+<t>The DANE TLSA record applied (as a string)</t>
+<t>The literal string <spanx style="verb">no-policy-found</spanx>, if neither a TLSA nor
+MTA-STS policy could be found.</t>
 <t>The domain for which the policy is applied</t>
 <t>The MX host</t>
 <t>An identifier for the policy (where applicable)</t>
@@ -282,10 +274,7 @@ to grow over time based on real-world experience. The initial set is:
 <t><spanx style="verb">success</spanx>: This indicates that the sending MTA was able to successfully
 negotiate a policy-compliant TLS connection, and serves to provide a
 &quot;heartbeat&quot; to receiving domains that reporting is functional and tabulating
-correctly.
-
-
-<vspace/></t>
+correctly.</t>
 </list>
 </t>
 </section>
@@ -364,15 +353,14 @@ filename = sender "!" policy-domain "!" begin-timestamp
 
  unique-id = 1*(ALPHA / DIGIT)
 
- sender = domain
-            ; imported from [@!RFC5322]
+ sender = domain        ; imported from [@!RFC5322]
 
  policy-domain   = domain
 
  begin-timestamp = 1*DIGIT
-                   ; seconds since 00:00:00 UTC January 1, 1970
-                   ; indicating start of the time range contained
-                   ; in the report
+                 ; seconds since 00:00:00 UTC January 1, 1970
+                 ; indicating start of the time range contained
+                 ; in the report
 
  end-timestamp = 1*DIGIT
                  ; seconds since 00:00:00 UTC January 1, 1970
@@ -451,8 +439,8 @@ SMTP STS or DANE TLSA failures.
 
 <section anchor="https-transport" title="HTTPS Transport">
 <t>The report MAY be delivered by POST to HTTPS. If compressed, the report should
-use the media type <spanx style="verb">application/
-gzip</spanx> if compressed (see <xref target="RFC6713"/>), and <spanx style="verb">text/json</spanx> otherwise.
+use the media type <spanx style="verb">application/gzip</spanx> if compressed (see <xref target="RFC6713"/>), and
+<spanx style="verb">text/json</spanx> otherwise.
 </t>
 </section>
 </section>
@@ -492,7 +480,7 @@ does not present a significant new vulnerability.</t>
 
 <figure align="center"><artwork align="center">
 _smtp_tlsrpt.mail.example.com. IN TXT \
-	"v=TLSRPTv1;rua=mailto:reports@example.com"
+        "v=TLSRPTv1;rua=mailto:reports@example.com"
 </artwork></figure>
 </section>
 
@@ -500,8 +488,8 @@ _smtp_tlsrpt.mail.example.com. IN TXT \
 
 <figure align="center"><artwork align="center">
 _smtp_tlsrpt.mail.example.com. IN TXT \
-	"v=TLSRPTv1; \
-	rua=https://reporting.example.com/v1/tlsrpt"
+        "v=TLSRPTv1; \
+        rua=https://reporting.example.com/v1/tlsrpt"
 </artwork></figure>
 </section>
 </section>
@@ -585,32 +573,32 @@ complete certificate chain presented during an attempted STARTTLS session.</t>
 
 <figure align="center"><artwork align="center">
 {
-	"organization-name": "Company-X",
-	"date-range": {
-		"start-datetime": "2016-04-01T00:00:00Z",
-		"end-datetime": "2016-04-01T23:59:59Z"
-	},
-	"contact-info": "sts-reporting@company-x.com",
-	"report-id": "5065427c-23d3-47ca-b6e0-946ea0e8c4be",
-	"policy": {
-		"policy-type": "sts",
-		"policy-string": "TODO: Add me",
-		"policy-domain": "company-y.com",
-		"mx-host": "*.mail.company-y.com"
-	},
-	"report-items": [{
-		"result-type": "ExpiredCertificate",
-		"sending-mta-ip": "98.136.216.25",
-		"receiving-mx-hostname": "mx1.mail.company-y.com",
-		"message-count": 100
-	}, {
-		"result-type": "StarttlsNotSupported",
-		"sending-mta-ip": "98.22.33.99",
-		"receiving-mx-hostname": "mx2.mail.company-y.com",
-		"message-count": 200,
-		"additional-information": "hxxps://reports.company-x.com/
-                  report_info?id=5065427c-23d3#StarttlsNotSupported"
-	}]
+  "organization-name": "Company-X",
+  "date-range": {
+    "start-datetime": "2016-04-01T00:00:00Z",
+    "end-datetime": "2016-04-01T23:59:59Z"
+  },
+  "contact-info": "sts-reporting@company-x.com",
+  "report-id": "5065427c-23d3-47ca-b6e0-946ea0e8c4be",
+  "policy": {
+    "policy-type": "sts",
+    "policy-string": "TODO: Add me",
+    "policy-domain": "company-y.com",
+    "mx-host": "*.mail.company-y.com"
+  },
+  "report-items": [{
+    "result-type": "ExpiredCertificate",
+    "sending-mta-ip": "98.136.216.25",
+    "receiving-mx-hostname": "mx1.mail.company-y.com",
+    "message-count": 100
+  }, {
+    "result-type": "StarttlsNotSupported",
+    "sending-mta-ip": "98.22.33.99",
+    "receiving-mx-hostname": "mx2.mail.company-y.com",
+    "message-count": 200,
+    "additional-information": "hxxps://reports.company-x.com/
+      report_info?id=5065427c-23d3#StarttlsNotSupported"
+  }]
 }
 </artwork></figure>
 <t>Figure: Example JSON report for a messages from Company-X to Company-Y, where
@@ -624,6 +612,7 @@ respond to the <spanx style="verb">STARTTLS</spanx> command.
 <back>
 <references title="Normative References">
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2818.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3339.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5234.xml"?>

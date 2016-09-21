@@ -146,18 +146,18 @@ Policies consist of the following directives:
 The formal definition of the `_smtp_tlsrpt` TXT record, defined using
 [@!RFC5234], is as follows:
 
-        tlsrpt-record       = tlsrpt-version *WSP %x3B tlsrpt-rua
+        tlsrpt-record    = tlsrpt-version *WSP %x3B tlsrpt-rua
 
-        tlsrpt-version      = "v" *WSP "=" *WSP %x54 %x4C %x53
-                              %x52 %x50 %x54 %x76 %x31
+        tlsrpt-version   = "v" *WSP "=" *WSP %x54 %x4C %x53
+                           %x52 %x50 %x54 %x76 %x31
 
-        tlsrpt-rua          = "rua" *WSP "=" *WSP tlsrpt-uri
+        tlsrpt-rua       = "rua" *WSP "=" *WSP tlsrpt-uri
 
-        tlsrpt-uri          = URI
-                            ; "URI" is imported from [@!RFC3986]; commas (ASCII
-                            ; 0x2C) and exclamation points (ASCII 0x21)
-                            ; MUST be encoded; the numeric portion MUST fit
-                            ; within an unsigned 64-bit integer
+        tlsrpt-uri       = URI
+                         ; "URI" is imported from [@!RFC3986]; commas (ASCII
+                         ; 0x2C) and exclamation points (ASCII 0x21)
+                         ; MUST be encoded; the numeric portion MUST fit
+                         ; within an unsigned 64-bit integer
 
 # Reporting Schema
 
@@ -454,32 +454,32 @@ Figure: JSON Report Format
 
 ```
 {
-        "organization-name": "Company-X",
-        "date-range": {
-                "start-datetime": "2016-04-01T00:00:00Z",
-                "end-datetime": "2016-04-01T23:59:59Z"
-        },
-        "contact-info": "sts-reporting@company-x.com",
-        "report-id": "5065427c-23d3-47ca-b6e0-946ea0e8c4be",
-        "policy": {
-                "policy-type": "sts",
-                "policy-string": "TODO: Add me",
-                "policy-domain": "company-y.com",
-                "mx-host": "*.mail.company-y.com"
-        },
-        "report-items": [{
-                "result-type": "ExpiredCertificate",
-                "sending-mta-ip": "98.136.216.25",
-                "receiving-mx-hostname": "mx1.mail.company-y.com",
-                "message-count": 100
-        }, {
-                "result-type": "StarttlsNotSupported",
-                "sending-mta-ip": "98.22.33.99",
-                "receiving-mx-hostname": "mx2.mail.company-y.com",
-                "message-count": 200,
-                "additional-information": "hxxps://reports.company-x.com/
-                  report_info?id=5065427c-23d3#StarttlsNotSupported"
-        }]
+  "organization-name": "Company-X",
+  "date-range": {
+    "start-datetime": "2016-04-01T00:00:00Z",
+    "end-datetime": "2016-04-01T23:59:59Z"
+  },
+  "contact-info": "sts-reporting@company-x.com",
+  "report-id": "5065427c-23d3-47ca-b6e0-946ea0e8c4be",
+  "policy": {
+    "policy-type": "sts",
+    "policy-string": "TODO: Add me",
+    "policy-domain": "company-y.com",
+    "mx-host": "*.mail.company-y.com"
+  },
+  "report-items": [{
+    "result-type": "ExpiredCertificate",
+    "sending-mta-ip": "98.136.216.25",
+    "receiving-mx-hostname": "mx1.mail.company-y.com",
+    "message-count": 100
+  }, {
+    "result-type": "StarttlsNotSupported",
+    "sending-mta-ip": "98.22.33.99",
+    "receiving-mx-hostname": "mx2.mail.company-y.com",
+    "message-count": 200,
+    "additional-information": "hxxps://reports.company-x.com/
+      report_info?id=5065427c-23d3#StarttlsNotSupported"
+  }]
 }
 ```
 
