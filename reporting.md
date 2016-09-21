@@ -117,7 +117,6 @@ We also define the following terms for further use in this document:
     [@!RFC7489] contains an XML-based reporting format for aggregate and
     detailed email delivery errors.
 
-
 # Reporting Policy
 
 A report receiver pushishes a record to its DNS indicating that it wishes to
@@ -147,18 +146,18 @@ Policies consist of the following directives:
 The formal definition of the `_smtp_tlsrpt` TXT record, defined using
 [@!RFC5234], is as follows:
 
-	tlsrpt-record		= tlsrpt-version *WSP %x3B tlsrpt-rua
+        tlsrpt-record       = tlsrpt-version *WSP %x3B tlsrpt-rua
 
-	tlsrpt-version 		= "v" *WSP "=" *WSP %x54 %x4C %x53
-						  %x52 %x50 %x54 %x76 %x31
+        tlsrpt-version      = "v" *WSP "=" *WSP %x54 %x4C %x53
+                              %x52 %x50 %x54 %x76 %x31
 
-	tlsrpt-rua			= "rua" *WSP "=" *WSP tlsrpt-uri
+        tlsrpt-rua          = "rua" *WSP "=" *WSP tlsrpt-uri
 
-	tlsrpt-uri      	= URI
-	                    ; "URI" is imported from [@!RFC3986]; commas (ASCII
-	                    ; 0x2C) and exclamation points (ASCII 0x21)
-	                    ; MUST be encoded; the numeric portion MUST fit
-	                    ; within an unsigned 64-bit integer
+        tlsrpt-uri          = URI
+                            ; "URI" is imported from [@!RFC3986]; commas (ASCII
+                            ; 0x2C) and exclamation points (ASCII 0x21)
+                            ; MUST be encoded; the numeric portion MUST fit
+                            ; within an unsigned 64-bit integer
 
 # Reporting Schema
 
@@ -191,20 +190,20 @@ Note that the failure types are non-exclusive; an aggregate report MAY contain
 overlapping `counts` of failure types where a single send attempt encountered
 multiple errors.
 
-
 ## Result Types
 
 The list of result types will start with the minimal set below, and is expected
 to grow over time based on real-world experience. The initial set is:
 
 ### Success Type
+
 * `success`: This indicates that the sending MTA was able to successfully
     negotiate a policy-compliant TLS connection, and serves to provide a
     "heartbeat" to receiving domains that reporting is functional and tabulating
     correctly.
 
-
 ### Routing Failures
+
 * `mx-mismatch`: This indicates that the MX resolved for the recipient domain
     did not match the MX constraint specified in the policy.
 * `certificate-host-mismatch`: This indicates that the certificate presented
@@ -230,40 +229,41 @@ to grow over time based on real-world experience. The initial set is:
 ### Policy Failures
 
 #### DANE-specific Policy Failures
+
 * `tlsa-invalid`: This indicates a validation error in the TLSA record
     associated with a DANE policy.
 * `dnssec-invalid`: This indicates a failure to authenticate DNS records for a
     Policy Domain with a published TLSA record.
 
 #### STS-specific Policy Failures
+
 * `sts-invalid`: This indicates a validation error for the overall MTA-STS
     policy.
 * `webpki-invalid`: This indicates that the MTA-STS policy could not be
     authenticated using PKIX validation.
 
-
 # Report Delivery
+
 Reports can be delivered either as an email message via SMTP or via HTTP
 POST.
 
 ## Report Filename
+
 The filename is typically constructed using the following ABNF:
 
-
-	filename = sender "!" policy-domain "!" begin-timestamp
+    filename = sender "!" policy-domain "!" begin-timestamp
                "!" end-timestamp [ "!" unique-id ] "." extension
 
      unique-id = 1*(ALPHA / DIGIT)
 
-     sender = domain
-                ; imported from [@!RFC5322]
+     sender = domain        ; imported from [@!RFC5322]
 
      policy-domain   = domain
 
      begin-timestamp = 1*DIGIT
-                       ; seconds since 00:00:00 UTC January 1, 1970
-                       ; indicating start of the time range contained
-                       ; in the report
+                     ; seconds since 00:00:00 UTC January 1, 1970
+                     ; indicating start of the time range contained
+                     ; in the report
 
      end-timestamp = 1*DIGIT
                      ; seconds since 00:00:00 UTC January 1, 1970
@@ -292,6 +292,7 @@ doing the compression increases the chances of acceptance of the report at some
 compute cost.
 
 ## Email Transport
+
 The report MAY be delivered by email. No specific MIME message structure is
 required. It is presumed that the aggregate reporting address will be equipped
 to extract MIME parts with the prescribed media type and filename and ignore
@@ -326,21 +327,18 @@ gzip` if compressed (see [@!RFC6713]), and `text/json` otherwise.
          Submitter: mail.sender.example.com
          Report-ID: <735ff.e317+bf22029@mailexample.net>
 
-
 Note that, when sending failure reports via SMTP, sending MTAs MUST NOT honor
 SMTP STS or DANE TLSA failures.
 
-
 ## HTTPS Transport
+
 The report MAY be delivered by POST to HTTPS. If compressed, the report should
 use the media type `application/gzip` if compressed (see [@!RFC6713]), and
 `text/json` otherwise.
 
-
 # IANA Considerations
 
 There are no IANA considerations at this time.
-
 
 # Security Considerations
 
@@ -364,22 +362,21 @@ several security risks presented by the existence of this reporting channel:
     absent DANE or MTA-STS policies, actual SMTP message payloads) today, this
     does not present a significant new vulnerability.
 
-
 # Appendix 1: Example Reporting Policy
 
 ## Report using MAILTO
 
 ```
 _smtp_tlsrpt.mail.example.com. IN TXT \
-	"v=TLSRPTv1;rua=mailto:reports@example.com"
+        "v=TLSRPTv1;rua=mailto:reports@example.com"
 ```
 
 ## Report using HTTPS
 
 ```
 _smtp_tlsrpt.mail.example.com. IN TXT \
-	"v=TLSRPTv1; \
-	rua=https://reporting.example.com/v1/tlsrpt"
+        "v=TLSRPTv1; \
+        rua=https://reporting.example.com/v1/tlsrpt"
 ```
 
 # Appendix 2: JSON Report Schema
@@ -453,37 +450,36 @@ Figure: JSON Report Format
     around the relevant `result-type`. For example, this URI might host the
     complete certificate chain presented during an attempted STARTTLS session.
 
-
 # Appendix 3: Example JSON Report
 
 ```
 {
-	"organization-name": "Company-X",
-	"date-range": {
-		"start-datetime": "2016-04-01T00:00:00Z",
-		"end-datetime": "2016-04-01T23:59:59Z"
-	},
-	"contact-info": "sts-reporting@company-x.com",
-	"report-id": "5065427c-23d3-47ca-b6e0-946ea0e8c4be",
-	"policy": {
-		"policy-type": "sts",
-		"policy-string": "TODO: Add me",
-		"policy-domain": "company-y.com",
-		"mx-host": "*.mail.company-y.com"
-	},
-	"report-items": [{
-		"result-type": "ExpiredCertificate",
-		"sending-mta-ip": "98.136.216.25",
-		"receiving-mx-hostname": "mx1.mail.company-y.com",
-		"message-count": 100
-	}, {
-		"result-type": "StarttlsNotSupported",
-		"sending-mta-ip": "98.22.33.99",
-		"receiving-mx-hostname": "mx2.mail.company-y.com",
-		"message-count": 200,
-		"additional-information": "hxxps://reports.company-x.com/
+        "organization-name": "Company-X",
+        "date-range": {
+                "start-datetime": "2016-04-01T00:00:00Z",
+                "end-datetime": "2016-04-01T23:59:59Z"
+        },
+        "contact-info": "sts-reporting@company-x.com",
+        "report-id": "5065427c-23d3-47ca-b6e0-946ea0e8c4be",
+        "policy": {
+                "policy-type": "sts",
+                "policy-string": "TODO: Add me",
+                "policy-domain": "company-y.com",
+                "mx-host": "*.mail.company-y.com"
+        },
+        "report-items": [{
+                "result-type": "ExpiredCertificate",
+                "sending-mta-ip": "98.136.216.25",
+                "receiving-mx-hostname": "mx1.mail.company-y.com",
+                "message-count": 100
+        }, {
+                "result-type": "StarttlsNotSupported",
+                "sending-mta-ip": "98.22.33.99",
+                "receiving-mx-hostname": "mx2.mail.company-y.com",
+                "message-count": 200,
+                "additional-information": "hxxps://reports.company-x.com/
                   report_info?id=5065427c-23d3#StarttlsNotSupported"
-	}]
+        }]
 }
 ```
 
@@ -491,7 +487,5 @@ Figure: Example JSON report for a messages from Company-X to Company-Y, where
 100 messages were attempted to Company Y servers with an expired certificate and
 200 messages were attempted to Company Y servers that did not successfully
 respond to the `STARTTLS` command.
-
-
 
 {backmatter}
