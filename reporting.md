@@ -368,14 +368,14 @@ several security risks presented by the existence of this reporting channel:
 
 # Appendix 1: Example Reporting Policy
 
-### Report using MAILTO
+## Report using MAILTO
 
 ```
 _smtp_tlsrpt.mail.example.com. IN TXT \
 	"v=TLSRPTv1;rua=mailto:reports@example.com"
 ```
 
-### Report using HTTPS
+## Report using HTTPS
 
 ```
 _smtp_tlsrpt.mail.example.com. IN TXT \
@@ -414,6 +414,7 @@ The JSON schema is derived from the HPKP JSON schema [@!RFC7469] (cf. Section 3)
   ]
 }
 ```
+
 Figure: JSON Report Format
 
   * `organization-name`: The name of the organization responsible for the
@@ -455,6 +456,7 @@ Figure: JSON Report Format
 
 
 # Appendix 3: Example JSON Report
+
 ```
 {
 	"organization-name": "Company-X",
@@ -485,6 +487,7 @@ Figure: JSON Report Format
 	}]
 }
 ```
+
 Figure: Example JSON report for a messages from Company-X to Company-Y, where
 100 messages were attempted to Company Y servers with an expired certificate and
 200 messages were attempted to Company Y servers that did not successfully
