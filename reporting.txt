@@ -77,11 +77,8 @@ Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.1.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   3
-   2.  Related Technologies  . . . . . . . . . . . . . . . . . . . .   3
+   2.  Related Technologies  . . . . . . . . . . . . . . . . . . . .   4
    3.  Reporting Policy  . . . . . . . . . . . . . . . . . . . . . .   4
-     3.1.  Example Reporting Policy  . . . . . . . . . . . . . . . .   5
-       3.1.1.  Report using MAILTO . . . . . . . . . . . . . . . . .   5
-       3.1.2.  Report using HTTPS  . . . . . . . . . . . . . . . . .   5
    4.  Reporting Schema  . . . . . . . . . . . . . . . . . . . . . .   5
      4.1.  Result Types  . . . . . . . . . . . . . . . . . . . . . .   6
        4.1.1.  Success Type  . . . . . . . . . . . . . . . . . . . .   6
@@ -89,12 +86,19 @@ Table of Contents
        4.1.3.  Negotiation Failures  . . . . . . . . . . . . . . . .   6
        4.1.4.  Policy Failures . . . . . . . . . . . . . . . . . . .   7
    5.  Report Delivery . . . . . . . . . . . . . . . . . . . . . . .   7
-   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
-   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   7
-   8.  Appendix 1: JSON Report Schema  . . . . . . . . . . . . . . .   8
-   9.  Appendix 2: Example JSON Report . . . . . . . . . . . . . . .  10
-   10. Normative References  . . . . . . . . . . . . . . . . . . . .  10
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  11
+     5.1.  Report Filename . . . . . . . . . . . . . . . . . . . . .   7
+     5.2.  Compression . . . . . . . . . . . . . . . . . . . . . . .   8
+     5.3.  Email Transport . . . . . . . . . . . . . . . . . . . . .   8
+     5.4.  HTTPS Transport . . . . . . . . . . . . . . . . . . . . .   9
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
+   8.  Appendix 1: Example Reporting Policy  . . . . . . . . . . . .  10
+     8.1.  Report using MAILTO . . . . . . . . . . . . . . . . . . .  10
+     8.2.  Report using HTTPS  . . . . . . . . . . . . . . . . . . .  10
+   9.  Appendix 2: JSON Report Schema  . . . . . . . . . . . . . . .  10
+   10. Appendix 3: Example JSON Report . . . . . . . . . . . . . . .  12
+   11. Normative References  . . . . . . . . . . . . . . . . . . . .  13
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  15
 
 1.  Introduction
 
@@ -102,10 +106,6 @@ Table of Contents
    hosts to establish secure SMTP sessions over TLS.  The protocol
    design is based on "Opportunistic Security" (OS) [RFC7435], which
    provides interoperability for clients that do not support STARTTLS
-   but means that any attacker who can delete parts of the SMTP session
-   (such as the "250 STARTTLS" response) or redirect the entire SMTP
-   session (perhaps by overwriting the resolved MX record of the
-   delivery domain) can perform a downgrade or interception attack.
 
 
 
@@ -113,6 +113,11 @@ Margolis, et al.         Expires January 9, 2017                [Page 2]
 
 Internet-Draft                 SMTP-TLSRPT                     July 2016
 
+
+   but means that any attacker who can delete parts of the SMTP session
+   (such as the "250 STARTTLS" response) or redirect the entire SMTP
+   session (perhaps by overwriting the resolved MX record of the
+   delivery domain) can perform a downgrade or interception attack.
 
    Because such "downgrade attacks" are not necessarily apparent to the
    receiving MTA, this document defines a mechanism for sending domains
@@ -153,14 +158,9 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
 
    o  Sending MTA: The MTA initiating the delivery of an email message.
 
-2.  Related Technologies
 
-   o  This document is intended as a companion to the specification for
-      SMTP MTA Strict Transport Security (MTA-STS, TODO: Add ref).
 
-   o  The Public Key Pinning Extension for HTTP [RFC7469] contains a
-      JSON-based definition for reporting individual pin validation
-      failures.
+
 
 
 
@@ -170,21 +170,27 @@ Margolis, et al.         Expires January 9, 2017                [Page 3]
 Internet-Draft                 SMTP-TLSRPT                     July 2016
 
 
+2.  Related Technologies
+
+   o  This document is intended as a companion to the specification for
+      SMTP MTA Strict Transport Security (MTA-STS, TODO: Add ref).
+
+   o  The Public Key Pinning Extension for HTTP [RFC7469] contains a
+      JSON-based definition for reporting individual pin validation
+      failures.
+
    o  The Domain-based Message Authentication, Reporting, and
       Conformance (DMARC) [RFC7489] contains an XML-based reporting
       format for aggregate and detailed email delivery errors.
 
 3.  Reporting Policy
 
-   SMTP TLSRPT policies are distributed via DNS from the Policy Domain's
-   zone, as TXT records (similar to DMARC policies) under the name
-   "_smtp_tlsrpt".  For example, for the Policy Domain "example.com",
-   the recipient's SMTP STS policy can be retrieved from
-   "_smtp_tlsrpt.example.com".
-
-   (Future implementations may move to alternate methods of policy
-   discovery or distribution.  See the section _Future_ _Work_ for more
-   discussion.)
+   A report receiver pushishes a record to its DNS indicating that it
+   wishes to receive reports.  These SMTP TLSRPT policies are
+   distributed via DNS from the Policy Domain's zone, as TXT records
+   (similar to DMARC policies) under the name "_smtp_tlsrpt".  For
+   example, for the Policy Domain "example.com", the recipient's SMTP
+   STS policy can be retrieved from "_smtp_tlsrpt.example.com".
 
    Policies consist of the following directives:
 
@@ -208,15 +214,9 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
       details--such as certificate chains and MTA banners--may be
       reported.  See the section _Future_ _Work_ for more details.)
 
-   The formal definition of the "_mta_sts" TXT record, defined using
+   The formal definition of the "_smtp_tlsrpt" TXT record, defined using
    [RFC5234], is as follows:
 
-         sts-text-record = sts-version *WSP %x3B *WSP sts-id
-
-         sts-version     = "v" *WSP "=" *WSP %x54 %x4C %x53
-                           %x52 %x50 %x54 %x76 %x31
-
-         sts-id          = "id" *WSP "=" *WSP 1*32(ALPHA / DIGIT)
 
 
 
@@ -226,20 +226,23 @@ Margolis, et al.         Expires January 9, 2017                [Page 4]
 Internet-Draft                 SMTP-TLSRPT                     July 2016
 
 
-3.1.  Example Reporting Policy
+ tlsrpt-record       = tlsrpt-version *WSP %x3B tlsrpt-rua
 
-3.1.1.  Report using MAILTO
+ tlsrpt-version      = "v" *WSP "=" *WSP %x54 %x4C %x53
+                       %x52 %x50 %x54 %x76 %x31
 
-              _smtp_tlsrpt.mail.example.com. IN TXT \
-                  "v=TLSRPTv1;rua=mailto:reports@example.com"
+ tlsrpt-rua          = "rua" *WSP "=" *WSP tlsrpt-uri
 
-3.1.2.  Report using HTTPS
-
-             _smtp_tlsrpt.mail.example.com. IN TXT \
-                 "v=TLSRPTv1; \
-                 rua=https://reporting.example.com/v1/tlsrpt"
+ tlsrpt-uri          = URI
+                     ; "URI" is imported from [@!RFC3986]; commas (ASCII
+                     ; 0x2C) and exclamation points (ASCII 0x21)
+                     ; MUST be encoded; the numeric portion MUST fit
+                     ; within an unsigned 64-bit integer
 
 4.  Reporting Schema
+
+   The report is composed as a plain text file encoded in the JSON
+   format ([RFC7159]).
 
    Aggregate reports contain the following fields:
 
@@ -271,9 +274,6 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
 
       *  An identifier for the policy (where applicable)
 
-   o  Aggregate counts, comprising result type, sending MTA IP,
-      receiving MTA hostname, message count, and an optional additional
-
 
 
 
@@ -282,6 +282,8 @@ Margolis, et al.         Expires January 9, 2017                [Page 5]
 Internet-Draft                 SMTP-TLSRPT                     July 2016
 
 
+   o  Aggregate counts, comprising result type, sending MTA IP,
+      receiving MTA hostname, message count, and an optional additional
       information field containing a URI for recipients to review
       further information on a failure type.
 
@@ -331,8 +333,6 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
 
 
 
-
-
 Margolis, et al.         Expires January 9, 2017                [Page 6]
 
 Internet-Draft                 SMTP-TLSRPT                     July 2016
@@ -365,25 +365,25 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
 
 5.  Report Delivery
 
-   Note that, when sending failure reports via SMTP, sending MTAs MUST
-   NOT honor SMTP STS or DANE TLSA failures.
+   Reports can be delivered either as an email message via SMTP or via
+   HTTP POST.
 
-6.  IANA Considerations
+5.1.  Report Filename
 
-   There are no IANA considerations at this time.
+   The filename is typically constructed using the following ABNF:
 
-7.  Security Considerations
 
-   SMTP TLS Reporting provides transparency into misconfigurations or
-   attempts to intercept or tamper with mail between hosts who support
-   STARTTLS.  There are several security risks presented by the
-   existence of this reporting channel:
 
-   o  Flooding of the Aggregate report URI (rua) endpoint: An attacker
-      could flood the endpoint and prevent the receiving domain from
-      accepting additional reports.  This type of Denial-of-Service
-      attack would limit visibility into STARTTLS failures, leaving the
-      receiving domain blind to an ongoing attack.
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -393,6 +393,127 @@ Margolis, et al.         Expires January 9, 2017                [Page 7]
 
 Internet-Draft                 SMTP-TLSRPT                     July 2016
 
+
+     filename = sender "!" policy-domain "!" begin-timestamp
+                "!" end-timestamp [ "!" unique-id ] "." extension
+
+      unique-id = 1*(ALPHA / DIGIT)
+
+      sender = domain
+                 ; imported from [@!RFC5322]
+
+      policy-domain   = domain
+
+      begin-timestamp = 1*DIGIT
+                        ; seconds since 00:00:00 UTC January 1, 1970
+                        ; indicating start of the time range contained
+                        ; in the report
+
+      end-timestamp = 1*DIGIT
+                      ; seconds since 00:00:00 UTC January 1, 1970
+                      ; indicating end of the time range contained
+                      ; in the report
+
+      extension = "json" / "json.gz"
+
+   The extension MUST be "json" for a plain JSON file, or "json.gz" for
+   a JSON file compressed using GZIP.
+
+   "unique-id" allows an optional unique ID generated by the Sending MTA
+   to distinguish among multiple reports generated simultaneously by
+   different sources within the same Policy Domain.  For example, this
+   is a possible filename for the gzip file of a report to the Policy
+   Domain "example.net" from the Sending MTA "mail.sender.example.com":
+
+ `mail.sender.example.com!example.net!1470013207!1470186007!001.json.gz`
+
+5.2.  Compression
+
+   The report SHOULD be subjected to GZIP compression.  Declining to
+   apply compression can cause the report to be too large for a receiver
+   to process (a commonly observed receiver limit is ten megabytes);
+   doing the compression increases the chances of acceptance of the
+   report at some compute cost.
+
+5.3.  Email Transport
+
+   The report MAY be delivered by email.  No specific MIME message
+   structure is required.  It is presumed that the aggregate reporting
+   address will be equipped to extract MIME parts with the prescribed
+   media type and filename and ignore the rest.
+
+
+
+
+Margolis, et al.         Expires January 9, 2017                [Page 8]
+
+Internet-Draft                 SMTP-TLSRPT                     July 2016
+
+
+   If compressed, the report should use the media type "application/
+   gzip" if compressed (see [RFC6713]), and "text/json" otherwise.
+
+   The [RFC5322].Subject field for individual report submissions SHOULD
+   conform to the following ABNF:
+
+     tlsrpt-subject = %x52.65.70.6f.72.74 1*FWS       ; "Report"
+                      %x44.6f.6d.61.69.6e.3a 1*FWS    ; "Domain:"
+                      domain-name 1*FWS               ; from RFC 6376
+                      %x53.75.62.6d.69.74.74.65.72.3a ; "Submitter:"
+                      1*FWS domain-name 1*FWS
+                      %x52.65.70.6f.72.74.2d.49.44.3a ; "Report-ID:"
+                      msg-id                          ; from RFC 5322
+
+   The first domain-name indicates the DNS domain name about which the
+   report was generated.  The second domain-name indicates the DNS
+   domain name representing the Sending MTA generating the report.  The
+   purpose of the Report-ID: portion of the field is to enable the
+   Policy Domain to identify and ignore duplicate reports that might be
+   sent by a Sending MTA.
+
+   For instance, this is a possible Subject field for a report to the
+   Policy Domain "example.net" from the Sending MTA
+   "mail.sender.example.com".  It is line-wrapped as allowed by
+   [RFC5322]:
+
+            Subject: Report Domain: example.net
+                Submitter: mail.sender.example.com
+                Report-ID: <735ff.e317+bf22029@mailexample.net>
+
+   Note that, when sending failure reports via SMTP, sending MTAs MUST
+   NOT honor SMTP STS or DANE TLSA failures.
+
+5.4.  HTTPS Transport
+
+   The report MAY be delivered by POST to HTTPS.  If compressed, the
+   report should use the media type "application/ gzip" if compressed
+   (see [RFC6713]), and "text/json" otherwise.
+
+6.  IANA Considerations
+
+   There are no IANA considerations at this time.
+
+7.  Security Considerations
+
+   SMTP TLS Reporting provides transparency into misconfigurations or
+   attempts to intercept or tamper with mail between hosts who support
+
+
+
+
+Margolis, et al.         Expires January 9, 2017                [Page 9]
+
+Internet-Draft                 SMTP-TLSRPT                     July 2016
+
+
+   STARTTLS.  There are several security risks presented by the
+   existence of this reporting channel:
+
+   o  Flooding of the Aggregate report URI (rua) endpoint: An attacker
+      could flood the endpoint and prevent the receiving domain from
+      accepting additional reports.  This type of Denial-of-Service
+      attack would limit visibility into STARTTLS failures, leaving the
+      receiving domain blind to an ongoing attack.
 
    o  Untrusted content: An attacker could inject malicious code into
       the report, opening a vulnerability in the receiving domain.
@@ -406,10 +527,40 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
       actual SMTP message payloads) today, this does not present a
       significant new vulnerability.
 
-8.  Appendix 1: JSON Report Schema
+8.  Appendix 1: Example Reporting Policy
+
+8.1.  Report using MAILTO
+
+              _smtp_tlsrpt.mail.example.com. IN TXT \
+                  "v=TLSRPTv1;rua=mailto:reports@example.com"
+
+8.2.  Report using HTTPS
+
+             _smtp_tlsrpt.mail.example.com. IN TXT \
+                 "v=TLSRPTv1; \
+                 rua=https://reporting.example.com/v1/tlsrpt"
+
+9.  Appendix 2: JSON Report Schema
 
    The JSON schema is derived from the HPKP JSON schema [RFC7469] (cf.
    Section 3)
+
+
+
+
+
+
+
+
+
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 10]
+
+Internet-Draft                 SMTP-TLSRPT                     July 2016
+
 
            {
              "organization-name": organization-name,
@@ -430,25 +581,17 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
                  "result-type": result-type,
                  "sending-mta-ip": ip-address,
                  "receiving-mx-hostname": receiving-mx-hostname,
+                 "receiving-mx-helo": receiving-mx-helo,
                  "message-count": message-count,
                  "additional-information": additional-info-uri
                }
              ]
            }
 
-                            JSON Report Format
+   Figure: JSON Report Format
 
    o  "organization-name": The name of the organization responsible for
       the report.  It is provided as a string.
-
-
-
-
-
-Margolis, et al.         Expires January 9, 2017                [Page 8]
-
-Internet-Draft                 SMTP-TLSRPT                     July 2016
-
 
    o  "date-time": The date-time indicates the start- and end-times for
       the report range.  It is provided as a string formatted according
@@ -465,6 +608,15 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
    o  "policy-type": The type of policy that was applied by the sending
       domain.  Presently, the only two valid choices are "tlsa" and
       "sts".  It is provided as a string.
+
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 11]
+
+Internet-Draft                 SMTP-TLSRPT                     July 2016
+
 
    o  "policy-string": The string serialization of the policy, whether
       TLSA record or STS policy.  Any linefeeds from the original policy
@@ -490,6 +642,9 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
       record with which the sending MTA attempted to negotiate a
       STARTTLS connection.
 
+   o  "receiving-mx-helo": (optional) The HELO or EHLO string from the
+      banner announced during the reported session.
+
    o  "message-count": The number of (attempted) messages that match the
       relevant "result-type" for this section.
 
@@ -498,15 +653,26 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
       URI might host the complete certificate chain presented during an
       attempted STARTTLS session.
 
+10.  Appendix 3: Example JSON Report
 
 
 
-Margolis, et al.         Expires January 9, 2017                [Page 9]
+
+
+
+
+
+
+
+
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 12]
 
 Internet-Draft                 SMTP-TLSRPT                     July 2016
 
-
-9.  Appendix 2: Example JSON Report
 
    {
        "organization-name": "Company-X",
@@ -537,12 +703,13 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
        }]
    }
 
-   Example JSON report for a messages from Company-X to Company-Y, where
-     100 messages were attempted to Company Y servers with an expired
-   certificate and 200 messages were attempted to Company Y servers that
-           did not successfully respond to the STARTTLS command.
+   Figure: Example JSON report for a messages from Company-X to
+   Company-Y, where 100 messages were attempted to Company Y servers
+   with an expired certificate and 200 messages were attempted to
+   Company Y servers that did not successfully respond to the "STARTTLS"
+   command.
 
-10.  Normative References
+11.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
@@ -557,7 +724,8 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
 
 
 
-Margolis, et al.         Expires January 9, 2017               [Page 10]
+
+Margolis, et al.         Expires January 9, 2017               [Page 13]
 
 Internet-Draft                 SMTP-TLSRPT                     July 2016
 
@@ -587,6 +755,14 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
               Protocol: TLSA", RFC 6698, DOI 10.17487/RFC6698, August
               2012, <http://www.rfc-editor.org/info/rfc6698>.
 
+   [RFC6713]  Levine, J., "The 'application/zlib' and 'application/gzip'
+              Media Types", RFC 6713, DOI 10.17487/RFC6713, August 2012,
+              <http://www.rfc-editor.org/info/rfc6713>.
+
+   [RFC7159]  Bray, T., Ed., "The JavaScript Object Notation (JSON) Data
+              Interchange Format", RFC 7159, DOI 10.17487/RFC7159, March
+              2014, <http://www.rfc-editor.org/info/rfc7159>.
+
    [RFC7435]  Dukhovni, V., "Opportunistic Security: Some Protection
               Most of the Time", RFC 7435, DOI 10.17487/RFC7435,
               December 2014, <http://www.rfc-editor.org/info/rfc7435>.
@@ -600,6 +776,16 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
               (DMARC)", RFC 7489, DOI 10.17487/RFC7489, March 2015,
               <http://www.rfc-editor.org/info/rfc7489>.
 
+
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 14]
+
+Internet-Draft                 SMTP-TLSRPT                     July 2016
+
+
 Authors' Addresses
 
    Daniel Margolis
@@ -608,20 +794,10 @@ Authors' Addresses
    Email: dmargolis (at) google.com
 
 
-
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 11]
-
-Internet-Draft                 SMTP-TLSRPT                     July 2016
-
-
    Alexander Brotman
    Comcast, Inc
 
-   Email: alexander_brotman (at) cable.comcast (dot com)
+   Email: alex_brotman (at) comcast.com
 
 
    Binu Ramakrishnan
@@ -661,12 +837,4 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
 
 
 
-
-
-
-
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 12]
+Margolis, et al.         Expires January 9, 2017               [Page 15]

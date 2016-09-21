@@ -505,14 +505,12 @@ _smtp_tlsrpt.mail.example.com. IN TXT \
 </artwork></figure>
 </section>
 </section>
-</section>
 
 <section anchor="appendix-2-json-report-schema" title="Appendix 2: JSON Report Schema">
 <t>The JSON schema is derived from the HPKP JSON schema <xref target="RFC7469"/> (cf. Section 3)
 </t>
 
-<figure align="center" title="JSON Report Format
-"><artwork align="center">
+<figure align="center"><artwork align="center">
 {
   "organization-name": organization-name,
   "date-range": {
@@ -539,6 +537,8 @@ _smtp_tlsrpt.mail.example.com. IN TXT \
   ]
 }
 </artwork></figure>
+<t>Figure: JSON Report Format
+</t>
 <t>
 <list style="symbols">
 <t><spanx style="verb">organization-name</spanx>: The name of the organization responsible for the
@@ -583,11 +583,7 @@ complete certificate chain presented during an attempted STARTTLS session.</t>
 
 <section anchor="appendix-3-example-json-report" title="Appendix 3: Example JSON Report">
 
-<figure align="center" title="Example JSON report for a messages from Company-X to Company-Y, where
-100 messages were attempted to Company Y servers with an expired certificate and
-200 messages were attempted to Company Y servers that did not successfully
-respond to the STARTTLS command.
-"><artwork align="center">
+<figure align="center"><artwork align="center">
 {
 	"organization-name": "Company-X",
 	"date-range": {
@@ -617,6 +613,11 @@ respond to the STARTTLS command.
 	}]
 }
 </artwork></figure>
+<t>Figure: Example JSON report for a messages from Company-X to Company-Y, where
+100 messages were attempted to Company Y servers with an expired certificate and
+200 messages were attempted to Company Y servers that did not successfully
+respond to the <spanx style="verb">STARTTLS</spanx> command.
+</t>
 </section>
 
 </middle>

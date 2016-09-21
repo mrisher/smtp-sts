@@ -63,7 +63,6 @@ misconfigurations.
 
 {mainmatter}
 
-
 # Introduction
 
 The STARTTLS extension to SMTP [@!RFC3207] allows SMTP clients and hosts to
@@ -89,7 +88,7 @@ routing, STARTTLS negotiation, and both DANE [@!RFC6698] and MTA-STS (TODO: Add
 ref) policy validation errors, and standard TXT record that recipient domains
 can use to indicate where reports in this format should be sent.
 
-This document is intended as a companion to the specification for SMTP MTA 
+This document is intended as a companion to the specification for SMTP MTAe
 Strict Transport Security (MTA-STS, TODO: Add ref).
 
 ## Terminology
@@ -100,21 +99,21 @@ they appear in this document, are to be interpreted as described in [@!RFC2119].
 
 We also define the following terms for further use in this document:
 
-  * STS Policy: A definition of the expected TLS availability and behavior, as
+* STS Policy: A definition of the expected TLS availability and behavior, as
     well as the desired actions for a given domain when a sending MTA encounters
     different results.
-  * TLSRPT Policy: A policy detailing the endpoint to which sending MTAs should
+* TLSRPT Policy: A policy detailing the endpoint to which sending MTAs should
     deliver reports.
-  * Policy Domain: The domain against which an STS Policy is defined.
-  * Sending MTA: The MTA initiating the delivery of an email message.
-
+* Policy Domain: The domain against which an STS Policy is defined.
+* Sending MTA: The MTA initiating the delivery of an email message.
 
 # Related Technologies
-  * This document is intended as a companion to the specification for SMTP MTA
+
+* This document is intended as a companion to the specification for SMTP MTA
     Strict Transport Security (MTA-STS, TODO: Add ref).
-  * The Public Key Pinning Extension for HTTP [@!RFC7469] contains a JSON-based
+* The Public Key Pinning Extension for HTTP [@!RFC7469] contains a JSON-based
     definition for reporting individual pin validation failures.
-  * The Domain-based Message Authentication, Reporting, and Conformance (DMARC)
+* The Domain-based Message Authentication, Reporting, and Conformance (DMARC)
     [@!RFC7489] contains an XML-based reporting format for aggregate and
     detailed email delivery errors.
 
@@ -129,28 +128,28 @@ recipient's SMTP STS policy can be retrieved from `_smtp_tlsrpt.example.com`.
 
 Policies consist of the following directives:
 
-   * `v`: This value MUST be equal to `TLSRPTv1`.
-   * `rua`: A URI specifying the endpoint to which aggregate information about
+* `v`: This value MUST be equal to `TLSRPTv1`.
+* `rua`: A URI specifying the endpoint to which aggregate information about
      policy failures should be sent (see the section _Reporting_ _Schema_ for
      more information). Two URI schemes are supported: `mailto` and `https`.
-         * In the case of `https`, reports should be submitted via POST
+  * In the case of `https`, reports should be submitted via POST
            ([@!RFC2818]) to the specified URI.
-         * In the case of `mailto`, reports should be submitted to the specified
+  * In the case of `mailto`, reports should be submitted to the specified
            email address. When sending failure reports via SMTP, sending MTAs
            MUST NOT honor SMTP STS or DANE TLSA failures.
-   * `ruf`: Future use. (There may also be a need for enabling more detailed
+* `ruf`: Future use. (There may also be a need for enabling more detailed
      "forensic" reporting during initial stages of a deployment. To address
      this, the authors consider the possibility of an optional additional
      "forensic reporting mode" in which more details--such as certificate chains
      and MTA banners--may be reported. See the section _Future_ _Work_ for more
      details.)
 
-The formal definition of the `_smtp_tlsrpt` TXT record, defined using 
+The formal definition of the `_smtp_tlsrpt` TXT record, defined using
 [@!RFC5234], is as follows:
 
 	tlsrpt-record		= tlsrpt-version *WSP %x3B tlsrpt-rua
 
-	tlsrpt-version 		= "v" *WSP "=" *WSP %x54 %x4C %x53 
+	tlsrpt-version 		= "v" *WSP "=" *WSP %x54 %x4C %x53
 						  %x52 %x50 %x54 %x76 %x31
 
 	tlsrpt-rua			= "rua" *WSP "=" *WSP tlsrpt-uri
@@ -163,26 +162,26 @@ The formal definition of the `_smtp_tlsrpt` TXT record, defined using
 
 # Reporting Schema
 
-The report is composed as a plain text file encoded in the JSON format 
-([@!RFC7159]). 
+The report is composed as a plain text file encoded in the JSON format
+([@!RFC7159]).
 
 Aggregate reports contain the following fields:
 
-* Report metadata: 
-	* The organization responsible for the report
-        * Contact information for one or more responsible parties for the
-          contents of the report
-	* A unique identifier for the report
-	* The reporting date range for the report
-* Policy, consisting of: 
-	* One of the following policy types:
-		* The SMTP MTA STS policy applied (as a string)
-		* The DANE TLSA record applied (as a string)
-                * The literal string `no-policy-found`, if neither a TLSA nor
-                  MTA-STS policy could be found.
-	* The domain for which the policy is applied
-	* The MX host
-	* An identifier for the policy (where applicable)
+* Report metadata:
+  * The organization responsible for the report
+  * Contact information for one or more responsible parties for the
+    contents of the report
+  * A unique identifier for the report
+  * The reporting date range for the report
+* Policy, consisting of:
+  * One of the following policy types:
+    * The SMTP MTA STS policy applied (as a string)
+    * The DANE TLSA record applied (as a string)
+    * The literal string `no-policy-found`, if neither a TLSA nor
+      MTA-STS policy could be found.
+  * The domain for which the policy is applied
+  * The MX host
+  * An identifier for the policy (where applicable)
 * Aggregate counts, comprising result type, sending MTA IP, receiving MTA
   hostname, message count, and an optional additional information field
   containing a URI for recipients to review further information on a failure
@@ -199,52 +198,52 @@ The list of result types will start with the minimal set below, and is expected
 to grow over time based on real-world experience. The initial set is:
 
 ### Success Type
-  * `success`: This indicates that the sending MTA was able to successfully
+* `success`: This indicates that the sending MTA was able to successfully
     negotiate a policy-compliant TLS connection, and serves to provide a
     "heartbeat" to receiving domains that reporting is functional and tabulating
     correctly.
 
-  
+
 ### Routing Failures
-  * `mx-mismatch`: This indicates that the MX resolved for the recipient domain
+* `mx-mismatch`: This indicates that the MX resolved for the recipient domain
     did not match the MX constraint specified in the policy.
-  * `certificate-host-mismatch`: This indicates that the certificate presented
+* `certificate-host-mismatch`: This indicates that the certificate presented
     by the receiving MX did not match the MX hostname.
 
 ### Negotiation Failures
 
-  * `starttls-not-supported`: This indicates that the recipient MX did not
+* `starttls-not-supported`: This indicates that the recipient MX did not
     support STARTTLS.
-  * `invalid-certificate`: This indicates that the certificate presented by the
+* `invalid-certificate`: This indicates that the certificate presented by the
     receiving MX did not validate.
-  * `certificate-host-mismatch`: This indicates that the certificate presented
+* `certificate-host-mismatch`: This indicates that the certificate presented
     did not adhere to the constraints specified in the STS or DANE policy, e.g.
     if the CN field did not match the hostname of the MX.
-  * `certificate-name-constraints-not-permitted`: The certificate request
+* `certificate-name-constraints-not-permitted`: The certificate request
     contains a name that is not listed as permitted in the name constraints
     extension of the cert issuer.
-  * `certificate-name-constraints-excluded`: The certificate request contains a
+* `certificate-name-constraints-excluded`: The certificate request contains a
     name that is listed as excluded in the name constraints extension of the
     issuer.
-  * `expired-certificate`: This indicates that the certificate has expired.
+* `expired-certificate`: This indicates that the certificate has expired.
 
 ### Policy Failures
-	
+
 #### DANE-specific Policy Failures
-  * `tlsa-invalid`: This indicates a validation error in the TLSA record
+* `tlsa-invalid`: This indicates a validation error in the TLSA record
     associated with a DANE policy.
-  * `dnssec-invalid`: This indicates a failure to authenticate DNS records for a
+* `dnssec-invalid`: This indicates a failure to authenticate DNS records for a
     Policy Domain with a published TLSA record.
 
 #### STS-specific Policy Failures
-  * `sts-invalid`: This indicates a validation error for the overall MTA-STS
+* `sts-invalid`: This indicates a validation error for the overall MTA-STS
     policy.
-  * `webpki-invalid`: This indicates that the MTA-STS policy could not be
-    authenticated using PKIX validation. 
+* `webpki-invalid`: This indicates that the MTA-STS policy could not be
+    authenticated using PKIX validation.
 
 
 # Report Delivery
-Reports can be delivered either as an email message via SMTP or via HTTP 
+Reports can be delivered either as an email message via SMTP or via HTTP
 POST.
 
 ## Report Filename
@@ -290,7 +289,7 @@ The report SHOULD be subjected to GZIP compression.
 Declining to apply compression can cause the report to be too large for a
 receiver to process (a commonly observed receiver limit is ten megabytes);
 doing the compression increases the chances of acceptance of the report at some
-compute cost. 
+compute cost.
 
 ## Email Transport
 The report MAY be delivered by email. No specific MIME message structure is
@@ -299,7 +298,7 @@ to extract MIME parts with the prescribed media type and filename and ignore
 the rest.
 
 If compressed, the report should use the media type `application/
-gzip` if compressed (see [@!RFC6713]), and `text/json` otherwise. 
+gzip` if compressed (see [@!RFC6713]), and `text/json` otherwise.
 
    The [@!RFC5322].Subject field for individual report submissions SHOULD
    conform to the following ABNF:
@@ -333,9 +332,9 @@ SMTP STS or DANE TLSA failures.
 
 
 ## HTTPS Transport
-The report MAY be delivered by POST to HTTPS. If compressed, the report should 
-use the media type `application/
-gzip` if compressed (see [@!RFC6713]), and `text/json` otherwise. 
+The report MAY be delivered by POST to HTTPS. If compressed, the report should
+use the media type `application/gzip` if compressed (see [@!RFC6713]), and
+`text/json` otherwise.
 
 
 # IANA Considerations
@@ -349,17 +348,17 @@ SMTP TLS Reporting provides transparency into misconfigurations or attempts to
 intercept or tamper with mail between hosts who support STARTTLS. There are
 several security risks presented by the existence of this reporting channel:
 
-  * Flooding of the Aggregate report URI (rua) endpoint: An attacker could
+* Flooding of the Aggregate report URI (rua) endpoint: An attacker could
     flood the endpoint and prevent the receiving domain from accepting
     additional reports. This type of Denial-of-Service attack would limit
     visibility into STARTTLS failures, leaving the receiving domain blind to an
     ongoing attack.
 
-  * Untrusted content: An attacker could inject malicious code into the
+* Untrusted content: An attacker could inject malicious code into the
     report, opening a vulnerability in the receiving domain. Implementers are
     advised to take precautions against evaluating the contents of the report.
 
-  * Report snooping: An attacker could create a bogus TLSRPT record to receive
+* Report snooping: An attacker could create a bogus TLSRPT record to receive
     statistics about a domain the attacker does not own. Since an attacker able
     to poison DNS is already able to receive counts of SMTP connections (and,
     absent DANE or MTA-STS policies, actual SMTP message payloads) today, this
@@ -417,40 +416,40 @@ The JSON schema is derived from the HPKP JSON schema [@!RFC7469] (cf. Section 3)
 
 Figure: JSON Report Format
 
-  * `organization-name`: The name of the organization responsible for the
+* `organization-name`: The name of the organization responsible for the
     report. It is provided as a string.
-  * `date-time`: The date-time indicates the start- and end-times for the report
+* `date-time`: The date-time indicates the start- and end-times for the report
     range. It is provided as a string formatted according to Section 5.6,
     "Internet Date/Time Format", of [@!RFC3339].
-  * `email-address`: The contact information for a responsible party of the
+* `email-address`: The contact information for a responsible party of the
     report. It is provided as a string formatted according to Section 3.4.1,
     "Addr-Spec", of [@!RFC5322].
-  * `report-id`: A unique identifier for the report. Report authors may use
+* `report-id`: A unique identifier for the report. Report authors may use
     whatever scheme they prefer to generate a unique identifier. It is provided
     as a string.
-  * `policy-type`: The type of policy that was applied by the sending domain.
+* `policy-type`: The type of policy that was applied by the sending domain.
     Presently, the only two valid choices are `tlsa` and `sts`. It is provided
     as a string.
-  * `policy-string`: The string serialization of the policy, whether TLSA record
+* `policy-string`: The string serialization of the policy, whether TLSA record
     or STS policy. Any linefeeds from the original policy MUST be replaced with
     [SP]. TODO: Help with specifics.
-  * `domain`: The Policy Domain upon which the policy was applied. For messages
+* `domain`: The Policy Domain upon which the policy was applied. For messages
     sent to `user@example.com` this field would contain `example.com`. It is
     provided as a string.
-  * `mx-host-pattern`: The pattern of MX hostnames from the applied policy. It
+* `mx-host-pattern`: The pattern of MX hostnames from the applied policy. It
     is provided as a string, and is interpreted in the same manner as the
     "Checking of Wildcard Certificates" rules in Section 6.4.3 of [@!RFC6125].
-  * `result-type`: A value from the _Result Types_ section above.
-  * `ip-address`: The IP address of the sending MTA that attempted the STARTTLS
+* `result-type`: A value from the _Result Types_ section above.
+* `ip-address`: The IP address of the sending MTA that attempted the STARTTLS
     connection. It is provided as a string representation of an IPv4 or IPv6
     address in dot-decimal or colon-hexadecimal notation.
-  * `receiving-mx-hostname`: The hostname of the receiving MTA MX record with
+* `receiving-mx-hostname`: The hostname of the receiving MTA MX record with
     which the sending MTA attempted to negotiate a STARTTLS connection.
-  * `receiving-mx-helo`: (optional) The HELO or EHLO string from the banner
+* `receiving-mx-helo`: (optional) The HELO or EHLO string from the banner
     announced during the reported session.
-  * `message-count`: The number of (attempted) messages that match the relevant
+* `message-count`: The number of (attempted) messages that match the relevant
     `result-type` for this section.
-  * `additional-info-uri`: An optional URI pointing to additional information
+* `additional-info-uri`: An optional URI pointing to additional information
     around the relevant `result-type`. For example, this URI might host the
     complete certificate chain presented during an attempted STARTTLS session.
 
