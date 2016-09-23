@@ -140,8 +140,7 @@ Policies consist of the following directives:
      "forensic" reporting during initial stages of a deployment. To address
      this, the authors consider the possibility of an optional additional
      "forensic reporting mode" in which more details--such as certificate chains
-     and MTA banners--may be reported. See the section _Future_ _Work_ for more
-     details.)
+     and MTA banners--may be reported.)
 
 The formal definition of the `_smtp_tlsrpt` TXT record, defined using
 [@!RFC5234], is as follows:
@@ -158,6 +157,24 @@ The formal definition of the `_smtp_tlsrpt` TXT record, defined using
                          ; 0x2C) and exclamation points (ASCII 0x21)
                          ; MUST be encoded; the numeric portion MUST fit
                          ; within an unsigned 64-bit integer
+
+## Example Reporting Policy
+
+### Report using MAILTO
+
+```
+_smtp_tlsrpt.example.com. IN TXT \
+	"v=TLSRPTv1;rua=mailto:reports@example.com"
+```
+
+### Report using HTTPS
+
+```
+_smtp_tlsrpt.example.com. IN TXT \
+	"v=TLSRPTv1; \
+	rua=https://reporting.example.com/v1/tlsrpt"
+```
+>>>>>>> master
 
 # Reporting Schema
 

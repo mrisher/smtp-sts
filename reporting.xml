@@ -201,8 +201,7 @@ recipient's TLSRPT policy can be retrieved from <spanx style="verb">_smtp_tlsrpt
  &quot;forensic&quot; reporting during initial stages of a deployment. To address
  this, the authors consider the possibility of an optional additional
  &quot;forensic reporting mode&quot; in which more details--such as certificate chains
- and MTA banners--may be reported. See the section <spanx style="emph">Future</spanx> <spanx style="emph">Work</spanx> for more
- details.)</t>
+ and MTA banners--may be reported.)</t>
 </list>
 </t>
 <t>The formal definition of the <spanx style="verb">_smtp_tlsrpt</spanx> TXT record, defined using
@@ -223,6 +222,42 @@ recipient's TLSRPT policy can be retrieved from <spanx style="verb">_smtp_tlsrpt
                      ; MUST be encoded; the numeric portion MUST fit
                      ; within an unsigned 64-bit integer
 </artwork></figure>
+
+<section anchor="example-reporting-policy" title="Example Reporting Policy">
+
+<section anchor="report-using-mailto" title="Report using MAILTO">
+
+<figure align="center"><artwork align="center">
+_smtp_tlsrpt.example.com. IN TXT \
+	"v=TLSRPTv1;rua=mailto:reports@example.com"
+</artwork></figure>
+</section>
+
+<section anchor="report-using-https" title="Report using HTTPS">
+
+<figure align="center"><artwork align="center">
+_smtp_tlsrpt.example.com. IN TXT \
+	"v=TLSRPTv1; \
+	rua=https://reporting.example.com/v1/tlsrpt"
+</artwork></figure>
+<t><list style="empty">
+<t><list style="empty">
+<t><list style="empty">
+<t><list style="empty">
+<t><list style="empty">
+<t><list style="empty">
+<t><list style="empty">
+<t>master
+</t>
+</list></t>
+</list></t>
+</list></t>
+</list></t>
+</list></t>
+</list></t>
+</list></t>
+</section>
+</section>
 </section>
 
 <section anchor="reporting-schema" title="Reporting Schema">
@@ -476,7 +511,7 @@ does not present a significant new vulnerability.</t>
 
 <section anchor="appendix-1-example-reporting-policy" title="Appendix 1: Example Reporting Policy">
 
-<section anchor="report-using-mailto" title="Report using MAILTO">
+<section anchor="report-using-mailto-1" title="Report using MAILTO">
 
 <figure align="center"><artwork align="center">
 _smtp_tlsrpt.mail.example.com. IN TXT \
@@ -484,7 +519,7 @@ _smtp_tlsrpt.mail.example.com. IN TXT \
 </artwork></figure>
 </section>
 
-<section anchor="report-using-https" title="Report using HTTPS">
+<section anchor="report-using-https-1" title="Report using HTTPS">
 
 <figure align="center"><artwork align="center">
 _smtp_tlsrpt.mail.example.com. IN TXT \
