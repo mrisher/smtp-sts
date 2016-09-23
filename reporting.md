@@ -88,7 +88,7 @@ routing, STARTTLS negotiation, and both DANE [@!RFC6698] and MTA-STS (TODO: Add
 ref) policy validation errors, and standard TXT record that recipient domains
 can use to indicate where reports in this format should be sent.
 
-This document is intended as a companion to the specification for SMTP MTAe
+This document is intended as a companion to the specification for SMTP MTA
 Strict Transport Security (MTA-STS, TODO: Add ref).
 
 ## Terminology
@@ -119,11 +119,11 @@ We also define the following terms for further use in this document:
 
 # Reporting Policy
 
-A report receiver pushishes a record to its DNS indicating that it wishes to
+A domain publishes a record to its DNS indicating that it wishes to
 receive reports. These SMTP TLSRPT policies are distributed via DNS from the
 Policy Domain's zone, as TXT records (similar to DMARC policies) under the name
 `_smtp_tlsrpt`. For example, for the Policy Domain `example.com`, the
-recipient's SMTP STS policy can be retrieved from `_smtp_tlsrpt.example.com`.
+recipient's TLSRPT policy can be retrieved from `_smtp_tlsrpt.example.com`.
 
 Policies consist of the following directives:
 
@@ -285,9 +285,9 @@ The filename is typically constructed using the following ABNF:
 
 ## Compression
 
-The report SHOULD be subjected to GZIP compression.
-Declining to apply compression can cause the report to be too large for a
-receiver to process (a commonly observed receiver limit is ten megabytes);
+The report SHOULD be subjected to GZIP compression for both email and HTTPS
+transport. Declining to apply compression can cause the report to be too large
+for a receiver to process (a commonly observed receiver limit is ten megabytes);
 doing the compression increases the chances of acceptance of the report at some
 compute cost.
 
@@ -333,7 +333,7 @@ SMTP STS or DANE TLSA failures.
 ## HTTPS Transport
 
 The report MAY be delivered by POST to HTTPS. If compressed, the report should
-use the media type `application/gzip` if compressed (see [@!RFC6713]), and
+use the media type `application/gzip` (see [@!RFC6713]), and
 `text/json` otherwise.
 
 # IANA Considerations

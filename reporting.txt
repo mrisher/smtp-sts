@@ -137,7 +137,7 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
    in this format should be sent.
 
    This document is intended as a companion to the specification for
-   SMTP MTAe Strict Transport Security (MTA-STS, TODO: Add ref).
+   SMTP MTA Strict Transport Security (MTA-STS, TODO: Add ref).
 
 1.1.  Terminology
 
@@ -185,12 +185,12 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
 
 3.  Reporting Policy
 
-   A report receiver pushishes a record to its DNS indicating that it
-   wishes to receive reports.  These SMTP TLSRPT policies are
-   distributed via DNS from the Policy Domain's zone, as TXT records
-   (similar to DMARC policies) under the name "_smtp_tlsrpt".  For
-   example, for the Policy Domain "example.com", the recipient's SMTP
-   STS policy can be retrieved from "_smtp_tlsrpt.example.com".
+   A domain publishes a record to its DNS indicating that it wishes to
+   receive reports.  These SMTP TLSRPT policies are distributed via DNS
+   from the Policy Domain's zone, as TXT records (similar to DMARC
+   policies) under the name "_smtp_tlsrpt".  For example, for the Policy
+   Domain "example.com", the recipient's TLSRPT policy can be retrieved
+   from "_smtp_tlsrpt.example.com".
 
    Policies consist of the following directives:
 
@@ -428,11 +428,11 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
 
 5.2.  Compression
 
-   The report SHOULD be subjected to GZIP compression.  Declining to
-   apply compression can cause the report to be too large for a receiver
-   to process (a commonly observed receiver limit is ten megabytes);
-   doing the compression increases the chances of acceptance of the
-   report at some compute cost.
+   The report SHOULD be subjected to GZIP compression for both email and
+   HTTPS transport.  Declining to apply compression can cause the report
+   to be too large for a receiver to process (a commonly observed
+   receiver limit is ten megabytes); doing the compression increases the
+   chances of acceptance of the report at some compute cost.
 
 5.3.  Email Transport
 
@@ -486,8 +486,8 @@ Internet-Draft                 SMTP-TLSRPT                     July 2016
 5.4.  HTTPS Transport
 
    The report MAY be delivered by POST to HTTPS.  If compressed, the
-   report should use the media type "application/gzip" if compressed
-   (see [RFC6713]), and "text/json" otherwise.
+   report should use the media type "application/gzip" (see [RFC6713]),
+   and "text/json" otherwise.
 
 6.  IANA Considerations
 
