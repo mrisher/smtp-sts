@@ -203,8 +203,8 @@ Aggregate reports contain the following fields:
   containing a URI for recipients to review further information on a failure
   type.
 
-Note that the failure types are non-exclusive; an aggregate report MAY contain
-overlapping `counts` of failure types where a single send attempt encountered
+Note that the failure types are non-exclusive; an aggregate report may contain
+overlapping `counts` of failure types when a single send attempt encountered
 multiple errors.
 
 ## Result Types
