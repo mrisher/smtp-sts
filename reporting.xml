@@ -293,8 +293,8 @@ containing a URI for recipients to review further information on a failure
 type.</t>
 </list>
 </t>
-<t>Note that the failure types are non-exclusive; an aggregate report MAY contain
-overlapping <spanx style="verb">counts</spanx> of failure types where a single send attempt encountered
+<t>Note that the failure types are non-exclusive; an aggregate report may contain
+overlapping <spanx style="verb">counts</spanx> of failure types when a single send attempt encountered
 multiple errors.
 </t>
 

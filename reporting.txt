@@ -318,7 +318,7 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
       further information on a failure type.
 
    Note that the failure types are non-exclusive; an aggregate report
-   MAY contain overlapping "counts" of failure types where a single send
+   may contain overlapping "counts" of failure types when a single send
    attempt encountered multiple errors.
 
 4.1.  Result Types
