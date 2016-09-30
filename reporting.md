@@ -3,13 +3,13 @@
    Title = "SMTP TLS Reporting"
    abbrev = "SMTP-TLSRPT"
    category = "std"
-   docName = "draft-ietf-uta-smtp-tlsrpt-01"
+   docName = "draft-ietf-uta-smtp-tlsrpt-02"
    ipr = "trust200902"
    area = "Applications"
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2016-07-08T00:00:00Z
+   date = 2016-10-01T00:00:00Z
 
    [[author]]
    initials="D."
@@ -268,7 +268,7 @@ POST.
 
 The filename is typically constructed using the following ABNF:
 
-    filename = sender "!" policy-domain "!" begin-timestamp
+     filename = sender "!" policy-domain "!" begin-timestamp
                "!" end-timestamp [ "!" unique-id ] "." extension
 
      unique-id = 1*(ALPHA / DIGIT)
@@ -442,8 +442,8 @@ Figure: JSON Report Format
     whatever scheme they prefer to generate a unique identifier. It is provided
     as a string.
 * `policy-type`: The type of policy that was applied by the sending domain.
-    Presently, the only two valid choices are `tlsa` and `sts`. It is provided
-    as a string.
+    Presently, the only three valid choices are `tlsa`, `sts`, and the literal
+    string `no-policy-found`. It is provided as a string.
 * `policy-string`: The string serialization of the policy, whether TLSA record
     or STS policy. Any linefeeds from the original policy MUST be replaced with
     [SP]. TODO: Help with specifics.
