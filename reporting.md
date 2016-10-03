@@ -207,17 +207,27 @@ Note that the failure types are non-exclusive; an aggregate report may contain
 overlapping `counts` of failure types when a single send attempt encountered
 multiple errors.
 
+## Delivery Summary
+
+### Success Count
+
+* `success-count`: This indicates that the sending MTA was able to successfully
+    negotiate a policy-compliant TLS connection, and serves to provide a
+    "heartbeat" to receiving domains that reporting is functional and tabulating
+    correctly.  This SHOULD be an aggregate count of successful connections for the
+    reporting system.
+    
+### Failure Count
+
+* `failure-count`: This indicates that the sending MTA was unable to successfully
+    establish a connection with the receiving platform.  The "Result Types" section 
+    will elaborate on the failed negotiation attempts.  This SHOULD be an aggregate
+    count of failed connections.  
+
 ## Result Types
 
 The list of result types will start with the minimal set below, and is expected
 to grow over time based on real-world experience. The initial set is:
-
-### Success Type
-
-* `success`: This indicates that the sending MTA was able to successfully
-    negotiate a policy-compliant TLS connection, and serves to provide a
-    "heartbeat" to receiving domains that reporting is functional and tabulating
-    correctly.
 
 ### Routing Failures
 
@@ -415,6 +425,10 @@ The JSON schema is derived from the HPKP JSON schema [@!RFC7469] (cf. Section 3)
     "policy-domain": domain,
     "mx-host": mx-host-pattern
   },
+  "summary": {
+    "success-count": successful-session-count,
+    "failure-count:" failure-session-count
+  }
   "report-items": [
     {
       "result-type": result-type,
@@ -461,6 +475,10 @@ Figure: JSON Report Format
     which the sending MTA attempted to negotiate a STARTTLS connection.
 * `receiving-mx-helo`: (optional) The HELO or EHLO string from the banner
     announced during the reported session.
+* `success-count`: The aggregate number (integer) of successfully negotiated 
+    SSL-enabled connections to the receiving site.
+* `failure-count`: The aggregate number (integer) of failures to negotiate
+    an SSL-enabled connection to the receiving site.
 * `message-count`: The number of (attempted) messages that match the relevant
     `result-type` for this section.
 * `additional-info-uri`: An optional URI pointing to additional information
@@ -484,6 +502,10 @@ Figure: JSON Report Format
     "policy-domain": "company-y.com",
     "mx-host": "*.mail.company-y.com"
   },
+  "summary": {
+    "success-count": 5326,
+    "failure-count": 300
+  }
   "report-items": [{
     "result-type": "ExpiredCertificate",
     "sending-mta-ip": "98.136.216.25",
