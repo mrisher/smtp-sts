@@ -240,8 +240,6 @@ to grow over time based on real-world experience. The initial set is:
 
 * `starttls-not-supported`: This indicates that the recipient MX did not
     support STARTTLS.
-* `invalid-certificate`: This indicates that the certificate presented by the
-    receiving MX did not validate.
 * `certificate-host-mismatch`: This indicates that the certificate presented
     did not adhere to the constraints specified in the STS or DANE policy, e.g.
     if the CN field did not match the hostname of the MX.
@@ -252,6 +250,9 @@ to grow over time based on real-world experience. The initial set is:
     name that is listed as excluded in the name constraints extension of the
     issuer.
 * `expired-certificate`: This indicates that the certificate has expired.
+* `validation-failure`: This indicates a general failure for a reason not matching 
+    a category above.  When using this declaration, the reporting MTA SHOULD utilize 
+    the `failure-reason` to provide more information to the receiving entity.
 
 ### Policy Failures
 
@@ -268,6 +269,16 @@ to grow over time based on real-world experience. The initial set is:
     policy.
 * `webpki-invalid`: This indicates that the MTA-STS policy could not be
     authenticated using PKIX validation.
+    
+### General failures
+
+When a negotation failure can not be categorized into one of the "Negotiation Failures" 
+stated above, the reporter SHOULD use the `validation-failure` category.  As TLS grows
+and becomes more complex, new mechanisms may not be easily categorized.  This allows for
+a generic feedback category.  When this category is used, the reporter SHOULD also use the
+`failure-reason-code` to give some feedback to the receiving entity.  This is intended
+to be a short text field, and the contents of the field should be an error code or error
+text, such as "X509_V_ERR_UNHANDLED_CRITICAL_CRL_EXTENSION".
 
 # Report Delivery
 
@@ -436,7 +447,8 @@ The JSON schema is derived from the HPKP JSON schema [@!RFC7469] (cf. Section 3)
       "receiving-mx-hostname": receiving-mx-hostname,
       "receiving-mx-helo": receiving-mx-helo,
       "message-count": message-count,
-      "additional-information": additional-info-uri
+      "additional-information": additional-info-uri,
+      "failure-reason-code": "Text body"
     }
   ]
 }
@@ -484,6 +496,8 @@ Figure: JSON Report Format
 * `additional-info-uri`: An optional URI pointing to additional information
     around the relevant `result-type`. For example, this URI might host the
     complete certificate chain presented during an attempted STARTTLS session.
+* `failure-reason-code`: A text field to include an SSL-related error
+    code or error message.
 
 # Appendix 3: Example JSON Report
 
@@ -504,7 +518,7 @@ Figure: JSON Report Format
   },
   "summary": {
     "success-count": 5326,
-    "failure-count": 300
+    "failure-count": 303
   }
   "report-items": [{
     "result-type": "ExpiredCertificate",
@@ -518,6 +532,12 @@ Figure: JSON Report Format
     "message-count": 200,
     "additional-information": "hxxps://reports.company-x.com/
       report_info?id=5065427c-23d3#StarttlsNotSupported"
+  },{
+  "result-type: "validation-failure",
+  "sending-mta-ip": "47.97.15.2",
+  "receiving-mx-hostname: "mx-backup.mail.company-y.com",
+  "message-count": 3,
+  "failure-error-code": "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED"
   }]
 }
 ```
