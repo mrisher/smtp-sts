@@ -199,7 +199,7 @@ Aggregate reports contain the following fields:
   * The MX host
   * An identifier for the policy (where applicable)
 * Aggregate counts, comprising result type, sending MTA IP, receiving MTA
-  hostname, message count, and an optional additional information field
+  hostname, session count, and an optional additional information field
   containing a URI for recipients to review further information on a failure
   type.
 
@@ -437,8 +437,8 @@ The JSON schema is derived from the HPKP JSON schema [@!RFC7469] (cf. Section 3)
     "mx-host": mx-host-pattern
   },
   "summary": {
-    "success-count": successful-session-count,
-    "failure-count:" failure-session-count
+    "success-aggregate": total-successful-session-count,
+    "failure-aggregate:" total-failure-session-count
   }
   "report-items": [
     {
@@ -446,7 +446,7 @@ The JSON schema is derived from the HPKP JSON schema [@!RFC7469] (cf. Section 3)
       "sending-mta-ip": ip-address,
       "receiving-mx-hostname": receiving-mx-hostname,
       "receiving-mx-helo": receiving-mx-helo,
-      "message-count": message-count,
+      "failure-sessions": failed-session-count,
       "additional-information": additional-info-uri,
       "failure-reason-code": "Text body"
     }
@@ -487,11 +487,11 @@ Figure: JSON Report Format
     which the sending MTA attempted to negotiate a STARTTLS connection.
 * `receiving-mx-helo`: (optional) The HELO or EHLO string from the banner
     announced during the reported session.
-* `success-count`: The aggregate number (integer) of successfully negotiated 
+* `success-aggregate`: The aggregate number (integer) of successfully negotiated 
     SSL-enabled connections to the receiving site.
-* `failure-count`: The aggregate number (integer) of failures to negotiate
+* `failure-aggregate`: The aggregate number (integer) of failures to negotiate
     an SSL-enabled connection to the receiving site.
-* `message-count`: The number of (attempted) messages that match the relevant
+* `failure-sessions`: The number of (attempted) sessions that match the relevant
     `result-type` for this section.
 * `additional-info-uri`: An optional URI pointing to additional information
     around the relevant `result-type`. For example, this URI might host the
@@ -517,27 +517,27 @@ Figure: JSON Report Format
     "mx-host": "*.mail.company-y.com"
   },
   "summary": {
-    "success-count": 5326,
-    "failure-count": 303
+    "success-aggregate": 5326,
+    "failure-aggregate": 303
   }
   "report-items": [{
     "result-type": "ExpiredCertificate",
     "sending-mta-ip": "98.136.216.25",
     "receiving-mx-hostname": "mx1.mail.company-y.com",
-    "message-count": 100
+    "failure-sessions": 100
   }, {
     "result-type": "StarttlsNotSupported",
     "sending-mta-ip": "98.22.33.99",
     "receiving-mx-hostname": "mx2.mail.company-y.com",
-    "message-count": 200,
+    "failure-sessions": 200,
     "additional-information": "hxxps://reports.company-x.com/
       report_info?id=5065427c-23d3#StarttlsNotSupported"
-  },{
-  "result-type: "validation-failure",
-  "sending-mta-ip": "47.97.15.2",
-  "receiving-mx-hostname: "mx-backup.mail.company-y.com",
-  "message-count": 3,
-  "failure-error-code": "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED"
+  }, {
+    "result-type: "validation-failure",
+    "sending-mta-ip": "47.97.15.2",
+    "receiving-mx-hostname: "mx-backup.mail.company-y.com",
+    "failure-sessions": 3,
+    "failure-error-code": "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED"
   }]
 }
 ```
