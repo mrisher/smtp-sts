@@ -288,7 +288,7 @@ MTA-STS policy could be found.</t>
 <t>An identifier for the policy (where applicable)</t>
 </list></t>
 <t>Aggregate counts, comprising result type, sending MTA IP, receiving MTA
-hostname, message count, and an optional additional information field
+hostname, session count, and an optional additional information field
 containing a URI for recipients to review further information on a failure
 type.</t>
 </list>
@@ -298,21 +298,39 @@ overlapping <spanx style="verb">counts</spanx> of failure types when a single se
 multiple errors.
 </t>
 
+<section anchor="delivery-summary" title="Delivery Summary">
+
+<section anchor="success-count" title="Success Count">
+<t>
+<list style="symbols">
+<t><spanx style="verb">success-count</spanx>: This indicates that the sending MTA was able to successfully
+negotiate a policy-compliant TLS connection, and serves to provide a
+&quot;heartbeat&quot; to receiving domains that reporting is functional and tabulating
+correctly.  This SHOULD be an aggregate count of successful connections for the
+reporting system.
+
+<vspace/></t>
+</list>
+</t>
+</section>
+
+<section anchor="failure-count" title="Failure Count">
+<t>
+<list style="symbols">
+<t><spanx style="verb">failure-count</spanx>: This indicates that the sending MTA was unable to successfully
+establish a connection with the receiving platform.  The &quot;Result Types&quot; section
+will elaborate on the failed negotiation attempts.  This SHOULD be an aggregate
+count of failed connections.
+<vspace/></t>
+</list>
+</t>
+</section>
+</section>
+
 <section anchor="result-types" title="Result Types">
 <t>The list of result types will start with the minimal set below, and is expected
 to grow over time based on real-world experience. The initial set is:
 </t>
-
-<section anchor="success-type" title="Success Type">
-<t>
-<list style="symbols">
-<t><spanx style="verb">success</spanx>: This indicates that the sending MTA was able to successfully
-negotiate a policy-compliant TLS connection, and serves to provide a
-&quot;heartbeat&quot; to receiving domains that reporting is functional and tabulating
-correctly.</t>
-</list>
-</t>
-</section>
 
 <section anchor="routing-failures" title="Routing Failures">
 <t>
@@ -330,8 +348,6 @@ by the receiving MX did not match the MX hostname.</t>
 <list style="symbols">
 <t><spanx style="verb">starttls-not-supported</spanx>: This indicates that the recipient MX did not
 support STARTTLS.</t>
-<t><spanx style="verb">invalid-certificate</spanx>: This indicates that the certificate presented by the
-receiving MX did not validate.</t>
 <t><spanx style="verb">certificate-host-mismatch</spanx>: This indicates that the certificate presented
 did not adhere to the constraints specified in the STS or DANE policy, e.g.
 if the CN field did not match the hostname of the MX.</t>
@@ -342,6 +358,9 @@ extension of the cert issuer.</t>
 name that is listed as excluded in the name constraints extension of the
 issuer.</t>
 <t><spanx style="verb">expired-certificate</spanx>: This indicates that the certificate has expired.</t>
+<t><spanx style="verb">validation-failure</spanx>: This indicates a general failure for a reason not matching
+a category above.  When using this declaration, the reporting MTA SHOULD utilize
+the <spanx style="verb">failure-reason</spanx> to provide more information to the receiving entity.</t>
 </list>
 </t>
 </section>
@@ -365,10 +384,23 @@ Policy Domain with a published TLSA record.</t>
 <t><spanx style="verb">sts-invalid</spanx>: This indicates a validation error for the overall MTA-STS
 policy.</t>
 <t><spanx style="verb">webpki-invalid</spanx>: This indicates that the MTA-STS policy could not be
-authenticated using PKIX validation.</t>
+authenticated using PKIX validation.
+
+<vspace/></t>
 </list>
 </t>
 </section>
+</section>
+
+<section anchor="general-failures" title="General failures">
+<t>When a negotation failure can not be categorized into one of the &quot;Negotiation Failures&quot;
+stated above, the reporter SHOULD use the <spanx style="verb">validation-failure</spanx> category.  As TLS grows
+and becomes more complex, new mechanisms may not be easily categorized.  This allows for
+a generic feedback category.  When this category is used, the reporter SHOULD also use the
+<spanx style="verb">failure-reason-code</spanx> to give some feedback to the receiving entity.  This is intended
+to be a short text field, and the contents of the field should be an error code or error
+text, such as &quot;X509_V_ERR_UNHANDLED_CRITICAL_CRL_EXTENSION&quot;.
+</t>
 </section>
 </section>
 </section>
@@ -548,14 +580,19 @@ _smtp_tlsrpt.mail.example.com. IN TXT \
     "policy-domain": domain,
     "mx-host": mx-host-pattern
   },
-  "report-items": [
+  "summary": {
+    "success-aggregate": total-successful-session-count,
+    "failure-aggregate:" total-failure-session-count
+  }
+  "failure-details": [
     {
       "result-type": result-type,
       "sending-mta-ip": ip-address,
       "receiving-mx-hostname": receiving-mx-hostname,
       "receiving-mx-helo": receiving-mx-helo,
-      "message-count": message-count,
-      "additional-information": additional-info-uri
+      "session-count": failed-session-count,
+      "additional-information": additional-info-uri,
+      "failure-reason-code": "Text body"
     }
   ]
 }
@@ -595,11 +632,17 @@ address in dot-decimal or colon-hexadecimal notation.</t>
 which the sending MTA attempted to negotiate a STARTTLS connection.</t>
 <t><spanx style="verb">receiving-mx-helo</spanx>: (optional) The HELO or EHLO string from the banner
 announced during the reported session.</t>
-<t><spanx style="verb">message-count</spanx>: The number of (attempted) messages that match the relevant
+<t><spanx style="verb">success-aggregate</spanx>: The aggregate number (integer) of successfully negotiated
+SSL-enabled connections to the receiving site.</t>
+<t><spanx style="verb">failure-aggregate</spanx>: The aggregate number (integer) of failures to negotiate
+an SSL-enabled connection to the receiving site.</t>
+<t><spanx style="verb">session-count</spanx>: The number of (attempted) sessions that match the relevant
 <spanx style="verb">result-type</spanx> for this section.</t>
 <t><spanx style="verb">additional-info-uri</spanx>: An optional URI pointing to additional information
 around the relevant <spanx style="verb">result-type</spanx>. For example, this URI might host the
 complete certificate chain presented during an attempted STARTTLS session.</t>
+<t><spanx style="verb">failure-reason-code</spanx>: A text field to include an SSL-related error
+code or error message.</t>
 </list>
 </t>
 </section>
@@ -621,25 +664,36 @@ complete certificate chain presented during an attempted STARTTLS session.</t>
     "policy-domain": "company-y.com",
     "mx-host": "*.mail.company-y.com"
   },
-  "report-items": [{
+  "summary": {
+    "success-aggregate": 5326,
+    "failure-aggregate": 303
+  }
+  "failure-details": [{
     "result-type": "ExpiredCertificate",
     "sending-mta-ip": "98.136.216.25",
     "receiving-mx-hostname": "mx1.mail.company-y.com",
-    "message-count": 100
+    "session-count": 100
   }, {
     "result-type": "StarttlsNotSupported",
     "sending-mta-ip": "98.22.33.99",
     "receiving-mx-hostname": "mx2.mail.company-y.com",
-    "message-count": 200,
+    "session-count": 200,
     "additional-information": "hxxps://reports.company-x.com/
       report_info?id=5065427c-23d3#StarttlsNotSupported"
+  }, {
+    "result-type: "validation-failure",
+    "sending-mta-ip": "47.97.15.2",
+    "receiving-mx-hostname: "mx-backup.mail.company-y.com",
+    "session-count": 3,
+    "failure-error-code": "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED"
   }]
 }
 </artwork></figure>
 <t>Figure: Example JSON report for a messages from Company-X to Company-Y, where
-100 messages were attempted to Company Y servers with an expired certificate and
-200 messages were attempted to Company Y servers that did not successfully
-respond to the <spanx style="verb">STARTTLS</spanx> command.
+100 sessions were attempted to Company Y servers with an expired certificate and
+200 sessions were attempted to Company Y servers that did not successfully
+respond to the <spanx style="verb">STARTTLS</spanx> command.  Additionally 3 sessions failed due to
+&quot;X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED&quot;.
 </t>
 </section>
 
