@@ -440,13 +440,13 @@ The JSON schema is derived from the HPKP JSON schema [@!RFC7469] (cf. Section 3)
     "success-aggregate": total-successful-session-count,
     "failure-aggregate:" total-failure-session-count
   }
-  "report-items": [
+  "failure-details": [
     {
       "result-type": result-type,
       "sending-mta-ip": ip-address,
       "receiving-mx-hostname": receiving-mx-hostname,
       "receiving-mx-helo": receiving-mx-helo,
-      "failure-sessions": failed-session-count,
+      "session-count": failed-session-count,
       "additional-information": additional-info-uri,
       "failure-reason-code": "Text body"
     }
@@ -491,7 +491,7 @@ Figure: JSON Report Format
     SSL-enabled connections to the receiving site.
 * `failure-aggregate`: The aggregate number (integer) of failures to negotiate
     an SSL-enabled connection to the receiving site.
-* `failure-sessions`: The number of (attempted) sessions that match the relevant
+* `session-count`: The number of (attempted) sessions that match the relevant
     `result-type` for this section.
 * `additional-info-uri`: An optional URI pointing to additional information
     around the relevant `result-type`. For example, this URI might host the
@@ -520,31 +520,32 @@ Figure: JSON Report Format
     "success-aggregate": 5326,
     "failure-aggregate": 303
   }
-  "report-items": [{
+  "failure-details": [{
     "result-type": "ExpiredCertificate",
     "sending-mta-ip": "98.136.216.25",
     "receiving-mx-hostname": "mx1.mail.company-y.com",
-    "failure-sessions": 100
+    "session-count": 100
   }, {
     "result-type": "StarttlsNotSupported",
     "sending-mta-ip": "98.22.33.99",
     "receiving-mx-hostname": "mx2.mail.company-y.com",
-    "failure-sessions": 200,
+    "session-count": 200,
     "additional-information": "hxxps://reports.company-x.com/
       report_info?id=5065427c-23d3#StarttlsNotSupported"
   }, {
     "result-type: "validation-failure",
     "sending-mta-ip": "47.97.15.2",
     "receiving-mx-hostname: "mx-backup.mail.company-y.com",
-    "failure-sessions": 3,
+    "session-count": 3,
     "failure-error-code": "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED"
   }]
 }
 ```
 
 Figure: Example JSON report for a messages from Company-X to Company-Y, where
-100 messages were attempted to Company Y servers with an expired certificate and
-200 messages were attempted to Company Y servers that did not successfully
-respond to the `STARTTLS` command.
+100 sessions were attempted to Company Y servers with an expired certificate and
+200 sessions were attempted to Company Y servers that did not successfully
+respond to the `STARTTLS` command.  Additionally 3 sessions failed due to
+"X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED".
 
 {backmatter}
