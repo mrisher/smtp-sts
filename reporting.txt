@@ -82,14 +82,14 @@ Table of Contents
      3.1.  Example Reporting Policy  . . . . . . . . . . . . . . . .   5
        3.1.1.  Report using MAILTO . . . . . . . . . . . . . . . . .   5
        3.1.2.  Report using HTTPS  . . . . . . . . . . . . . . . . .   5
-   4.  Reporting Schema  . . . . . . . . . . . . . . . . . . . . . .   6
-     4.1.  Delivery Summary  . . . . . . . . . . . . . . . . . . . .   7
-       4.1.1.  Success Count . . . . . . . . . . . . . . . . . . . .   7
-       4.1.2.  Failure Count . . . . . . . . . . . . . . . . . . . .   7
+   4.  Reporting Schema  . . . . . . . . . . . . . . . . . . . . . .   5
+     4.1.  Delivery Summary  . . . . . . . . . . . . . . . . . . . .   6
+       4.1.1.  Success Count . . . . . . . . . . . . . . . . . . . .   6
+       4.1.2.  Failure Count . . . . . . . . . . . . . . . . . . . .   6
      4.2.  Result Types  . . . . . . . . . . . . . . . . . . . . . .   7
        4.2.1.  Routing Failures  . . . . . . . . . . . . . . . . . .   7
        4.2.2.  Negotiation Failures  . . . . . . . . . . . . . . . .   7
-       4.2.3.  Policy Failures . . . . . . . . . . . . . . . . . . .   8
+       4.2.3.  Policy Failures . . . . . . . . . . . . . . . . . . .   7
        4.2.4.  General failures  . . . . . . . . . . . . . . . . . .   8
    5.  Report Delivery . . . . . . . . . . . . . . . . . . . . . . .   8
      5.1.  Report Filename . . . . . . . . . . . . . . . . . . . . .   8
@@ -262,28 +262,6 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
                  "v=TLSRPTv1; \
                  rua=https://reporting.example.com/v1/tlsrpt"
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Margolis, et al.          Expires April 8, 2017                 [Page 5]
-
-Internet-Draft                 SMTP-TLSRPT                  October 2016
-
-
-                        master
-
 4.  Reporting Schema
 
    The report is composed as a plain text file encoded in the JSON
@@ -295,6 +273,15 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
 
       *  The organization responsible for the report
 
+
+
+
+
+Margolis, et al.          Expires April 8, 2017                 [Page 5]
+
+Internet-Draft                 SMTP-TLSRPT                  October 2016
+
+
       *  Contact information for one or more responsible parties for the
          contents of the report
 
@@ -304,14 +291,10 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
 
    o  Policy, consisting of:
 
-      *  One of the following policy types:
-
-      *  The SMTP MTA STS policy applied (as a string)
-
-      *  The DANE TLSA record applied (as a string)
-
-      *  The literal string "no-policy-found", if neither a TLSA nor
-         MTA-STS policy could be found.
+      *  One of the following policy types: (1) The SMTP MTA STS policy
+         applied (as a string) (2) The DANE TLSA record applied (as a
+         string) (3) The literal string "no-policy-found", if neither a
+         TLSA nor MTA-STS policy could be found.
 
       *  The domain for which the policy is applied
 
@@ -327,16 +310,6 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
    Note that the failure types are non-exclusive; an aggregate report
    may contain overlapping "counts" of failure types when a single send
    attempt encountered multiple errors.
-
-
-
-
-
-
-Margolis, et al.          Expires April 8, 2017                 [Page 6]
-
-Internet-Draft                 SMTP-TLSRPT                  October 2016
-
 
 4.1.  Delivery Summary
 
@@ -356,6 +329,14 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
       The "Result Types" section will elaborate on the failed
       negotiation attempts.  This field contains an aggregate count of
       failed connections.
+
+
+
+
+Margolis, et al.          Expires April 8, 2017                 [Page 6]
+
+Internet-Draft                 SMTP-TLSRPT                  October 2016
+
 
 4.2.  Result Types
 
@@ -387,13 +368,6 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
       contains a name that is listed as excluded in the name constraints
       extension of the issuer.
 
-
-
-Margolis, et al.          Expires April 8, 2017                 [Page 7]
-
-Internet-Draft                 SMTP-TLSRPT                  October 2016
-
-
    o  "expired-certificate": This indicates that the certificate has
       expired.
 
@@ -411,6 +385,14 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
 
    o  "dnssec-invalid": This indicates a failure to authenticate DNS
       records for a Policy Domain with a published TLSA record.
+
+
+
+
+Margolis, et al.          Expires April 8, 2017                 [Page 7]
+
+Internet-Draft                 SMTP-TLSRPT                  October 2016
+
 
 4.2.3.2.  STS-specific Policy Failures
 
@@ -440,6 +422,24 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
 5.1.  Report Filename
 
    The filename is typically constructed using the following ABNF:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -243,22 +243,6 @@ _smtp_tlsrpt.example.com. IN TXT \
 	"v=TLSRPTv1; \
 	rua=https://reporting.example.com/v1/tlsrpt"
 </artwork></figure>
-<t><list style="empty">
-<t><list style="empty">
-<t><list style="empty">
-<t><list style="empty">
-<t><list style="empty">
-<t><list style="empty">
-<t><list style="empty">
-<t>master
-</t>
-</list></t>
-</list></t>
-</list></t>
-</list></t>
-</list></t>
-</list></t>
-</list></t>
 </section>
 </section>
 </section>
@@ -281,10 +265,10 @@ contents of the report</t>
 </list></t>
 <t>Policy, consisting of:
 <list style="symbols">
-<t>One of the following policy types:</t>
-<t>The SMTP MTA STS policy applied (as a string)</t>
-<t>The DANE TLSA record applied (as a string)</t>
-<t>The literal string <spanx style="verb">no-policy-found</spanx>, if neither a TLSA nor
+<t>One of the following policy types:
+(1) The SMTP MTA STS policy applied (as a string)
+(2) The DANE TLSA record applied (as a string)
+(3) The literal string <spanx style="verb">no-policy-found</spanx>, if neither a TLSA nor
 MTA-STS policy could be found.</t>
 <t>The domain for which the policy is applied</t>
 <t>The MX host</t>

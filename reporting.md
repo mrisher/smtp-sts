@@ -177,7 +177,6 @@ _smtp_tlsrpt.example.com. IN TXT \
 	"v=TLSRPTv1; \
 	rua=https://reporting.example.com/v1/tlsrpt"
 ```
->>>>>>> master
 
 # Reporting Schema
 
@@ -194,10 +193,10 @@ Aggregate reports contain the following fields:
   * The reporting date range for the report
 * Policy, consisting of:
   * One of the following policy types:
-    + The SMTP MTA STS policy applied (as a string)
-    + The DANE TLSA record applied (as a string)
-    + The literal string `no-policy-found`, if neither a TLSA nor
-      MTA-STS policy could be found.
+    (1) The SMTP MTA STS policy applied (as a string)
+    (2) The DANE TLSA record applied (as a string)
+    (3) The literal string `no-policy-found`, if neither a TLSA nor
+    MTA-STS policy could be found.
   * The domain for which the policy is applied
   * The MX host
   * An identifier for the policy (where applicable)
