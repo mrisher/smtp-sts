@@ -85,7 +85,7 @@ recipient domains.
 
 Specifically, this document defines a reporting schema that covers failures in
 routing, STARTTLS negotiation, and both DANE [@!RFC6698] and MTA-STS (TODO: Add
-ref) policy validation errors, and standard TXT record that recipient domains
+ref) policy validation errors, and a standard TXT record that recipient domains
 can use to indicate where reports in this format should be sent.
 
 This document is intended as a companion to the specification for SMTP MTA
@@ -99,12 +99,15 @@ they appear in this document, are to be interpreted as described in [@!RFC2119].
 
 We also define the following terms for further use in this document:
 
-* STS Policy: A definition of the expected TLS availability and behavior, as
-    well as the desired actions for a given domain when a sending MTA encounters
-    different results.
-* TLSRPT Policy: A policy detailing the endpoint to which sending MTAs should
-    deliver reports.
-* Policy Domain: The domain against which an STS Policy is defined.
+* STS Policy: A definition of the expected TLS availability, behavior, and
+  desired actions for a given domain when a sending MTA encounters
+  problems in negotiating a secure channel. STS is defined in [TODO]
+* DANE Policy: A mechanism for enabling the administrators of domain names to
+  specify the keys used in that domain's TLS servers. DANE is defined in
+  [@!RFC6698]
+* TLSRPT Policy: A policy specifying the endpoint to which sending MTAs should
+  deliver reports.
+* Policy Domain: The domain against which an STS or DANE Policy is defined.
 * Sending MTA: The MTA initiating the delivery of an email message.
 
 # Related Technologies
@@ -174,7 +177,6 @@ _smtp_tlsrpt.example.com. IN TXT \
 	"v=TLSRPTv1; \
 	rua=https://reporting.example.com/v1/tlsrpt"
 ```
->>>>>>> master
 
 # Reporting Schema
 
@@ -191,10 +193,10 @@ Aggregate reports contain the following fields:
   * The reporting date range for the report
 * Policy, consisting of:
   * One of the following policy types:
-    * The SMTP MTA STS policy applied (as a string)
-    * The DANE TLSA record applied (as a string)
-    * The literal string `no-policy-found`, if neither a TLSA nor
-      MTA-STS policy could be found.
+    (1) The SMTP MTA STS policy applied (as a string)
+    (2) The DANE TLSA record applied (as a string)
+    (3) The literal string `no-policy-found`, if neither a TLSA nor
+    MTA-STS policy could be found.
   * The domain for which the policy is applied
   * The MX host
   * An identifier for the policy (where applicable)
@@ -212,17 +214,17 @@ multiple errors.
 ### Success Count
 
 * `success-count`: This indicates that the sending MTA was able to successfully
-    negotiate a policy-compliant TLS connection, and serves to provide a
-    "heartbeat" to receiving domains that reporting is functional and tabulating
-    correctly.  This SHOULD be an aggregate count of successful connections for the
-    reporting system.
+  negotiate a policy-compliant TLS connection, and serves to provide a
+  "heartbeat" to receiving domains that reporting is functional and tabulating
+  correctly.  This field contains an aggregate count of successful connections
+  for the reporting system.
     
 ### Failure Count
 
-* `failure-count`: This indicates that the sending MTA was unable to successfully
-    establish a connection with the receiving platform.  The "Result Types" section 
-    will elaborate on the failed negotiation attempts.  This SHOULD be an aggregate
-    count of failed connections.  
+* `failure-count`: This indicates that the sending MTA was unable to
+  successfully establish a connection with the receiving platform.  The "Result
+  Types" section will elaborate on the failed negotiation attempts.  This field
+  contains an aggregate count of failed connections.  
 
 ## Result Types
 
@@ -233,8 +235,6 @@ to grow over time based on real-world experience. The initial set is:
 
 * `mx-mismatch`: This indicates that the MX resolved for the recipient domain
     did not match the MX constraint specified in the policy.
-* `certificate-host-mismatch`: This indicates that the certificate presented
-    by the receiving MX did not match the MX hostname.
 
 ### Negotiation Failures
 
@@ -272,7 +272,7 @@ to grow over time based on real-world experience. The initial set is:
     
 ### General failures
 
-When a negotation failure can not be categorized into one of the "Negotiation Failures" 
+When a negotiation failure can not be categorized into one of the "Negotiation Failures" 
 stated above, the reporter SHOULD use the `validation-failure` category.  As TLS grows
 and becomes more complex, new mechanisms may not be easily categorized.  This allows for
 a generic feedback category.  When this category is used, the reporter SHOULD also use the
@@ -326,7 +326,7 @@ The filename is typically constructed using the following ABNF:
 The report SHOULD be subjected to GZIP compression for both email and HTTPS
 transport. Declining to apply compression can cause the report to be too large
 for a receiver to process (a commonly observed receiver limit is ten megabytes);
-doing the compression increases the chances of acceptance of the report at some
+compressing the file increases the chances of acceptance of the report at some
 compute cost.
 
 ## Email Transport
@@ -397,8 +397,19 @@ several security risks presented by the existence of this reporting channel:
 * Report snooping: An attacker could create a bogus TLSRPT record to receive
     statistics about a domain the attacker does not own. Since an attacker able
     to poison DNS is already able to receive counts of SMTP connections (and,
-    absent DANE or MTA-STS policies, actual SMTP message payloads) today, this
+    absent DANE or MTA-STS policies, actual SMTP message payloads), this
     does not present a significant new vulnerability.
+
+* Reports as DDoS: TLSRPT allows specifying destinations for the reports that
+  are outside the authority of the Policy Domain, which allows domains to
+  delegate processing of reports to a partner organization. However, an attacker
+  who controls the Policy Domain DNS could also use this mechanism to direct the
+  reports to an unwitting victim, flooding that victim with excessive reports.
+  DMARC [@!RFC7489] defines an elegant solution for verifying delegation;
+  however, since the attacker had less ability to generate large reports than
+  with DMARC failures, and since the reports are generated by the sending MTA,
+  such a delegation mechanism is left for a future version of this
+  specification. 
 
 # Appendix 1: Example Reporting Policy
 

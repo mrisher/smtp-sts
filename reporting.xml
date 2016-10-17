@@ -133,7 +133,7 @@ recipient domains.
 </t>
 <t>Specifically, this document defines a reporting schema that covers failures in
 routing, STARTTLS negotiation, and both DANE <xref target="RFC6698"/> and MTA-STS (TODO: Add
-ref) policy validation errors, and standard TXT record that recipient domains
+ref) policy validation errors, and a standard TXT record that recipient domains
 can use to indicate where reports in this format should be sent.
 </t>
 <t>This document is intended as a companion to the specification for SMTP MTA
@@ -149,12 +149,15 @@ they appear in this document, are to be interpreted as described in <xref target
 </t>
 <t>
 <list style="symbols">
-<t>STS Policy: A definition of the expected TLS availability and behavior, as
-well as the desired actions for a given domain when a sending MTA encounters
-different results.</t>
-<t>TLSRPT Policy: A policy detailing the endpoint to which sending MTAs should
+<t>STS Policy: A definition of the expected TLS availability, behavior, and
+desired actions for a given domain when a sending MTA encounters
+problems in negotiating a secure channel. STS is defined in [TODO]</t>
+<t>DANE Policy: A mechanism for enabling the administrators of domain names to
+specify the keys used in that domain's TLS servers. DANE is defined in
+<xref target="RFC6698"/></t>
+<t>TLSRPT Policy: A policy specifying the endpoint to which sending MTAs should
 deliver reports.</t>
-<t>Policy Domain: The domain against which an STS Policy is defined.</t>
+<t>Policy Domain: The domain against which an STS or DANE Policy is defined.</t>
 <t>Sending MTA: The MTA initiating the delivery of an email message.</t>
 </list>
 </t>
@@ -240,22 +243,6 @@ _smtp_tlsrpt.example.com. IN TXT \
 	"v=TLSRPTv1; \
 	rua=https://reporting.example.com/v1/tlsrpt"
 </artwork></figure>
-<t><list style="empty">
-<t><list style="empty">
-<t><list style="empty">
-<t><list style="empty">
-<t><list style="empty">
-<t><list style="empty">
-<t><list style="empty">
-<t>master
-</t>
-</list></t>
-</list></t>
-</list></t>
-</list></t>
-</list></t>
-</list></t>
-</list></t>
 </section>
 </section>
 </section>
@@ -278,10 +265,10 @@ contents of the report</t>
 </list></t>
 <t>Policy, consisting of:
 <list style="symbols">
-<t>One of the following policy types:</t>
-<t>The SMTP MTA STS policy applied (as a string)</t>
-<t>The DANE TLSA record applied (as a string)</t>
-<t>The literal string <spanx style="verb">no-policy-found</spanx>, if neither a TLSA nor
+<t>One of the following policy types:
+(1) The SMTP MTA STS policy applied (as a string)
+(2) The DANE TLSA record applied (as a string)
+(3) The literal string <spanx style="verb">no-policy-found</spanx>, if neither a TLSA nor
 MTA-STS policy could be found.</t>
 <t>The domain for which the policy is applied</t>
 <t>The MX host</t>
@@ -306,8 +293,8 @@ multiple errors.
 <t><spanx style="verb">success-count</spanx>: This indicates that the sending MTA was able to successfully
 negotiate a policy-compliant TLS connection, and serves to provide a
 &quot;heartbeat&quot; to receiving domains that reporting is functional and tabulating
-correctly.  This SHOULD be an aggregate count of successful connections for the
-reporting system.
+correctly.  This field contains an aggregate count of successful connections
+for the reporting system.
 
 <vspace/></t>
 </list>
@@ -317,10 +304,10 @@ reporting system.
 <section anchor="failure-count" title="Failure Count">
 <t>
 <list style="symbols">
-<t><spanx style="verb">failure-count</spanx>: This indicates that the sending MTA was unable to successfully
-establish a connection with the receiving platform.  The &quot;Result Types&quot; section
-will elaborate on the failed negotiation attempts.  This SHOULD be an aggregate
-count of failed connections.
+<t><spanx style="verb">failure-count</spanx>: This indicates that the sending MTA was unable to
+successfully establish a connection with the receiving platform.  The &quot;Result
+Types&quot; section will elaborate on the failed negotiation attempts.  This field
+contains an aggregate count of failed connections.
 <vspace/></t>
 </list>
 </t>
@@ -337,8 +324,6 @@ to grow over time based on real-world experience. The initial set is:
 <list style="symbols">
 <t><spanx style="verb">mx-mismatch</spanx>: This indicates that the MX resolved for the recipient domain
 did not match the MX constraint specified in the policy.</t>
-<t><spanx style="verb">certificate-host-mismatch</spanx>: This indicates that the certificate presented
-by the receiving MX did not match the MX hostname.</t>
 </list>
 </t>
 </section>
@@ -393,7 +378,7 @@ authenticated using PKIX validation.
 </section>
 
 <section anchor="general-failures" title="General failures">
-<t>When a negotation failure can not be categorized into one of the &quot;Negotiation Failures&quot;
+<t>When a negotiation failure can not be categorized into one of the &quot;Negotiation Failures&quot;
 stated above, the reporter SHOULD use the <spanx style="verb">validation-failure</spanx> category.  As TLS grows
 and becomes more complex, new mechanisms may not be easily categorized.  This allows for
 a generic feedback category.  When this category is used, the reporter SHOULD also use the
@@ -455,7 +440,7 @@ POST.
 <t>The report SHOULD be subjected to GZIP compression for both email and HTTPS
 transport. Declining to apply compression can cause the report to be too large
 for a receiver to process (a commonly observed receiver limit is ten megabytes);
-doing the compression increases the chances of acceptance of the report at some
+compressing the file increases the chances of acceptance of the report at some
 compute cost.
 </t>
 </section>
@@ -535,8 +520,18 @@ advised to take precautions against evaluating the contents of the report.</t>
 <t>Report snooping: An attacker could create a bogus TLSRPT record to receive
 statistics about a domain the attacker does not own. Since an attacker able
 to poison DNS is already able to receive counts of SMTP connections (and,
-absent DANE or MTA-STS policies, actual SMTP message payloads) today, this
+absent DANE or MTA-STS policies, actual SMTP message payloads), this
 does not present a significant new vulnerability.</t>
+<t>Reports as DDoS: TLSRPT allows specifying destinations for the reports that
+are outside the authority of the Policy Domain, which allows domains to
+delegate processing of reports to a partner organization. However, an attacker
+who controls the Policy Domain DNS could also use this mechanism to direct the
+reports to an unwitting victim, flooding that victim with excessive reports.
+DMARC <xref target="RFC7489"/> defines an elegant solution for verifying delegation;
+however, since the attacker had less ability to generate large reports than
+with DMARC failures, and since the reports are generated by the sending MTA,
+such a delegation mechanism is left for a future version of this
+specification.</t>
 </list>
 </t>
 </section>

@@ -85,11 +85,11 @@ Table of Contents
    4.  Reporting Schema  . . . . . . . . . . . . . . . . . . . . . .   5
      4.1.  Delivery Summary  . . . . . . . . . . . . . . . . . . . .   6
        4.1.1.  Success Count . . . . . . . . . . . . . . . . . . . .   6
-       4.1.2.  Failure Count . . . . . . . . . . . . . . . . . . . .   7
+       4.1.2.  Failure Count . . . . . . . . . . . . . . . . . . . .   6
      4.2.  Result Types  . . . . . . . . . . . . . . . . . . . . . .   7
        4.2.1.  Routing Failures  . . . . . . . . . . . . . . . . . .   7
        4.2.2.  Negotiation Failures  . . . . . . . . . . . . . . . .   7
-       4.2.3.  Policy Failures . . . . . . . . . . . . . . . . . . .   8
+       4.2.3.  Policy Failures . . . . . . . . . . . . . . . . . . .   7
        4.2.4.  General failures  . . . . . . . . . . . . . . . . . .   8
    5.  Report Delivery . . . . . . . . . . . . . . . . . . . . . . .   8
      5.1.  Report Filename . . . . . . . . . . . . . . . . . . . . .   8
@@ -101,7 +101,7 @@ Table of Contents
    8.  Appendix 1: Example Reporting Policy  . . . . . . . . . . . .  11
      8.1.  Report using MAILTO . . . . . . . . . . . . . . . . . . .  11
      8.2.  Report using HTTPS  . . . . . . . . . . . . . . . . . . .  11
-   9.  Appendix 2: JSON Report Schema  . . . . . . . . . . . . . . .  11
+   9.  Appendix 2: JSON Report Schema  . . . . . . . . . . . . . . .  12
    10. Appendix 3: Example JSON Report . . . . . . . . . . . . . . .  14
    11. Normative References  . . . . . . . . . . . . . . . . . . . .  15
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
@@ -138,7 +138,7 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
 
    Specifically, this document defines a reporting schema that covers
    failures in routing, STARTTLS negotiation, and both DANE [RFC6698]
-   and MTA-STS (TODO: Add ref) policy validation errors, and standard
+   and MTA-STS (TODO: Add ref) policy validation errors, and a standard
    TXT record that recipient domains can use to indicate where reports
    in this format should be sent.
 
@@ -153,14 +153,14 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
 
    We also define the following terms for further use in this document:
 
-   o  STS Policy: A definition of the expected TLS availability and
-      behavior, as well as the desired actions for a given domain when a
-      sending MTA encounters different results.
+   o  STS Policy: A definition of the expected TLS availability,
+      behavior, and desired actions for a given domain when a sending
+      MTA encounters problems in negotiating a secure channel.  STS is
+      defined in [TODO]
 
-   o  TLSRPT Policy: A policy detailing the endpoint to which sending
-      MTAs should deliver reports.
-
-   o  Policy Domain: The domain against which an STS Policy is defined.
+   o  DANE Policy: A mechanism for enabling the administrators of domain
+      names to specify the keys used in that domain's TLS servers.  DANE
+      is defined in [RFC6698]
 
 
 
@@ -169,6 +169,12 @@ Margolis, et al.          Expires April 8, 2017                 [Page 3]
 
 Internet-Draft                 SMTP-TLSRPT                  October 2016
 
+
+   o  TLSRPT Policy: A policy specifying the endpoint to which sending
+      MTAs should deliver reports.
+
+   o  Policy Domain: The domain against which an STS or DANE Policy is
+      defined.
 
    o  Sending MTA: The MTA initiating the delivery of an email message.
 
@@ -211,12 +217,6 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
          SMTP, sending MTAs MUST NOT honor SMTP STS or DANE TLSA
          failures.
 
-   o  "ruf": Future use.  (There may also be a need for enabling more
-      detailed "forensic" reporting during initial stages of a
-      deployment.  To address this, the authors consider the possibility
-      of an optional additional "forensic reporting mode" in which more
-      details--such as certificate chains and MTA banners--may be
-      reported.)
 
 
 
@@ -225,6 +225,13 @@ Margolis, et al.          Expires April 8, 2017                 [Page 4]
 
 Internet-Draft                 SMTP-TLSRPT                  October 2016
 
+
+   o  "ruf": Future use.  (There may also be a need for enabling more
+      detailed "forensic" reporting during initial stages of a
+      deployment.  To address this, the authors consider the possibility
+      of an optional additional "forensic reporting mode" in which more
+      details--such as certificate chains and MTA banners--may be
+      reported.)
 
    The formal definition of the "_smtp_tlsrpt" TXT record, defined using
    [RFC5234], is as follows:
@@ -255,24 +262,17 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
                  "v=TLSRPTv1; \
                  rua=https://reporting.example.com/v1/tlsrpt"
 
-
-
-
-
-
-
-
-
-
-
-
-
-                        master
-
 4.  Reporting Schema
 
    The report is composed as a plain text file encoded in the JSON
    format ([RFC7159]).
+
+   Aggregate reports contain the following fields:
+
+   o  Report metadata:
+
+      *  The organization responsible for the report
+
 
 
 
@@ -281,12 +281,6 @@ Margolis, et al.          Expires April 8, 2017                 [Page 5]
 
 Internet-Draft                 SMTP-TLSRPT                  October 2016
 
-
-   Aggregate reports contain the following fields:
-
-   o  Report metadata:
-
-      *  The organization responsible for the report
 
       *  Contact information for one or more responsible parties for the
          contents of the report
@@ -297,14 +291,10 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
 
    o  Policy, consisting of:
 
-      *  One of the following policy types:
-
-      *  The SMTP MTA STS policy applied (as a string)
-
-      *  The DANE TLSA record applied (as a string)
-
-      *  The literal string "no-policy-found", if neither a TLSA nor
-         MTA-STS policy could be found.
+      *  One of the following policy types: (1) The SMTP MTA STS policy
+         applied (as a string) (2) The DANE TLSA record applied (as a
+         string) (3) The literal string "no-policy-found", if neither a
+         TLSA nor MTA-STS policy could be found.
 
       *  The domain for which the policy is applied
 
@@ -328,7 +318,17 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
    o  "success-count": This indicates that the sending MTA was able to
       successfully negotiate a policy-compliant TLS connection, and
       serves to provide a "heartbeat" to receiving domains that
-      reporting is functional and tabulating correctly.  This SHOULD be
+      reporting is functional and tabulating correctly.  This field
+      contains an aggregate count of successful connections for the
+      reporting system.
+
+4.1.2.  Failure Count
+
+   o  "failure-count": This indicates that the sending MTA was unable to
+      successfully establish a connection with the receiving platform.
+      The "Result Types" section will elaborate on the failed
+      negotiation attempts.  This field contains an aggregate count of
+      failed connections.
 
 
 
@@ -337,17 +337,6 @@ Margolis, et al.          Expires April 8, 2017                 [Page 6]
 
 Internet-Draft                 SMTP-TLSRPT                  October 2016
 
-
-      an aggregate count of successful connections for the reporting
-      system.
-
-4.1.2.  Failure Count
-
-   o  "failure-count": This indicates that the sending MTA was unable to
-      successfully establish a connection with the receiving platform.
-      The "Result Types" section will elaborate on the failed
-      negotiation attempts.  This SHOULD be an aggregate count of failed
-      connections.
 
 4.2.  Result Types
 
@@ -360,9 +349,6 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
    o  "mx-mismatch": This indicates that the MX resolved for the
       recipient domain did not match the MX constraint specified in the
       policy.
-
-   o  "certificate-host-mismatch": This indicates that the certificate
-      presented by the receiving MX did not match the MX hostname.
 
 4.2.2.  Negotiation Failures
 
@@ -385,15 +371,6 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
    o  "expired-certificate": This indicates that the certificate has
       expired.
 
-
-
-
-
-Margolis, et al.          Expires April 8, 2017                 [Page 7]
-
-Internet-Draft                 SMTP-TLSRPT                  October 2016
-
-
    o  "validation-failure": This indicates a general failure for a
       reason not matching a category above.  When using this
       declaration, the reporting MTA SHOULD utilize the "failure-reason"
@@ -409,6 +386,14 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
    o  "dnssec-invalid": This indicates a failure to authenticate DNS
       records for a Policy Domain with a published TLSA record.
 
+
+
+
+Margolis, et al.          Expires April 8, 2017                 [Page 7]
+
+Internet-Draft                 SMTP-TLSRPT                  October 2016
+
+
 4.2.3.2.  STS-specific Policy Failures
 
    o  "sts-invalid": This indicates a validation error for the overall
@@ -419,7 +404,7 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
 
 4.2.4.  General failures
 
-   When a negotation failure can not be categorized into one of the
+   When a negotiation failure can not be categorized into one of the
    "Negotiation Failures" stated above, the reporter SHOULD use the
    "validation-failure" category.  As TLS grows and becomes more
    complex, new mechanisms may not be easily categorized.  This allows
@@ -437,6 +422,21 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
 5.1.  Report Filename
 
    The filename is typically constructed using the following ABNF:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -487,7 +487,7 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
    The report SHOULD be subjected to GZIP compression for both email and
    HTTPS transport.  Declining to apply compression can cause the report
    to be too large for a receiver to process (a commonly observed
-   receiver limit is ten megabytes); doing the compression increases the
+   receiver limit is ten megabytes); compressing the file increases the
    chances of acceptance of the report at some compute cost.
 
 5.3.  Email Transport
@@ -580,8 +580,20 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
       receive statistics about a domain the attacker does not own.
       Since an attacker able to poison DNS is already able to receive
       counts of SMTP connections (and, absent DANE or MTA-STS policies,
-      actual SMTP message payloads) today, this does not present a
-      significant new vulnerability.
+      actual SMTP message payloads), this does not present a significant
+      new vulnerability.
+
+   o  Reports as DDoS: TLSRPT allows specifying destinations for the
+      reports that are outside the authority of the Policy Domain, which
+      allows domains to delegate processing of reports to a partner
+      organization.  However, an attacker who controls the Policy Domain
+      DNS could also use this mechanism to direct the reports to an
+      unwitting victim, flooding that victim with excessive reports.
+      DMARC [RFC7489] defines an elegant solution for verifying
+      delegation; however, since the attacker had less ability to
+      generate large reports than with DMARC failures, and since the
+      reports are generated by the sending MTA, such a delegation
+      mechanism is left for a future version of this specification.
 
 8.  Appendix 1: Example Reporting Policy
 
@@ -596,18 +608,6 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
                    "v=TLSRPTv1; \
                    rua=https://reporting.example.com/v1/tlsrpt"
 
-9.  Appendix 2: JSON Report Schema
-
-   The JSON schema is derived from the HPKP JSON schema [RFC7469] (cf.
-   Section 3)
-
-
-
-
-
-
-
-
 
 
 
@@ -617,6 +617,11 @@ Margolis, et al.          Expires April 8, 2017                [Page 11]
 
 Internet-Draft                 SMTP-TLSRPT                  October 2016
 
+
+9.  Appendix 2: JSON Report Schema
+
+   The JSON schema is derived from the HPKP JSON schema [RFC7469] (cf.
+   Section 3)
 
          {
            "organization-name": organization-name,
@@ -662,17 +667,16 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
       of the report.  It is provided as a string formatted according to
       Section 3.4.1, "Addr-Spec", of [RFC5322].
 
-   o  "report-id": A unique identifier for the report.  Report authors
-      may use whatever scheme they prefer to generate a unique
-      identifier.  It is provided as a string.
-
-
 
 
 Margolis, et al.          Expires April 8, 2017                [Page 12]
 
 Internet-Draft                 SMTP-TLSRPT                  October 2016
 
+
+   o  "report-id": A unique identifier for the report.  Report authors
+      may use whatever scheme they prefer to generate a unique
+      identifier.  It is provided as a string.
 
    o  "policy-type": The type of policy that was applied by the sending
       domain.  Presently, the only three valid choices are "tlsa",
@@ -718,10 +722,6 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
 
    o  "additional-info-uri": An optional URI pointing to additional
       information around the relevant "result-type".  For example, this
-      URI might host the complete certificate chain presented during an
-      attempted STARTTLS session.
-
-
 
 
 
@@ -729,6 +729,9 @@ Margolis, et al.          Expires April 8, 2017                [Page 13]
 
 Internet-Draft                 SMTP-TLSRPT                  October 2016
 
+
+      URI might host the complete certificate chain presented during an
+      attempted STARTTLS session.
 
    o  "failure-reason-code": A text field to include an SSL-related
       error code or error message.
@@ -774,10 +777,7 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
        }]
      }
 
-   Figure: Example JSON report for a messages from Company-X to
-   Company-Y, where 100 sessions were attempted to Company Y servers
-   with an expired certificate and 200 sessions were attempted to
-   Company Y servers that did not successfully respond to the "STARTTLS"
+
 
 
 
@@ -786,6 +786,10 @@ Margolis, et al.          Expires April 8, 2017                [Page 14]
 Internet-Draft                 SMTP-TLSRPT                  October 2016
 
 
+   Figure: Example JSON report for a messages from Company-X to
+   Company-Y, where 100 sessions were attempted to Company Y servers
+   with an expired certificate and 200 sessions were attempted to
+   Company Y servers that did not successfully respond to the "STARTTLS"
    command.  Additionally 3 sessions failed due to
    "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED".
 
@@ -829,10 +833,6 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
               Protocol: TLSA", RFC 6698, DOI 10.17487/RFC6698, August
               2012, <http://www.rfc-editor.org/info/rfc6698>.
 
-   [RFC6713]  Levine, J., "The 'application/zlib' and 'application/gzip'
-              Media Types", RFC 6713, DOI 10.17487/RFC6713, August 2012,
-              <http://www.rfc-editor.org/info/rfc6713>.
-
 
 
 
@@ -841,6 +841,10 @@ Margolis, et al.          Expires April 8, 2017                [Page 15]
 
 Internet-Draft                 SMTP-TLSRPT                  October 2016
 
+
+   [RFC6713]  Levine, J., "The 'application/zlib' and 'application/gzip'
+              Media Types", RFC 6713, DOI 10.17487/RFC6713, August 2012,
+              <http://www.rfc-editor.org/info/rfc6713>.
 
    [RFC7159]  Bray, T., Ed., "The JavaScript Object Notation (JSON) Data
               Interchange Format", RFC 7159, DOI 10.17487/RFC7159, March
@@ -885,6 +889,15 @@ Authors' Addresses
    Email: janet.jones (at) microsoft (dot com)
 
 
+
+
+
+
+Margolis, et al.          Expires April 8, 2017                [Page 16]
+
+Internet-Draft                 SMTP-TLSRPT                  October 2016
+
+
    Mark Risher
    Google, Inc
 
@@ -893,4 +906,47 @@ Authors' Addresses
 
 
 
-Margolis, et al.          Expires April 8, 2017                [Page 16]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Margolis, et al.          Expires April 8, 2017                [Page 17]
