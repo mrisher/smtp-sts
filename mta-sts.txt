@@ -84,17 +84,19 @@ Table of Contents
      5.1.  MX Matching . . . . . . . . . . . . . . . . . . . . . . .   8
      5.2.  MX Certificate Validation . . . . . . . . . . . . . . . .   8
    6.  Policy Application  . . . . . . . . . . . . . . . . . . . . .   9
-     6.1.  MX Preference . . . . . . . . . . . . . . . . . . . . . .   9
-     6.2.  Policy Application Control Flow . . . . . . . . . . . . .  10
-   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  10
-   8.  Security Considerations . . . . . . . . . . . . . . . . . . .  10
+     6.1.  Policy Versioning . . . . . . . . . . . . . . . . . . . .   9
+     6.2.  MX Preference . . . . . . . . . . . . . . . . . . . . . .  10
+     6.3.  Policy Application Control Flow . . . . . . . . . . . . .  10
+   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  11
+   8.  Security Considerations . . . . . . . . . . . . . . . . . . .  11
    9.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  12
-   10. Appendix 1: Domain Owner STS example record . . . . . . . . .  12
-     10.1.  Example 1  . . . . . . . . . . . . . . . . . . . . . . .  12
-   11. References  . . . . . . . . . . . . . . . . . . . . . . . . .  13
-     11.1.  Normative References . . . . . . . . . . . . . . . . . .  13
-     11.2.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  14
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  14
+   10. Appendix 1: Domain Owner STS example record . . . . . . . . .  13
+     10.1.  Example 1  . . . . . . . . . . . . . . . . . . . . . . .  13
+   11. Appendix 2: Message delivery pseudocode . . . . . . . . . . .  13
+   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  15
+     12.1.  Normative References . . . . . . . . . . . . . . . . . .  15
+     12.2.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  16
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
 
 1.  Introduction
 
@@ -104,8 +106,6 @@ Table of Contents
 
    While such _opportunistic_ encryption protocols provide a high
    barrier against passive man-in-the-middle traffic interception, any
-   attacker who can delete parts of the SMTP session (such as the "250
-   STARTTLS" response) or who can redirect the entire SMTP session
 
 
 
@@ -114,6 +114,8 @@ Margolis, et al.         Expires January 9, 2017                [Page 2]
 Internet-Draft                   MTA-STS                       July 2016
 
 
+   attacker who can delete parts of the SMTP session (such as the "250
+   STARTTLS" response) or who can redirect the entire SMTP session
    (perhaps by overwriting the resolved MX record of the delivery
    domain) can perform downgrade or interception attacks.
 
@@ -158,8 +160,6 @@ Internet-Draft                   MTA-STS                       July 2016
 
    o  Policy Authentication: Authentication of the STS policy retrieved
       for a recipient domain by the sender.
-
-
 
 
 
@@ -487,7 +487,51 @@ Internet-Draft                   MTA-STS                       July 2016
    to the Policy Domain.  This is to limit the risk of misconfigurations
    when deploying new policies.
 
-6.1.  MX Preference
+6.1.  Policy Versioning
+
+   Because an STS Policy that has never before successfully been
+   validated should not be used to reject mail, sending MTAs SHOULD be
+   aware of policy versions.  When delivering a given message, a sending
+   MTA may, for the recipient domain, posess a cached, previously
+   validated (unexpired) policy _and/or_ a newly fetched, never-before-
+   validated policy.
+
+
+
+
+
+
+Margolis, et al.         Expires January 9, 2017                [Page 9]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
+   During policy application, the sending MTA now has an option of which
+   policy to apply; it is suggested that MTAs implement the following
+   logic:
+
+   o  _If_ a new, unvalidated policy exists, attempt to deliver in
+      compliance with this policy.  If this attempt succeeds _or_ the
+      new policy mode is "report", mark the policy as "validated" and
+      remove the previously cached policy.
+
+   o  _If_ a new, unvalidated policy with mode set to "enforce" was
+      attempted and failed to validate, deliver the message in
+      compliance with the old, previously cached policy, and consider
+      this a policy validation failure (for the purposes of TLSRPT
+      (TODO: add reference)).
+
+   Implementers may choose to think of this as a "two-pass" model
+   (though such an implementation may be less efficient than a more
+   optimized alternative):
+
+   o  In the first pass, the new policy is attempted and, if successful,
+      becomes the old policy.
+
+   o  In the second pass, the old policy (or policy-missing) is
+      attempted, as would be the case if no new policy were found.
+
+6.2.  MX Preference
 
    When applying a policy, sending MTAs SHOULD select recipient MXs by
    first eliminating any MXs at lower priority than the current host (if
@@ -498,19 +542,11 @@ Internet-Draft                   MTA-STS                       July 2016
 
    If none of the attempted MX hosts validate according to the policy,
    the policy MUST be refreshed at least once, as described in _Policy_
-
-
-
-Margolis, et al.         Expires January 9, 2017                [Page 9]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
    _Discovery_ _&_ _Authentication_, before a message should be
    permanently rejected.  (In the case of policies in "report" mode, the
    sending MTA may simply fall back to the original candidate MX set.)
 
-6.2.  Policy Application Control Flow
+6.3.  Policy Application Control Flow
 
    The control flow for a sending MTA consists of the following steps:
 
@@ -518,12 +554,20 @@ Internet-Draft                   MTA-STS                       July 2016
        "_mta_sts" TXT record is present for the recipient domain, fetch
        a new policy, authenticate, and cache it.
 
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 10]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
    2.  Validate candidate MX or MXs against policy.  If a valid MX is
        discovered, deliver mail and mark cached policy as "successfully
        applied."
 
    3.  If no valid recipient MX is found, the cached policy mode is
-       "reject", and the cached policy has previously been successfully
+       "enforce", and the cached policy has previously been successfully
        applied, temporarily fail the message.
 
    4.  Upon message retries, a message MAY be permanently failed
@@ -553,15 +597,6 @@ Internet-Draft                   MTA-STS                       July 2016
        and/or modify messages despite opportunistic TLS.  This
        impersonation could be accomplished by spoofing the DNS MX record
        for the recipient domain, or by redirecting client connections
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 10]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
        intended for the legitimate recipient server (for example, by
        altering BGP routing tables).
 
@@ -574,6 +609,15 @@ Internet-Draft                   MTA-STS                       July 2016
    Since we use DNS TXT record for policy discovery, an attacker who is
    able to block DNS responses can suppress the discovery of an STS
    Policy, making the Policy Domain appear not to have an STS Policy.
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 11]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
    The caching model described in _Policy_ _Expirations_ is designed to
    resist this attack.
 
@@ -610,14 +654,6 @@ Internet-Draft                   MTA-STS                       July 2016
    exists for configurations that allow attackers on the same domain to
    receive mail for that domain.  For example, an easy configuration
    option when authoring an STS Policy for "example.com" is to set the
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 11]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
    "mx" equal to "*.example.com"; recipient domains must consider in
    this case the risk that any user possessing a valid hostname and CA-
    signed certificate (for example, "dhcp-123.example.com") will, from
@@ -629,6 +665,14 @@ Internet-Draft                   MTA-STS                       July 2016
    Nicolas Lidzborski Google, Inc nlidz (at) google (dot com)
 
    Wei Chuang Google, Inc weihaw (at) google (dot com)
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 12]
+
+Internet-Draft                   MTA-STS                       July 2016
+
 
    Brandon Long Google, Inc blong (at) google (dot com)
 
@@ -664,19 +708,102 @@ Internet-Draft                   MTA-STS                       July 2016
               }
 
 
+11.  Appendix 2: Message delivery pseudocode
+
+   Below is pseudocode demonstrating the logic of a complaint sending
+   MTA.
+
+func tryGetCachedValidatedPolicy(domain) { ... }
+
+func storePolicyInCache(domain, policy) { ... }
+
+func markCachedPolicyAsValid(domain, policy) { ... }
+
+func isValidated(policy) { ... }
+
+func isEnforce(policy) { ... }
 
 
 
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 12]
+Margolis, et al.         Expires January 9, 2017               [Page 13]
 
 Internet-Draft                   MTA-STS                       July 2016
 
 
-11.  References
+func isNonExpired(policy) { ... }
 
-11.1.  Normative References
+func getMxsForPolicy(domain, policy) {
+  // Sort the MXs by priority, filtering out those which are invalid according
+  // to "policy".
+}
+
+func tryStartTls(mx) { ... }
+
+func tryDeliverMail(connection) { ... }
+
+func tryGetNewPolicy(domain) {
+  // Return a new policy from DNS, or a cached policy that has not yet been
+  // validated.
+}
+
+func certMatches(connection, policy) { ... }
+
+func tryMxAccordingTo(message, mx, policy) {
+  enforce := isValidated(policy) && isEnforce(policy) && isNonExpired(policy)
+  var connection
+  if !tryStartTls(mx, &connection) && enforce {
+    return false
+  }
+  if !certMatches(connection, policy) && enforce {
+    return false
+  }
+  return deliverMail(connection, message)
+}
+
+func tryWithPolicy(message, domain, policy) {
+  mxes := getMxesForPolicy(domain, policy)
+  for mx in mxes {
+    if tryMxAccordingTo(message, mx, policy) {
+      return true
+    }
+  }
+  return false
+}
+
+func handleMessage(message) {
+  domain := domainFromMessage(message)
+  oldPolicy := tryGetCachedValidatedPolicy(domain)
+  newPolicy := tryGetNewPolicy(domain)
+  if newPolicy && newPolicy != oldPolicy {
+    if tryWithPolicy(message, newPolicy) {
+      storePolicyInCache(domain, newPolicy)
+      markCachedPolicyAsValid(domain, newPolicy)
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 14]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
+      return true;
+    }
+    report()  // New policy invalid!
+  }
+  if oldPolicy {
+    if !tryWithPolicy(message, oldPolicy) {
+      report()
+      return false
+    }
+    return true
+  }
+  deliverWithoutSts(message)
+}
+
+
+12.  References
+
+12.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
@@ -706,6 +833,15 @@ Internet-Draft                   MTA-STS                       July 2016
               RFC5234, January 2008,
               <http://www.rfc-editor.org/info/rfc5234>.
 
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 15]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
    [RFC5785]  Nottingham, M. and E. Hammer-Lahav, "Defining Well-Known
               Uniform Resource Identifiers (URIs)", RFC 5785, DOI 10
               .17487/RFC5785, April 2010,
@@ -718,25 +854,13 @@ Internet-Draft                   MTA-STS                       July 2016
               Security (TLS)", RFC 6125, DOI 10.17487/RFC6125, March
               2011, <http://www.rfc-editor.org/info/rfc6125>.
 
-
-
-
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 13]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
    [RFC7672]  Dukhovni, V. and W. Hardaker, "SMTP Security via
               Opportunistic DNS-Based Authentication of Named Entities
               (DANE) Transport Layer Security (TLS)", RFC 7672, DOI 10
               .17487/RFC7672, October 2015,
               <http://www.rfc-editor.org/info/rfc7672>.
 
-11.2.  URIs
+12.2.  URIs
 
    [1] https://mta-sts.example.com/.well-known/mta-sts.json:
 
@@ -766,6 +890,14 @@ Authors' Addresses
    Email: alexander_brotman (at) cable.comcast (dot com)
 
 
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 16]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
    Janet Jones
    Microsoft, Inc
 
@@ -781,4 +913,40 @@ Authors' Addresses
 
 
 
-Margolis, et al.         Expires January 9, 2017               [Page 14]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 17]

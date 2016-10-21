@@ -369,8 +369,8 @@ validate:
 </t>
 <t>
 <list style="numbers">
-<t>That the recipient MX matches the <spanx style="verb">mx</spanx> pattern from the recipient
-domain's policy.</t>
+<t>That the recipient MX matches the <spanx style="verb">mx</spanx> pattern from the recipient domain's
+policy.</t>
 <t>That the recipient MX supports STARTTLS and offers a valid PKIX based TLS
 certificate.</t>
 </list>
@@ -439,6 +439,40 @@ Domain. This is to limit the risk of misconfigurations when deploying new
 policies.
 </t>
 
+<section anchor="policy-versioning" title="Policy Versioning">
+<t>Because an STS Policy that has never before successfully been validated should
+not be used to reject mail, sending MTAs SHOULD be aware of policy versions.
+When delivering a given message, a sending MTA may, for the recipient domain,
+posess a cached, previously validated (unexpired) policy <spanx style="emph">and/or</spanx> a newly
+fetched, never-before-validated policy.
+</t>
+<t>During policy application, the sending MTA now has an option of which policy to
+apply; it is suggested that MTAs implement the following logic:
+</t>
+<t>
+<list style="symbols">
+<t><spanx style="emph">If</spanx> a new, unvalidated policy exists, attempt to deliver in compliance with
+this policy. If this attempt succeeds <spanx style="emph">or</spanx> the new policy mode is <spanx style="verb">report</spanx>,
+mark the policy as &quot;validated&quot; and remove the previously cached policy.</t>
+<t><spanx style="emph">If</spanx> a new, unvalidated policy with mode set to <spanx style="verb">enforce</spanx> was attempted and
+failed to validate, deliver the message in compliance with the old, previously
+cached policy, and consider this a policy validation failure (for the purposes
+of TLSRPT (TODO: add reference)).</t>
+</list>
+</t>
+<t>Implementers may choose to think of this as a &quot;two-pass&quot; model (though such an
+implementation may be less efficient than a more optimized alternative):
+</t>
+<t>
+<list style="symbols">
+<t>In the first pass, the new policy is attempted and, if successful, becomes the
+old policy.</t>
+<t>In the second pass, the old policy (or policy-missing) is attempted, as would
+be the case if no new policy were found.</t>
+</list>
+</t>
+</section>
+
 <section anchor="mx-preference" title="MX Preference">
 <t>When applying a policy, sending MTAs SHOULD select recipient MXs by first
 eliminating any MXs at lower priority than the current host (if in the MX
@@ -465,7 +499,7 @@ record is present for the recipient domain, fetch a new policy, authenticate,
 and cache it.</t>
 <t>Validate candidate MX or MXs against policy. If a valid MX is discovered,
 deliver mail and mark cached policy as &quot;successfully applied.&quot;</t>
-<t>If no valid recipient MX is found, the cached policy mode is <spanx style="verb">reject</spanx>, and
+<t>If no valid recipient MX is found, the cached policy mode is <spanx style="verb">enforce</spanx>, and
 the cached policy has previously been successfully applied, temporarily fail
 the message.</t>
 <t>Upon message retries, a message MAY be permanently failed following first
@@ -605,6 +639,86 @@ _mta_sts  IN TXT ( "v=STSv1; id=20160831085700Z;" )
 
 </artwork></figure>
 </section>
+</section>
+
+<section anchor="appendix-2-message-delivery-pseudocode" title="Appendix 2: Message delivery pseudocode">
+<t>Below is pseudocode demonstrating the logic of a complaint sending MTA.
+</t>
+
+<figure align="center"><artwork align="center">
+func tryGetCachedValidatedPolicy(domain) { ... }
+
+func storePolicyInCache(domain, policy) { ... }
+
+func markCachedPolicyAsValid(domain, policy) { ... }
+
+func isValidated(policy) { ... }
+
+func isEnforce(policy) { ... }
+
+func isNonExpired(policy) { ... }
+
+func getMxsForPolicy(domain, policy) {
+  // Sort the MXs by priority, filtering out those which are invalid according
+  // to "policy".
+}
+
+func tryStartTls(mx) { ... }
+
+func tryDeliverMail(connection) { ... }
+
+func tryGetNewPolicy(domain) {
+  // Return a new policy from DNS, or a cached policy that has not yet been
+  // validated.
+}
+
+func certMatches(connection, policy) { ... }
+
+func tryMxAccordingTo(message, mx, policy) {
+  enforce := isValidated(policy) &amp;&amp; isEnforce(policy) &amp;&amp; isNonExpired(policy)
+  var connection
+  if !tryStartTls(mx, &amp;connection) &amp;&amp; enforce {
+    return false
+  }
+  if !certMatches(connection, policy) &amp;&amp; enforce {
+    return false
+  }
+  return deliverMail(connection, message)
+}
+
+func tryWithPolicy(message, domain, policy) {
+  mxes := getMxesForPolicy(domain, policy)
+  for mx in mxes {
+    if tryMxAccordingTo(message, mx, policy) {
+      return true
+    }
+  }
+  return false
+}
+
+func handleMessage(message) {
+  domain := domainFromMessage(message)
+  oldPolicy := tryGetCachedValidatedPolicy(domain)
+  newPolicy := tryGetNewPolicy(domain)
+  if newPolicy &amp;&amp; newPolicy != oldPolicy {
+    if tryWithPolicy(message, newPolicy) {
+      storePolicyInCache(domain, newPolicy)
+      markCachedPolicyAsValid(domain, newPolicy)
+      return true; 
+    }
+    report()  // New policy invalid!
+  }
+  if oldPolicy {
+    if !tryWithPolicy(message, oldPolicy) {
+      report()
+      return false
+    }
+    return true
+  }
+  deliverWithoutSts(message)
+}
+
+</artwork></figure>
 </section>
 
 </middle>
