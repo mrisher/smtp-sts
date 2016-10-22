@@ -125,8 +125,8 @@ We also define the following terms for further use in this document:
 A domain publishes a record to its DNS indicating that it wishes to
 receive reports. These SMTP TLSRPT policies are distributed via DNS from the
 Policy Domain's zone, as TXT records (similar to DMARC policies) under the name
-`_smtp_tlsrpt`. For example, for the Policy Domain `example.com`, the
-recipient's TLSRPT policy can be retrieved from `_smtp_tlsrpt.example.com`.
+`_smtp-tlsrpt`. For example, for the Policy Domain `example.com`, the
+recipient's TLSRPT policy can be retrieved from `_smtp-tlsrpt.example.com`.
 
 Policies consist of the following directives:
 
@@ -145,7 +145,7 @@ Policies consist of the following directives:
      "forensic reporting mode" in which more details--such as certificate chains
      and MTA banners--may be reported.)
 
-The formal definition of the `_smtp_tlsrpt` TXT record, defined using
+The formal definition of the `_smtp-tlsrpt` TXT record, defined using
 [@!RFC5234], is as follows:
 
         tlsrpt-record    = tlsrpt-version *WSP %x3B tlsrpt-rua
@@ -166,14 +166,14 @@ The formal definition of the `_smtp_tlsrpt` TXT record, defined using
 ### Report using MAILTO
 
 ```
-_smtp_tlsrpt.example.com. IN TXT \
+_smtp-tlsrpt.example.com. IN TXT \
 	"v=TLSRPTv1;rua=mailto:reports@example.com"
 ```
 
 ### Report using HTTPS
 
 ```
-_smtp_tlsrpt.example.com. IN TXT \
+_smtp-tlsrpt.example.com. IN TXT \
 	"v=TLSRPTv1; \
 	rua=https://reporting.example.com/v1/tlsrpt"
 ```
@@ -416,14 +416,14 @@ several security risks presented by the existence of this reporting channel:
 ## Report using MAILTO
 
 ```
-_smtp_tlsrpt.mail.example.com. IN TXT \
+_smtp-tlsrpt.mail.example.com. IN TXT \
         "v=TLSRPTv1;rua=mailto:reports@example.com"
 ```
 
 ## Report using HTTPS
 
 ```
-_smtp_tlsrpt.mail.example.com. IN TXT \
+_smtp-tlsrpt.mail.example.com. IN TXT \
         "v=TLSRPTv1; \
         rua=https://reporting.example.com/v1/tlsrpt"
 ```
