@@ -540,13 +540,7 @@ https://mta-sts.example.com/.well-known/mta-sts.json:
 Below is pseudocode demonstrating the logic of a complaint sending MTA.
 
 ~~~~~~~~~
-func tryGetCachedValidatedPolicy(domain) { ... }
-
 func storePolicyInCache(domain, policy) { ... }
-
-func markCachedPolicyAsValid(domain, policy) { ... }
-
-func isValidated(policy) { ... }
 
 func isEnforce(policy) { ... }
 
@@ -569,19 +563,25 @@ func tryGetNewPolicy(domain) {
 func certMatches(connection, policy) { ... }
 
 func tryMxAccordingTo(message, mx, policy) {
-  enforce := isValidated(policy) && isEnforce(policy) && isNonExpired(policy)
-  var connection
-  if !tryStartTls(mx, &connection) && enforce {
-    return false
+  connection := connect(mx)
+  if !connection {
+    return false  // Can't connect to the MX so it's not an STS error.
   }
-  if !certMatches(connection, policy) && enforce {
-    return false
+  status := !(tryStartTls(mx, &connection) && certMatches(connection, mx)) 
+  if !status {
+    // Report error establishing TLS or validating cert.
   }
-  return deliverMail(connection, message)
+  if status || !isEnforce(policy) {
+    return deliverMail(connection, message)
+  }
+  return false
 }
 
 func tryWithPolicy(message, domain, policy) {
   mxes := getMxesForPolicy(domain, policy)
+  if mxs is empty {
+    // Report error finding MXes that match the policy.
+  }
   for mx in mxes {
     if tryMxAccordingTo(message, mx, policy) {
       return true
@@ -597,18 +597,14 @@ func handleMessage(message) {
   if newPolicy && newPolicy != oldPolicy {
     if tryWithPolicy(message, newPolicy) {
       storePolicyInCache(domain, newPolicy)
-      markCachedPolicyAsValid(domain, newPolicy)
       return true; 
     }
-    report()  // New policy invalid!
+    // New policy appears invalid!
   }
   if oldPolicy {
-    if !tryWithPolicy(message, oldPolicy) {
-      report()
-      return false
-    }
-    return true
+    return tryWithPolicy(message, oldPolicy)
   }
+  // There is no policy or there's a new policy that did not work.
   deliverWithoutSts(message)
 }
 
