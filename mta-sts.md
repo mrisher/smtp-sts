@@ -356,7 +356,9 @@ policies.
 ## Policy Versioning
 
 Because an STS Policy that has never before successfully been validated should
-not be used to reject mail, sending MTAs SHOULD be aware of policy versions.
+not be used to reject mail, sending MTAs should consider the issue of
+maintaining multiple versions of a recipient domain's policy.
+
 When delivering a given message, a sending MTA may, for the recipient domain,
 posess a cached, previously validated (unexpired) policy *and/or* a newly
 fetched, never-before-validated policy.
@@ -364,11 +366,11 @@ fetched, never-before-validated policy.
 During policy application, the sending MTA now has an option of which policy to
 apply; it is suggested that MTAs implement the following logic:
 
-* *If* a new, unvalidated policy exists, attempt to deliver in compliance with
+* If a new, unvalidated policy exists, attempt to deliver in compliance with
   this policy. If this attempt succeeds *or* the new policy mode is `report`,
   mark the policy as "validated" and remove the previously cached policy.
 
-* *If* a new, unvalidated policy with mode set to `enforce` was attempted and
+* If a new, unvalidated policy with mode set to `enforce` was attempted and
   failed to validate, deliver the message in compliance with the old, previously
   cached policy, and consider this a policy validation failure (for the purposes
   of TLSRPT (TODO: add reference)).

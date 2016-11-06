@@ -441,8 +441,10 @@ policies.
 
 <section anchor="policy-versioning" title="Policy Versioning">
 <t>Because an STS Policy that has never before successfully been validated should
-not be used to reject mail, sending MTAs SHOULD be aware of policy versions.
-When delivering a given message, a sending MTA may, for the recipient domain,
+not be used to reject mail, sending MTAs should consider the issue of
+maintaining multiple versions of a recipient domain's policy.
+</t>
+<t>When delivering a given message, a sending MTA may, for the recipient domain,
 posess a cached, previously validated (unexpired) policy <spanx style="emph">and/or</spanx> a newly
 fetched, never-before-validated policy.
 </t>
@@ -451,10 +453,10 @@ apply; it is suggested that MTAs implement the following logic:
 </t>
 <t>
 <list style="symbols">
-<t><spanx style="emph">If</spanx> a new, unvalidated policy exists, attempt to deliver in compliance with
+<t>If a new, unvalidated policy exists, attempt to deliver in compliance with
 this policy. If this attempt succeeds <spanx style="emph">or</spanx> the new policy mode is <spanx style="verb">report</spanx>,
 mark the policy as &quot;validated&quot; and remove the previously cached policy.</t>
-<t><spanx style="emph">If</spanx> a new, unvalidated policy with mode set to <spanx style="verb">enforce</spanx> was attempted and
+<t>If a new, unvalidated policy with mode set to <spanx style="verb">enforce</spanx> was attempted and
 failed to validate, deliver the message in compliance with the old, previously
 cached policy, and consider this a policy validation failure (for the purposes
 of TLSRPT (TODO: add reference)).</t>
@@ -646,13 +648,7 @@ _mta_sts  IN TXT ( "v=STSv1; id=20160831085700Z;" )
 </t>
 
 <figure align="center"><artwork align="center">
-func tryGetCachedValidatedPolicy(domain) { ... }
-
 func storePolicyInCache(domain, policy) { ... }
-
-func markCachedPolicyAsValid(domain, policy) { ... }
-
-func isValidated(policy) { ... }
 
 func isEnforce(policy) { ... }
 
@@ -675,19 +671,25 @@ func tryGetNewPolicy(domain) {
 func certMatches(connection, policy) { ... }
 
 func tryMxAccordingTo(message, mx, policy) {
-  enforce := isValidated(policy) &amp;&amp; isEnforce(policy) &amp;&amp; isNonExpired(policy)
-  var connection
-  if !tryStartTls(mx, &amp;connection) &amp;&amp; enforce {
-    return false
+  connection := connect(mx)
+  if !connection {
+    return false  // Can't connect to the MX so it's not an STS error.
   }
-  if !certMatches(connection, policy) &amp;&amp; enforce {
-    return false
+  status := !(tryStartTls(mx, &amp;connection) &amp;&amp; certMatches(connection, mx)) 
+  if !status {
+    // Report error establishing TLS or validating cert.
   }
-  return deliverMail(connection, message)
+  if status || !isEnforce(policy) {
+    return deliverMail(connection, message)
+  }
+  return false
 }
 
 func tryWithPolicy(message, domain, policy) {
   mxes := getMxesForPolicy(domain, policy)
+  if mxs is empty {
+    // Report error finding MXes that match the policy.
+  }
   for mx in mxes {
     if tryMxAccordingTo(message, mx, policy) {
       return true
@@ -703,18 +705,14 @@ func handleMessage(message) {
   if newPolicy &amp;&amp; newPolicy != oldPolicy {
     if tryWithPolicy(message, newPolicy) {
       storePolicyInCache(domain, newPolicy)
-      markCachedPolicyAsValid(domain, newPolicy)
       return true; 
     }
-    report()  // New policy invalid!
+    // New policy appears invalid!
   }
   if oldPolicy {
-    if !tryWithPolicy(message, oldPolicy) {
-      report()
-      return false
-    }
-    return true
+    return tryWithPolicy(message, oldPolicy)
   }
+  // There is no policy or there's a new policy that did not work.
   deliverWithoutSts(message)
 }
 

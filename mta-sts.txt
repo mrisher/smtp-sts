@@ -490,13 +490,13 @@ Internet-Draft                   MTA-STS                       July 2016
 6.1.  Policy Versioning
 
    Because an STS Policy that has never before successfully been
-   validated should not be used to reject mail, sending MTAs SHOULD be
-   aware of policy versions.  When delivering a given message, a sending
-   MTA may, for the recipient domain, posess a cached, previously
-   validated (unexpired) policy _and/or_ a newly fetched, never-before-
-   validated policy.
+   validated should not be used to reject mail, sending MTAs should
+   consider the issue of maintaining multiple versions of a recipient
+   domain's policy.
 
-
+   When delivering a given message, a sending MTA may, for the recipient
+   domain, posess a cached, previously validated (unexpired) policy
+   _and/or_ a newly fetched, never-before-validated policy.
 
 
 
@@ -510,12 +510,12 @@ Internet-Draft                   MTA-STS                       July 2016
    policy to apply; it is suggested that MTAs implement the following
    logic:
 
-   o  _If_ a new, unvalidated policy exists, attempt to deliver in
+   o  If a new, unvalidated policy exists, attempt to deliver in
       compliance with this policy.  If this attempt succeeds _or_ the
       new policy mode is "report", mark the policy as "validated" and
       remove the previously cached policy.
 
-   o  _If_ a new, unvalidated policy with mode set to "enforce" was
+   o  If a new, unvalidated policy with mode set to "enforce" was
       attempted and failed to validate, deliver the message in
       compliance with the old, previously cached policy, and consider
       this a policy validation failure (for the purposes of TLSRPT
@@ -713,15 +713,15 @@ Internet-Draft                   MTA-STS                       July 2016
    Below is pseudocode demonstrating the logic of a complaint sending
    MTA.
 
-func tryGetCachedValidatedPolicy(domain) { ... }
-
 func storePolicyInCache(domain, policy) { ... }
 
-func markCachedPolicyAsValid(domain, policy) { ... }
-
-func isValidated(policy) { ... }
-
 func isEnforce(policy) { ... }
+
+func isNonExpired(policy) { ... }
+
+func getMxsForPolicy(domain, policy) {
+  // Sort the MXs by priority, filtering out those which are invalid according
+  // to "policy".
 
 
 
@@ -730,11 +730,6 @@ Margolis, et al.         Expires January 9, 2017               [Page 13]
 Internet-Draft                   MTA-STS                       July 2016
 
 
-func isNonExpired(policy) { ... }
-
-func getMxsForPolicy(domain, policy) {
-  // Sort the MXs by priority, filtering out those which are invalid according
-  // to "policy".
 }
 
 func tryStartTls(mx) { ... }
@@ -749,19 +744,25 @@ func tryGetNewPolicy(domain) {
 func certMatches(connection, policy) { ... }
 
 func tryMxAccordingTo(message, mx, policy) {
-  enforce := isValidated(policy) && isEnforce(policy) && isNonExpired(policy)
-  var connection
-  if !tryStartTls(mx, &connection) && enforce {
-    return false
+  connection := connect(mx)
+  if !connection {
+    return false  // Can't connect to the MX so it's not an STS error.
   }
-  if !certMatches(connection, policy) && enforce {
-    return false
+  status := !(tryStartTls(mx, &connection) && certMatches(connection, mx))
+  if !status {
+    // Report error establishing TLS or validating cert.
   }
-  return deliverMail(connection, message)
+  if status || !isEnforce(policy) {
+    return deliverMail(connection, message)
+  }
+  return false
 }
 
 func tryWithPolicy(message, domain, policy) {
   mxes := getMxesForPolicy(domain, policy)
+  if mxs is empty {
+    // Report error finding MXes that match the policy.
+  }
   for mx in mxes {
     if tryMxAccordingTo(message, mx, policy) {
       return true
@@ -777,7 +778,6 @@ func handleMessage(message) {
   if newPolicy && newPolicy != oldPolicy {
     if tryWithPolicy(message, newPolicy) {
       storePolicyInCache(domain, newPolicy)
-      markCachedPolicyAsValid(domain, newPolicy)
 
 
 
@@ -788,15 +788,12 @@ Internet-Draft                   MTA-STS                       July 2016
 
       return true;
     }
-    report()  // New policy invalid!
+    // New policy appears invalid!
   }
   if oldPolicy {
-    if !tryWithPolicy(message, oldPolicy) {
-      report()
-      return false
-    }
-    return true
+    return tryWithPolicy(message, oldPolicy)
   }
+  // There is no policy or there's a new policy that did not work.
   deliverWithoutSts(message)
 }
 
@@ -833,7 +830,10 @@ Internet-Draft                   MTA-STS                       July 2016
               RFC5234, January 2008,
               <http://www.rfc-editor.org/info/rfc5234>.
 
-
+   [RFC5785]  Nottingham, M. and E. Hammer-Lahav, "Defining Well-Known
+              Uniform Resource Identifiers (URIs)", RFC 5785, DOI 10
+              .17487/RFC5785, April 2010,
+              <http://www.rfc-editor.org/info/rfc5785>.
 
 
 
@@ -841,11 +841,6 @@ Margolis, et al.         Expires January 9, 2017               [Page 15]
 
 Internet-Draft                   MTA-STS                       July 2016
 
-
-   [RFC5785]  Nottingham, M. and E. Hammer-Lahav, "Defining Well-Known
-              Uniform Resource Identifiers (URIs)", RFC 5785, DOI 10
-              .17487/RFC5785, April 2010,
-              <http://www.rfc-editor.org/info/rfc5785>.
 
    [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
               Verification of Domain-Based Application Service Identity
@@ -890,14 +885,6 @@ Authors' Addresses
    Email: alexander_brotman (at) cable.comcast (dot com)
 
 
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 16]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
    Janet Jones
    Microsoft, Inc
 
@@ -906,47 +893,4 @@ Internet-Draft                   MTA-STS                       July 2016
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 17]
+Margolis, et al.         Expires January 9, 2017               [Page 16]
