@@ -161,6 +161,11 @@ The formal definition of the `_smtp-tlsrpt` TXT record, defined using
                          ; MUST be encoded; the numeric portion MUST fit
                          ; within an unsigned 64-bit integer
 
+If multiple TXT records for `_smtp-tlsrpt` are returned by the resolver, records
+which do not begin with `v=TLSRPTv1;` are discarded. If the number of resulting
+records is not one, senders MUST assume the recipient domain does not implement
+TLSRPT.
+
 ## Example Reporting Policy
 
 ### Report using MAILTO

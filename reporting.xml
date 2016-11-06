@@ -225,6 +225,11 @@ recipient's TLSRPT policy can be retrieved from <spanx style="verb">_smtp-tlsrpt
                      ; MUST be encoded; the numeric portion MUST fit
                      ; within an unsigned 64-bit integer
 </artwork></figure>
+<t>If multiple TXT records for <spanx style="verb">_smtp-tlsrpt</spanx> are returned by the resolver, records
+which do not begin with <spanx style="verb">v=TLSRPTv1;</spanx> are discarded. If the number of resulting
+records is not one, senders MUST assume the recipient domain does not implement
+TLSRPT.
+</t>
 
 <section anchor="example-reporting-policy" title="Example Reporting Policy">
 
