@@ -377,7 +377,7 @@ The control flow for a sending MTA consists of the following steps:
    and cache it.
 2. Validate candidate MX or MXs against policy. If a valid MX is discovered,
    deliver mail and mark cached policy as "successfully applied."
-3. If no valid recipient MX is found, the cached policy mode is `reject`, and
+3. If no valid recipient MX is found, the cached policy mode is `enforce`, and
    the cached policy has previously been successfully applied, temporarily fail
    the message.
 4. Upon message retries, a message MAY be permanently failed following first

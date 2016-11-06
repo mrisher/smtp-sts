@@ -523,7 +523,7 @@ Internet-Draft                   MTA-STS                       July 2016
        applied."
 
    3.  If no valid recipient MX is found, the cached policy mode is
-       "reject", and the cached policy has previously been successfully
+       "enforce", and the cached policy has previously been successfully
        applied, temporarily fail the message.
 
    4.  Upon message retries, a message MAY be permanently failed

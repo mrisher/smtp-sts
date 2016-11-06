@@ -465,7 +465,7 @@ record is present for the recipient domain, fetch a new policy, authenticate,
 and cache it.</t>
 <t>Validate candidate MX or MXs against policy. If a valid MX is discovered,
 deliver mail and mark cached policy as &quot;successfully applied.&quot;</t>
-<t>If no valid recipient MX is found, the cached policy mode is <spanx style="verb">reject</spanx>, and
+<t>If no valid recipient MX is found, the cached policy mode is <spanx style="verb">enforce</spanx>, and
 the cached policy has previously been successfully applied, temporarily fail
 the message.</t>
 <t>Upon message retries, a message MAY be permanently failed following first
