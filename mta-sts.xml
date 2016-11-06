@@ -202,13 +202,16 @@ between revisions.</t>
 <t><spanx style="verb">version</spanx>: (plain-text, required). Currently only &quot;STSv1&quot; is supported.</t>
 <t><spanx style="verb">mode</spanx>: (plain-text, required). Either &quot;enforce&quot; or &quot;report&quot;, indicating the
 expected behavior of a sending MTA in the case of a policy validation failure.</t>
+<t><spanx style="verb">max_age</spanx>: Max lifetime of the policy (plain-text non-negative integer
+seconds).  Well-behaved clients SHOULD cache a policy for up to this value
+from last policy fetch time.</t>
 <t><spanx style="verb">mx</spanx>: MX patterns (list of plain-text MX match strings, required). One or more
 patterns matching the expected MX for this domain. For example,
 <spanx style="verb">["*.example.com", "*.example.net"]</spanx> indicates that mail for this domain might
-be handled by any MX with a hostname at <spanx style="verb">example.com</spanx> or <spanx style="verb">example.net</spanx>.</t>
-<t><spanx style="verb">max_age</spanx>: Max lifetime of the policy (plain-text positive integer seconds).
-Well-behaved clients SHOULD cache a policy for up to this value from last
-policy fetch time.</t>
+be handled by any MX with a hostname at <spanx style="verb">example.com</spanx> or <spanx style="verb">example.net</spanx>. Valid
+patterns can be either hostname literals (e.g. &quot;mx1.example.com&quot;) or wildcard
+matches, so long as the wildcard occupies the full left-most label in the
+pattern. (Thus <spanx style="verb">*.example.com</spanx> is valid but <spanx style="verb">mx*.example.com</spanx> is not.)</t>
 </list>
 </t>
 <t>A lenient parser SHOULD accept TXT record sand policy files which are

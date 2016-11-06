@@ -210,14 +210,14 @@ Internet-Draft                   MTA-STS                       July 2016
       indicating the expected behavior of a sending MTA in the case of a
       policy validation failure.
 
+   o  "max_age": Max lifetime of the policy (plain-text non-negative
+      integer seconds).  Well-behaved clients SHOULD cache a policy for
+      up to this value from last policy fetch time.
+
    o  "mx": MX patterns (list of plain-text MX match strings, required).
       One or more patterns matching the expected MX for this domain.
       For example, "["*.example.com", "*.example.net"]" indicates that
       mail for this domain might be handled by any MX with a hostname at
-      "example.com" or "example.net".
-
-
-
 
 
 
@@ -226,9 +226,11 @@ Margolis, et al.         Expires January 9, 2017                [Page 4]
 Internet-Draft                   MTA-STS                       July 2016
 
 
-   o  "max_age": Max lifetime of the policy (plain-text positive integer
-      seconds).  Well-behaved clients SHOULD cache a policy for up to
-      this value from last policy fetch time.
+      "example.com" or "example.net".  Valid patterns can be either
+      hostname literals (e.g. "mx1.example.com") or wildcard matches, so
+      long as the wildcard occupies the full left-most label in the
+      pattern.  (Thus "*.example.com" is valid but "mx*.example.com" is
+      not.)
 
    A lenient parser SHOULD accept TXT record sand policy files which are
    syntactically valid (i.e. valid key-value pairs or valid JSON)
@@ -271,8 +273,6 @@ Internet-Draft                   MTA-STS                       July 2016
    may make it difficult for recipient domains to change infrastructure
    in ways which the policy forbids), domains can, at any time, publish
    an updated policy.  As described in _Policy_ _Application_, senders
-   MUST fetch a new policy before treating a validation failure as a
-   permanent delivery failure.
 
 
 
@@ -281,6 +281,9 @@ Margolis, et al.         Expires January 9, 2017                [Page 5]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+   MUST fetch a new policy before treating a validation failure as a
+   permanent delivery failure.
 
 3.1.1.  Policy Updates
 
@@ -328,15 +331,14 @@ Internet-Draft                   MTA-STS                       July 2016
    use a set of trusted CAs similar to those in widely deployed Web
    browsers and operating systems.
 
-   HTTP 3xx redirects MUST NOT be followed.
-
-
 
 
 Margolis, et al.         Expires January 9, 2017                [Page 6]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+   HTTP 3xx redirects MUST NOT be followed.
 
    Senders may wish to rate-limit the frequency of attempts to fetch the
    HTTPS endpoint even if a valid TXT record for the recipient domain
@@ -383,8 +385,6 @@ Internet-Draft                   MTA-STS                       July 2016
    a valid pattern, but "foo.*.example.com" is not.  Given the pattern
    "*.example.com", "mx1.example.com" is a valid MX host, but
    "1234.dhcp.example.com" is not.
-
-
 
 
 

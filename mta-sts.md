@@ -137,13 +137,16 @@ Policies are JSON [@!RFC4627] objects containing the following key/value pairs
 * `version`: (plain-text, required). Currently only "STSv1" is supported.
 * `mode`: (plain-text, required). Either "enforce" or "report", indicating the
   expected behavior of a sending MTA in the case of a policy validation failure.
+* `max_age`: Max lifetime of the policy (plain-text non-negative integer
+  seconds).  Well-behaved clients SHOULD cache a policy for up to this value
+  from last policy fetch time.
 * `mx`: MX patterns (list of plain-text MX match strings, required). One or more
   patterns matching the expected MX for this domain. For example,
   `["*.example.com", "*.example.net"]` indicates that mail for this domain might
-  be handled by any MX with a hostname at `example.com` or `example.net`.
-* `max_age`: Max lifetime of the policy (plain-text positive integer seconds).
-  Well-behaved clients SHOULD cache a policy for up to this value from last
-  policy fetch time.
+  be handled by any MX with a hostname at `example.com` or `example.net`. Valid
+  patterns can be either hostname literals (e.g. "mx1.example.com") or wildcard
+  matches, so long as the wildcard occupies the full left-most label in the
+  pattern. (Thus `*.example.com` is valid but `mx*.example.com` is not.)
 
 A lenient parser SHOULD accept TXT record sand policy files which are
 syntactically valid (i.e. valid key-value pairs or valid JSON) implementing a
