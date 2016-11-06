@@ -459,17 +459,17 @@ original candidate MX set.)
 </t>
 <t>
 <list style="numbers">
-<t>Check for a cached, non-expired policy. If none exists and the <spanx style="verb">_mta-sts</spanx> TXT
-record is present for the recipient domain, fetch a new policy, authenticate,
-and cache it.</t>
-<t>Validate candidate MX or MXs against policy. If a valid MX is discovered,
-deliver mail and mark cached policy as &quot;successfully applied.&quot;</t>
-<t>If no valid recipient MX is found, the cached policy mode is <spanx style="verb">enforce</spanx>, and
-the cached policy has previously been successfully applied, temporarily fail
-the message.</t>
-<t>Upon message retries, a message MAY be permanently failed following first
-checking for the presence of a new policy (as indicated by the <spanx style="verb">id</spanx> field in
-the <spanx style="verb">_mta-sts</spanx> TXT record).</t>
+<t>Check for a cached, non-expired policy.</t>
+<t>Check for a new a new policy and, if one is present, fetch and authenticate
+it. (This is optional on the first delivery attempt for this message, but
+required if this is a retry following a failure on step 4 below.)</t>
+<t>Attempt to deliver the message according to the new policy, if one exists. If
+successful (either because the recipient domain complies with the policy or
+because the policy mode is <spanx style="verb">report</spanx>), cache the policy, replacing any
+previous cache entry.</t>
+<t>If step 3 was unsuccessful, attempt to deliver the message according to the
+cached policy. If unsuccessful and the cached policy mode is <spanx style="verb">enforce</spanx>,
+temporarily fail the message. Otherwise, deliver the message without MTA-STS.</t>
 </list>
 </t>
 </section>

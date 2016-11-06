@@ -89,10 +89,10 @@ Table of Contents
    9.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  12
    10. Appendix 1: Domain Owner STS example record . . . . . . . . .  12
      10.1.  Example 1  . . . . . . . . . . . . . . . . . . . . . . .  12
-   11. Appendix 2: Message delivery pseudocode . . . . . . . . . . .  12
+   11. Appendix 2: Message delivery pseudocode . . . . . . . . . . .  13
    12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  14
-     12.1.  Normative References . . . . . . . . . . . . . . . . . .  14
-     12.2.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  15
+     12.1.  Normative References . . . . . . . . . . . . . . . . . .  15
+     12.2.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  16
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
 
 1.  Introduction
@@ -513,21 +513,22 @@ Internet-Draft                   MTA-STS                       July 2016
 
    The control flow for a sending MTA consists of the following steps:
 
-   1.  Check for a cached, non-expired policy.  If none exists and the
-       "_mta-sts" TXT record is present for the recipient domain, fetch
-       a new policy, authenticate, and cache it.
+   1.  Check for a cached, non-expired policy.
 
-   2.  Validate candidate MX or MXs against policy.  If a valid MX is
-       discovered, deliver mail and mark cached policy as "successfully
-       applied."
+   2.  Check for a new a new policy and, if one is present, fetch and
+       authenticate it.  (This is optional on the first delivery attempt
+       for this message, but required if this is a retry following a
+       failure on step 4 below.)
 
-   3.  If no valid recipient MX is found, the cached policy mode is
-       "enforce", and the cached policy has previously been successfully
-       applied, temporarily fail the message.
+   3.  Attempt to deliver the message according to the new policy, if
+       one exists.  If successful (either because the recipient domain
+       complies with the policy or because the policy mode is "report"),
+       cache the policy, replacing any previous cache entry.
 
-   4.  Upon message retries, a message MAY be permanently failed
-       following first checking for the presence of a new policy (as
-       indicated by the "id" field in the "_mta-sts" TXT record).
+   4.  If step 3 was unsuccessful, attempt to deliver the message
+       according to the cached policy.  If unsuccessful and the cached
+       policy mode is "enforce", temporarily fail the message.
+       Otherwise, deliver the message without MTA-STS.
 
 7.  IANA Considerations
 
@@ -552,8 +553,7 @@ Internet-Draft                   MTA-STS                       July 2016
        and/or modify messages despite opportunistic TLS.  This
        impersonation could be accomplished by spoofing the DNS MX record
        for the recipient domain, or by redirecting client connections
-       intended for the legitimate recipient server (for example, by
-       altering BGP routing tables).
+
 
 
 
@@ -561,6 +561,9 @@ Margolis, et al.         Expires January 9, 2017               [Page 10]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+       intended for the legitimate recipient server (for example, by
+       altering BGP routing tables).
 
    SMTP Strict Transport Security relies on certificate validation via
    PKIX based TLS identity checking [RFC6125].  Attackers who are able
@@ -607,9 +610,6 @@ Internet-Draft                   MTA-STS                       July 2016
    exists for configurations that allow attackers on the same domain to
    receive mail for that domain.  For example, an easy configuration
    option when authoring an STS Policy for "example.com" is to set the
-   "mx" equal to "*.example.com"; recipient domains must consider in
-   this case the risk that any user possessing a valid hostname and CA-
-   signed certificate (for example, "dhcp-123.example.com") will, from
 
 
 
@@ -618,6 +618,9 @@ Margolis, et al.         Expires January 9, 2017               [Page 11]
 Internet-Draft                   MTA-STS                       July 2016
 
 
+   "mx" equal to "*.example.com"; recipient domains must consider in
+   this case the risk that any user possessing a valid hostname and CA-
+   signed certificate (for example, "dhcp-123.example.com") will, from
    the perspective of STS Policy validation, be a valid MX host for that
    domain.
 
@@ -661,10 +664,7 @@ Internet-Draft                   MTA-STS                       July 2016
               }
 
 
-11.  Appendix 2: Message delivery pseudocode
 
-   Below is pseudocode demonstrating the logic of a complaint sending
-   MTA.
 
 
 
@@ -672,6 +672,12 @@ Internet-Draft                   MTA-STS                       July 2016
 Margolis, et al.         Expires January 9, 2017               [Page 12]
 
 Internet-Draft                   MTA-STS                       July 2016
+
+
+11.  Appendix 2: Message delivery pseudocode
+
+   Below is pseudocode demonstrating the logic of a complaint sending
+   MTA.
 
 
 func isEnforce(policy) {
@@ -716,12 +722,6 @@ func tryMxAccordingTo(message, mx, policy) {
   connection := connect(mx)
   if !connection {
     return false  // Can't connect to the MX so it's not an STS error.
-  }
-  status := !(tryStartTls(mx, &connection) && certMatches(connection, mx))
-  if !status {
-    // Report error establishing TLS or validating cert.
-  }
-  if status || !isEnforce(policy) {
 
 
 
@@ -730,6 +730,12 @@ Margolis, et al.         Expires January 9, 2017               [Page 13]
 Internet-Draft                   MTA-STS                       July 2016
 
 
+  }
+  status := !(tryStartTls(mx, &connection) && certMatches(connection, mx))
+  if !status {
+    // Report error establishing TLS or validating cert.
+  }
+  if status || !isEnforce(policy) {
     return tryDeliverMail(connection, message)
   }
   return false
@@ -769,12 +775,6 @@ func handleMessage(message) {
 
 12.  References
 
-12.1.  Normative References
-
-   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
-              Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
-              RFC2119, March 1997,
-              <http://www.rfc-editor.org/info/rfc2119>.
 
 
 
@@ -785,6 +785,13 @@ Margolis, et al.         Expires January 9, 2017               [Page 14]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+12.1.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
+              RFC2119, March 1997,
+              <http://www.rfc-editor.org/info/rfc2119>.
 
    [RFC2821]  Klensin, J., Ed., "Simple Mail Transfer Protocol", RFC
               2821, DOI 10.17487/RFC2821, April 2001,
@@ -827,13 +834,6 @@ Internet-Draft                   MTA-STS                       July 2016
               .17487/RFC7672, October 2015,
               <http://www.rfc-editor.org/info/rfc7672>.
 
-12.2.  URIs
-
-   [1] https://mta-sts.example.com/.well-known/mta-sts.json:
-
-
-
-
 
 
 
@@ -841,6 +841,10 @@ Margolis, et al.         Expires January 9, 2017               [Page 15]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+12.2.  URIs
+
+   [1] https://mta-sts.example.com/.well-known/mta-sts.json:
 
 Authors' Addresses
 
@@ -872,10 +876,6 @@ Authors' Addresses
    Microsoft, Inc
 
    Email: janet.jones (at) microsoft (dot com)
-
-
-
-
 
 
 
