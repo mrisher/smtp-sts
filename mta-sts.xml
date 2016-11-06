@@ -634,7 +634,9 @@ _mta-sts  IN TXT ( "v=STSv1; id=20160831085700Z;" )
 </section>
 
 <section anchor="appendix-2-message-delivery-pseudocode" title="Appendix 2: Message delivery pseudocode">
-<t>Below is pseudocode demonstrating the logic of a complaint sending MTA.
+<t>Below is pseudocode demonstrating the logic of a complaint sending MTA. This
+implements the &quot;two-pass&quot; approach, first attempting delivery with a newly
+fetched policy (if present) before falling back to a cached policy (if present).
 </t>
 
 <figure align="center"><artwork align="center">

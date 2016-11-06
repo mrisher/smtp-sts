@@ -704,7 +704,9 @@ Internet-Draft                   MTA-STS                       July 2016
 12.  Appendix 2: Message delivery pseudocode
 
    Below is pseudocode demonstrating the logic of a complaint sending
-   MTA.
+   MTA.  This implements the "two-pass" approach, first attempting
+   delivery with a newly fetched policy (if present) before falling back
+   to a cached policy (if present).
 
 
 func isEnforce(policy) {
@@ -720,8 +722,6 @@ func tryStartTls(mx) {
 }
 
 func certMatches(connection, mx) {
-  // Return if the server certificate from "connection" matches the "mx" host.
-}
 
 
 
@@ -729,6 +729,9 @@ Margolis, et al.         Expires January 9, 2017               [Page 13]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+  // Return if the server certificate from "connection" matches the "mx" host.
+}
 
 func tryDeliverMail(connection, message) {
   // Attempt to deliver "message" via "connection".
@@ -775,9 +778,6 @@ func tryWithPolicy(message, domain, policy) {
   for mx in mxes {
     if tryMxAccordingTo(message, mx, policy) {
       return true
-    }
-  }
-  return false
 
 
 
@@ -786,6 +786,9 @@ Margolis, et al.         Expires January 9, 2017               [Page 14]
 Internet-Draft                   MTA-STS                       July 2016
 
 
+    }
+  }
+  return false
 }
 
 func handleMessage(message) {
@@ -829,10 +832,7 @@ func handleMessage(message) {
               4033, DOI 10.17487/RFC4033, March 2005,
               <http://www.rfc-editor.org/info/rfc4033>.
 
-   [RFC4627]  Crockford, D., "The application/json Media Type for
-              JavaScript Object Notation (JSON)", RFC 4627, DOI 10
-              .17487/RFC4627, July 2006,
-              <http://www.rfc-editor.org/info/rfc4627>.
+
 
 
 
@@ -841,6 +841,11 @@ Margolis, et al.         Expires January 9, 2017               [Page 15]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+   [RFC4627]  Crockford, D., "The application/json Media Type for
+              JavaScript Object Notation (JSON)", RFC 4627, DOI 10
+              .17487/RFC4627, July 2006,
+              <http://www.rfc-editor.org/info/rfc4627>.
 
    [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
               Specifications: ABNF", STD 68, RFC 5234, DOI 10.17487/
@@ -883,11 +888,6 @@ Authors' Addresses
    Email: risher (at) google (dot com)
 
 
-   Binu Ramakrishnan
-   Yahoo!, Inc
-
-   Email: rbinu (at) yahoo-inc (dot com)
-
 
 
 
@@ -896,6 +896,12 @@ Authors' Addresses
 Margolis, et al.         Expires January 9, 2017               [Page 16]
 
 Internet-Draft                   MTA-STS                       July 2016
+
+
+   Binu Ramakrishnan
+   Yahoo!, Inc
+
+   Email: rbinu (at) yahoo-inc (dot com)
 
 
    Alexander Brotman
@@ -908,12 +914,6 @@ Internet-Draft                   MTA-STS                       July 2016
    Microsoft, Inc
 
    Email: janet.jones (at) microsoft (dot com)
-
-
-
-
-
-
 
 
 

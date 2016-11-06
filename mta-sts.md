@@ -524,7 +524,9 @@ https://mta-sts.example.com/.well-known/mta-sts.json:
 
 # Appendix 2: Message delivery pseudocode
 
-Below is pseudocode demonstrating the logic of a complaint sending MTA.
+Below is pseudocode demonstrating the logic of a complaint sending MTA. This
+implements the "two-pass" approach, first attempting delivery with a newly
+fetched policy (if present) before falling back to a cached policy (if present).
 
 ~~~~~~~~~
 
