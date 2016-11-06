@@ -182,8 +182,8 @@ detailed email delivery errors.</t>
 <t>A domain publishes a record to its DNS indicating that it wishes to
 receive reports. These SMTP TLSRPT policies are distributed via DNS from the
 Policy Domain's zone, as TXT records (similar to DMARC policies) under the name
-<spanx style="verb">_smtp_tlsrpt</spanx>. For example, for the Policy Domain <spanx style="verb">example.com</spanx>, the
-recipient's TLSRPT policy can be retrieved from <spanx style="verb">_smtp_tlsrpt.example.com</spanx>.
+<spanx style="verb">_smtp-tlsrpt</spanx>. For example, for the Policy Domain <spanx style="verb">example.com</spanx>, the
+recipient's TLSRPT policy can be retrieved from <spanx style="verb">_smtp-tlsrpt.example.com</spanx>.
 </t>
 <t>Policies consist of the following directives:
 </t>
@@ -207,7 +207,7 @@ recipient's TLSRPT policy can be retrieved from <spanx style="verb">_smtp_tlsrpt
  and MTA banners--may be reported.)</t>
 </list>
 </t>
-<t>The formal definition of the <spanx style="verb">_smtp_tlsrpt</spanx> TXT record, defined using
+<t>The formal definition of the <spanx style="verb">_smtp-tlsrpt</spanx> TXT record, defined using
 <xref target="RFC5234"/>, is as follows:
 </t>
 
@@ -231,7 +231,7 @@ recipient's TLSRPT policy can be retrieved from <spanx style="verb">_smtp_tlsrpt
 <section anchor="report-using-mailto" title="Report using MAILTO">
 
 <figure align="center"><artwork align="center">
-_smtp_tlsrpt.example.com. IN TXT \
+_smtp-tlsrpt.example.com. IN TXT \
 	"v=TLSRPTv1;rua=mailto:reports@example.com"
 </artwork></figure>
 </section>
@@ -239,7 +239,7 @@ _smtp_tlsrpt.example.com. IN TXT \
 <section anchor="report-using-https" title="Report using HTTPS">
 
 <figure align="center"><artwork align="center">
-_smtp_tlsrpt.example.com. IN TXT \
+_smtp-tlsrpt.example.com. IN TXT \
 	"v=TLSRPTv1; \
 	rua=https://reporting.example.com/v1/tlsrpt"
 </artwork></figure>
@@ -541,7 +541,7 @@ specification.</t>
 <section anchor="report-using-mailto-1" title="Report using MAILTO">
 
 <figure align="center"><artwork align="center">
-_smtp_tlsrpt.mail.example.com. IN TXT \
+_smtp-tlsrpt.mail.example.com. IN TXT \
         "v=TLSRPTv1;rua=mailto:reports@example.com"
 </artwork></figure>
 </section>
@@ -549,7 +549,7 @@ _smtp_tlsrpt.mail.example.com. IN TXT \
 <section anchor="report-using-https-1" title="Report using HTTPS">
 
 <figure align="center"><artwork align="center">
-_smtp_tlsrpt.mail.example.com. IN TXT \
+_smtp-tlsrpt.mail.example.com. IN TXT \
         "v=TLSRPTv1; \
         rua=https://reporting.example.com/v1/tlsrpt"
 </artwork></figure>
