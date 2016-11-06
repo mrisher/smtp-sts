@@ -542,27 +542,44 @@ https://mta-sts.example.com/.well-known/mta-sts.json:
 Below is pseudocode demonstrating the logic of a complaint sending MTA.
 
 ~~~~~~~~~
-func storePolicyInCache(domain, policy) { ... }
 
-func isEnforce(policy) { ... }
+func isEnforce(policy) {
+  // Return true if the policy mode is "enforce".
+}
 
-func isNonExpired(policy) { ... }
+func isNonExpired(policy) {
+  // Return true if the policy is not expired.
+}
+
+func tryStartTls(mx) {
+  // Attempt to open an SMTP connection with STARTTLS with the MX.
+}
+
+func certMatches(connection, mx) {
+  // Return if the server certificate from "connection" matches the "mx" host.
+}
+
+func tryDeliverMail(connection, message) {
+  // Attempt to deliver "message" via "connection".
+}
 
 func getMxsForPolicy(domain, policy) {
   // Sort the MXs by priority, filtering out those which are invalid according
   // to "policy".
 }
 
-func tryStartTls(mx) { ... }
-
-func tryDeliverMail(connection) { ... }
-
 func tryGetNewPolicy(domain) {
-  // Return a new policy from DNS, or a cached policy that has not yet been
-  // validated.
+  // Check for an MTA STS TXT record for "domain" in DNS, and return the
+  // indicated policy (or a local cache of the unvalidated policy).
 }
 
-func certMatches(connection, policy) { ... }
+func cacheValidatedPolicy(domain, policy) {
+  // Store "policy" as the cached, validated policy for "domain".
+}
+
+func tryGetCachedValidatedPolicy(domain, policy) {
+  // Return a cached, validated policy for "domain".
+}
 
 func tryMxAccordingTo(message, mx, policy) {
   connection := connect(mx)
@@ -574,7 +591,7 @@ func tryMxAccordingTo(message, mx, policy) {
     // Report error establishing TLS or validating cert.
   }
   if status || !isEnforce(policy) {
-    return deliverMail(connection, message)
+    return tryDeliverMail(connection, message)
   }
   return false
 }
@@ -593,12 +610,12 @@ func tryWithPolicy(message, domain, policy) {
 }
 
 func handleMessage(message) {
-  domain := domainFromMessage(message)
+  domain := ... // domain part after '@' from recipient
   oldPolicy := tryGetCachedValidatedPolicy(domain)
   newPolicy := tryGetNewPolicy(domain)
   if newPolicy && newPolicy != oldPolicy {
     if tryWithPolicy(message, newPolicy) {
-      storePolicyInCache(domain, newPolicy)
+      cacheValidatedPolicy(domain, newPolicy)
       return true; 
     }
     // New policy appears invalid!
@@ -607,7 +624,7 @@ func handleMessage(message) {
     return tryWithPolicy(message, oldPolicy)
   }
   // There is no policy or there's a new policy that did not work.
-  deliverWithoutSts(message)
+  // Try to deliver the message normally (i.e. without STS).
 }
 
 ~~~~~~~~~

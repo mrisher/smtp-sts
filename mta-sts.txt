@@ -713,15 +713,15 @@ Internet-Draft                   MTA-STS                       July 2016
    Below is pseudocode demonstrating the logic of a complaint sending
    MTA.
 
-func storePolicyInCache(domain, policy) { ... }
 
-func isEnforce(policy) { ... }
+func isEnforce(policy) {
+  // Return true if the policy mode is "enforce".
+}
 
-func isNonExpired(policy) { ... }
+func isNonExpired(policy) {
+  // Return true if the policy is not expired.
+}
 
-func getMxsForPolicy(domain, policy) {
-  // Sort the MXs by priority, filtering out those which are invalid according
-  // to "policy".
 
 
 
@@ -730,18 +730,35 @@ Margolis, et al.         Expires January 9, 2017               [Page 13]
 Internet-Draft                   MTA-STS                       July 2016
 
 
+func tryStartTls(mx) {
+  // Attempt to open an SMTP connection with STARTTLS with the MX.
 }
 
-func tryStartTls(mx) { ... }
+func certMatches(connection, mx) {
+  // Return if the server certificate from "connection" matches the "mx" host.
+}
 
-func tryDeliverMail(connection) { ... }
+func tryDeliverMail(connection, message) {
+  // Attempt to deliver "message" via "connection".
+}
+
+func getMxsForPolicy(domain, policy) {
+  // Sort the MXs by priority, filtering out those which are invalid according
+  // to "policy".
+}
 
 func tryGetNewPolicy(domain) {
-  // Return a new policy from DNS, or a cached policy that has not yet been
-  // validated.
+  // Check for an MTA STS TXT record for "domain" in DNS, and return the
+  // indicated policy (or a local cache of the unvalidated policy).
 }
 
-func certMatches(connection, policy) { ... }
+func cacheValidatedPolicy(domain, policy) {
+  // Store "policy" as the cached, validated policy for "domain".
+}
+
+func tryGetCachedValidatedPolicy(domain, policy) {
+  // Return a cached, validated policy for "domain".
+}
 
 func tryMxAccordingTo(message, mx, policy) {
   connection := connect(mx)
@@ -753,7 +770,7 @@ func tryMxAccordingTo(message, mx, policy) {
     // Report error establishing TLS or validating cert.
   }
   if status || !isEnforce(policy) {
-    return deliverMail(connection, message)
+    return tryDeliverMail(connection, message)
   }
   return false
 }
@@ -761,6 +778,14 @@ func tryMxAccordingTo(message, mx, policy) {
 func tryWithPolicy(message, domain, policy) {
   mxes := getMxesForPolicy(domain, policy)
   if mxs is empty {
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 14]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
     // Report error finding MXes that match the policy.
   }
   for mx in mxes {
@@ -772,20 +797,12 @@ func tryWithPolicy(message, domain, policy) {
 }
 
 func handleMessage(message) {
-  domain := domainFromMessage(message)
+  domain := ... // domain part after '@' from recipient
   oldPolicy := tryGetCachedValidatedPolicy(domain)
   newPolicy := tryGetNewPolicy(domain)
   if newPolicy && newPolicy != oldPolicy {
     if tryWithPolicy(message, newPolicy) {
-      storePolicyInCache(domain, newPolicy)
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 14]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
+      cacheValidatedPolicy(domain, newPolicy)
       return true;
     }
     // New policy appears invalid!
@@ -794,7 +811,7 @@ Internet-Draft                   MTA-STS                       July 2016
     return tryWithPolicy(message, oldPolicy)
   }
   // There is no policy or there's a new policy that did not work.
-  deliverWithoutSts(message)
+  // Try to deliver the message normally (i.e. without STS).
 }
 
 
@@ -815,6 +832,16 @@ Internet-Draft                   MTA-STS                       July 2016
               Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
               February 2002, <http://www.rfc-editor.org/info/rfc3207>.
 
+
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 15]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
    [RFC4033]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
               Rose, "DNS Security Introduction and Requirements", RFC
               4033, DOI 10.17487/RFC4033, March 2005,
@@ -834,13 +861,6 @@ Internet-Draft                   MTA-STS                       July 2016
               Uniform Resource Identifiers (URIs)", RFC 5785, DOI 10
               .17487/RFC5785, April 2010,
               <http://www.rfc-editor.org/info/rfc5785>.
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 15]
-
-Internet-Draft                   MTA-STS                       July 2016
-
 
    [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
               Verification of Domain-Based Application Service Identity
@@ -865,6 +885,17 @@ Authors' Addresses
    Google, Inc
 
    Email: dmargolis (at) google.com
+
+
+
+
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 16]
+
+Internet-Draft                   MTA-STS                       July 2016
 
 
    Mark Risher
@@ -893,4 +924,29 @@ Authors' Addresses
 
 
 
-Margolis, et al.         Expires January 9, 2017               [Page 16]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 17]
