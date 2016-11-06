@@ -132,13 +132,13 @@ The MTA-STS TXT record MUST specify the following fields:
   of a previously seen policy. There is no implied ordering of `id` fields
   between revisions.
 
-Policies MUST specify the following fields in JSON [@!RFC4627] format:
+Policies are JSON [@!RFC4627] objects containing the following key/value pairs
 
 * `version`: (plain-text, required). Currently only "STSv1" is supported.
 * `mode`: (plain-text, required). Either "enforce" or "report", indicating the
   expected behavior of a sending MTA in the case of a policy validation failure.
-* `mx`: MX patterns (list of plain-text MX match patterns, required). One or
-  more patterns matching the expected MX for this domain. For example,
+* `mx`: MX patterns (list of plain-text MX match strings, required). One or more
+  patterns matching the expected MX for this domain. For example,
   `["*.example.com", "*.example.net"]` indicates that mail for this domain might
   be handled by any MX with a hostname at `example.com` or `example.net`.
 * `max_age`: Max lifetime of the policy (plain-text positive integer seconds).
@@ -148,10 +148,6 @@ Policies MUST specify the following fields in JSON [@!RFC4627] format:
 A lenient parser SHOULD accept TXT record sand policy files which are
 syntactically valid (i.e. valid key-value pairs or valid JSON) implementing a
 superset of this specification, in which case unknown values SHALL be ignored.
-
-## Formal Definition
-
-### TXT Record
 
 An example TXT record is as below:
 
@@ -170,9 +166,7 @@ is as follows:
     sts-id          = "id" *WSP "=" *WSP 1*32(ALPHA / DIGIT) 
 
 
-### SMTP MTA-STS Policy
-
-An example policy is as below:
+An example JSON policy is as below:
 
 ~~~~~~~~~
 {
@@ -182,41 +176,6 @@ An example policy is as below:
   "max_age": 123456
 }
 ~~~~~~~~~
-
-
-The formal definition of the SMTP MTA-STS policy, using [@!RFC5234], is as
-follows:
-
-    sts-record      = WSP %x7B WSP  ; { left curly bracket
-                      sts-element   ; comma-separated
-                      [             ; list
-                      WSP %x2c WSP  ; of
-                      sts-element   ; sts-elements
-                      ]
-                      WSP %x7d WSP  ; } right curly bracket
-
-    sts-element     = sts-version / sts-mode / sts-id / sts-mx / sts-max_age
-
-    sts-version     = %x22 "version" %x22 *WSP %x3a *WSP ; "version":
-                      %x22 %x53 %x54 %x53 %x76 %x31      ; "STSv1"
-
-    sts-mode        = %x22 "mode" %x22 *WSP %x3a *WSP    ; "mode":
-                      %x22 ("report" / "enforce") %x22   ; "report"/"enforce"
-
-    sts-mx          = %x22 "mx" $x22 *WSP %x3a *WSP      ; "mx":
-                      %x5B                               ; [
-                      domain-match                       ; comma-separated list
-                      [WSP %x2c domain-match WSP]        ; of domain-matches
-                      %x5B                               ; ]
-
-    sts-max_age     = %x22 "max_age" %x22 *WSP $x3a *WSP ; "max_age":
-                      1*10DIGIT                          ; some digits
-
-    domain-match    = %x22 1*(dtext / "*") *("."         ; wildcard or label
-                      1*dtext) %x22                      ; with 0+ more labels
-
-    dtext           = ALPHA / DIGIT / %2D                ; A-Z, a-z, 0-9, "-" 
-
 
 ## Policy Expiration
 

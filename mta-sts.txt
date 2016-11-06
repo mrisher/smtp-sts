@@ -71,32 +71,29 @@ Table of Contents
      1.1.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   3
    2.  Related Technologies  . . . . . . . . . . . . . . . . . . . .   4
    3.  Policy Semantics  . . . . . . . . . . . . . . . . . . . . . .   4
-     3.1.  Formal Definition . . . . . . . . . . . . . . . . . . . .   5
-       3.1.1.  TXT Record  . . . . . . . . . . . . . . . . . . . . .   5
-       3.1.2.  SMTP MTA-STS Policy . . . . . . . . . . . . . . . . .   5
-     3.2.  Policy Expiration . . . . . . . . . . . . . . . . . . . .   6
-       3.2.1.  Policy Updates  . . . . . . . . . . . . . . . . . . .   7
-       3.2.2.  Policy Revocation . . . . . . . . . . . . . . . . . .   7
-   4.  Policy Discovery & Authentication . . . . . . . . . . . . . .   7
-     4.1.  HTTPS Policy Fetching . . . . . . . . . . . . . . . . . .   7
-     4.2.  Policy Selection for Smart Hosts  . . . . . . . . . . . .   8
-   5.  Policy Validation . . . . . . . . . . . . . . . . . . . . . .   8
-     5.1.  MX Matching . . . . . . . . . . . . . . . . . . . . . . .   8
-     5.2.  MX Certificate Validation . . . . . . . . . . . . . . . .   9
-   6.  Policy Application  . . . . . . . . . . . . . . . . . . . . .   9
-     6.1.  Policy Versioning . . . . . . . . . . . . . . . . . . . .  10
-     6.2.  MX Preference . . . . . . . . . . . . . . . . . . . . . .  10
-     6.3.  Policy Application Control Flow . . . . . . . . . . . . .  11
-   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  11
-   8.  Security Considerations . . . . . . . . . . . . . . . . . . .  11
-   9.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  13
-   10. Appendix 1: Domain Owner STS example record . . . . . . . . .  13
-     10.1.  Example 1  . . . . . . . . . . . . . . . . . . . . . . .  13
-   11. Appendix 2: Message delivery pseudocode . . . . . . . . . . .  13
-   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  15
-     12.1.  Normative References . . . . . . . . . . . . . . . . . .  15
-     12.2.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  16
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  17
+     3.1.  Policy Expiration . . . . . . . . . . . . . . . . . . . .   5
+       3.1.1.  Policy Updates  . . . . . . . . . . . . . . . . . . .   6
+       3.1.2.  Policy Revocation . . . . . . . . . . . . . . . . . .   6
+   4.  Policy Discovery & Authentication . . . . . . . . . . . . . .   6
+     4.1.  HTTPS Policy Fetching . . . . . . . . . . . . . . . . . .   6
+     4.2.  Policy Selection for Smart Hosts  . . . . . . . . . . . .   7
+   5.  Policy Validation . . . . . . . . . . . . . . . . . . . . . .   7
+     5.1.  MX Matching . . . . . . . . . . . . . . . . . . . . . . .   7
+     5.2.  MX Certificate Validation . . . . . . . . . . . . . . . .   8
+   6.  Policy Application  . . . . . . . . . . . . . . . . . . . . .   8
+     6.1.  Policy Versioning . . . . . . . . . . . . . . . . . . . .   9
+     6.2.  MX Preference . . . . . . . . . . . . . . . . . . . . . .   9
+     6.3.  Policy Application Control Flow . . . . . . . . . . . . .  10
+   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  10
+   8.  Security Considerations . . . . . . . . . . . . . . . . . . .  10
+   9.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  12
+   10. Appendix 1: Domain Owner STS example record . . . . . . . . .  12
+     10.1.  Example 1  . . . . . . . . . . . . . . . . . . . . . . .  12
+   11. Appendix 2: Message delivery pseudocode . . . . . . . . . . .  12
+   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  14
+     12.1.  Normative References . . . . . . . . . . . . . . . . . .  14
+     12.2.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  15
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
 
 1.  Introduction
 
@@ -106,6 +103,9 @@ Table of Contents
 
    While such _opportunistic_ encryption protocols provide a high
    barrier against passive man-in-the-middle traffic interception, any
+   attacker who can delete parts of the SMTP session (such as the "250
+   STARTTLS" response) or who can redirect the entire SMTP session
+
 
 
 
@@ -114,8 +114,6 @@ Margolis, et al.         Expires January 9, 2017                [Page 2]
 Internet-Draft                   MTA-STS                       July 2016
 
 
-   attacker who can delete parts of the SMTP session (such as the "250
-   STARTTLS" response) or who can redirect the entire SMTP session
    (perhaps by overwriting the resolved MX record of the delivery
    domain) can perform downgrade or interception attacks.
 
@@ -165,6 +163,8 @@ Internet-Draft                   MTA-STS                       July 2016
 
 
 
+
+
 Margolis, et al.         Expires January 9, 2017                [Page 3]
 
 Internet-Draft                   MTA-STS                       July 2016
@@ -200,7 +200,8 @@ Internet-Draft                   MTA-STS                       July 2016
       updated by comparing to the "id" of a previously seen policy.
       There is no implied ordering of "id" fields between revisions.
 
-   Policies MUST specify the following fields in JSON [RFC4627] format:
+   Policies are JSON [RFC4627] objects containing the following key/
+   value pairs
 
    o  "version": (plain-text, required).  Currently only "STSv1" is
       supported.
@@ -209,15 +210,14 @@ Internet-Draft                   MTA-STS                       July 2016
       indicating the expected behavior of a sending MTA in the case of a
       policy validation failure.
 
-   o  "mx": MX patterns (list of plain-text MX match patterns,
-      required).  One or more patterns matching the expected MX for this
-      domain.  For example, "["*.example.com", "*.example.net"]"
-      indicates that mail for this domain might be handled by any MX
-      with a hostname at "example.com" or "example.net".
+   o  "mx": MX patterns (list of plain-text MX match strings, required).
+      One or more patterns matching the expected MX for this domain.
+      For example, "["*.example.com", "*.example.net"]" indicates that
+      mail for this domain might be handled by any MX with a hostname at
+      "example.com" or "example.net".
 
-   o  "max_age": Max lifetime of the policy (plain-text positive integer
-      seconds).  Well-behaved clients SHOULD cache a policy for up to
-      this value from last policy fetch time.
+
+
 
 
 
@@ -226,14 +226,14 @@ Margolis, et al.         Expires January 9, 2017                [Page 4]
 Internet-Draft                   MTA-STS                       July 2016
 
 
+   o  "max_age": Max lifetime of the policy (plain-text positive integer
+      seconds).  Well-behaved clients SHOULD cache a policy for up to
+      this value from last policy fetch time.
+
    A lenient parser SHOULD accept TXT record sand policy files which are
    syntactically valid (i.e. valid key-value pairs or valid JSON)
    implementing a superset of this specification, in which case unknown
    values SHALL be ignored.
-
-3.1.  Formal Definition
-
-3.1.1.  TXT Record
 
    An example TXT record is as below:
 
@@ -249,9 +249,7 @@ Internet-Draft                   MTA-STS                       July 2016
 
       sts-id          = "id" *WSP "=" *WSP 1*32(ALPHA / DIGIT)
 
-3.1.2.  SMTP MTA-STS Policy
-
-   An example policy is as below:
+   An example JSON policy is as below:
 
                       {
                         "version": "STSv1",
@@ -260,59 +258,7 @@ Internet-Draft                   MTA-STS                       July 2016
                         "max_age": 123456
                       }
 
-   The formal definition of the SMTP MTA-STS policy, using [RFC5234], is
-   as follows:
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Margolis, et al.         Expires January 9, 2017                [Page 5]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
-sts-record      = WSP %x7B WSP  ; { left curly bracket
-                  sts-element   ; comma-separated
-                  [             ; list
-                  WSP %x2c WSP  ; of
-                  sts-element   ; sts-elements
-                  ]
-                  WSP %x7d WSP  ; } right curly bracket
-
-sts-element     = sts-version / sts-mode / sts-id / sts-mx / sts-max_age
-
-sts-version     = %x22 "version" %x22 *WSP %x3a *WSP ; "version":
-                  %x22 %x53 %x54 %x53 %x76 %x31      ; "STSv1"
-
-sts-mode        = %x22 "mode" %x22 *WSP %x3a *WSP    ; "mode":
-                  %x22 ("report" / "enforce") %x22   ; "report"/"enforce"
-
-sts-mx          = %x22 "mx" $x22 *WSP %x3a *WSP      ; "mx":
-                  %x5B                               ; [
-                  domain-match                       ; comma-separated list
-                  [WSP %x2c domain-match WSP]        ; of domain-matches
-                  %x5B                               ; ]
-
-sts-max_age     = %x22 "max_age" %x22 *WSP $x3a *WSP ; "max_age":
-                  1*10DIGIT                          ; some digits
-
-domain-match    = %x22 1*(dtext / "*") *("."         ; wildcard or label
-                  1*dtext) %x22                      ; with 0+ more labels
-
-dtext           = ALPHA / DIGIT / %2D                ; A-Z, a-z, 0-9, "-"
-
-3.2.  Policy Expiration
+3.1.  Policy Expiration
 
    In order to resist attackers inserting a fraudulent policy, SMTP MTA-
    STS policies are designed to be long-lived, with an expiry typically
@@ -331,14 +277,12 @@ dtext           = ALPHA / DIGIT / %2D                ; A-Z, a-z, 0-9, "-"
 
 
 
-
-
-Margolis, et al.         Expires January 9, 2017                [Page 6]
+Margolis, et al.         Expires January 9, 2017                [Page 5]
 
 Internet-Draft                   MTA-STS                       July 2016
 
 
-3.2.1.  Policy Updates
+3.1.1.  Policy Updates
 
    Updating the policy requires that the owner make changes in two
    places: the "_mta-sts" TXT record in the Policy Domain's DNS zone and
@@ -349,7 +293,7 @@ Internet-Draft                   MTA-STS                       July 2016
    policy will continue to be used by senders until both the HTTPS and
    TXT endpoints are updated and the TXT record's TTL has passed.
 
-3.2.2.  Policy Revocation
+3.1.2.  Policy Revocation
 
    Senders MUST treat a policy with a max_age of 0 as a revocation: they
    should purge any previously cached policy and proceed to deliver mail
@@ -389,7 +333,7 @@ Internet-Draft                   MTA-STS                       July 2016
 
 
 
-Margolis, et al.         Expires January 9, 2017                [Page 7]
+Margolis, et al.         Expires January 9, 2017                [Page 6]
 
 Internet-Draft                   MTA-STS                       July 2016
 
@@ -445,7 +389,7 @@ Internet-Draft                   MTA-STS                       July 2016
 
 
 
-Margolis, et al.         Expires January 9, 2017                [Page 8]
+Margolis, et al.         Expires January 9, 2017                [Page 7]
 
 Internet-Draft                   MTA-STS                       July 2016
 
@@ -501,7 +445,7 @@ Internet-Draft                   MTA-STS                       July 2016
 
 
 
-Margolis, et al.         Expires January 9, 2017                [Page 9]
+Margolis, et al.         Expires January 9, 2017                [Page 8]
 
 Internet-Draft                   MTA-STS                       July 2016
 
@@ -557,7 +501,7 @@ Internet-Draft                   MTA-STS                       July 2016
 
 
 
-Margolis, et al.         Expires January 9, 2017               [Page 10]
+Margolis, et al.         Expires January 9, 2017                [Page 9]
 
 Internet-Draft                   MTA-STS                       July 2016
 
@@ -613,7 +557,7 @@ Internet-Draft                   MTA-STS                       July 2016
 
 
 
-Margolis, et al.         Expires January 9, 2017               [Page 11]
+Margolis, et al.         Expires January 9, 2017               [Page 10]
 
 Internet-Draft                   MTA-STS                       July 2016
 
@@ -669,7 +613,7 @@ Internet-Draft                   MTA-STS                       July 2016
 
 
 
-Margolis, et al.         Expires January 9, 2017               [Page 12]
+Margolis, et al.         Expires January 9, 2017               [Page 11]
 
 Internet-Draft                   MTA-STS                       July 2016
 
@@ -725,7 +669,7 @@ Internet-Draft                   MTA-STS                       July 2016
 
 
 
-Margolis, et al.         Expires January 9, 2017               [Page 13]
+Margolis, et al.         Expires January 9, 2017               [Page 12]
 
 Internet-Draft                   MTA-STS                       July 2016
 
@@ -781,7 +725,7 @@ func tryMxAccordingTo(message, mx, policy) {
 
 
 
-Margolis, et al.         Expires January 9, 2017               [Page 14]
+Margolis, et al.         Expires January 9, 2017               [Page 13]
 
 Internet-Draft                   MTA-STS                       July 2016
 
@@ -837,7 +781,7 @@ func handleMessage(message) {
 
 
 
-Margolis, et al.         Expires January 9, 2017               [Page 15]
+Margolis, et al.         Expires January 9, 2017               [Page 14]
 
 Internet-Draft                   MTA-STS                       July 2016
 
@@ -893,7 +837,7 @@ Internet-Draft                   MTA-STS                       July 2016
 
 
 
-Margolis, et al.         Expires January 9, 2017               [Page 16]
+Margolis, et al.         Expires January 9, 2017               [Page 15]
 
 Internet-Draft                   MTA-STS                       July 2016
 
@@ -949,4 +893,4 @@ Authors' Addresses
 
 
 
-Margolis, et al.         Expires January 9, 2017               [Page 17]
+Margolis, et al.         Expires January 9, 2017               [Page 16]
