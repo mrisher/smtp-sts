@@ -53,9 +53,9 @@
 
 SMTP Mail Transfer Agent Strict Transport Security (SMTP STS) is a mechanism
 enabling mail service providers to declare their ability to receive TLS-secured
-connections, an expectated validity of certificates presented by their MX hosts,
-and to request that sending SMTP servers report upon and/or refuse to deliver
-messages that cannot be delivered securely.
+connections and an expected validity of certificates presented by their MX
+hosts, and to specify whether sending SMTP servers should refuse to deliver to
+MX hosts that do not offer TLS with a trusted server certificate.
 
 {mainmatter}
 
