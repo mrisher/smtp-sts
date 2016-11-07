@@ -52,10 +52,9 @@
 .# Abstract
 
 SMTP MTA-STS is a mechanism enabling mail service providers to declare their
-ability to receive TLS-secured connections, an expectated validity of
-certificates presented by their MX hosts, and to request that sending SMTP
-servers report upon and/or refuse to deliver messages that cannot be delivered
-securely.
+ability to receive TLS-secured connections, an expected validity of certificates
+presented by their MX hosts, and to request that sending SMTP servers report
+upon and/or refuse to deliver messages that cannot be delivered securely.
 
 {mainmatter}
 
