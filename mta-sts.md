@@ -210,9 +210,7 @@ This JSON object contains the following key/value pairs:
   seconds).  Well-behaved clients SHOULD cache a policy for up to this value
   from last policy fetch time. To mitigate the risks of attacks at policy
   refresh time, it is expected that this value typically be in the range of
-  weeks or greater. A value of `0` indicates the policy should be revoked, and
-  the sender should proceed as if the Policy Domain does not implement SMTP
-  MTA-STS.
+  weeks or greater.
 * `mx`: MX patterns (list of plain-text MX match strings, required). One or more
   patterns matching the expected MX for this domain. For example,
   `["*.example.com", "*.example.net"]` indicates that mail for this domain might
@@ -379,10 +377,7 @@ apply; it is suggested that MTAs implement the following logic:
 
 * If a new, unvalidated policy exists, attempt to deliver in compliance with
   this policy. If this attempt succeeds *or* the new policy mode is `report`,
-  mark the policy as "validated" and remove the previously cached policy. (If
-  the new policy has `max_age` equal to `0`--i.e., it is a revocation
-  policy--delivery can proceed immediately, and the cache unconditionally
-  purged.)
+  mark the policy as "validated" and remove the previously cached policy.
 
 * If a new, unvalidated policy with mode set to `enforce` was attempted and
   failed to validate, deliver the message in compliance with the old, previously
@@ -442,9 +437,9 @@ senders to cache the policy and refuse to deliver messages once the victim has
 resecured the MX records.
 
 This attack is mitigated in part by the ability of a victim domain to (at any
-time) publish a new policy updating or revoking the cached, malicious policy,
-though this does require the victim domain to both obtain a valid CA-signed
-certificate and to understand and properly configure SMTP STS.
+time) publish a new policy updating the cached, malicious policy, though this
+does require the victim domain to both obtain a valid CA-signed certificate and
+to understand and properly configure SMTP STS.
 
 Similarly, we consider the possibilty of domains that deliberately allow
 untrusted users to serve untrusted content on user-specified subdomains. In some
@@ -459,7 +454,7 @@ policy.  We believe this attack is rendered more difficult by the need for the
 attacker to both inject malicious (but temporarily working) MX records and also
 serve the `_mta-sts` TXT record on the same domain--something not, to our
 knowledge, widely provided to untrusted users. This attack is additionally
-mitigated by the aforementioned ability for a victim domain to revoke an invalid
+mitigated by the aforementioned ability for a victim domain to update an invalid
 policy at any future date.
 
 Even if an attacker cannot modify a served policy, the potential exists for
