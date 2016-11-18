@@ -147,7 +147,7 @@ Policies are JSON [@!RFC4627] objects containing the following key/value pairs
   matches, so long as the wildcard occupies the full left-most label in the
   pattern. (Thus `*.example.com` is valid but `mx*.example.com` is not.)
 
-A lenient parser SHOULD accept TXT record sand policy files which are
+A lenient parser SHOULD accept TXT records and policy files which are
 syntactically valid (i.e. valid key-value pairs or valid JSON) implementing a
 superset of this specification, in which case unknown values SHALL be ignored.
 
