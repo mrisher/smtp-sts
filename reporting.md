@@ -248,13 +248,12 @@ to grow over time based on real-world experience. The initial set is:
 * `certificate-host-mismatch`: This indicates that the certificate presented
     did not adhere to the constraints specified in the STS or DANE policy, e.g.
     if the CN field did not match the hostname of the MX.
-* `certificate-name-constraints-not-permitted`: The certificate request
-    contains a name that is not listed as permitted in the name constraints
-    extension of the cert issuer.
-* `certificate-name-constraints-excluded`: The certificate request contains a
-    name that is listed as excluded in the name constraints extension of the
-    issuer.
-* `expired-certificate`: This indicates that the certificate has expired.
+* `certificate-expired`: This indicates that the certificate has expired.
+* `certificate-not-trusted`: This a label that covers multiple certificate
+    related failures that include, but not limited to errors such as
+    untrusted/unknown CAs, certificate name contraints, certificate chain
+    errors etc. When using this declaration, the reporting MTA SHOULD utilize
+    the `failure-reason` to provide more information to the receiving entity.
 * `validation-failure`: This indicates a general failure for a reason not matching 
     a category above.  When using this declaration, the reporting MTA SHOULD utilize 
     the `failure-reason` to provide more information to the receiving entity.
@@ -284,6 +283,10 @@ a generic feedback category.  When this category is used, the reporter SHOULD al
 `failure-reason-code` to give some feedback to the receiving entity.  This is intended
 to be a short text field, and the contents of the field should be an error code or error
 text, such as "X509_V_ERR_UNHANDLED_CRITICAL_CRL_EXTENSION".
+
+### Transient failures
+
+Transient errors due to too-busy network, TCP timeouts, etc. are not required to be reported. 
 
 # Report Delivery
 
@@ -528,7 +531,7 @@ Figure: JSON Report Format
   "report-id": "5065427c-23d3-47ca-b6e0-946ea0e8c4be",
   "policy": {
     "policy-type": "sts",
-    "policy-string": "TODO: Add me",
+    "policy-string": "{ \"version\": \"STSv1\",\"mode\": \"report\", \"mx\": [\"*.mail.company-y.com\"], \"max_age\": 86400 }",
     "policy-domain": "company-y.com",
     "mx-host": "*.mail.company-y.com"
   },
@@ -537,12 +540,12 @@ Figure: JSON Report Format
     "failure-aggregate": 303
   }
   "failure-details": [{
-    "result-type": "ExpiredCertificate",
+    "result-type": "certificate-expired",
     "sending-mta-ip": "98.136.216.25",
     "receiving-mx-hostname": "mx1.mail.company-y.com",
     "session-count": 100
   }, {
-    "result-type": "StarttlsNotSupported",
+    "result-type": "starttls-not-supported",
     "sending-mta-ip": "98.22.33.99",
     "receiving-mx-hostname": "mx2.mail.company-y.com",
     "session-count": 200,
