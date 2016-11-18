@@ -177,7 +177,7 @@ semicolon-separated key/value pairs containing the following fields:
 
 An example TXT record is as below:
 
-`_mta-sts  IN TXT "v=STSv1; id=20160831085700Z;"`
+`_mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"`
 
 The formal definition of the `_mta-sts` TXT record, defined using [@!RFC5234],
 is as follows:
@@ -505,7 +505,7 @@ presented by the recipient MX validate.
 
 STS policy indicator TXT RR:
 ~~~~~~~~~
-_mta-sts  IN TXT "v=STSv1; id=20160831085700Z;"
+_mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
 ~~~~~~~~~
 
 STS Policy JSON served as the response body at
