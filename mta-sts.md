@@ -177,7 +177,7 @@ semicolon-separated key/value pairs containing the following fields:
 
 An example TXT record is as below:
 
-`_mta-sts  IN TXT ( "v=STSv1; id=20160831085700Z;" )`
+`_mta-sts  IN TXT "v=STSv1; id=20160831085700Z;"`
 
 The formal definition of the `_mta-sts` TXT record, defined using [@!RFC5234],
 is as follows:
@@ -231,8 +231,10 @@ An example JSON policy is as below:
 ```
 
 A lenient parser SHOULD accept TXT records and policy files which are
-syntactically valid (i.e. valid key-value pairs or valid JSON) implementing a
-superset of this specification, in which case unknown values SHALL be ignored.
+syntactically valid (i.e. valid key-value pairs, separated by semi-colons
+for TXT records and valid JSON for policy files). Implementing a
+superset of this specification, in which case unknown values SHALL be
+ignored.
 
 ## HTTPS Policy Fetching
 
@@ -503,7 +505,7 @@ presented by the recipient MX validate.
 
 STS policy indicator TXT RR:
 ~~~~~~~~~
-_mta-sts  IN TXT ( "v=STSv1; id=20160831085700Z;" )
+_mta-sts  IN TXT "v=STSv1; id=20160831085700Z;"
 ~~~~~~~~~
 
 STS Policy JSON served as the response body at
