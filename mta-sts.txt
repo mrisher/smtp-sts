@@ -261,7 +261,7 @@ Internet-Draft                   MTA-STS                       July 2016
 
    An example TXT record is as below:
 
-   "_mta-sts IN TXT ( "v=STSv1; id=20160831085700Z;" )"
+   "_mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;""
 
    The formal definition of the "_mta-sts" TXT record, defined using
    [RFC5234], is as follows:
@@ -339,9 +339,10 @@ Internet-Draft                   MTA-STS                       July 2016
 
 
    A lenient parser SHOULD accept TXT records and policy files which are
-   syntactically valid (i.e. valid key-value pairs or valid JSON)
+   syntactically valid (i.e. valid key-value pairs separated by semi-
+   colons for TXT records and valid JSON for policy files) and
    implementing a superset of this specification, in which case unknown
-   values SHALL be ignored.
+   fields SHALL be ignored.
 
 4.3.  HTTPS Policy Fetching
 
@@ -385,7 +386,6 @@ Internet-Draft                   MTA-STS                       July 2016
    policies which specify "report" mode MUST NOT be interpreted as
    delivery failures, as described in the section _Policy_
    _Application_.
-
 
 
 
@@ -686,7 +686,7 @@ Internet-Draft                   MTA-STS                       July 2016
 
    STS policy indicator TXT RR:
 
-            _mta-sts  IN TXT ( "v=STSv1; id=20160831085700Z;" )
+       _mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
 
    STS Policy JSON served as the response body at [1]
 

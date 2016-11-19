@@ -91,6 +91,7 @@ Table of Contents
        4.2.2.  Negotiation Failures  . . . . . . . . . . . . . . . .   7
        4.2.3.  Policy Failures . . . . . . . . . . . . . . . . . . .   8
        4.2.4.  General failures  . . . . . . . . . . . . . . . . . .   8
+       4.2.5.  Transient failures  . . . . . . . . . . . . . . . . .   8
    5.  Report Delivery . . . . . . . . . . . . . . . . . . . . . . .   8
      5.1.  Report Filename . . . . . . . . . . . . . . . . . . . . .   8
      5.2.  Compression . . . . . . . . . . . . . . . . . . . . . . .   9
@@ -105,7 +106,6 @@ Table of Contents
    10. Appendix 3: Example JSON Report . . . . . . . . . . . . . . .  14
    11. Normative References  . . . . . . . . . . . . . . . . . . . .  15
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
-
 
 
 
@@ -368,21 +368,21 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
       or DANE policy, e.g.  if the CN field did not match the hostname
       of the MX.
 
-   o  "certificate-name-constraints-not-permitted": The certificate
-      request contains a name that is not listed as permitted in the
-      name constraints extension of the cert issuer.
-
-   o  "certificate-name-constraints-excluded": The certificate request
-      contains a name that is listed as excluded in the name constraints
-      extension of the issuer.
-
-   o  "expired-certificate": This indicates that the certificate has
+   o  "certificate-expired": This indicates that the certificate has
       expired.
+
+   o  "certificate-not-trusted": This a label that covers multiple
+      certificate related failures that include, but not limited to
+      errors such as untrusted/unknown CAs, certificate name contraints,
+      certificate chain errors etc.  When using this declaration, the
+      reporting MTA SHOULD utilize the "failure-reason" to provide more
+      information to the receiving entity.
 
    o  "validation-failure": This indicates a general failure for a
       reason not matching a category above.  When using this
       declaration, the reporting MTA SHOULD utilize the "failure-reason"
       to provide more information to the receiving entity.
+
 
 
 
@@ -424,6 +424,11 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
    text field, and the contents of the field should be an error code or
    error text, such as "X509_V_ERR_UNHANDLED_CRITICAL_CRL_EXTENSION".
 
+4.2.5.  Transient failures
+
+   Transient errors due to too-busy network, TCP timeouts, etc. are not
+   required to be reported.
+
 5.  Report Delivery
 
    Reports can be delivered either as an email message via SMTP or via
@@ -432,11 +437,6 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
 5.1.  Report Filename
 
    The filename is typically constructed using the following ABNF:
-
-
-
-
-
 
 
 
@@ -738,44 +738,44 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
 
 10.  Appendix 3: Example JSON Report
 
-     {
-       "organization-name": "Company-X",
-       "date-range": {
-         "start-datetime": "2016-04-01T00:00:00Z",
-         "end-datetime": "2016-04-01T23:59:59Z"
-       },
-       "contact-info": "sts-reporting@company-x.com",
-       "report-id": "5065427c-23d3-47ca-b6e0-946ea0e8c4be",
-       "policy": {
-         "policy-type": "sts",
-         "policy-string": "TODO: Add me",
-         "policy-domain": "company-y.com",
-         "mx-host": "*.mail.company-y.com"
-       },
-       "summary": {
-         "success-aggregate": 5326,
-         "failure-aggregate": 303
-       }
-       "failure-details": [{
-         "result-type": "ExpiredCertificate",
-         "sending-mta-ip": "98.136.216.25",
-         "receiving-mx-hostname": "mx1.mail.company-y.com",
-         "session-count": 100
-       }, {
-         "result-type": "StarttlsNotSupported",
-         "sending-mta-ip": "98.22.33.99",
-         "receiving-mx-hostname": "mx2.mail.company-y.com",
-         "session-count": 200,
-         "additional-information": "hxxps://reports.company-x.com/
-           report_info?id=5065427c-23d3#StarttlsNotSupported"
-       }, {
-         "result-type: "validation-failure",
-         "sending-mta-ip": "47.97.15.2",
-         "receiving-mx-hostname: "mx-backup.mail.company-y.com",
-         "session-count": 3,
-         "failure-error-code": "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED"
-       }]
-     }
+{
+  "organization-name": "Company-X",
+  "date-range": {
+    "start-datetime": "2016-04-01T00:00:00Z",
+    "end-datetime": "2016-04-01T23:59:59Z"
+  },
+  "contact-info": "sts-reporting@company-x.com",
+  "report-id": "5065427c-23d3-47ca-b6e0-946ea0e8c4be",
+  "policy": {
+    "policy-type": "sts",
+    "policy-string": "{ \"version\": \"STSv1\",\"mode\": \"report\", \"mx\": [\"*.mail.company-y.com\"], \"max_age\": 86400 }",
+    "policy-domain": "company-y.com",
+    "mx-host": "*.mail.company-y.com"
+  },
+  "summary": {
+    "success-aggregate": 5326,
+    "failure-aggregate": 303
+  }
+  "failure-details": [{
+    "result-type": "certificate-expired",
+    "sending-mta-ip": "98.136.216.25",
+    "receiving-mx-hostname": "mx1.mail.company-y.com",
+    "session-count": 100
+  }, {
+    "result-type": "starttls-not-supported",
+    "sending-mta-ip": "98.22.33.99",
+    "receiving-mx-hostname": "mx2.mail.company-y.com",
+    "session-count": 200,
+    "additional-information": "hxxps://reports.company-x.com/
+      report_info?id=5065427c-23d3#StarttlsNotSupported"
+  }, {
+    "result-type: "validation-failure",
+    "sending-mta-ip": "47.97.15.2",
+    "receiving-mx-hostname: "mx-backup.mail.company-y.com",
+    "session-count": 3,
+    "failure-error-code": "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED"
+  }]
+}
 
 
 

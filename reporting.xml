@@ -341,13 +341,12 @@ support STARTTLS.</t>
 <t><spanx style="verb">certificate-host-mismatch</spanx>: This indicates that the certificate presented
 did not adhere to the constraints specified in the STS or DANE policy, e.g.
 if the CN field did not match the hostname of the MX.</t>
-<t><spanx style="verb">certificate-name-constraints-not-permitted</spanx>: The certificate request
-contains a name that is not listed as permitted in the name constraints
-extension of the cert issuer.</t>
-<t><spanx style="verb">certificate-name-constraints-excluded</spanx>: The certificate request contains a
-name that is listed as excluded in the name constraints extension of the
-issuer.</t>
-<t><spanx style="verb">expired-certificate</spanx>: This indicates that the certificate has expired.</t>
+<t><spanx style="verb">certificate-expired</spanx>: This indicates that the certificate has expired.</t>
+<t><spanx style="verb">certificate-not-trusted</spanx>: This a label that covers multiple certificate
+related failures that include, but not limited to errors such as
+untrusted/unknown CAs, certificate name contraints, certificate chain
+errors etc. When using this declaration, the reporting MTA SHOULD utilize
+the <spanx style="verb">failure-reason</spanx> to provide more information to the receiving entity.</t>
 <t><spanx style="verb">validation-failure</spanx>: This indicates a general failure for a reason not matching
 a category above.  When using this declaration, the reporting MTA SHOULD utilize
 the <spanx style="verb">failure-reason</spanx> to provide more information to the receiving entity.</t>
@@ -390,6 +389,11 @@ a generic feedback category.  When this category is used, the reporter SHOULD al
 <spanx style="verb">failure-reason-code</spanx> to give some feedback to the receiving entity.  This is intended
 to be a short text field, and the contents of the field should be an error code or error
 text, such as &quot;X509_V_ERR_UNHANDLED_CRITICAL_CRL_EXTENSION&quot;.
+</t>
+</section>
+
+<section anchor="transient-failures" title="Transient failures">
+<t>Transient errors due to too-busy network, TCP timeouts, etc. are not required to be reported.
 </t>
 </section>
 </section>
@@ -660,7 +664,7 @@ code or error message.</t>
   "report-id": "5065427c-23d3-47ca-b6e0-946ea0e8c4be",
   "policy": {
     "policy-type": "sts",
-    "policy-string": "TODO: Add me",
+    "policy-string": "{ \"version\": \"STSv1\",\"mode\": \"report\", \"mx\": [\"*.mail.company-y.com\"], \"max_age\": 86400 }",
     "policy-domain": "company-y.com",
     "mx-host": "*.mail.company-y.com"
   },
@@ -669,12 +673,12 @@ code or error message.</t>
     "failure-aggregate": 303
   }
   "failure-details": [{
-    "result-type": "ExpiredCertificate",
+    "result-type": "certificate-expired",
     "sending-mta-ip": "98.136.216.25",
     "receiving-mx-hostname": "mx1.mail.company-y.com",
     "session-count": 100
   }, {
-    "result-type": "StarttlsNotSupported",
+    "result-type": "starttls-not-supported",
     "sending-mta-ip": "98.22.33.99",
     "receiving-mx-hostname": "mx2.mail.company-y.com",
     "session-count": 200,

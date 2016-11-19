@@ -246,7 +246,7 @@ between revisions.</t>
 </t>
 <t>An example TXT record is as below:
 </t>
-<t><spanx style="verb">_mta-sts  IN TXT ( "v=STSv1; id=20160831085700Z;" )</spanx>
+<t><spanx style="verb">_mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"</spanx>
 </t>
 <t>The formal definition of the <spanx style="verb">_mta-sts</spanx> TXT record, defined using <xref target="RFC5234"/>,
 is as follows:
@@ -306,8 +306,9 @@ pattern. (Thus <spanx style="verb">*.example.com</spanx> is valid but <spanx sty
 }
 </artwork></figure>
 <t>A lenient parser SHOULD accept TXT records and policy files which are
-syntactically valid (i.e. valid key-value pairs or valid JSON) implementing a
-superset of this specification, in which case unknown values SHALL be ignored.
+syntactically valid (i.e. valid key-value pairs separated by semi-colons for
+TXT records and valid JSON for policy files) and implementing a superset of this
+specification, in which case unknown fields SHALL be ignored.
 </t>
 </section>
 
@@ -610,7 +611,7 @@ presented by the recipient MX validate.
 </t>
 
 <figure align="center"><artwork align="center">
-_mta-sts  IN TXT ( "v=STSv1; id=20160831085700Z;" )
+_mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
 </artwork></figure>
 <t>STS Policy JSON served as the response body at
 <eref target="https://mta-sts.example.com/.well-known/mta-sts.json:"/>
