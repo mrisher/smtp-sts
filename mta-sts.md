@@ -365,25 +365,27 @@ passed.
 
 ## Policy Versioning
 
-Because an STS Policy that has never before successfully been validated should
-not be used to reject mail, sending MTAs should consider the issue of
-maintaining multiple versions of a recipient domain's policy.
+Because an STS Policy that has never before successfully been satisfied during
+delivery of mail to the Policy Domain should not be used to reject mail, sending
+MTAs should consider the issue of maintaining multiple versions of a recipient
+domain's policy.
 
 When delivering a given message, a sending MTA may, for the recipient domain,
-posess a cached, previously validated (unexpired) policy *and/or* a newly
-fetched, never-before-validated policy.
+posess a cached, previously satisfied (unexpired) policy *and/or* a newly
+fetched, never-before-satisfied policy.
 
 During policy application, the sending MTA now has an option of which policy to
 apply; it is suggested that MTAs implement the following logic:
 
-* If a new, unvalidated policy exists, attempt to deliver in compliance with
-  this policy. If this attempt succeeds *or* the new policy mode is `report`,
-  mark the policy as "validated" and remove the previously cached policy.
+* If a new, never-before-used policy exists, attempt to deliver in compliance
+  with this policy. If this attempt succeeds *or* the new policy mode is
+  `report`, mark the policy as "satisfied" and remove the previously cached
+  policy.
 
-* If a new, unvalidated policy with mode set to `enforce` was attempted and
-  failed to validate, deliver the message in compliance with the old, previously
-  cached policy, and consider this a policy validation failure (for the purposes
-  of TLSRPT (TODO: add reference)).
+* If a new, never-before-used unsatisfied policy with mode set to `enforce` was
+  attempted and could not be applied successfully, deliver the message in
+  compliance with the old, previously cached policy, and consider this a
+  delivery failure for the purposes of TLSRPT (TODO: add reference).
 
 Implementers may choose to think of this as a "two-pass" model (though such an
 implementation may be less efficient than a more optimized alternative):
@@ -554,15 +556,15 @@ func getMxsForPolicy(domain, policy) {
 
 func tryGetNewPolicy(domain) {
   // Check for an MTA STS TXT record for "domain" in DNS, and return the
-  // indicated policy (or a local cache of the unvalidated policy).
+  // indicated policy (or a local cache of the unsatisfied policy).
 }
 
 func cacheValidatedPolicy(domain, policy) {
-  // Store "policy" as the cached, validated policy for "domain".
+  // Store "policy" as the cached, satisfied policy for "domain".
 }
 
 func tryGetCachedValidatedPolicy(domain, policy) {
-  // Return a cached, validated policy for "domain".
+  // Return a cached, satisfied policy for "domain".
 }
 
 func tryMxAccordingTo(message, mx, policy) {
