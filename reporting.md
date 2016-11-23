@@ -390,8 +390,8 @@ use the media type `application/gzip` (see [@!RFC6713]), and
 ## Delivery Retry
 
 In the event of a delivery failure, regardless of the delivery method, a 
-sender SHOULD attempt redelivery for up to 24hrs after the initial attempt.  
-As previously stated the reports are optional, so while it is ideal to attempt 
+sender SHOULD attempt redelivery for up to 24hrs after the initial attempt.  As
+previously stated the reports are optional, so while it is ideal to attempt
 redelivery, it is not required.  If multiple retries are attempted, they should
 be on a logarithmic scale.
 
