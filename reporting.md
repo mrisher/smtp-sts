@@ -214,6 +214,11 @@ Note that the failure types are non-exclusive; an aggregate report may contain
 overlapping `counts` of failure types when a single send attempt encountered
 multiple errors.
 
+## Report Time-frame
+
+The report SHOULD cover a full day, from 0000-2400 UTC.  This should allow for
+easier correlation of failure events.
+
 ## Delivery Summary
 
 ### Success Count
@@ -274,7 +279,7 @@ to grow over time based on real-world experience. The initial set is:
 * `webpki-invalid`: This indicates that the MTA-STS policy could not be
     authenticated using PKIX validation.
     
-### General failures
+### General Failures
 
 When a negotiation failure can not be categorized into one of the "Negotiation Failures" 
 stated above, the reporter SHOULD use the `validation-failure` category.  As TLS grows
@@ -284,7 +289,7 @@ a generic feedback category.  When this category is used, the reporter SHOULD al
 to be a short text field, and the contents of the field should be an error code or error
 text, such as "X509_V_ERR_UNHANDLED_CRITICAL_CRL_EXTENSION".
 
-### Transient failures
+### Transient Failures
 
 Transient errors due to too-busy network, TCP timeouts, etc. are not required to be reported. 
 
@@ -381,6 +386,14 @@ SMTP STS or DANE TLSA failures.
 The report MAY be delivered by POST to HTTPS. If compressed, the report should
 use the media type `application/gzip` (see [@!RFC6713]), and
 `text/json` otherwise.
+
+## Delivery Retry
+
+In the event of a delivery failure, regardless of the delivery method, a 
+sender SHOULD attempt redelivery for up to 24hrs after the initial attempt.
+As previously stated the reports are optional, so while it is ideal to attempt 
+redelivery, it is not required.  If multiple retries are attempted, they should
+be on a logarithmic scale.
 
 # IANA Considerations
 
@@ -479,7 +492,8 @@ Figure: JSON Report Format
     report. It is provided as a string.
 * `date-time`: The date-time indicates the start- and end-times for the report
     range. It is provided as a string formatted according to Section 5.6,
-    "Internet Date/Time Format", of [@!RFC3339].
+    "Internet Date/Time Format", of [@!RFC3339].  The report should be for a
+    full UTC day, 0000-2400.
 * `email-address`: The contact information for a responsible party of the
     report. It is provided as a string formatted according to Section 3.4.1,
     "Addr-Spec", of [@!RFC5322].
