@@ -290,6 +290,12 @@ overlapping <spanx style="verb">counts</spanx> of failure types when a single se
 multiple errors.
 </t>
 
+<section anchor="report-timeframe" title="Report Time-frame">
+<t>The report SHOULD cover a full day, from 0000-2400 UTC.  This should allow for
+easier correlation of failure events.
+</t>
+</section>
+
 <section anchor="delivery-summary" title="Delivery Summary">
 
 <section anchor="success-count" title="Success Count">
@@ -381,7 +387,7 @@ authenticated using PKIX validation.
 </section>
 </section>
 
-<section anchor="general-failures" title="General failures">
+<section anchor="general-failures" title="General Failures">
 <t>When a negotiation failure can not be categorized into one of the &quot;Negotiation Failures&quot;
 stated above, the reporter SHOULD use the <spanx style="verb">validation-failure</spanx> category.  As TLS grows
 and becomes more complex, new mechanisms may not be easily categorized.  This allows for
@@ -392,7 +398,7 @@ text, such as &quot;X509_V_ERR_UNHANDLED_CRITICAL_CRL_EXTENSION&quot;.
 </t>
 </section>
 
-<section anchor="transient-failures" title="Transient failures">
+<section anchor="transient-failures" title="Transient Failures">
 <t>Transient errors due to too-busy network, TCP timeouts, etc. are not required to be reported.
 </t>
 </section>
@@ -504,6 +510,15 @@ use the media type <spanx style="verb">application/gzip</spanx> (see <xref targe
 <spanx style="verb">text/json</spanx> otherwise.
 </t>
 </section>
+
+<section anchor="delivery-retry" title="Delivery Retry">
+<t>In the event of a delivery failure, regardless of the delivery method, a
+sender SHOULD attempt redelivery for up to 24hrs after the initial attempt.  As
+previously stated the reports are optional, so while it is ideal to attempt
+redelivery, it is not required.  If multiple retries are attempted, they should
+be on a logarithmic scale.
+</t>
+</section>
 </section>
 
 <section anchor="iana-considerations" title="IANA Considerations">
@@ -609,7 +624,8 @@ _smtp-tlsrpt.mail.example.com. IN TXT \
 report. It is provided as a string.</t>
 <t><spanx style="verb">date-time</spanx>: The date-time indicates the start- and end-times for the report
 range. It is provided as a string formatted according to Section 5.6,
-&quot;Internet Date/Time Format&quot;, of <xref target="RFC3339"/>.</t>
+&quot;Internet Date/Time Format&quot;, of <xref target="RFC3339"/>.  The report should be for a
+full UTC day, 0000-2400.</t>
 <t><spanx style="verb">email-address</spanx>: The contact information for a responsible party of the
 report. It is provided as a string formatted according to Section 3.4.1,
 &quot;Addr-Spec&quot;, of <xref target="RFC5322"/>.</t>
