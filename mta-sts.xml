@@ -349,6 +349,9 @@ policy.</t>
 certificate.</t>
 </list>
 </t>
+<t>A policy which has been successfully used to deliver mail according to these
+constraints is said to be a &quot;validated policy&quot;.
+</t>
 <t>This section does not dictate the behavior of sending MTAs when policies fail to
 validate; in particular, validation failures of policies which specify <spanx style="verb">report</spanx>
 mode MUST NOT be interpreted as delivery failures, as described in the section
@@ -459,9 +462,10 @@ passed.
 </section>
 
 <section anchor="policy-versioning" title="Policy Versioning">
-<t>Because an STS Policy that has never before successfully been validated should
-not be used to reject mail, sending MTAs should consider the issue of
-maintaining multiple versions of a recipient domain's policy.
+<t>Because an STS Policy that has never before successfully been validated (that
+is, which has never been used to deliver mail as described in &quot;Policy
+Validation&quot;) should not be used to reject mail, sending MTAs should consider the
+issue of maintaining multiple versions of a recipient domain's policy.
 </t>
 <t>When delivering a given message, a sending MTA may, for the recipient domain,
 posess a cached, previously validated (unexpired) policy <spanx style="emph">and/or</spanx> a newly

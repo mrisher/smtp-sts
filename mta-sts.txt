@@ -83,7 +83,7 @@ Table of Contents
    6.  Policy Application  . . . . . . . . . . . . . . . . . . . . .   8
      6.1.  MX Preference . . . . . . . . . . . . . . . . . . . . . .   9
      6.2.  Policy Application Control Flow . . . . . . . . . . . . .   9
-   7.  Operational Considerations  . . . . . . . . . . . . . . . . .   9
+   7.  Operational Considerations  . . . . . . . . . . . . . . . . .  10
      7.1.  Policy Updates  . . . . . . . . . . . . . . . . . . . . .  10
      7.2.  Policy Versioning . . . . . . . . . . . . . . . . . . . .  10
    8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  11
@@ -381,11 +381,11 @@ Internet-Draft                   MTA-STS                       July 2016
    2.  That the recipient MX supports STARTTLS and offers a valid PKIX
        based TLS certificate.
 
+   A policy which has been successfully used to deliver mail according
+   to these constraints is said to be a "validated policy".
+
    This section does not dictate the behavior of sending MTAs when
    policies fail to validate; in particular, validation failures of
-   policies which specify "report" mode MUST NOT be interpreted as
-   delivery failures, as described in the section _Policy_
-   _Application_.
 
 
 
@@ -393,6 +393,10 @@ Margolis, et al.         Expires January 9, 2017                [Page 7]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+   policies which specify "report" mode MUST NOT be interpreted as
+   delivery failures, as described in the section _Policy_
+   _Application_.
 
 5.1.  MX Matching
 
@@ -437,11 +441,7 @@ Internet-Draft                   MTA-STS                       July 2016
        previously been successfully applied when delivering at least one
        message to the Policy Domain.
 
-   When a message fails to deliver due to an "enforce" policy, a
-   compliant MTA MUST check for the presence of an updated policy at the
-   Policy Domain before permanently failing to deliver the message.
-   This allows implementing domains to update long-lived policies on the
-   fly.
+
 
 
 
@@ -449,6 +449,12 @@ Margolis, et al.         Expires January 9, 2017                [Page 8]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+   When a message fails to deliver due to an "enforce" policy, a
+   compliant MTA MUST check for the presence of an updated policy at the
+   Policy Domain before permanently failing to deliver the message.
+   This allows implementing domains to update long-lived policies on the
+   fly.
 
 6.1.  MX Preference
 
@@ -492,12 +498,6 @@ Internet-Draft                   MTA-STS                       July 2016
    message is first attempted against a newly-fetched policy and, if
    unsuccessful, attempted again with the cached (or nil) policy.
 
-7.  Operational Considerations
-
-
-
-
-
 
 
 
@@ -505,6 +505,8 @@ Margolis, et al.         Expires January 9, 2017                [Page 9]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+7.  Operational Considerations
 
 7.1.  Policy Updates
 
@@ -521,9 +523,10 @@ Internet-Draft                   MTA-STS                       July 2016
 7.2.  Policy Versioning
 
    Because an STS Policy that has never before successfully been
-   validated should not be used to reject mail, sending MTAs should
-   consider the issue of maintaining multiple versions of a recipient
-   domain's policy.
+   validated (that is, which has never been used to deliver mail as
+   described in "Policy Validation") should not be used to reject mail,
+   sending MTAs should consider the issue of maintaining multiple
+   versions of a recipient domain's policy.
 
    When delivering a given message, a sending MTA may, for the recipient
    domain, posess a cached, previously validated (unexpired) policy
@@ -551,9 +554,6 @@ Internet-Draft                   MTA-STS                       July 2016
    o  In the first pass, the new policy is attempted and, if successful,
       becomes the old policy.
 
-   o  In the second pass, the old (or nil) policy is attempted, as would
-      be the case if no new policy were found.
-
 
 
 
@@ -561,6 +561,9 @@ Margolis, et al.         Expires January 9, 2017               [Page 10]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+   o  In the second pass, the old (or nil) policy is attempted, as would
+      be the case if no new policy were found.
 
 8.  IANA Considerations
 
@@ -608,9 +611,6 @@ Internet-Draft                   MTA-STS                       July 2016
    senders to cache the policy and refuse to deliver messages once the
    victim has resecured the MX records.
 
-   This attack is mitigated in part by the ability of a victim domain to
-   (at any time) publish a new policy updating the cached, malicious
-
 
 
 Margolis, et al.         Expires January 9, 2017               [Page 11]
@@ -618,6 +618,8 @@ Margolis, et al.         Expires January 9, 2017               [Page 11]
 Internet-Draft                   MTA-STS                       July 2016
 
 
+   This attack is mitigated in part by the ability of a victim domain to
+   (at any time) publish a new policy updating the cached, malicious
    policy, though this does require the victim domain to both obtain a
    valid CA-signed certificate and to understand and properly configure
    SMTP STS.
@@ -663,8 +665,6 @@ Internet-Draft                   MTA-STS                       July 2016
    Klaus Umbach 1&1 Mail & Media Development & Technology GmbH
    klaus.umbach (at) 1und1 (dot de)
 
-   Markus Laber 1&1 Mail & Media Development & Technology GmbH
-   markus.laber (at) 1und1 (dot de)
 
 
 
@@ -673,6 +673,9 @@ Margolis, et al.         Expires January 9, 2017               [Page 12]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+   Markus Laber 1&1 Mail & Media Development & Technology GmbH
+   markus.laber (at) 1und1 (dot de)
 
 11.  Appendix 1: Domain Owner STS example record
 
@@ -719,9 +722,6 @@ func tryStartTls(mx) {
 }
 
 func certMatches(connection, mx) {
-  // Return if the server certificate from "connection" matches the "mx" host.
-}
-
 
 
 
@@ -729,6 +729,9 @@ Margolis, et al.         Expires January 9, 2017               [Page 13]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+  // Return if the server certificate from "connection" matches the "mx" host.
+}
 
 func tryDeliverMail(connection, message) {
   // Attempt to deliver "message" via "connection".
@@ -775,9 +778,6 @@ func tryWithPolicy(message, domain, policy) {
   for mx in mxes {
     if tryMxAccordingTo(message, mx, policy) {
       return true
-    }
-  }
-  return false
 
 
 
@@ -786,6 +786,9 @@ Margolis, et al.         Expires January 9, 2017               [Page 14]
 Internet-Draft                   MTA-STS                       July 2016
 
 
+    }
+  }
+  return false
 }
 
 func handleMessage(message) {
@@ -829,10 +832,7 @@ func handleMessage(message) {
               4033, DOI 10.17487/RFC4033, March 2005,
               <http://www.rfc-editor.org/info/rfc4033>.
 
-   [RFC4627]  Crockford, D., "The application/json Media Type for
-              JavaScript Object Notation (JSON)", RFC 4627, DOI 10
-              .17487/RFC4627, July 2006,
-              <http://www.rfc-editor.org/info/rfc4627>.
+
 
 
 
@@ -841,6 +841,11 @@ Margolis, et al.         Expires January 9, 2017               [Page 15]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+   [RFC4627]  Crockford, D., "The application/json Media Type for
+              JavaScript Object Notation (JSON)", RFC 4627, DOI 10
+              .17487/RFC4627, July 2006,
+              <http://www.rfc-editor.org/info/rfc4627>.
 
    [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
               Specifications: ABNF", STD 68, RFC 5234, DOI 10.17487/
@@ -883,11 +888,6 @@ Authors' Addresses
    Email: risher (at) google (dot com)
 
 
-   Binu Ramakrishnan
-   Yahoo!, Inc
-
-   Email: rbinu (at) yahoo-inc (dot com)
-
 
 
 
@@ -896,6 +896,12 @@ Authors' Addresses
 Margolis, et al.         Expires January 9, 2017               [Page 16]
 
 Internet-Draft                   MTA-STS                       July 2016
+
+
+   Binu Ramakrishnan
+   Yahoo!, Inc
+
+   Email: rbinu (at) yahoo-inc (dot com)
 
 
    Alexander Brotman
@@ -908,12 +914,6 @@ Internet-Draft                   MTA-STS                       July 2016
    Microsoft, Inc
 
    Email: janet.jones (at) microsoft (dot com)
-
-
-
-
-
-
 
 
 

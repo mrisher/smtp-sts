@@ -267,6 +267,9 @@ non-expired SMTP MTA-STS policy, a sending MTA honoring SMTP STS MUST validate:
 2. That the recipient MX supports STARTTLS and offers a valid PKIX based TLS
    certificate.
 
+A policy which has been successfully used to deliver mail according to these
+constraints is said to be a "validated policy".
+
 This section does not dictate the behavior of sending MTAs when policies fail to
 validate; in particular, validation failures of policies which specify `report`
 mode MUST NOT be interpreted as delivery failures, as described in the section
@@ -365,9 +368,10 @@ passed.
 
 ## Policy Versioning
 
-Because an STS Policy that has never before successfully been validated should
-not be used to reject mail, sending MTAs should consider the issue of
-maintaining multiple versions of a recipient domain's policy.
+Because an STS Policy that has never before successfully been validated (that
+is, which has never been used to deliver mail as described in "Policy
+Validation") should not be used to reject mail, sending MTAs should consider the
+issue of maintaining multiple versions of a recipient domain's policy.
 
 When delivering a given message, a sending MTA may, for the recipient domain,
 posess a cached, previously validated (unexpired) policy *and/or* a newly
