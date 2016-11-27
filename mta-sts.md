@@ -251,6 +251,10 @@ that the HTTPS GET fails, we suggest implementions may limit further attempts to
 a period of five minutes or longer per version ID, to avoid overwhelming
 resource-constrained recipients with cascading failures.
 
+Senders MAY impose a timeout on the HTTPS GET to avoid long delays imposed by
+attempted policy updates. A suggested timeout is one minute; policy hosts SHOULD
+respond to requests with a complete policy body within that timeout.
+
 ## Policy Selection for Smart Hosts
 
 When sending mail via a "smart host"--an intermediate SMTP relay rather than the

@@ -327,6 +327,10 @@ that the HTTPS GET fails, we suggest implementions may limit further attempts to
 a period of five minutes or longer per version ID, to avoid overwhelming
 resource-constrained recipients with cascading failures.
 </t>
+<t>Senders MAY impose a timeout on the HTTPS GET to avoid long delays imposed by
+attempted policy updates. A suggested timeout is one minute; policy hosts SHOULD
+respond to requests with a complete policy body within that timeout.
+</t>
 </section>
 
 <section anchor="policy-selection-for-smart-hosts" title="Policy Selection for Smart Hosts">

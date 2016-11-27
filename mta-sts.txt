@@ -362,6 +362,11 @@ Internet-Draft                   MTA-STS                       July 2016
    or longer per version ID, to avoid overwhelming resource-constrained
    recipients with cascading failures.
 
+   Senders MAY impose a timeout on the HTTPS GET to avoid long delays
+   imposed by attempted policy updates.  A suggested timeout is one
+   minute; policy hosts SHOULD respond to requests with a complete
+   policy body within that timeout.
+
 4.4.  Policy Selection for Smart Hosts
 
    When sending mail via a "smart host"--an intermediate SMTP relay
@@ -381,11 +386,6 @@ Internet-Draft                   MTA-STS                       July 2016
    2.  That the recipient MX supports STARTTLS and offers a valid PKIX
        based TLS certificate.
 
-   A policy which has been successfully used to deliver mail according
-   to these constraints is said to be a "validated policy".
-
-   This section does not dictate the behavior of sending MTAs when
-   policies fail to validate; in particular, validation failures of
 
 
 
@@ -394,6 +394,11 @@ Margolis, et al.         Expires January 9, 2017                [Page 7]
 Internet-Draft                   MTA-STS                       July 2016
 
 
+   A policy which has been successfully used to deliver mail according
+   to these constraints is said to be a "validated policy".
+
+   This section does not dictate the behavior of sending MTAs when
+   policies fail to validate; in particular, validation failures of
    policies which specify "report" mode MUST NOT be interpreted as
    delivery failures, as described in the section _Policy_
    _Application_.
@@ -437,11 +442,6 @@ Internet-Draft                   MTA-STS                       July 2016
 
    2.  "enforce": In this mode, sending MTAs treat STS policy failures
        as a mail delivery error, and MUST NOT deliver the message to
-       this host if and only if the current policy version has
-       previously been successfully applied when delivering at least one
-       message to the Policy Domain.
-
-
 
 
 
@@ -449,6 +449,10 @@ Margolis, et al.         Expires January 9, 2017                [Page 8]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+       this host if and only if the current policy version has
+       previously been successfully applied when delivering at least one
+       message to the Policy Domain.
 
    When a message fails to deliver due to an "enforce" policy, a
    compliant MTA MUST check for the presence of an updated policy at the
@@ -493,10 +497,6 @@ Internet-Draft                   MTA-STS                       July 2016
        following first checking for the presence of a new policy (as
        indicated by the "id" field in the "_mta-sts" TXT record).
 
-   Alternative compliant implementations may also exist.  In particular,
-   it may be easier to consider a "two-pass" implementation, in which a
-   message is first attempted against a newly-fetched policy and, if
-   unsuccessful, attempted again with the cached (or nil) policy.
 
 
 
@@ -505,6 +505,11 @@ Margolis, et al.         Expires January 9, 2017                [Page 9]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+   Alternative compliant implementations may also exist.  In particular,
+   it may be easier to consider a "two-pass" implementation, in which a
+   message is first attempted against a newly-fetched policy and, if
+   unsuccessful, attempted again with the cached (or nil) policy.
 
 7.  Operational Considerations
 
@@ -547,12 +552,7 @@ Internet-Draft                   MTA-STS                       July 2016
       this a policy validation failure (for the purposes of TLSRPT
       (TODO: add reference)).
 
-   Implementers may choose to think of this as a "two-pass" model
-   (though such an implementation may be less efficient than a more
-   optimized alternative):
 
-   o  In the first pass, the new policy is attempted and, if successful,
-      becomes the old policy.
 
 
 
@@ -561,6 +561,13 @@ Margolis, et al.         Expires January 9, 2017               [Page 10]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+   Implementers may choose to think of this as a "two-pass" model
+   (though such an implementation may be less efficient than a more
+   optimized alternative):
+
+   o  In the first pass, the new policy is attempted and, if successful,
+      becomes the old policy.
 
    o  In the second pass, the old (or nil) policy is attempted, as would
       be the case if no new policy were found.
@@ -602,6 +609,15 @@ Internet-Draft                   MTA-STS                       July 2016
    Policy, making the Policy Domain appear not to have an STS Policy.
    The sender policy cache is designed to resist this attack.
 
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 11]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
    We additionally consider the Denial of Service risk posed by an
    attacker who can modify the DNS records for a victim domain.  Absent
    SMTP STS, such an attacker can cause a sending MTA to cache invalid
@@ -610,13 +626,6 @@ Internet-Draft                   MTA-STS                       July 2016
    "mx" constraints that validate the malicious MX record, causing
    senders to cache the policy and refuse to deliver messages once the
    victim has resecured the MX records.
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 11]
-
-Internet-Draft                   MTA-STS                       July 2016
-
 
    This attack is mitigated in part by the ability of a victim domain to
    (at any time) publish a new policy updating the cached, malicious
@@ -658,21 +667,19 @@ Internet-Draft                   MTA-STS                       July 2016
 
    Wei Chuang Google, Inc weihaw (at) google (dot com)
 
-   Brandon Long Google, Inc blong (at) google (dot com)
-
-   Franck Martin LinkedIn, Inc fmartin (at) linkedin (dot com)
-
-   Klaus Umbach 1&1 Mail & Media Development & Technology GmbH
-   klaus.umbach (at) 1und1 (dot de)
-
-
-
 
 
 Margolis, et al.         Expires January 9, 2017               [Page 12]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+   Brandon Long Google, Inc blong (at) google (dot com)
+
+   Franck Martin LinkedIn, Inc fmartin (at) linkedin (dot com)
+
+   Klaus Umbach 1&1 Mail & Media Development & Technology GmbH
+   klaus.umbach (at) 1und1 (dot de)
 
    Markus Laber 1&1 Mail & Media Development & Technology GmbH
    markus.laber (at) 1und1 (dot de)
@@ -715,13 +722,6 @@ func isEnforce(policy) {
 
 func isNonExpired(policy) {
   // Return true if the policy is not expired.
-}
-
-func tryStartTls(mx) {
-  // Attempt to open an SMTP connection with STARTTLS with the MX.
-}
-
-func certMatches(connection, mx) {
 
 
 
@@ -730,6 +730,13 @@ Margolis, et al.         Expires January 9, 2017               [Page 13]
 Internet-Draft                   MTA-STS                       July 2016
 
 
+}
+
+func tryStartTls(mx) {
+  // Attempt to open an SMTP connection with STARTTLS with the MX.
+}
+
+func certMatches(connection, mx) {
   // Return if the server certificate from "connection" matches the "mx" host.
 }
 
@@ -771,13 +778,6 @@ func tryMxAccordingTo(message, mx, policy) {
 }
 
 func tryWithPolicy(message, domain, policy) {
-  mxes := getMxesForPolicy(domain, policy)
-  if mxs is empty {
-    // Report error finding MXes that match the policy.
-  }
-  for mx in mxes {
-    if tryMxAccordingTo(message, mx, policy) {
-      return true
 
 
 
@@ -786,6 +786,13 @@ Margolis, et al.         Expires January 9, 2017               [Page 14]
 Internet-Draft                   MTA-STS                       July 2016
 
 
+  mxes := getMxesForPolicy(domain, policy)
+  if mxs is empty {
+    // Report error finding MXes that match the policy.
+  }
+  for mx in mxes {
+    if tryMxAccordingTo(message, mx, policy) {
+      return true
     }
   }
   return false
@@ -827,13 +834,6 @@ func handleMessage(message) {
               Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
               February 2002, <http://www.rfc-editor.org/info/rfc3207>.
 
-   [RFC4033]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
-              Rose, "DNS Security Introduction and Requirements", RFC
-              4033, DOI 10.17487/RFC4033, March 2005,
-              <http://www.rfc-editor.org/info/rfc4033>.
-
-
-
 
 
 
@@ -841,6 +841,11 @@ Margolis, et al.         Expires January 9, 2017               [Page 15]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+   [RFC4033]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+              Rose, "DNS Security Introduction and Requirements", RFC
+              4033, DOI 10.17487/RFC4033, March 2005,
+              <http://www.rfc-editor.org/info/rfc4033>.
 
    [RFC4627]  Crockford, D., "The application/json Media Type for
               JavaScript Object Notation (JSON)", RFC 4627, DOI 10
@@ -882,11 +887,6 @@ Authors' Addresses
    Email: dmargolis (at) google.com
 
 
-   Mark Risher
-   Google, Inc
-
-   Email: risher (at) google (dot com)
-
 
 
 
@@ -896,6 +896,12 @@ Authors' Addresses
 Margolis, et al.         Expires January 9, 2017               [Page 16]
 
 Internet-Draft                   MTA-STS                       July 2016
+
+
+   Mark Risher
+   Google, Inc
+
+   Email: risher (at) google (dot com)
 
 
    Binu Ramakrishnan
@@ -914,12 +920,6 @@ Internet-Draft                   MTA-STS                       July 2016
    Microsoft, Inc
 
    Email: janet.jones (at) microsoft (dot com)
-
-
-
-
-
-
 
 
 
