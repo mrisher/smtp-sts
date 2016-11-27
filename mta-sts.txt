@@ -88,14 +88,14 @@ Table of Contents
      7.2.  Policy Versioning . . . . . . . . . . . . . . . . . . . .  10
    8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  11
    9.  Security Considerations . . . . . . . . . . . . . . . . . . .  11
-   10. Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  12
+   10. Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  13
    11. Appendix 1: Domain Owner STS example record . . . . . . . . .  13
      11.1.  Example 1  . . . . . . . . . . . . . . . . . . . . . . .  13
    12. Appendix 2: Message delivery pseudocode . . . . . . . . . . .  13
    13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  15
      13.1.  Normative References . . . . . . . . . . . . . . . . . .  15
      13.2.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  16
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  17
 
 1.  Introduction
 
@@ -460,6 +460,11 @@ Internet-Draft                   MTA-STS                       July 2016
    This allows implementing domains to update long-lived policies on the
    fly.
 
+   Finally, in both "enforce" and "report" modes, failures to deliver in
+   compliance with the applied policy result in failure reports to the
+   policy domain, as described in the TLSRPT specification (TODO: add
+   ref).
+
 6.1.  MX Preference
 
    When applying a policy, sending MTAs SHOULD select recipient MXs by
@@ -493,11 +498,6 @@ Internet-Draft                   MTA-STS                       July 2016
        allowed by the new policy (if present), update the cache with the
        new policy.
 
-   5.  Upon message retries, a message MAY be permanently failed
-       following first checking for the presence of a new policy (as
-       indicated by the "id" field in the "_mta-sts" TXT record).
-
-
 
 
 
@@ -505,6 +505,10 @@ Margolis, et al.         Expires January 9, 2017                [Page 9]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+   5.  Upon message retries, a message MAY be permanently failed
+       following first checking for the presence of a new policy (as
+       indicated by the "id" field in the "_mta-sts" TXT record).
 
    Alternative compliant implementations may also exist.  In particular,
    it may be easier to consider a "two-pass" implementation, in which a
@@ -549,10 +553,6 @@ Internet-Draft                   MTA-STS                       July 2016
    o  If a new, unvalidated policy with mode set to "enforce" was
       attempted and failed to validate, deliver the message in
       compliance with the old, previously cached policy, and consider
-      this a policy validation failure (for the purposes of TLSRPT
-      (TODO: add reference)).
-
-
 
 
 
@@ -561,6 +561,9 @@ Margolis, et al.         Expires January 9, 2017               [Page 10]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+      this a policy validation failure (for the purposes of TLSRPT
+      (TODO: add reference)).
 
    Implementers may choose to think of this as a "two-pass" model
    (though such an implementation may be less efficient than a more
@@ -606,9 +609,6 @@ Internet-Draft                   MTA-STS                       July 2016
 
    Since we use DNS TXT records for policy discovery, an attacker who is
    able to block DNS responses can suppress the discovery of an STS
-   Policy, making the Policy Domain appear not to have an STS Policy.
-   The sender policy cache is designed to resist this attack.
-
 
 
 
@@ -617,6 +617,9 @@ Margolis, et al.         Expires January 9, 2017               [Page 11]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+   Policy, making the Policy Domain appear not to have an STS Policy.
+   The sender policy cache is designed to resist this attack.
 
    We additionally consider the Denial of Service risk posed by an
    attacker who can modify the DNS records for a victim domain.  Absent
@@ -661,11 +664,8 @@ Internet-Draft                   MTA-STS                       July 2016
    the perspective of STS Policy validation, be a valid MX host for that
    domain.
 
-10.  Contributors
 
-   Nicolas Lidzborski Google, Inc nlidz (at) google (dot com)
 
-   Wei Chuang Google, Inc weihaw (at) google (dot com)
 
 
 
@@ -673,6 +673,12 @@ Margolis, et al.         Expires January 9, 2017               [Page 12]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+10.  Contributors
+
+   Nicolas Lidzborski Google, Inc nlidz (at) google (dot com)
+
+   Wei Chuang Google, Inc weihaw (at) google (dot com)
 
    Brandon Long Google, Inc blong (at) google (dot com)
 
@@ -716,12 +722,6 @@ Internet-Draft                   MTA-STS                       July 2016
    to a cached policy (if present).
 
 
-func isEnforce(policy) {
-  // Return true if the policy mode is "enforce".
-}
-
-func isNonExpired(policy) {
-  // Return true if the policy is not expired.
 
 
 
@@ -730,6 +730,12 @@ Margolis, et al.         Expires January 9, 2017               [Page 13]
 Internet-Draft                   MTA-STS                       July 2016
 
 
+func isEnforce(policy) {
+  // Return true if the policy mode is "enforce".
+}
+
+func isNonExpired(policy) {
+  // Return true if the policy is not expired.
 }
 
 func tryStartTls(mx) {
@@ -772,12 +778,6 @@ func tryMxAccordingTo(message, mx, policy) {
     // Report error establishing TLS or validating cert.
   }
   if status || !isEnforce(policy) {
-    return tryDeliverMail(connection, message)
-  }
-  return false
-}
-
-func tryWithPolicy(message, domain, policy) {
 
 
 
@@ -786,6 +786,12 @@ Margolis, et al.         Expires January 9, 2017               [Page 14]
 Internet-Draft                   MTA-STS                       July 2016
 
 
+    return tryDeliverMail(connection, message)
+  }
+  return false
+}
+
+func tryWithPolicy(message, domain, policy) {
   mxes := getMxesForPolicy(domain, policy)
   if mxs is empty {
     // Report error finding MXes that match the policy.
@@ -826,13 +832,7 @@ func handleMessage(message) {
               RFC2119, March 1997,
               <http://www.rfc-editor.org/info/rfc2119>.
 
-   [RFC2821]  Klensin, J., Ed., "Simple Mail Transfer Protocol", RFC
-              2821, DOI 10.17487/RFC2821, April 2001,
-              <http://www.rfc-editor.org/info/rfc2821>.
 
-   [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
-              Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
-              February 2002, <http://www.rfc-editor.org/info/rfc3207>.
 
 
 
@@ -841,6 +841,14 @@ Margolis, et al.         Expires January 9, 2017               [Page 15]
 
 Internet-Draft                   MTA-STS                       July 2016
 
+
+   [RFC2821]  Klensin, J., Ed., "Simple Mail Transfer Protocol", RFC
+              2821, DOI 10.17487/RFC2821, April 2001,
+              <http://www.rfc-editor.org/info/rfc2821>.
+
+   [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
+              Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
+              February 2002, <http://www.rfc-editor.org/info/rfc3207>.
 
    [RFC4033]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
               Rose, "DNS Security Introduction and Requirements", RFC
@@ -879,14 +887,6 @@ Internet-Draft                   MTA-STS                       July 2016
 
    [1] https://mta-sts.example.com/.well-known/mta-sts.json:
 
-Authors' Addresses
-
-   Daniel Margolis
-   Google, Inc
-
-   Email: dmargolis (at) google.com
-
-
 
 
 
@@ -896,6 +896,14 @@ Authors' Addresses
 Margolis, et al.         Expires January 9, 2017               [Page 16]
 
 Internet-Draft                   MTA-STS                       July 2016
+
+
+Authors' Addresses
+
+   Daniel Margolis
+   Google, Inc
+
+   Email: dmargolis (at) google.com
 
 
    Mark Risher
@@ -920,14 +928,6 @@ Internet-Draft                   MTA-STS                       July 2016
    Microsoft, Inc
 
    Email: janet.jones (at) microsoft (dot com)
-
-
-
-
-
-
-
-
 
 
 

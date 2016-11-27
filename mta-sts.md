@@ -322,6 +322,10 @@ check for the presence of an updated policy at the Policy Domain before
 permanently failing to deliver the message. This allows implementing domains to
 update long-lived policies on the fly.
 
+Finally, in both `enforce` and `report` modes, failures to deliver in compliance
+with the applied policy result in failure reports to the policy domain, as
+described in the TLSRPT specification (TODO: add ref).
+
 ## MX Preference
 
 When applying a policy, sending MTAs SHOULD select recipient MXs by first
