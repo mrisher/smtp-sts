@@ -71,31 +71,28 @@ Table of Contents
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.1.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   3
    2.  Related Technologies  . . . . . . . . . . . . . . . . . . . .   3
-   3.  Overview  . . . . . . . . . . . . . . . . . . . . . . . . . .   4
-   4.  Policy Discovery  . . . . . . . . . . . . . . . . . . . . . .   5
-     4.1.  MTA-STS TXT Records . . . . . . . . . . . . . . . . . . .   5
-     4.2.  MTA-STS Policies  . . . . . . . . . . . . . . . . . . . .   6
-     4.3.  HTTPS Policy Fetching . . . . . . . . . . . . . . . . . .   7
-     4.4.  Policy Selection for Smart Hosts  . . . . . . . . . . . .   7
-   5.  Policy Validation . . . . . . . . . . . . . . . . . . . . . .   7
-     5.1.  MX Matching . . . . . . . . . . . . . . . . . . . . . . .   8
-     5.2.  MX Certificate Validation . . . . . . . . . . . . . . . .   8
-   6.  Policy Application  . . . . . . . . . . . . . . . . . . . . .   8
-     6.1.  MX Preference . . . . . . . . . . . . . . . . . . . . . .   9
-     6.2.  Policy Application Control Flow . . . . . . . . . . . . .   9
-   7.  Operational Considerations  . . . . . . . . . . . . . . . . .  10
-     7.1.  Policy Updates  . . . . . . . . . . . . . . . . . . . . .  10
-     7.2.  Policy Versioning . . . . . . . . . . . . . . . . . . . .  10
-   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  11
-   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  11
-   10. Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  13
-   11. Appendix 1: Domain Owner STS example record . . . . . . . . .  13
-     11.1.  Example 1  . . . . . . . . . . . . . . . . . . . . . . .  13
-   12. Appendix 2: Message delivery pseudocode . . . . . . . . . . .  13
-   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  15
-     13.1.  Normative References . . . . . . . . . . . . . . . . . .  15
-     13.2.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  16
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  17
+   3.  Policy Discovery  . . . . . . . . . . . . . . . . . . . . . .   3
+     3.1.  MTA-STS TXT Records . . . . . . . . . . . . . . . . . . .   4
+     3.2.  MTA-STS Policies  . . . . . . . . . . . . . . . . . . . .   5
+     3.3.  HTTPS Policy Fetching . . . . . . . . . . . . . . . . . .   6
+     3.4.  Policy Selection for Smart Hosts  . . . . . . . . . . . .   6
+     3.5.  MX Matching . . . . . . . . . . . . . . . . . . . . . . .   7
+     3.6.  MX Certificate Validation . . . . . . . . . . . . . . . .   7
+   4.  Policy Application  . . . . . . . . . . . . . . . . . . . . .   7
+     4.1.  MX Preference . . . . . . . . . . . . . . . . . . . . . .   8
+     4.2.  Policy Application Control Flow . . . . . . . . . . . . .   8
+   5.  Operational Considerations  . . . . . . . . . . . . . . . . .   8
+     5.1.  Policy Updates  . . . . . . . . . . . . . . . . . . . . .   8
+   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
+   8.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  10
+   9.  Appendix 1: Domain Owner STS example record . . . . . . . . .  11
+     9.1.  Example 1 . . . . . . . . . . . . . . . . . . . . . . . .  11
+   10. Appendix 2: Message delivery pseudocode . . . . . . . . . . .  11
+   11. References  . . . . . . . . . . . . . . . . . . . . . . . . .  13
+     11.1.  Normative References . . . . . . . . . . . . . . . . . .  13
+     11.2.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  14
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  14
 
 1.  Introduction
 
@@ -106,6 +103,9 @@ Table of Contents
    While such _opportunistic_ encryption protocols provide a high
    barrier against passive man-in-the-middle traffic interception, any
    attacker who can delete parts of the SMTP session (such as the "250
+   STARTTLS" response) or who can redirect the entire SMTP session
+   (perhaps by overwriting the resolved MX record of the delivery
+   domain) can perform downgrade or interception attacks.
 
 
 
@@ -113,10 +113,6 @@ Margolis, et al.         Expires January 9, 2017                [Page 2]
 
 Internet-Draft                   MTA-STS                       July 2016
 
-
-   STARTTLS" response) or who can redirect the entire SMTP session
-   (perhaps by overwriting the resolved MX record of the delivery
-   domain) can perform downgrade or interception attacks.
 
    This document defines a mechanism for recipient domains to publish
    policies specifying:
@@ -160,8 +156,12 @@ Internet-Draft                   MTA-STS                       July 2016
    In addition, SMTP STS provides an optional report-only mode, enabling
    soft deployments to detect policy failures.
 
+3.  Policy Discovery
 
-
+   SMTP STS policies are distributed via HTTPS from a "well-known" path
+   served within the Policy Domain, and their presence and current
+   version are indicated by a TXT record at the Policy Domain.  These
+   TXT records additionally contain a policy "id" field, allowing
 
 
 
@@ -170,71 +170,6 @@ Margolis, et al.         Expires January 9, 2017                [Page 3]
 Internet-Draft                   MTA-STS                       July 2016
 
 
-3.  Overview
-
-   SMTP STS policies are distributed via a "well-known" HTTPS endpoint
-   in the Policy Domain, and their presence and versioning is indicated
-   by way of a DNS record in the Policy Domain.  The definition of these
-   policy URIs and the mechanism to discover, fetch, authenticate, and
-   validate against policies is described in detail in the relevant
-   following sections.
-
-   Compliant MTAs implement long-lived policy caches and a mechanism to
-   check for policy updates.  Thus when sending to an MTA at an external
-   domain, a compliant MTA may:
-
-   o  Already have a previously cached, unexpired policy for the
-      recipient domain.
-
-   o  Discover a new, not-yet-used policy for the recipient domain.
-
-   One or both of these conditions may be true.  In order to allow
-   recipient domains to both safely publish new policies and to allow
-   new policies to take precedence over sender's cached policies while
-   maintaining resilience against a denial of service against the policy
-   discovery mechanism, we impose the following rules upon sender
-   application of a policy:
-
-   1.  A policy will only be cached if a message can successfully be
-       delivered according to that policy.
-
-   2.  A message will only be delivered if it validates against a cached
-       (or to-be-cached) policy, or if no policy is present in the
-       cache.
-
-   These two rules confer the following properties:
-
-   o  A misconfigured policy which is never satisfiable may cause a
-      sender to deliver mail to the Policy Domain as though it has no
-      MTA STS policy, but it will not cause mail delivery to fail.
-
-   o  A sender can safely check for a new policy if delivery according
-      to a cached policy fails.
-
-   o  If a sender who has already discovered a working policy for a
-      recipient domain should be unable to refresh the policy--due, for
-      example, to an attacker who blocks DNS or HTTPS requests--the
-      sender will fail "closed" and continue to apply the working
-      policy.
-
-
-
-
-
-Margolis, et al.         Expires January 9, 2017                [Page 4]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
-   Below, we describe in detail the semantics of MTA-STS policies, and
-   their discovery, authentication, and application.
-
-4.  Policy Discovery
-
-   SMTP STS policies are distributed via HTTPS from a "well-known" path
-   served within the Policy Domain, and their presence and current
-   version are indicated by a TXT record at the Policy Domain.  These
-   TXT records additionally contain a policy "id" field, allowing
    sending MTAs to check the currency of a cached policy without
    performing an HTTPS request.
 
@@ -244,7 +179,7 @@ Internet-Draft                   MTA-STS                       July 2016
    previously cached policy, the sender need only check the TXT record's
    version "id" against the cached value.
 
-4.1.  MTA-STS TXT Records
+3.1.  MTA-STS TXT Records
 
    The MTA-STS TXT record is a TXT record with the name "_mta-sts" at
    the Policy Domain.  For the domain "example.com", this record would
@@ -273,22 +208,25 @@ Internet-Draft                   MTA-STS                       July 2016
 
       sts-id          = "id" *WSP "=" *WSP 1*32(ALPHA / DIGIT)
 
-
-
-
-
-Margolis, et al.         Expires January 9, 2017                [Page 5]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
    If multiple TXT records for "_mta-sts" are returned by the resolver,
    records which do not begin with "v=STSv1;" are discarded.  If the
    number of resulting records is not one, senders MUST assume the
    recipient domain does not implement MTA STS and skip the remaining
    steps of policy discovery.
 
-4.2.  MTA-STS Policies
+
+
+
+
+
+
+
+Margolis, et al.         Expires January 9, 2017                [Page 4]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
+3.2.  MTA-STS Policies
 
    The policy itself is a JSON [RFC4627] object served via the HTTPS GET
    method from the fixed [RFC5785] "well-known" path of ".well-known/
@@ -330,21 +268,21 @@ Internet-Draft                   MTA-STS                       July 2016
                         "max_age": 123456
                       }
 
-
-
-
-Margolis, et al.         Expires January 9, 2017                [Page 6]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
    A lenient parser SHOULD accept TXT records and policy files which are
    syntactically valid (i.e. valid key-value pairs separated by semi-
    colons for TXT records and valid JSON for policy files) and
    implementing a superset of this specification, in which case unknown
    fields SHALL be ignored.
 
-4.3.  HTTPS Policy Fetching
+
+
+
+Margolis, et al.         Expires January 9, 2017                [Page 5]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
+3.3.  HTTPS Policy Fetching
 
    When fetching a new policy or updating a policy, the HTTPS endpoint
    MUST present a TLS certificate which is valid for the "mta-sts" host
@@ -367,14 +305,14 @@ Internet-Draft                   MTA-STS                       July 2016
    minute; policy hosts SHOULD respond to requests with a complete
    policy body within that timeout.
 
-4.4.  Policy Selection for Smart Hosts
+3.4.  Policy Selection for Smart Hosts
 
    When sending mail via a "smart host"--an intermediate SMTP relay
    rather than the message recipient's server--compliant senders MUST
    treat the smart host domain as the policy domain for the purposes of
    policy discovery and application.
 
-5.  Policy Validation
+   #Policy Validation
 
    When sending to an MX at a domain for which the sender has a valid
    and non-expired SMTP MTA-STS policy, a sending MTA honoring SMTP STS
@@ -386,24 +324,24 @@ Internet-Draft                   MTA-STS                       July 2016
    2.  That the recipient MX supports STARTTLS and offers a valid PKIX
        based TLS certificate.
 
-
-
-
-Margolis, et al.         Expires January 9, 2017                [Page 7]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
    A policy which has been successfully used to deliver mail according
    to these constraints is said to be a "validated policy".
 
    This section does not dictate the behavior of sending MTAs when
    policies fail to validate; in particular, validation failures of
    policies which specify "report" mode MUST NOT be interpreted as
+
+
+
+Margolis, et al.         Expires January 9, 2017                [Page 6]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
    delivery failures, as described in the section _Policy_
    _Application_.
 
-5.1.  MX Matching
+3.5.  MX Matching
 
    When delivering mail for the Policy Domain to a recipient MX host,
    the sender validates the MX match against the "mx" pattern from the
@@ -417,7 +355,7 @@ Internet-Draft                   MTA-STS                       July 2016
    "*.example.com", "mx1.example.com" is a valid MX host, but
    "1234.dhcp.example.com" is not.
 
-5.2.  MX Certificate Validation
+3.6.  MX Certificate Validation
 
    The certificate presented by the receiving MX MUST be valid for the
    MX hostname and chain to a root CA that is trusted by the sending
@@ -429,7 +367,7 @@ Internet-Draft                   MTA-STS                       July 2016
    the MX hostname is assumed to be that of the A RR and should be
    validated as such.
 
-6.  Policy Application
+4.  Policy Application
 
    When sending to an MX at a domain for which the sender has a valid,
    non-expired STS policy, a sending MTA honoring SMTP STS applies the
@@ -442,21 +380,20 @@ Internet-Draft                   MTA-STS                       July 2016
 
    2.  "enforce": In this mode, sending MTAs treat STS policy failures
        as a mail delivery error, and MUST NOT deliver the message to
-
-
-
-Margolis, et al.         Expires January 9, 2017                [Page 8]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
-       this host if and only if the current policy version has
-       previously been successfully applied when delivering at least one
-       message to the Policy Domain.
+       this host.
 
    When a message fails to deliver due to an "enforce" policy, a
    compliant MTA MUST check for the presence of an updated policy at the
    Policy Domain before permanently failing to deliver the message.
+
+
+
+
+Margolis, et al.         Expires January 9, 2017                [Page 7]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
    This allows implementing domains to update long-lived policies on the
    fly.
 
@@ -465,7 +402,7 @@ Internet-Draft                   MTA-STS                       July 2016
    policy domain, as described in the TLSRPT specification (TODO: add
    ref).
 
-6.1.  MX Preference
+4.1.  MX Preference
 
    When applying a policy, sending MTAs SHOULD select recipient MXs by
    first eliminating any MXs at lower priority than the current host (if
@@ -474,7 +411,7 @@ Internet-Draft                   MTA-STS                       July 2016
    then attempting delivery to matching hosts as indicated by their MX
    priority, until delivery succeeds or the MX candidate set is empty.
 
-6.2.  Policy Application Control Flow
+4.2.  Policy Application Control Flow
 
    An example control flow for a compliant sender consists of the
    following steps:
@@ -483,106 +420,50 @@ Internet-Draft                   MTA-STS                       July 2016
        to fetch a new policy.  (Optionally, sending MTAs may
        unconditionally check for a new policy at this step.)
 
-   2.  Filter candidate MXs against the policy or policies.  (If both a
-       cached and a new policy are present, this will be the
-       intersection of MXs allowed by either policy.)
+   2.  Filter candidate MXs against the current policy.
 
-   3.  If no candidate MXs are valid and the policy is from the policy
-       cache with mode "enforce", temporarily fail the message.
-       (Otherwise, generate a failure report but deliver as though MTA
-       STS were not implemented.)
+   3.  If no candidate MXs are valid and the policy mode is "enforce",
+       temporarily fail the message.  (Otherwise, generate a failure
+       report but deliver as though MTA STS were not implemented.)
 
    4.  For each candidate MX, in order of MX priority, attempt to
        deliver the message, enforcing STARTTLS and the MX host's PKIX
-       certificate validation.  If delivery succeeds and the MX is
-       allowed by the new policy (if present), update the cache with the
-       new policy.
-
-
-
-
-Margolis, et al.         Expires January 9, 2017                [Page 9]
-
-Internet-Draft                   MTA-STS                       July 2016
-
+       certificate validation.
 
    5.  Upon message retries, a message MAY be permanently failed
        following first checking for the presence of a new policy (as
        indicated by the "id" field in the "_mta-sts" TXT record).
 
-   Alternative compliant implementations may also exist.  In particular,
-   it may be easier to consider a "two-pass" implementation, in which a
-   message is first attempted against a newly-fetched policy and, if
-   unsuccessful, attempted again with the cached (or nil) policy.
+5.  Operational Considerations
 
-7.  Operational Considerations
-
-7.1.  Policy Updates
+5.1.  Policy Updates
 
    Updating the policy requires that the owner make changes in two
    places: the "_mta-sts" TXT record in the Policy Domain's DNS zone and
    at the corresponding HTTPS endpoint.  In the case where the HTTPS
    endpoint has been updated but the TXT record has not yet been,
+
+
+
+Margolis, et al.         Expires January 9, 2017                [Page 8]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
    senders will not know there is a new policy released and may thus
    continue to use old, previously cached versions.  Recipients should
    thus expect a policy will continue to be used by senders until both
    the HTTPS and TXT endpoints are updated and the TXT record's TTL has
    passed.
 
-7.2.  Policy Versioning
-
-   Because an STS Policy that has never before successfully been
-   validated (that is, which has never been used to deliver mail as
-   described in "Policy Validation") should not be used to reject mail,
-   sending MTAs should consider the issue of maintaining multiple
-   versions of a recipient domain's policy.
-
-   When delivering a given message, a sending MTA may, for the recipient
-   domain, posess a cached, previously validated (unexpired) policy
-   _and/or_ a newly fetched, never-before-validated policy.
-
-   During policy application, the sending MTA now has an option of which
-   policy to apply; it is suggested that MTAs implement the following
-   logic:
-
-   o  If a new, unvalidated policy exists, attempt to deliver in
-      compliance with this policy.  If this attempt succeeds _or_ the
-      new policy mode is "report", mark the policy as "validated" and
-      remove the previously cached policy.
-
-   o  If a new, unvalidated policy with mode set to "enforce" was
-      attempted and failed to validate, deliver the message in
-      compliance with the old, previously cached policy, and consider
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 10]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
-      this a policy validation failure (for the purposes of TLSRPT
-      (TODO: add reference)).
-
-   Implementers may choose to think of this as a "two-pass" model
-   (though such an implementation may be less efficient than a more
-   optimized alternative):
-
-   o  In the first pass, the new policy is attempted and, if successful,
-      becomes the old policy.
-
-   o  In the second pass, the old (or nil) policy is attempted, as would
-      be the case if no new policy were found.
-
-8.  IANA Considerations
+6.  IANA Considerations
 
    A new .well-known URI will be registered in the Well-Known URIs
    registry as described below:
 
    URI Suffix: mta-sts.json Change Controller: IETF
 
-9.  Security Considerations
+7.  Security Considerations
 
    SMTP Strict Transport Security attempts to protect against an active
    attacker who wishes to intercept or tamper with mail between hosts
@@ -609,15 +490,6 @@ Internet-Draft                   MTA-STS                       July 2016
 
    Since we use DNS TXT records for policy discovery, an attacker who is
    able to block DNS responses can suppress the discovery of an STS
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 11]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
    Policy, making the Policy Domain appear not to have an STS Policy.
    The sender policy cache is designed to resist this attack.
 
@@ -626,6 +498,14 @@ Internet-Draft                   MTA-STS                       July 2016
    SMTP STS, such an attacker can cause a sending MTA to cache invalid
    MX records for a long TTL.  With SMTP STS, the attacker can
    additionally advertise a new, long-"max_age" SMTP STS policy with
+
+
+
+Margolis, et al.         Expires January 9, 2017                [Page 9]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
    "mx" constraints that validate the malicious MX record, causing
    senders to cache the policy and refuse to deliver messages once the
    victim has resecured the MX records.
@@ -664,17 +544,7 @@ Internet-Draft                   MTA-STS                       July 2016
    the perspective of STS Policy validation, be a valid MX host for that
    domain.
 
-
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 12]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
-10.  Contributors
+8.  Contributors
 
    Nicolas Lidzborski Google, Inc nlidz (at) google (dot com)
 
@@ -684,15 +554,23 @@ Internet-Draft                   MTA-STS                       July 2016
 
    Franck Martin LinkedIn, Inc fmartin (at) linkedin (dot com)
 
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 10]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
    Klaus Umbach 1&1 Mail & Media Development & Technology GmbH
    klaus.umbach (at) 1und1 (dot de)
 
    Markus Laber 1&1 Mail & Media Development & Technology GmbH
    markus.laber (at) 1und1 (dot de)
 
-11.  Appendix 1: Domain Owner STS example record
+9.  Appendix 1: Domain Owner STS example record
 
-11.1.  Example 1
+9.1.  Example 1
 
    The owner of "example.com" wishes to begin using STS with a policy
    that will solicit reports from receivers without affecting how the
@@ -714,20 +592,12 @@ Internet-Draft                   MTA-STS                       July 2016
               }
 
 
-12.  Appendix 2: Message delivery pseudocode
+10.  Appendix 2: Message delivery pseudocode
 
    Below is pseudocode demonstrating the logic of a complaint sending
    MTA.  This implements the "two-pass" approach, first attempting
    delivery with a newly fetched policy (if present) before falling back
    to a cached policy (if present).
-
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 13]
-
-Internet-Draft                   MTA-STS                       July 2016
 
 
 func isEnforce(policy) {
@@ -740,6 +610,14 @@ func isNonExpired(policy) {
 
 func tryStartTls(mx) {
   // Attempt to open an SMTP connection with STARTTLS with the MX.
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 11]
+
+Internet-Draft                   MTA-STS                       July 2016
+
+
 }
 
 func certMatches(connection, mx) {
@@ -760,12 +638,16 @@ func tryGetNewPolicy(domain) {
   // indicated policy (or a local cache of the unvalidated policy).
 }
 
-func cacheValidatedPolicy(domain, policy) {
-  // Store "policy" as the cached, validated policy for "domain".
+func cachePolicy(domain, policy) {
+  // Store "policy" as the cached policy for "domain".
 }
 
-func tryGetCachedValidatedPolicy(domain, policy) {
-  // Return a cached, validated policy for "domain".
+func tryGetCachedPolicy(domain, policy) {
+  // Return a cached policy for "domain".
+}
+
+func reportError(error) {
+  // Report an error via TLSRPT.
 }
 
 func tryMxAccordingTo(message, mx, policy) {
@@ -774,19 +656,24 @@ func tryMxAccordingTo(message, mx, policy) {
     return false  // Can't connect to the MX so it's not an STS error.
   }
   status := !(tryStartTls(mx, &connection) && certMatches(connection, mx))
-  if !status {
-    // Report error establishing TLS or validating cert.
+  status = true
+  if !tryStartTls(mx, &connection) {
+    status = false
+    reportError(E_NO_VALID_TLS)
+  } else if certMatches(connection, mx) {
+    status =f alse
+    reportError(E_CERT_MISMATCH)
   }
   if status || !isEnforce(policy) {
+    return tryDeliverMail(connection, message)
 
 
 
-Margolis, et al.         Expires January 9, 2017               [Page 14]
+Margolis, et al.         Expires January 9, 2017               [Page 12]
 
 Internet-Draft                   MTA-STS                       July 2016
 
 
-    return tryDeliverMail(connection, message)
   }
   return false
 }
@@ -794,7 +681,7 @@ Internet-Draft                   MTA-STS                       July 2016
 func tryWithPolicy(message, domain, policy) {
   mxes := getMxesForPolicy(domain, policy)
   if mxs is empty {
-    // Report error finding MXes that match the policy.
+    reportError(E_NO_VALID_MXES)
   }
   for mx in mxes {
     if tryMxAccordingTo(message, mx, policy) {
@@ -806,14 +693,11 @@ func tryWithPolicy(message, domain, policy) {
 
 func handleMessage(message) {
   domain := ... // domain part after '@' from recipient
-  oldPolicy := tryGetCachedValidatedPolicy(domain)
+  oldPolicy := tryGetCachedPolicy(domain)
   newPolicy := tryGetNewPolicy(domain)
-  if newPolicy && newPolicy != oldPolicy {
-    if tryWithPolicy(message, newPolicy) {
-      cacheValidatedPolicy(domain, newPolicy)
-      return true;
-    }
-    // New policy appears invalid!
+  if newPolicy {
+    cachePolicy(domain, newPolicy)
+    oldPolicy = newPolicy
   }
   if oldPolicy {
     return tryWithPolicy(message, oldPolicy)
@@ -823,28 +707,28 @@ func handleMessage(message) {
 }
 
 
-13.  References
+11.  References
 
-13.1.  Normative References
+11.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
               RFC2119, March 1997,
               <http://www.rfc-editor.org/info/rfc2119>.
 
-
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 15]
-
-Internet-Draft                   MTA-STS                       July 2016
-
-
    [RFC2821]  Klensin, J., Ed., "Simple Mail Transfer Protocol", RFC
               2821, DOI 10.17487/RFC2821, April 2001,
               <http://www.rfc-editor.org/info/rfc2821>.
+
+
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 13]
+
+Internet-Draft                   MTA-STS                       July 2016
+
 
    [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
               Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
@@ -883,20 +767,9 @@ Internet-Draft                   MTA-STS                       July 2016
               .17487/RFC7672, October 2015,
               <http://www.rfc-editor.org/info/rfc7672>.
 
-13.2.  URIs
+11.2.  URIs
 
    [1] https://mta-sts.example.com/.well-known/mta-sts.json:
-
-
-
-
-
-
-
-Margolis, et al.         Expires January 9, 2017               [Page 16]
-
-Internet-Draft                   MTA-STS                       July 2016
-
 
 Authors' Addresses
 
@@ -904,6 +777,13 @@ Authors' Addresses
    Google, Inc
 
    Email: dmargolis (at) google.com
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 14]
+
+Internet-Draft                   MTA-STS                       July 2016
 
 
    Mark Risher
@@ -949,4 +829,12 @@ Authors' Addresses
 
 
 
-Margolis, et al.         Expires January 9, 2017               [Page 17]
+
+
+
+
+
+
+
+
+Margolis, et al.         Expires January 9, 2017               [Page 15]
