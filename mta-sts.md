@@ -220,7 +220,7 @@ When sending mail via a "smart host"--an intermediate SMTP relay rather than the
 message recipient's server--compliant senders MUST treat the smart host domain
 as the policy domain for the purposes of policy discovery and application.
 
-#Policy Validation
+# Policy Validation
 
 When sending to an MX at a domain for which the sender has a valid and
 non-expired SMTP MTA-STS policy, a sending MTA honoring SMTP STS MUST validate:
@@ -229,9 +229,6 @@ non-expired SMTP MTA-STS policy, a sending MTA honoring SMTP STS MUST validate:
    policy.
 2. That the recipient MX supports STARTTLS and offers a valid PKIX based TLS
    certificate.
-
-A policy which has been successfully used to deliver mail according to these
-constraints is said to be a "validated policy".
 
 This section does not dictate the behavior of sending MTAs when policies fail to
 validate; in particular, validation failures of policies which specify `report`
@@ -296,9 +293,9 @@ MX candidate set is empty.
 
 An example control flow for a compliant sender consists of the following steps:
 
-1. Check for a cached, non-expired policy. If none exists, attempt to fetch a
-   new policy. (Optionally, sending MTAs may unconditionally check for a new
-   policy at this step.)
+1. Check for a cached policy whose time-since-fetch has not exceeded its
+   `max_age`. If none exists, attempt to fetch a new policy. (Optionally,
+   sending MTAs may unconditionally check for a new policy at this step.)
 2. Filter candidate MXs against the current policy.
 3. If no candidate MXs are valid and the policy mode is `enforce`, temporarily
    fail the message.  (Otherwise, generate a failure report but deliver as
@@ -508,7 +505,7 @@ func tryMxAccordingTo(message, mx, policy) {
     status = false
     reportError(E_NO_VALID_TLS)
   } else if certMatches(connection, mx) {
-    status =f alse
+    status = false
     reportError(E_CERT_MISMATCH)
   }
   if status || !isEnforce(policy) {

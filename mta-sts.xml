@@ -287,8 +287,10 @@ respond to requests with a complete policy body within that timeout.
 message recipient's server--compliant senders MUST treat the smart host domain
 as the policy domain for the purposes of policy discovery and application.
 </t>
-<t>#Policy Validation
-</t>
+</section>
+</section>
+
+<section anchor="policy-validation" title="Policy Validation">
 <t>When sending to an MX at a domain for which the sender has a valid and
 non-expired SMTP MTA-STS policy, a sending MTA honoring SMTP STS MUST validate:
 </t>
@@ -300,15 +302,11 @@ policy.</t>
 certificate.</t>
 </list>
 </t>
-<t>A policy which has been successfully used to deliver mail according to these
-constraints is said to be a &quot;validated policy&quot;.
-</t>
 <t>This section does not dictate the behavior of sending MTAs when policies fail to
 validate; in particular, validation failures of policies which specify <spanx style="verb">report</spanx>
 mode MUST NOT be interpreted as delivery failures, as described in the section
 <spanx style="emph">Policy</spanx> <spanx style="emph">Application</spanx>.
 </t>
-</section>
 
 <section anchor="mx-matching" title="MX Matching">
 <t>When delivering mail for the Policy Domain to a recipient MX host, the sender
@@ -375,9 +373,9 @@ MX candidate set is empty.
 </t>
 <t>
 <list style="numbers">
-<t>Check for a cached, non-expired policy. If none exists, attempt to fetch a
-new policy. (Optionally, sending MTAs may unconditionally check for a new
-policy at this step.)</t>
+<t>Check for a cached policy whose time-since-fetch has not exceeded its
+<spanx style="verb">max_age</spanx>. If none exists, attempt to fetch a new policy. (Optionally,
+sending MTAs may unconditionally check for a new policy at this step.)</t>
 <t>Filter candidate MXs against the current policy.</t>
 <t>If no candidate MXs are valid and the policy mode is <spanx style="verb">enforce</spanx>, temporarily
 fail the message.  (Otherwise, generate a failure report but deliver as
@@ -602,7 +600,7 @@ func tryMxAccordingTo(message, mx, policy) {
     status = false
     reportError(E_NO_VALID_TLS)
   } else if certMatches(connection, mx) {
-    status =f alse
+    status = false
     reportError(E_CERT_MISMATCH)
   }
   if status || !isEnforce(policy) {
