@@ -107,47 +107,6 @@ _Security_ _Considerations_.
 In addition, SMTP STS provides an optional report-only mode, enabling soft
 deployments to detect policy failures.
 
-# Overview
-
-SMTP STS policies are distributed via a "well-known" HTTPS endpoint in the
-Policy Domain, and their presence and versioning is indicated by way of a DNS
-record in the Policy Domain. The definition of these policy URIs and the
-mechanism to discover, fetch, authenticate, and validate against policies is
-described in detail in the relevant following sections.
-
-Compliant MTAs implement long-lived policy caches and a mechanism to check for
-policy updates. Thus when sending to an MTA at an external domain, a compliant
-MTA may:
-
-* Already have a previously cached, unexpired policy for the recipient domain.
-* Discover a new, not-yet-used policy for the recipient domain.
-
-One or both of these conditions may be true. In order to allow recipient domains
-to both safely publish new policies and to allow new policies to take precedence
-over sender's cached policies while maintaining resilience against a denial of
-service against the policy discovery mechanism, we impose the following rules
-upon sender application of a policy:
-
-1. A policy will only be cached if a message can successfully be delivered
-   according to that policy.
-2. A message will only be delivered if it validates against a cached (or
-   to-be-cached) policy, or if no policy is present in the cache.
-
-These two rules confer the following properties:
-
-* A misconfigured policy which is never satisfiable may cause a sender to
-  deliver mail to the Policy Domain as though it has no MTA STS policy, but it
-  will not cause mail delivery to fail.
-* A sender can safely check for a new policy if delivery according to a cached
-  policy fails.
-* If a sender who has already discovered a working policy for a recipient domain
-  should be unable to refresh the policy--due, for example, to an attacker who
-  blocks DNS or HTTPS requests--the sender will fail "closed" and continue to
-  apply the working policy.
-
-Below, we describe in detail the semantics of MTA-STS policies, and their
-discovery, authentication, and application.
-
 # Policy Discovery
 
 SMTP STS policies are distributed via HTTPS from a "well-known" path served
@@ -271,9 +230,6 @@ non-expired SMTP MTA-STS policy, a sending MTA honoring SMTP STS MUST validate:
 2. That the recipient MX supports STARTTLS and offers a valid PKIX based TLS
    certificate.
 
-A policy which has been successfully used to deliver mail according to these
-constraints is said to be a "validated policy".
-
 This section does not dictate the behavior of sending MTAs when policies fail to
 validate; in particular, validation failures of policies which specify `report`
 mode MUST NOT be interpreted as delivery failures, as described in the section
@@ -313,9 +269,7 @@ validation one of two ways, depending on the value of the policy `mode` field:
    failures.
 
 2. `enforce`: In this mode, sending MTAs treat STS policy failures as a mail
-   delivery error, and MUST NOT deliver the message to this host if and only if
-   the current policy version has previously been successfully applied when
-   delivering at least one message to the Policy Domain.
+   delivery error, and MUST NOT deliver the message to this host.
 
 When a message fails to deliver due to an `enforce` policy, a compliant MTA MUST
 check for the presence of an updated policy at the Policy Domain before
@@ -339,27 +293,18 @@ MX candidate set is empty.
 
 An example control flow for a compliant sender consists of the following steps:
 
-1. Check for a cached, non-expired policy. If none exists, attempt to fetch a
-   new policy. (Optionally, sending MTAs may unconditionally check for a new
-   policy at this step.)
-2. Filter candidate MXs against the policy or policies. (If both a cached and a
-   new policy are present, this will be the intersection of MXs allowed by
-   either policy.)
-3. If no candidate MXs are valid and the policy is from the policy cache with
-   mode `enforce`, temporarily fail the message.  (Otherwise, generate a failure
-   report but deliver as though MTA STS were not implemented.)
+1. Check for a cached policy whose time-since-fetch has not exceeded its
+   `max_age`. If none exists, attempt to fetch a new policy. (Optionally,
+   sending MTAs may unconditionally check for a new policy at this step.)
+2. Filter candidate MXs against the current policy.
+3. If no candidate MXs are valid and the policy mode is `enforce`, temporarily
+   fail the message.  (Otherwise, generate a failure report but deliver as
+   though MTA STS were not implemented.)
 4. For each candidate MX, in order of MX priority, attempt to deliver the
-   message, enforcing STARTTLS and the MX host's PKIX certificate validation. If
-   delivery succeeds and the MX is allowed by the new policy (if present),
-   update the cache with the new policy.
+   message, enforcing STARTTLS and the MX host's PKIX certificate validation.
 5. Upon message retries, a message MAY be permanently failed following first
    checking for the presence of a new policy (as indicated by the `id` field in
    the `_mta-sts` TXT record).
-
-Alternative compliant implementations may also exist. In particular, it may be
-easier to consider a "two-pass" implementation, in which a message is first
-attempted against a newly-fetched policy and, if unsuccessful, attempted again
-with the cached (or nil) policy.
 
 # Operational Considerations
 
@@ -373,38 +318,6 @@ released and may thus continue to use old, previously cached versions.
 Recipients should thus expect a policy will continue to be used by senders until
 both the HTTPS and TXT endpoints are updated and the TXT record's TTL has
 passed.
-
-## Policy Versioning
-
-Because an STS Policy that has never before successfully been validated (that
-is, which has never been used to deliver mail as described in "Policy
-Validation") should not be used to reject mail, sending MTAs should consider the
-issue of maintaining multiple versions of a recipient domain's policy.
-
-When delivering a given message, a sending MTA may, for the recipient domain,
-posess a cached, previously validated (unexpired) policy *and/or* a newly
-fetched, never-before-validated policy.
-
-During policy application, the sending MTA now has an option of which policy to
-apply; it is suggested that MTAs implement the following logic:
-
-* If a new, unvalidated policy exists, attempt to deliver in compliance with
-  this policy. If this attempt succeeds *or* the new policy mode is `report`,
-  mark the policy as "validated" and remove the previously cached policy.
-
-* If a new, unvalidated policy with mode set to `enforce` was attempted and
-  failed to validate, deliver the message in compliance with the old, previously
-  cached policy, and consider this a policy validation failure (for the purposes
-  of TLSRPT (TODO: add reference)).
-
-Implementers may choose to think of this as a "two-pass" model (though such an
-implementation may be less efficient than a more optimized alternative):
-
-* In the first pass, the new policy is attempted and, if successful, becomes the
-  old policy.
-
-* In the second pass, the old (or nil) policy is attempted, as would be the case
-  if no new policy were found.
 
 # IANA Considerations
 
@@ -569,12 +482,16 @@ func tryGetNewPolicy(domain) {
   // indicated policy (or a local cache of the unvalidated policy).
 }
 
-func cacheValidatedPolicy(domain, policy) {
-  // Store "policy" as the cached, validated policy for "domain".
+func cachePolicy(domain, policy) {
+  // Store "policy" as the cached policy for "domain".
 }
 
-func tryGetCachedValidatedPolicy(domain, policy) {
-  // Return a cached, validated policy for "domain".
+func tryGetCachedPolicy(domain, policy) {
+  // Return a cached policy for "domain".
+}
+
+func reportError(error) {
+  // Report an error via TLSRPT.
 }
 
 func tryMxAccordingTo(message, mx, policy) {
@@ -583,8 +500,13 @@ func tryMxAccordingTo(message, mx, policy) {
     return false  // Can't connect to the MX so it's not an STS error.
   }
   status := !(tryStartTls(mx, &connection) && certMatches(connection, mx)) 
-  if !status {
-    // Report error establishing TLS or validating cert.
+  status = true
+  if !tryStartTls(mx, &connection) {
+    status = false
+    reportError(E_NO_VALID_TLS)
+  } else if certMatches(connection, mx) {
+    status = false
+    reportError(E_CERT_MISMATCH)
   }
   if status || !isEnforce(policy) {
     return tryDeliverMail(connection, message)
@@ -595,7 +517,7 @@ func tryMxAccordingTo(message, mx, policy) {
 func tryWithPolicy(message, domain, policy) {
   mxes := getMxesForPolicy(domain, policy)
   if mxs is empty {
-    // Report error finding MXes that match the policy.
+    reportError(E_NO_VALID_MXES)
   }
   for mx in mxes {
     if tryMxAccordingTo(message, mx, policy) {
@@ -607,14 +529,11 @@ func tryWithPolicy(message, domain, policy) {
 
 func handleMessage(message) {
   domain := ... // domain part after '@' from recipient
-  oldPolicy := tryGetCachedValidatedPolicy(domain)
+  oldPolicy := tryGetCachedPolicy(domain)
   newPolicy := tryGetNewPolicy(domain)
-  if newPolicy && newPolicy != oldPolicy {
-    if tryWithPolicy(message, newPolicy) {
-      cacheValidatedPolicy(domain, newPolicy)
-      return true; 
-    }
-    // New policy appears invalid!
+  if newPolicy {
+    cachePolicy(domain, newPolicy)
+    oldPolicy = newPolicy
   }
   if oldPolicy {
     return tryWithPolicy(message, oldPolicy)
