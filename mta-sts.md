@@ -166,7 +166,7 @@ This JSON object contains the following key/value pairs:
 * `mode`: (plain-text, required). Either "enforce" or "report", indicating the
   expected behavior of a sending MTA in the case of a policy validation failure.
 * `max_age`: Max lifetime of the policy (plain-text non-negative integer
-  seconds).  Well-behaved clients SHOULD cache a policy for up to this value
+  seconds, required).  Well-behaved clients SHOULD cache a policy for up to this value
   from last policy fetch time. To mitigate the risks of attacks at policy
   refresh time, it is expected that this value typically be in the range of
   weeks or greater.
