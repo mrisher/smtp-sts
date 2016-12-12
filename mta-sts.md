@@ -198,7 +198,7 @@ specification, in which case unknown fields SHALL be ignored.
 
 When fetching a new policy or updating a policy, the HTTPS endpoint MUST present
 a TLS certificate which is valid for the `mta-sts` host (as described in
-[@!RFC6125]), chain to a root CA that is trusted by the sending CA, and be
+[@!RFC6125]), chain to a root CA that is trusted by the sending MTA, and be
 non-expired. It is expected that sending MTAs use a set of trusted CAs similar
 to those in widely deployed Web browsers and operating systems.
 
