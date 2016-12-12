@@ -109,7 +109,7 @@ deployments to detect policy failures.
 
 # Policy Discovery
 
-SMTP STS policies are distributed via HTTPS from a "well-known" path served
+SMTP STS policies are distributed via HTTPS from a "well-known" [@!RFC5785] path served
 within the Policy Domain, and their presence and current version are indicated
 by a TXT record at the Policy Domain. These TXT records additionally contain a
 policy `id` field, allowing sending MTAs to check the currency of a cached
