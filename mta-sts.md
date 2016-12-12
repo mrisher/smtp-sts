@@ -141,7 +141,7 @@ An example TXT record is as below:
 The formal definition of the `_mta-sts` TXT record, defined using [@!RFC5234],
 is as follows:
 
-    sts-text-record = sts-version *WSP %x3B *WSP sts-id
+    sts-text-record = sts-version *WSP %x3B *WSP sts-id [%x3B]
 
     sts-version     = "v" *WSP "=" *WSP %x53 %x54        ; "STSv1" 
                       %x53 %x76 %x31
