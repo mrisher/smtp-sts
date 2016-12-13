@@ -172,18 +172,18 @@ Internet-Draft                   MTA-STS                       July 2016
 
 3.  Policy Discovery
 
-   SMTP STS policies are distributed via HTTPS from a "well-known" path
-   served within the Policy Domain, and their presence and current
-   version are indicated by a TXT record at the Policy Domain.  These
-   TXT records additionally contain a policy "id" field, allowing
-   sending MTAs to check the currency of a cached policy without
-   performing an HTTPS request.
+   SMTP STS policies are distributed via HTTPS from a "well-known"
+   [RFC5785] path served within the Policy Domain, and their presence
+   and current version are indicated by a TXT record at the Policy
+   Domain.  These TXT records additionally contain a policy "id" field,
+   allowing sending MTAs to check the currency of a cached policy
+   without performing an HTTPS request.
 
-   Thus to discover if a recipient domain implements MTA-STS, a sender
-   need only resolve a single TXT record; conversely, to see if an
-   updated policy is available for a domain for which the sender has a
-   previously cached policy, the sender need only check the TXT record's
-   version "id" against the cached value.
+   To discover if a recipient domain implements MTA-STS, a sender need
+   only resolve a single TXT record.  To see if an updated policy is
+   available for a domain for which the sender has a previously cached
+   policy, the sender need only check the TXT record's version "id"
+   against the cached value.
 
 3.1.  MTA-STS TXT Records
 
@@ -207,7 +207,7 @@ Internet-Draft                   MTA-STS                       July 2016
    The formal definition of the "_mta-sts" TXT record, defined using
    [RFC5234], is as follows:
 
-      sts-text-record = sts-version *WSP %x3B *WSP sts-id
+      sts-text-record = sts-version *WSP %x3B *WSP sts-id [%x3B]
 
       sts-version     = "v" *WSP "=" *WSP %x53 %x54        ; "STSv1"
                         %x53 %x76 %x31
@@ -247,10 +247,11 @@ Internet-Draft                   MTA-STS                       July 2016
       policy validation failure.
 
    o  "max_age": Max lifetime of the policy (plain-text non-negative
-      integer seconds).  Well-behaved clients SHOULD cache a policy for
-      up to this value from last policy fetch time.  To mitigate the
-      risks of attacks at policy refresh time, it is expected that this
-      value typically be in the range of weeks or greater.
+      integer seconds, required).  Well-behaved clients SHOULD cache a
+      policy for up to this value from last policy fetch time.  To
+      mitigate the risks of attacks at policy refresh time, it is
+      expected that this value typically be in the range of weeks or
+      greater.
 
    o  "mx": MX patterns (list of plain-text MX match strings, required).
       One or more patterns matching the expected MX for this domain.
@@ -273,7 +274,6 @@ Internet-Draft                   MTA-STS                       July 2016
 
    A lenient parser SHOULD accept TXT records and policy files which are
    syntactically valid (i.e. valid key-value pairs separated by semi-
-   colons for TXT records and valid JSON for policy files) and
 
 
 
@@ -282,6 +282,7 @@ Margolis, et al.         Expires January 9, 2017                [Page 5]
 Internet-Draft                   MTA-STS                       July 2016
 
 
+   colons for TXT records and valid JSON for policy files) and
    implementing a superset of this specification, in which case unknown
    fields SHALL be ignored.
 
@@ -290,8 +291,8 @@ Internet-Draft                   MTA-STS                       July 2016
    When fetching a new policy or updating a policy, the HTTPS endpoint
    MUST present a TLS certificate which is valid for the "mta-sts" host
    (as described in [RFC6125]), chain to a root CA that is trusted by
-   the sending CA, and be non-expired.  It is expected that sending MTAs
-   use a set of trusted CAs similar to those in widely deployed Web
+   the sending MTA, and be non-expired.  It is expected that sending
+   MTAs use a set of trusted CAs similar to those in widely deployed Web
    browsers and operating systems.
 
    HTTP 3xx redirects MUST NOT be followed.
@@ -329,7 +330,6 @@ Internet-Draft                   MTA-STS                       July 2016
 
    This section does not dictate the behavior of sending MTAs when
    policies fail to validate; in particular, validation failures of
-   policies which specify "report" mode MUST NOT be interpreted as
 
 
 
@@ -338,6 +338,7 @@ Margolis, et al.         Expires January 9, 2017                [Page 6]
 Internet-Draft                   MTA-STS                       July 2016
 
 
+   policies which specify "report" mode MUST NOT be interpreted as
    delivery failures, as described in the section _Policy_
    _Application_.
 
@@ -385,7 +386,6 @@ Internet-Draft                   MTA-STS                       July 2016
    When a message fails to deliver due to an "enforce" policy, a
    compliant MTA MUST check for the presence of an updated policy at the
    Policy Domain before permanently failing to deliver the message.
-
 
 
 

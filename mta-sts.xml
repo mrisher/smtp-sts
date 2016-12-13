@@ -165,16 +165,16 @@ deployments to detect policy failures.
 </section>
 
 <section anchor="policy-discovery" title="Policy Discovery">
-<t>SMTP STS policies are distributed via HTTPS from a &quot;well-known&quot; path served
+<t>SMTP STS policies are distributed via HTTPS from a &quot;well-known&quot; <xref target="RFC5785"/> path served
 within the Policy Domain, and their presence and current version are indicated
 by a TXT record at the Policy Domain. These TXT records additionally contain a
 policy <spanx style="verb">id</spanx> field, allowing sending MTAs to check the currency of a cached
 policy without performing an HTTPS request.
 </t>
-<t>Thus to discover if a recipient domain implements MTA-STS, a sender need only
-resolve a single TXT record; conversely, to see if an updated policy is
-available for a domain for which the sender has a previously cached policy, the
-sender need only check the TXT record's version <spanx style="verb">id</spanx> against the cached value.
+<t>To discover if a recipient domain implements MTA-STS, a sender need only resolve
+a single TXT record. To see if an updated policy is available for a domain for
+which the sender has a previously cached policy, the sender need only check the
+TXT record's version <spanx style="verb">id</spanx> against the cached value.
 </t>
 
 <section anchor="mtasts-txt-records" title="MTA-STS TXT Records">
@@ -202,7 +202,7 @@ is as follows:
 </t>
 
 <figure align="center"><artwork align="center">
-sts-text-record = sts-version *WSP %x3B *WSP sts-id
+sts-text-record = sts-version *WSP %x3B *WSP sts-id [%x3B]
 
 sts-version     = "v" *WSP "=" *WSP %x53 %x54        ; "STSv1" 
                   %x53 %x76 %x31
@@ -230,7 +230,7 @@ the <spanx style="verb">mta-sts</spanx> host at the Policy Domain. Thus for <spa
 <t><spanx style="verb">mode</spanx>: (plain-text, required). Either &quot;enforce&quot; or &quot;report&quot;, indicating the
 expected behavior of a sending MTA in the case of a policy validation failure.</t>
 <t><spanx style="verb">max_age</spanx>: Max lifetime of the policy (plain-text non-negative integer
-seconds).  Well-behaved clients SHOULD cache a policy for up to this value
+seconds, required).  Well-behaved clients SHOULD cache a policy for up to this value
 from last policy fetch time. To mitigate the risks of attacks at policy
 refresh time, it is expected that this value typically be in the range of
 weeks or greater.</t>
@@ -264,7 +264,7 @@ specification, in which case unknown fields SHALL be ignored.
 <section anchor="https-policy-fetching" title="HTTPS Policy Fetching">
 <t>When fetching a new policy or updating a policy, the HTTPS endpoint MUST present
 a TLS certificate which is valid for the <spanx style="verb">mta-sts</spanx> host (as described in
-<xref target="RFC6125"/>), chain to a root CA that is trusted by the sending CA, and be
+<xref target="RFC6125"/>), chain to a root CA that is trusted by the sending MTA, and be
 non-expired. It is expected that sending MTAs use a set of trusted CAs similar
 to those in widely deployed Web browsers and operating systems.
 </t>

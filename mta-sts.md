@@ -115,10 +115,10 @@ by a TXT record at the Policy Domain. These TXT records additionally contain a
 policy `id` field, allowing sending MTAs to check the currency of a cached
 policy without performing an HTTPS request.
 
-To discover if a recipient domain implements MTA-STS, a sender need only
-resolve a single TXT record. To see if an updated policy is
-available for a domain for which the sender has a previously cached policy, the
-sender need only check the TXT record's version `id` against the cached value.
+To discover if a recipient domain implements MTA-STS, a sender need only resolve
+a single TXT record. To see if an updated policy is available for a domain for
+which the sender has a previously cached policy, the sender need only check the
+TXT record's version `id` against the cached value.
 
 ## MTA-STS TXT Records
 
