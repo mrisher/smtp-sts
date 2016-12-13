@@ -109,14 +109,14 @@ deployments to detect policy failures.
 
 # Policy Discovery
 
-SMTP STS policies are distributed via HTTPS from a "well-known" path served
+SMTP STS policies are distributed via HTTPS from a "well-known" [@!RFC5785] path served
 within the Policy Domain, and their presence and current version are indicated
 by a TXT record at the Policy Domain. These TXT records additionally contain a
 policy `id` field, allowing sending MTAs to check the currency of a cached
 policy without performing an HTTPS request.
 
-Thus to discover if a recipient domain implements MTA-STS, a sender need only
-resolve a single TXT record; conversely, to see if an updated policy is
+To discover if a recipient domain implements MTA-STS, a sender need only
+resolve a single TXT record. To see if an updated policy is
 available for a domain for which the sender has a previously cached policy, the
 sender need only check the TXT record's version `id` against the cached value.
 
@@ -141,7 +141,7 @@ An example TXT record is as below:
 The formal definition of the `_mta-sts` TXT record, defined using [@!RFC5234],
 is as follows:
 
-    sts-text-record = sts-version *WSP %x3B *WSP sts-id
+    sts-text-record = sts-version *WSP %x3B *WSP sts-id [%x3B]
 
     sts-version     = "v" *WSP "=" *WSP %x53 %x54        ; "STSv1" 
                       %x53 %x76 %x31
@@ -166,7 +166,7 @@ This JSON object contains the following key/value pairs:
 * `mode`: (plain-text, required). Either "enforce" or "report", indicating the
   expected behavior of a sending MTA in the case of a policy validation failure.
 * `max_age`: Max lifetime of the policy (plain-text non-negative integer
-  seconds).  Well-behaved clients SHOULD cache a policy for up to this value
+  seconds, required).  Well-behaved clients SHOULD cache a policy for up to this value
   from last policy fetch time. To mitigate the risks of attacks at policy
   refresh time, it is expected that this value typically be in the range of
   weeks or greater.
@@ -198,7 +198,7 @@ specification, in which case unknown fields SHALL be ignored.
 
 When fetching a new policy or updating a policy, the HTTPS endpoint MUST present
 a TLS certificate which is valid for the `mta-sts` host (as described in
-[@!RFC6125]), chain to a root CA that is trusted by the sending CA, and be
+[@!RFC6125]), chain to a root CA that is trusted by the sending MTA, and be
 non-expired. It is expected that sending MTAs use a set of trusted CAs similar
 to those in widely deployed Web browsers and operating systems.
 
