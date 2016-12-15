@@ -38,7 +38,7 @@
    fullname="Alexander Brotman"
    organization="Comcast, Inc"
      [author.address]
-     email="alexander_brotman (at) cable.comcast (dot com)"
+     email="alex_brotman (at) comcast.com"
    [[author]]
    initials="J."
    surname="Jones"
