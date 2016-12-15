@@ -5,14 +5,14 @@
 Using TLS in Applications                                    D. Margolis
 Internet-Draft                                               Google, Inc
 Intended status: Standards Track                              A. Brotman
-Expires: April 8, 2017                                      Comcast, Inc
+Expires: June 18, 2017                                      Comcast, Inc
                                                          B. Ramakrishnan
                                                              Yahoo!, Inc
                                                                 J. Jones
                                                           Microsoft, Inc
                                                                M. Risher
                                                              Google, Inc
-                                                         October 5, 2016
+                                                       December 15, 2016
 
 
                            SMTP TLS Reporting
@@ -46,16 +46,16 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on April 8, 2017.
+   This Internet-Draft will expire on June 18, 2017.
 
 
 
 
 
 
-Margolis, et al.          Expires April 8, 2017                 [Page 1]
+Margolis, et al.          Expires June 18, 2017                 [Page 1]
 
-Internet-Draft                 SMTP-TLSRPT                  October 2016
+Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
 Copyright Notice
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Margolis, et al.          Expires April 8, 2017                 [Page 2]
+Margolis, et al.          Expires June 18, 2017                 [Page 2]
 
-Internet-Draft                 SMTP-TLSRPT                  October 2016
+Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
    11. Normative References  . . . . . . . . . . . . . . . . . . . .  16
@@ -165,9 +165,9 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
 
 
 
-Margolis, et al.          Expires April 8, 2017                 [Page 3]
+Margolis, et al.          Expires June 18, 2017                 [Page 3]
 
-Internet-Draft                 SMTP-TLSRPT                  October 2016
+Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
    o  DANE Policy: A mechanism for enabling the administrators of domain
@@ -221,9 +221,9 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
 
 
 
-Margolis, et al.          Expires April 8, 2017                 [Page 4]
+Margolis, et al.          Expires June 18, 2017                 [Page 4]
 
-Internet-Draft                 SMTP-TLSRPT                  October 2016
+Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
          SMTP, sending MTAs MUST NOT honor SMTP STS or DANE TLSA
@@ -277,9 +277,9 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
 
 
 
-Margolis, et al.          Expires April 8, 2017                 [Page 5]
+Margolis, et al.          Expires June 18, 2017                 [Page 5]
 
-Internet-Draft                 SMTP-TLSRPT                  October 2016
+Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
 4.  Reporting Schema
@@ -333,9 +333,9 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
 
 
 
-Margolis, et al.          Expires April 8, 2017                 [Page 6]
+Margolis, et al.          Expires June 18, 2017                 [Page 6]
 
-Internet-Draft                 SMTP-TLSRPT                  October 2016
+Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
 4.2.  Delivery Summary
@@ -389,9 +389,9 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
 
 
 
-Margolis, et al.          Expires April 8, 2017                 [Page 7]
+Margolis, et al.          Expires June 18, 2017                 [Page 7]
 
-Internet-Draft                 SMTP-TLSRPT                  October 2016
+Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
       reporting MTA SHOULD utilize the "failure-reason" to provide more
@@ -445,9 +445,9 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
 
 
 
-Margolis, et al.          Expires April 8, 2017                 [Page 8]
+Margolis, et al.          Expires June 18, 2017                 [Page 8]
 
-Internet-Draft                 SMTP-TLSRPT                  October 2016
+Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
 5.1.  Report Filename
@@ -501,9 +501,9 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
 
 
 
-Margolis, et al.          Expires April 8, 2017                 [Page 9]
+Margolis, et al.          Expires June 18, 2017                 [Page 9]
 
-Internet-Draft                 SMTP-TLSRPT                  October 2016
+Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
 5.3.  Email Transport
@@ -557,9 +557,9 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
 
 
 
-Margolis, et al.          Expires April 8, 2017                [Page 10]
+Margolis, et al.          Expires June 18, 2017                [Page 10]
 
-Internet-Draft                 SMTP-TLSRPT                  October 2016
+Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
 5.5.  Delivery Retry
@@ -613,9 +613,9 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
 
 
 
-Margolis, et al.          Expires April 8, 2017                [Page 11]
+Margolis, et al.          Expires June 18, 2017                [Page 11]
 
-Internet-Draft                 SMTP-TLSRPT                  October 2016
+Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
       reports are generated by the sending MTA, such a delegation
@@ -669,9 +669,9 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
 
 
 
-Margolis, et al.          Expires April 8, 2017                [Page 12]
+Margolis, et al.          Expires June 18, 2017                [Page 12]
 
-Internet-Draft                 SMTP-TLSRPT                  October 2016
+Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
          {
@@ -725,9 +725,9 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
 
 
 
-Margolis, et al.          Expires April 8, 2017                [Page 13]
+Margolis, et al.          Expires June 18, 2017                [Page 13]
 
-Internet-Draft                 SMTP-TLSRPT                  October 2016
+Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
    o  "policy-type": The type of policy that was applied by the sending
@@ -781,9 +781,9 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
 
 
 
-Margolis, et al.          Expires April 8, 2017                [Page 14]
+Margolis, et al.          Expires June 18, 2017                [Page 14]
 
-Internet-Draft                 SMTP-TLSRPT                  October 2016
+Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
    o  "failure-reason-code": A text field to include an SSL-related
@@ -837,9 +837,9 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
 
 
 
-Margolis, et al.          Expires April 8, 2017                [Page 15]
+Margolis, et al.          Expires June 18, 2017                [Page 15]
 
-Internet-Draft                 SMTP-TLSRPT                  October 2016
+Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
    command.  Additionally 3 sessions failed due to
@@ -893,9 +893,9 @@ Internet-Draft                 SMTP-TLSRPT                  October 2016
 
 
 
-Margolis, et al.          Expires April 8, 2017                [Page 16]
+Margolis, et al.          Expires June 18, 2017                [Page 16]
 
-Internet-Draft                 SMTP-TLSRPT                  October 2016
+Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
    [RFC7159]  Bray, T., Ed., "The JavaScript Object Notation (JSON) Data
@@ -949,4 +949,4 @@ Authors' Addresses
 
 
 
-Margolis, et al.          Expires April 8, 2017                [Page 17]
+Margolis, et al.          Expires June 18, 2017                [Page 17]
