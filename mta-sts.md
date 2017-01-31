@@ -122,9 +122,9 @@ TXT record's version `id` against the cached value.
 
 ## MTA-STS TXT Records
 
-The MTA-STS TXT record is a TXT record with the name `_mta-sts` at the Policy
+The MTA-STS TXT record is a TXT record with the name `mta-sts` at the Policy
 Domain. For the domain `example.com`, this record would be
-`_mta-sts.example.com`.  MTA-STS TXT records MUST be US-ASCII,
+`mta-sts.example.com`.  MTA-STS TXT records MUST be US-ASCII,
 semicolon-separated key/value pairs containing the following fields:
 
 * `v`: (plain-text, required). Currently only "STSv1" is supported.
@@ -136,9 +136,9 @@ semicolon-separated key/value pairs containing the following fields:
 
 An example TXT record is as below:
 
-`_mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"`
+`mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"`
 
-The formal definition of the `_mta-sts` TXT record, defined using [@!RFC5234],
+The formal definition of the `mta-sts` TXT record, defined using [@!RFC5234],
 is as follows:
 
     sts-text-record = sts-version *WSP %x3B *WSP sts-id [%x3B]
@@ -148,7 +148,7 @@ is as follows:
 
     sts-id          = "id" *WSP "=" *WSP 1*32(ALPHA / DIGIT) 
 
-If multiple TXT records for `_mta-sts` are returned by the resolver, records
+If multiple TXT records for `mta-sts` are returned by the resolver, records
 which do not begin with `v=STSv1;` are discarded. If the number of resulting
 records is not one, senders MUST assume the recipient domain does not implement
 MTA STS and skip the remaining steps of policy discovery.
@@ -304,14 +304,14 @@ An example control flow for a compliant sender consists of the following steps:
    message, enforcing STARTTLS and the MX host's PKIX certificate validation.
 5. Upon message retries, a message MAY be permanently failed following first
    checking for the presence of a new policy (as indicated by the `id` field in
-   the `_mta-sts` TXT record).
+   the `mta-sts` TXT record).
 
 # Operational Considerations
 
 ## Policy Updates
 
 Updating the policy requires that the owner make changes in two places: the
-`_mta-sts` TXT record in the Policy Domain's DNS zone and at the corresponding
+`mta-sts` TXT record in the Policy Domain's DNS zone and at the corresponding
 HTTPS endpoint. In the case where the HTTPS endpoint has been updated but the
 TXT record has not yet been, senders will not know there is a new policy
 released and may thus continue to use old, previously cached versions.
@@ -378,7 +378,7 @@ In these cases, there is a risk that untrusted users would be able to serve
 custom content at the `mta-sts` host, including serving an illegitimate SMTP STS
 policy.  We believe this attack is rendered more difficult by the need for the
 attacker to both inject malicious (but temporarily working) MX records and also
-serve the `_mta-sts` TXT record on the same domain--something not, to our
+serve the `mta-sts` TXT record on the same domain--something not, to our
 knowledge, widely provided to untrusted users. This attack is additionally
 mitigated by the aforementioned ability for a victim domain to update an invalid
 policy at any future date.
@@ -429,7 +429,7 @@ presented by the recipient MX validate.
 
 STS policy indicator TXT RR:
 ~~~~~~~~~
-_mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
+mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
 ~~~~~~~~~
 
 STS Policy JSON served as the response body at
