@@ -82,18 +82,18 @@ Table of Contents
    5.  Policy Application  . . . . . . . . . . . . . . . . . . . . .   7
      5.1.  MX Preference . . . . . . . . . . . . . . . . . . . . . .   8
      5.2.  Policy Application Control Flow . . . . . . . . . . . . .   8
-   6.  Operational Considerations  . . . . . . . . . . . . . . . . .   9
-     6.1.  Policy Updates  . . . . . . . . . . . . . . . . . . . . .   9
+   6.  Operational Considerations  . . . . . . . . . . . . . . . . .   8
+     6.1.  Policy Updates  . . . . . . . . . . . . . . . . . . . . .   8
    7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
    8.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
-   9.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  11
+   9.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  10
    10. Appendix 1: Domain Owner STS example record . . . . . . . . .  11
      10.1.  Example 1  . . . . . . . . . . . . . . . . . . . . . . .  11
    11. Appendix 2: Message delivery pseudocode . . . . . . . . . . .  11
    12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  13
-     12.1.  Normative References . . . . . . . . . . . . . . . . . .  14
-     12.2.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  15
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  15
+     12.1.  Normative References . . . . . . . . . . . . . . . . . .  13
+     12.2.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  14
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  14
 
 1.  Introduction
 
@@ -187,9 +187,9 @@ Internet-Draft                   MTA-STS                   December 2016
 
 3.1.  MTA-STS TXT Records
 
-   The MTA-STS TXT record is a TXT record with the name "mta-sts" at the
-   Policy Domain.  For the domain "example.com", this record would be
-   "mta-sts.example.com".  MTA-STS TXT records MUST be US-ASCII,
+   The MTA-STS TXT record is a TXT record with the name "_mta-sts" at
+   the Policy Domain.  For the domain "example.com", this record would
+   be "_mta-sts.example.com".  MTA-STS TXT records MUST be US-ASCII,
    semicolon-separated key/value pairs containing the following fields:
 
    o  "v": (plain-text, required).  Currently only "STSv1" is supported.
@@ -202,9 +202,9 @@ Internet-Draft                   MTA-STS                   December 2016
 
    An example TXT record is as below:
 
-   "mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;""
+   "_mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;""
 
-   The formal definition of the "mta-sts" TXT record, defined using
+   The formal definition of the "_mta-sts" TXT record, defined using
    [RFC5234], is as follows:
 
       sts-text-record = sts-version *WSP %x3B *WSP sts-id [%x3B]
@@ -214,7 +214,7 @@ Internet-Draft                   MTA-STS                   December 2016
 
       sts-id          = "id" *WSP "=" *WSP 1*32(ALPHA / DIGIT)
 
-   If multiple TXT records for "mta-sts" are returned by the resolver,
+   If multiple TXT records for "_mta-sts" are returned by the resolver,
    records which do not begin with "v=STSv1;" are discarded.  If the
    number of resulting records is not one, senders MUST assume the
 
@@ -261,9 +261,7 @@ Internet-Draft                   MTA-STS                   December 2016
       hostname literals (e.g. "mx1.example.com") or wildcard matches, so
       long as the wildcard occupies the full left-most label in the
       pattern.  (Thus "*.example.com" is valid but "mx*.example.com" is
-      not.)  In the case of Internationalized Domain Names ([RFC5891]),
-      the MX MUST specify the Punycode-encoded A-label, as per
-      [RFC3492], and not the Unicode-encoded U-label.
+      not.)
 
    An example JSON policy is as below:
 
@@ -274,6 +272,8 @@ Internet-Draft                   MTA-STS                   December 2016
                         "max_age": 123456
                       }
 
+   A lenient parser SHOULD accept TXT records and policy files which are
+   syntactically valid (i.e. valid key-value pairs separated by semi-
 
 
 
@@ -282,8 +282,6 @@ Margolis, et al.          Expires June 18, 2017                 [Page 5]
 Internet-Draft                   MTA-STS                   December 2016
 
 
-   A lenient parser SHOULD accept TXT records and policy files which are
-   syntactically valid (i.e. valid key-value pairs separated by semi-
    colons for TXT records and valid JSON for policy files) and
    implementing a superset of this specification, in which case unknown
    fields SHALL be ignored.
@@ -330,6 +328,8 @@ Internet-Draft                   MTA-STS                   December 2016
    2.  That the recipient MX supports STARTTLS and offers a valid PKIX
        based TLS certificate.
 
+   This section does not dictate the behavior of sending MTAs when
+   policies fail to validate; in particular, validation failures of
 
 
 
@@ -338,8 +338,6 @@ Margolis, et al.          Expires June 18, 2017                 [Page 6]
 Internet-Draft                   MTA-STS                   December 2016
 
 
-   This section does not dictate the behavior of sending MTAs when
-   policies fail to validate; in particular, validation failures of
    policies which specify "report" mode MUST NOT be interpreted as
    delivery failures, as described in the section _Policy_
    _Application_.
@@ -385,7 +383,9 @@ Internet-Draft                   MTA-STS                   December 2016
        as a mail delivery error, and MUST NOT deliver the message to
        this host.
 
-
+   When a message fails to deliver due to an "enforce" policy, a
+   compliant MTA MUST check for the presence of an updated policy at the
+   Policy Domain before permanently failing to deliver the message.
 
 
 
@@ -394,9 +394,6 @@ Margolis, et al.          Expires June 18, 2017                 [Page 7]
 Internet-Draft                   MTA-STS                   December 2016
 
 
-   When a message fails to deliver due to an "enforce" policy, a
-   compliant MTA MUST check for the presence of an updated policy at the
-   Policy Domain before permanently failing to deliver the message.
    This allows implementing domains to update long-lived policies on the
    fly.
 
@@ -436,12 +433,15 @@ Internet-Draft                   MTA-STS                   December 2016
 
    5.  Upon message retries, a message MAY be permanently failed
        following first checking for the presence of a new policy (as
-       indicated by the "id" field in the "mta-sts" TXT record).
+       indicated by the "id" field in the "_mta-sts" TXT record).
 
+6.  Operational Considerations
 
+6.1.  Policy Updates
 
-
-
+   Updating the policy requires that the owner make changes in two
+   places: the "_mta-sts" TXT record in the Policy Domain's DNS zone and
+   at the corresponding HTTPS endpoint.  In the case where the HTTPS
 
 
 
@@ -450,13 +450,6 @@ Margolis, et al.          Expires June 18, 2017                 [Page 8]
 Internet-Draft                   MTA-STS                   December 2016
 
 
-6.  Operational Considerations
-
-6.1.  Policy Updates
-
-   Updating the policy requires that the owner make changes in two
-   places: the "mta-sts" TXT record in the Policy Domain's DNS zone and
-   at the corresponding HTTPS endpoint.  In the case where the HTTPS
    endpoint has been updated but the TXT record has not yet been,
    senders will not know there is a new policy released and may thus
    continue to use old, previously cached versions.  Recipients should
@@ -498,6 +491,13 @@ Internet-Draft                   MTA-STS                   December 2016
 
    Since we use DNS TXT records for policy discovery, an attacker who is
    able to block DNS responses can suppress the discovery of an STS
+   Policy, making the Policy Domain appear not to have an STS Policy.
+   The sender policy cache is designed to resist this attack.
+
+   We additionally consider the Denial of Service risk posed by an
+   attacker who can modify the DNS records for a victim domain.  Absent
+   SMTP STS, such an attacker can cause a sending MTA to cache invalid
+   MX records for a long TTL.  With SMTP STS, the attacker can
 
 
 
@@ -506,13 +506,6 @@ Margolis, et al.          Expires June 18, 2017                 [Page 9]
 Internet-Draft                   MTA-STS                   December 2016
 
 
-   Policy, making the Policy Domain appear not to have an STS Policy.
-   The sender policy cache is designed to resist this attack.
-
-   We additionally consider the Denial of Service risk posed by an
-   attacker who can modify the DNS records for a victim domain.  Absent
-   SMTP STS, such an attacker can cause a sending MTA to cache invalid
-   MX records for a long TTL.  With SMTP STS, the attacker can
    additionally advertise a new, long-"max_age" SMTP STS policy with
    "mx" constraints that validate the malicious MX record, causing
    senders to cache the policy and refuse to deliver messages once the
@@ -536,11 +529,11 @@ Internet-Draft                   MTA-STS                   December 2016
    serve custom content at the "mta-sts" host, including serving an
    illegitimate SMTP STS policy.  We believe this attack is rendered
    more difficult by the need for the attacker to both inject malicious
-   (but temporarily working) MX records and also serve the "mta-sts" TXT
-   record on the same domain--something not, to our knowledge, widely
-   provided to untrusted users.  This attack is additionally mitigated
-   by the aforementioned ability for a victim domain to update an
-   invalid policy at any future date.
+   (but temporarily working) MX records and also serve the "_mta-sts"
+   TXT record on the same domain--something not, to our knowledge,
+   widely provided to untrusted users.  This attack is additionally
+   mitigated by the aforementioned ability for a victim domain to update
+   an invalid policy at any future date.
 
    Even if an attacker cannot modify a served policy, the potential
    exists for configurations that allow attackers on the same domain to
@@ -552,16 +545,6 @@ Internet-Draft                   MTA-STS                   December 2016
    the perspective of STS Policy validation, be a valid MX host for that
    domain.
 
-
-
-
-
-
-Margolis, et al.          Expires June 18, 2017                [Page 10]
-
-Internet-Draft                   MTA-STS                   December 2016
-
-
 9.  Contributors
 
    Nicolas Lidzborski Google, Inc nlidz (at) google (dot com)
@@ -571,6 +554,13 @@ Internet-Draft                   MTA-STS                   December 2016
    Brandon Long Google, Inc blong (at) google (dot com)
 
    Franck Martin LinkedIn, Inc fmartin (at) linkedin (dot com)
+
+
+
+Margolis, et al.          Expires June 18, 2017                [Page 10]
+
+Internet-Draft                   MTA-STS                   December 2016
+
 
    Klaus Umbach 1&1 Mail & Media Development & Technology GmbH
    klaus.umbach (at) 1und1 (dot de)
@@ -590,7 +580,7 @@ Internet-Draft                   MTA-STS                   December 2016
 
    STS policy indicator TXT RR:
 
-        mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
+       _mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
 
    STS Policy JSON served as the response body at [1]
 
@@ -610,14 +600,6 @@ Internet-Draft                   MTA-STS                   December 2016
    to a cached policy (if present).
 
 
-
-
-
-Margolis, et al.          Expires June 18, 2017                [Page 11]
-
-Internet-Draft                   MTA-STS                   December 2016
-
-
 func isEnforce(policy) {
   // Return true if the policy mode is "enforce".
 }
@@ -628,6 +610,14 @@ func isNonExpired(policy) {
 
 func tryStartTls(mx) {
   // Attempt to open an SMTP connection with STARTTLS with the MX.
+
+
+
+Margolis, et al.          Expires June 18, 2017                [Page 11]
+
+Internet-Draft                   MTA-STS                   December 2016
+
+
 }
 
 func certMatches(connection, mx) {
@@ -666,14 +656,6 @@ func tryMxAccordingTo(message, mx, policy) {
     return false  // Can't connect to the MX so it's not an STS error.
   }
   status := !(tryStartTls(mx, &connection) && certMatches(connection, mx))
-
-
-
-Margolis, et al.          Expires June 18, 2017                [Page 12]
-
-Internet-Draft                   MTA-STS                   December 2016
-
-
   status = true
   if !tryStartTls(mx, &connection) {
     status = false
@@ -684,6 +666,14 @@ Internet-Draft                   MTA-STS                   December 2016
   }
   if status || !isEnforce(policy) {
     return tryDeliverMail(connection, message)
+
+
+
+Margolis, et al.          Expires June 18, 2017                [Page 12]
+
+Internet-Draft                   MTA-STS                   December 2016
+
+
   }
   return false
 }
@@ -719,17 +709,6 @@ func handleMessage(message) {
 
 12.  References
 
-
-
-
-
-
-
-Margolis, et al.          Expires June 18, 2017                [Page 13]
-
-Internet-Draft                   MTA-STS                   December 2016
-
-
 12.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
@@ -741,14 +720,19 @@ Internet-Draft                   MTA-STS                   December 2016
               2821, DOI 10.17487/RFC2821, April 2001,
               <http://www.rfc-editor.org/info/rfc2821>.
 
+
+
+
+
+
+Margolis, et al.          Expires June 18, 2017                [Page 13]
+
+Internet-Draft                   MTA-STS                   December 2016
+
+
    [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
               Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
               February 2002, <http://www.rfc-editor.org/info/rfc3207>.
-
-   [RFC3492]  Costello, A., "Punycode: A Bootstring encoding of Unicode
-              for Internationalized Domain Names in Applications
-              (IDNA)", RFC 3492, DOI 10.17487/RFC3492, March 2003,
-              <http://www.rfc-editor.org/info/rfc3492>.
 
    [RFC4033]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
               Rose, "DNS Security Introduction and Requirements", RFC
@@ -769,22 +753,6 @@ Internet-Draft                   MTA-STS                   December 2016
               Uniform Resource Identifiers (URIs)", RFC 5785, DOI 10
               .17487/RFC5785, April 2010,
               <http://www.rfc-editor.org/info/rfc5785>.
-
-   [RFC5891]  Klensin, J., "Internationalized Domain Names in
-              Applications (IDNA): Protocol", RFC 5891, DOI 10.17487/
-              RFC5891, August 2010,
-              <http://www.rfc-editor.org/info/rfc5891>.
-
-
-
-
-
-
-
-Margolis, et al.          Expires June 18, 2017                [Page 14]
-
-Internet-Draft                   MTA-STS                   December 2016
-
 
    [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
               Verification of Domain-Based Application Service Identity
@@ -811,6 +779,13 @@ Authors' Addresses
    Email: dmargolis (at) google.com
 
 
+
+
+Margolis, et al.          Expires June 18, 2017                [Page 14]
+
+Internet-Draft                   MTA-STS                   December 2016
+
+
    Mark Risher
    Google, Inc
 
@@ -826,13 +801,38 @@ Authors' Addresses
    Alexander Brotman
    Comcast, Inc
 
-   Email: alex_brotman (at) comcast.com
+   Email: alexander_brotman (at) cable.comcast (dot com)
 
 
    Janet Jones
    Microsoft, Inc
 
    Email: janet.jones (at) microsoft (dot com)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

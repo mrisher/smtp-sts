@@ -68,7 +68,7 @@
 <region></region>
 </postal>
 <phone></phone>
-<email>alex_brotman (at) comcast.com</email>
+<email>alexander_brotman (at) cable.comcast (dot com)</email>
 <uri></uri>
 </address>
 </author>
@@ -178,9 +178,9 @@ TXT record's version <spanx style="verb">id</spanx> against the cached value.
 </t>
 
 <section anchor="mtasts-txt-records" title="MTA-STS TXT Records">
-<t>The MTA-STS TXT record is a TXT record with the name <spanx style="verb">mta-sts</spanx> at the Policy
+<t>The MTA-STS TXT record is a TXT record with the name <spanx style="verb">_mta-sts</spanx> at the Policy
 Domain. For the domain <spanx style="verb">example.com</spanx>, this record would be
-<spanx style="verb">mta-sts.example.com</spanx>.  MTA-STS TXT records MUST be US-ASCII,
+<spanx style="verb">_mta-sts.example.com</spanx>.  MTA-STS TXT records MUST be US-ASCII,
 semicolon-separated key/value pairs containing the following fields:
 </t>
 <t>
@@ -195,9 +195,9 @@ between revisions.</t>
 </t>
 <t>An example TXT record is as below:
 </t>
-<t><spanx style="verb">mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"</spanx>
+<t><spanx style="verb">_mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"</spanx>
 </t>
-<t>The formal definition of the <spanx style="verb">mta-sts</spanx> TXT record, defined using <xref target="RFC5234"/>,
+<t>The formal definition of the <spanx style="verb">_mta-sts</spanx> TXT record, defined using <xref target="RFC5234"/>,
 is as follows:
 </t>
 
@@ -209,7 +209,7 @@ sts-version     = "v" *WSP "=" *WSP %x53 %x54        ; "STSv1"
 
 sts-id          = "id" *WSP "=" *WSP 1*32(ALPHA / DIGIT) 
 </artwork></figure>
-<t>If multiple TXT records for <spanx style="verb">mta-sts</spanx> are returned by the resolver, records
+<t>If multiple TXT records for <spanx style="verb">_mta-sts</spanx> are returned by the resolver, records
 which do not begin with <spanx style="verb">v=STSv1;</spanx> are discarded. If the number of resulting
 records is not one, senders MUST assume the recipient domain does not implement
 MTA STS and skip the remaining steps of policy discovery.
@@ -240,10 +240,7 @@ patterns matching the expected MX for this domain. For example,
 be handled by any MX with a hostname at <spanx style="verb">example.com</spanx> or <spanx style="verb">example.net</spanx>. Valid
 patterns can be either hostname literals (e.g. &quot;mx1.example.com&quot;) or wildcard
 matches, so long as the wildcard occupies the full left-most label in the
-pattern. (Thus <spanx style="verb">*.example.com</spanx> is valid but <spanx style="verb">mx*.example.com</spanx> is not.) In the
-case of Internationalized Domain Names (<xref target="RFC5891"/>), the MX MUST specify the
-Punycode-encoded A-label, as per <xref target="RFC3492"/>, and not the Unicode-encoded
-U-label.</t>
+pattern. (Thus <spanx style="verb">*.example.com</spanx> is valid but <spanx style="verb">mx*.example.com</spanx> is not.)</t>
 </list>
 </t>
 <t>An example JSON policy is as below:
@@ -387,7 +384,7 @@ though MTA STS were not implemented.)</t>
 message, enforcing STARTTLS and the MX host's PKIX certificate validation.</t>
 <t>Upon message retries, a message MAY be permanently failed following first
 checking for the presence of a new policy (as indicated by the <spanx style="verb">id</spanx> field in
-the <spanx style="verb">mta-sts</spanx> TXT record).</t>
+the <spanx style="verb">_mta-sts</spanx> TXT record).</t>
 </list>
 </t>
 </section>
@@ -397,7 +394,7 @@ the <spanx style="verb">mta-sts</spanx> TXT record).</t>
 
 <section anchor="policy-updates" title="Policy Updates">
 <t>Updating the policy requires that the owner make changes in two places: the
-<spanx style="verb">mta-sts</spanx> TXT record in the Policy Domain's DNS zone and at the corresponding
+<spanx style="verb">_mta-sts</spanx> TXT record in the Policy Domain's DNS zone and at the corresponding
 HTTPS endpoint. In the case where the HTTPS endpoint has been updated but the
 TXT record has not yet been, senders will not know there is a new policy
 released and may thus continue to use old, previously cached versions.
@@ -469,7 +466,7 @@ DNS records at the provider's domain.
 custom content at the <spanx style="verb">mta-sts</spanx> host, including serving an illegitimate SMTP STS
 policy.  We believe this attack is rendered more difficult by the need for the
 attacker to both inject malicious (but temporarily working) MX records and also
-serve the <spanx style="verb">mta-sts</spanx> TXT record on the same domain--something not, to our
+serve the <spanx style="verb">_mta-sts</spanx> TXT record on the same domain--something not, to our
 knowledge, widely provided to untrusted users. This attack is additionally
 mitigated by the aforementioned ability for a victim domain to update an invalid
 policy at any future date.
@@ -524,7 +521,7 @@ presented by the recipient MX validate.
 </t>
 
 <figure align="center"><artwork align="center">
-mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
+_mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
 </artwork></figure>
 <t>STS Policy JSON served as the response body at
 <eref target="https://mta-sts.example.com/.well-known/mta-sts.json:"/>
@@ -649,12 +646,10 @@ func handleMessage(message) {
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2821.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>
-<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3492.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4033.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4627.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5234.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5785.xml"?>
-<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5891.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6125.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7672.xml"?>
 </references>
