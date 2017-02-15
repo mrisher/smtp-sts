@@ -5,18 +5,18 @@
 Using TLS in Applications                                    D. Margolis
 Internet-Draft                                               Google, Inc
 Intended status: Standards Track                              A. Brotman
-Expires: June 18, 2017                                      Comcast, Inc
+Expires: August 19, 2017                                    Comcast, Inc
                                                          B. Ramakrishnan
                                                              Yahoo!, Inc
                                                                 J. Jones
                                                           Microsoft, Inc
                                                                M. Risher
                                                              Google, Inc
-                                                       December 15, 2016
+                                                       February 15, 2017
 
 
                            SMTP TLS Reporting
-                     draft-ietf-uta-smtp-tlsrpt-02
+                     draft-ietf-uta-smtp-tlsrpt-03
 
 Abstract
 
@@ -46,21 +46,21 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on June 18, 2017.
+   This Internet-Draft will expire on August 19, 2017.
 
 
 
 
 
 
-Margolis, et al.          Expires June 18, 2017                 [Page 1]
+Margolis, et al.         Expires August 19, 2017                [Page 1]
 
-Internet-Draft                 SMTP-TLSRPT                 December 2016
+Internet-Draft                 SMTP-TLSRPT                 February 2017
 
 
 Copyright Notice
 
-   Copyright (c) 2016 IETF Trust and the persons identified as the
+   Copyright (c) 2017 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Margolis, et al.          Expires June 18, 2017                 [Page 2]
+Margolis, et al.         Expires August 19, 2017                [Page 2]
 
-Internet-Draft                 SMTP-TLSRPT                 December 2016
+Internet-Draft                 SMTP-TLSRPT                 February 2017
 
 
    11. Normative References  . . . . . . . . . . . . . . . . . . . .  16
@@ -165,9 +165,9 @@ Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
 
-Margolis, et al.          Expires June 18, 2017                 [Page 3]
+Margolis, et al.         Expires August 19, 2017                [Page 3]
 
-Internet-Draft                 SMTP-TLSRPT                 December 2016
+Internet-Draft                 SMTP-TLSRPT                 February 2017
 
 
    o  DANE Policy: A mechanism for enabling the administrators of domain
@@ -200,9 +200,9 @@ Internet-Draft                 SMTP-TLSRPT                 December 2016
    A domain publishes a record to its DNS indicating that it wishes to
    receive reports.  These SMTP TLSRPT policies are distributed via DNS
    from the Policy Domain's zone, as TXT records (similar to DMARC
-   policies) under the name "_smtp-tlsrpt".  For example, for the Policy
+   policies) under the name "smtp-tlsrpt".  For example, for the Policy
    Domain "example.com", the recipient's TLSRPT policy can be retrieved
-   from "_smtp-tlsrpt.example.com".
+   from "smtp-tlsrpt.example.com".
 
    Policies consist of the following directives:
 
@@ -221,9 +221,9 @@ Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
 
-Margolis, et al.          Expires June 18, 2017                 [Page 4]
+Margolis, et al.         Expires August 19, 2017                [Page 4]
 
-Internet-Draft                 SMTP-TLSRPT                 December 2016
+Internet-Draft                 SMTP-TLSRPT                 February 2017
 
 
          SMTP, sending MTAs MUST NOT honor SMTP STS or DANE TLSA
@@ -236,7 +236,7 @@ Internet-Draft                 SMTP-TLSRPT                 December 2016
       details--such as certificate chains and MTA banners--may be
       reported.)
 
-   The formal definition of the "_smtp-tlsrpt" TXT record, defined using
+   The formal definition of the "smtp-tlsrpt" TXT record, defined using
    [RFC5234], is as follows:
 
     tlsrpt-record    = tlsrpt-version *WSP %x3B tlsrpt-rua
@@ -252,7 +252,7 @@ Internet-Draft                 SMTP-TLSRPT                 December 2016
                      ; MUST be encoded; the numeric portion MUST fit
                      ; within an unsigned 64-bit integer
 
-   If multiple TXT records for "_smtp-tlsrpt" are returned by the
+   If multiple TXT records for "smtp-tlsrpt" are returned by the
    resolver, records which do not begin with "v=TLSRPTv1;" are
    discarded.  If the number of resulting records is not one, senders
    MUST assume the recipient domain does not implement TLSRPT.
@@ -261,12 +261,12 @@ Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 3.1.1.  Report using MAILTO
 
-              _smtp-tlsrpt.example.com. IN TXT \
+              smtp-tlsrpt.example.com. IN TXT \
                   "v=TLSRPTv1;rua=mailto:reports@example.com"
 
 3.1.2.  Report using HTTPS
 
-             _smtp-tlsrpt.example.com. IN TXT \
+             smtp-tlsrpt.example.com. IN TXT \
                  "v=TLSRPTv1; \
                  rua=https://reporting.example.com/v1/tlsrpt"
 
@@ -277,9 +277,9 @@ Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
 
-Margolis, et al.          Expires June 18, 2017                 [Page 5]
+Margolis, et al.         Expires August 19, 2017                [Page 5]
 
-Internet-Draft                 SMTP-TLSRPT                 December 2016
+Internet-Draft                 SMTP-TLSRPT                 February 2017
 
 
 4.  Reporting Schema
@@ -333,9 +333,9 @@ Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
 
-Margolis, et al.          Expires June 18, 2017                 [Page 6]
+Margolis, et al.         Expires August 19, 2017                [Page 6]
 
-Internet-Draft                 SMTP-TLSRPT                 December 2016
+Internet-Draft                 SMTP-TLSRPT                 February 2017
 
 
 4.2.  Delivery Summary
@@ -389,9 +389,9 @@ Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
 
-Margolis, et al.          Expires June 18, 2017                 [Page 7]
+Margolis, et al.         Expires August 19, 2017                [Page 7]
 
-Internet-Draft                 SMTP-TLSRPT                 December 2016
+Internet-Draft                 SMTP-TLSRPT                 February 2017
 
 
       reporting MTA SHOULD utilize the "failure-reason" to provide more
@@ -445,9 +445,9 @@ Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
 
-Margolis, et al.          Expires June 18, 2017                 [Page 8]
+Margolis, et al.         Expires August 19, 2017                [Page 8]
 
-Internet-Draft                 SMTP-TLSRPT                 December 2016
+Internet-Draft                 SMTP-TLSRPT                 February 2017
 
 
 5.1.  Report Filename
@@ -501,9 +501,9 @@ Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
 
-Margolis, et al.          Expires June 18, 2017                 [Page 9]
+Margolis, et al.         Expires August 19, 2017                [Page 9]
 
-Internet-Draft                 SMTP-TLSRPT                 December 2016
+Internet-Draft                 SMTP-TLSRPT                 February 2017
 
 
 5.3.  Email Transport
@@ -557,9 +557,9 @@ Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
 
-Margolis, et al.          Expires June 18, 2017                [Page 10]
+Margolis, et al.         Expires August 19, 2017               [Page 10]
 
-Internet-Draft                 SMTP-TLSRPT                 December 2016
+Internet-Draft                 SMTP-TLSRPT                 February 2017
 
 
 5.5.  Delivery Retry
@@ -613,9 +613,9 @@ Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
 
-Margolis, et al.          Expires June 18, 2017                [Page 11]
+Margolis, et al.         Expires August 19, 2017               [Page 11]
 
-Internet-Draft                 SMTP-TLSRPT                 December 2016
+Internet-Draft                 SMTP-TLSRPT                 February 2017
 
 
       reports are generated by the sending MTA, such a delegation
@@ -625,12 +625,12 @@ Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 8.1.  Report using MAILTO
 
-            _smtp-tlsrpt.mail.example.com. IN TXT \
+            smtp-tlsrpt.mail.example.com. IN TXT \
                     "v=TLSRPTv1;rua=mailto:reports@example.com"
 
 8.2.  Report using HTTPS
 
-           _smtp-tlsrpt.mail.example.com. IN TXT \
+           smtp-tlsrpt.mail.example.com. IN TXT \
                    "v=TLSRPTv1; \
                    rua=https://reporting.example.com/v1/tlsrpt"
 
@@ -669,9 +669,9 @@ Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
 
-Margolis, et al.          Expires June 18, 2017                [Page 12]
+Margolis, et al.         Expires August 19, 2017               [Page 12]
 
-Internet-Draft                 SMTP-TLSRPT                 December 2016
+Internet-Draft                 SMTP-TLSRPT                 February 2017
 
 
          {
@@ -725,9 +725,9 @@ Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
 
-Margolis, et al.          Expires June 18, 2017                [Page 13]
+Margolis, et al.         Expires August 19, 2017               [Page 13]
 
-Internet-Draft                 SMTP-TLSRPT                 December 2016
+Internet-Draft                 SMTP-TLSRPT                 February 2017
 
 
    o  "policy-type": The type of policy that was applied by the sending
@@ -781,9 +781,9 @@ Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
 
-Margolis, et al.          Expires June 18, 2017                [Page 14]
+Margolis, et al.         Expires August 19, 2017               [Page 14]
 
-Internet-Draft                 SMTP-TLSRPT                 December 2016
+Internet-Draft                 SMTP-TLSRPT                 February 2017
 
 
    o  "failure-reason-code": A text field to include an SSL-related
@@ -837,9 +837,9 @@ Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
 
-Margolis, et al.          Expires June 18, 2017                [Page 15]
+Margolis, et al.         Expires August 19, 2017               [Page 15]
 
-Internet-Draft                 SMTP-TLSRPT                 December 2016
+Internet-Draft                 SMTP-TLSRPT                 February 2017
 
 
    command.  Additionally 3 sessions failed due to
@@ -893,9 +893,9 @@ Internet-Draft                 SMTP-TLSRPT                 December 2016
 
 
 
-Margolis, et al.          Expires June 18, 2017                [Page 16]
+Margolis, et al.         Expires August 19, 2017               [Page 16]
 
-Internet-Draft                 SMTP-TLSRPT                 December 2016
+Internet-Draft                 SMTP-TLSRPT                 February 2017
 
 
    [RFC7159]  Bray, T., Ed., "The JavaScript Object Notation (JSON) Data
@@ -949,4 +949,4 @@ Authors' Addresses
 
 
 
-Margolis, et al.          Expires June 18, 2017                [Page 17]
+Margolis, et al.         Expires August 19, 2017               [Page 17]

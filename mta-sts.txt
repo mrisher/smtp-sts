@@ -5,17 +5,17 @@
 Using TLS in Applications                                    D. Margolis
 Internet-Draft                                                 M. Risher
 Intended status: Standards Track                             Google, Inc
-Expires: June 18, 2017                                   B. Ramakrishnan
+Expires: August 19, 2017                                 B. Ramakrishnan
                                                              Yahoo!, Inc
                                                               A. Brotman
                                                             Comcast, Inc
                                                                 J. Jones
                                                           Microsoft, Inc
-                                                       December 15, 2016
+                                                       February 15, 2017
 
 
               SMTP MTA Strict Transport Security (MTA-STS)
-                       draft-ietf-uta-mta-sts-02
+                       draft-ietf-uta-mta-sts-03
 
 Abstract
 
@@ -41,11 +41,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on June 18, 2017.
+   This Internet-Draft will expire on August 19, 2017.
 
 Copyright Notice
 
-   Copyright (c) 2016 IETF Trust and the persons identified as the
+   Copyright (c) 2017 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Margolis, et al.          Expires June 18, 2017                 [Page 1]
+Margolis, et al.         Expires August 19, 2017                [Page 1]
 
-Internet-Draft                   MTA-STS                   December 2016
+Internet-Draft                   MTA-STS                   February 2017
 
 
    (http://trustee.ietf.org/license-info) in effect on the date of
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Margolis, et al.          Expires June 18, 2017                 [Page 2]
+Margolis, et al.         Expires August 19, 2017                [Page 2]
 
-Internet-Draft                   MTA-STS                   December 2016
+Internet-Draft                   MTA-STS                   February 2017
 
 
    (perhaps by overwriting the resolved MX record of the delivery
@@ -165,9 +165,9 @@ Internet-Draft                   MTA-STS                   December 2016
 
 
 
-Margolis, et al.          Expires June 18, 2017                 [Page 3]
+Margolis, et al.         Expires August 19, 2017                [Page 3]
 
-Internet-Draft                   MTA-STS                   December 2016
+Internet-Draft                   MTA-STS                   February 2017
 
 
 3.  Policy Discovery
@@ -187,9 +187,9 @@ Internet-Draft                   MTA-STS                   December 2016
 
 3.1.  MTA-STS TXT Records
 
-   The MTA-STS TXT record is a TXT record with the name "_mta-sts" at
-   the Policy Domain.  For the domain "example.com", this record would
-   be "_mta-sts.example.com".  MTA-STS TXT records MUST be US-ASCII,
+   The MTA-STS TXT record is a TXT record with the name "mta-sts" at the
+   Policy Domain.  For the domain "example.com", this record would be
+   "mta-sts.example.com".  MTA-STS TXT records MUST be US-ASCII,
    semicolon-separated key/value pairs containing the following fields:
 
    o  "v": (plain-text, required).  Currently only "STSv1" is supported.
@@ -202,9 +202,9 @@ Internet-Draft                   MTA-STS                   December 2016
 
    An example TXT record is as below:
 
-   "_mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;""
+   "mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;""
 
-   The formal definition of the "_mta-sts" TXT record, defined using
+   The formal definition of the "mta-sts" TXT record, defined using
    [RFC5234], is as follows:
 
       sts-text-record = sts-version *WSP %x3B *WSP sts-id [%x3B]
@@ -214,16 +214,16 @@ Internet-Draft                   MTA-STS                   December 2016
 
       sts-id          = "id" *WSP "=" *WSP 1*32(ALPHA / DIGIT)
 
-   If multiple TXT records for "_mta-sts" are returned by the resolver,
+   If multiple TXT records for "mta-sts" are returned by the resolver,
    records which do not begin with "v=STSv1;" are discarded.  If the
    number of resulting records is not one, senders MUST assume the
 
 
 
 
-Margolis, et al.          Expires June 18, 2017                 [Page 4]
+Margolis, et al.         Expires August 19, 2017                [Page 4]
 
-Internet-Draft                   MTA-STS                   December 2016
+Internet-Draft                   MTA-STS                   February 2017
 
 
    recipient domain does not implement MTA STS and skip the remaining
@@ -277,9 +277,9 @@ Internet-Draft                   MTA-STS                   December 2016
 
 
 
-Margolis, et al.          Expires June 18, 2017                 [Page 5]
+Margolis, et al.         Expires August 19, 2017                [Page 5]
 
-Internet-Draft                   MTA-STS                   December 2016
+Internet-Draft                   MTA-STS                   February 2017
 
 
    colons for TXT records and valid JSON for policy files) and
@@ -333,9 +333,9 @@ Internet-Draft                   MTA-STS                   December 2016
 
 
 
-Margolis, et al.          Expires June 18, 2017                 [Page 6]
+Margolis, et al.         Expires August 19, 2017                [Page 6]
 
-Internet-Draft                   MTA-STS                   December 2016
+Internet-Draft                   MTA-STS                   February 2017
 
 
    policies which specify "report" mode MUST NOT be interpreted as
@@ -389,9 +389,9 @@ Internet-Draft                   MTA-STS                   December 2016
 
 
 
-Margolis, et al.          Expires June 18, 2017                 [Page 7]
+Margolis, et al.         Expires August 19, 2017                [Page 7]
 
-Internet-Draft                   MTA-STS                   December 2016
+Internet-Draft                   MTA-STS                   February 2017
 
 
    This allows implementing domains to update long-lived policies on the
@@ -433,21 +433,21 @@ Internet-Draft                   MTA-STS                   December 2016
 
    5.  Upon message retries, a message MAY be permanently failed
        following first checking for the presence of a new policy (as
-       indicated by the "id" field in the "_mta-sts" TXT record).
+       indicated by the "id" field in the "mta-sts" TXT record).
 
 6.  Operational Considerations
 
 6.1.  Policy Updates
 
    Updating the policy requires that the owner make changes in two
-   places: the "_mta-sts" TXT record in the Policy Domain's DNS zone and
+   places: the "mta-sts" TXT record in the Policy Domain's DNS zone and
    at the corresponding HTTPS endpoint.  In the case where the HTTPS
 
 
 
-Margolis, et al.          Expires June 18, 2017                 [Page 8]
+Margolis, et al.         Expires August 19, 2017                [Page 8]
 
-Internet-Draft                   MTA-STS                   December 2016
+Internet-Draft                   MTA-STS                   February 2017
 
 
    endpoint has been updated but the TXT record has not yet been,
@@ -501,9 +501,9 @@ Internet-Draft                   MTA-STS                   December 2016
 
 
 
-Margolis, et al.          Expires June 18, 2017                 [Page 9]
+Margolis, et al.         Expires August 19, 2017                [Page 9]
 
-Internet-Draft                   MTA-STS                   December 2016
+Internet-Draft                   MTA-STS                   February 2017
 
 
    additionally advertise a new, long-"max_age" SMTP STS policy with
@@ -529,11 +529,11 @@ Internet-Draft                   MTA-STS                   December 2016
    serve custom content at the "mta-sts" host, including serving an
    illegitimate SMTP STS policy.  We believe this attack is rendered
    more difficult by the need for the attacker to both inject malicious
-   (but temporarily working) MX records and also serve the "_mta-sts"
-   TXT record on the same domain--something not, to our knowledge,
-   widely provided to untrusted users.  This attack is additionally
-   mitigated by the aforementioned ability for a victim domain to update
-   an invalid policy at any future date.
+   (but temporarily working) MX records and also serve the "mta-sts" TXT
+   record on the same domain--something not, to our knowledge, widely
+   provided to untrusted users.  This attack is additionally mitigated
+   by the aforementioned ability for a victim domain to update an
+   invalid policy at any future date.
 
    Even if an attacker cannot modify a served policy, the potential
    exists for configurations that allow attackers on the same domain to
@@ -557,9 +557,9 @@ Internet-Draft                   MTA-STS                   December 2016
 
 
 
-Margolis, et al.          Expires June 18, 2017                [Page 10]
+Margolis, et al.         Expires August 19, 2017               [Page 10]
 
-Internet-Draft                   MTA-STS                   December 2016
+Internet-Draft                   MTA-STS                   February 2017
 
 
    Klaus Umbach 1&1 Mail & Media Development & Technology GmbH
@@ -580,7 +580,7 @@ Internet-Draft                   MTA-STS                   December 2016
 
    STS policy indicator TXT RR:
 
-       _mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
+        mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
 
    STS Policy JSON served as the response body at [1]
 
@@ -613,9 +613,9 @@ func tryStartTls(mx) {
 
 
 
-Margolis, et al.          Expires June 18, 2017                [Page 11]
+Margolis, et al.         Expires August 19, 2017               [Page 11]
 
-Internet-Draft                   MTA-STS                   December 2016
+Internet-Draft                   MTA-STS                   February 2017
 
 
 }
@@ -669,9 +669,9 @@ func tryMxAccordingTo(message, mx, policy) {
 
 
 
-Margolis, et al.          Expires June 18, 2017                [Page 12]
+Margolis, et al.         Expires August 19, 2017               [Page 12]
 
-Internet-Draft                   MTA-STS                   December 2016
+Internet-Draft                   MTA-STS                   February 2017
 
 
   }
@@ -725,9 +725,9 @@ func handleMessage(message) {
 
 
 
-Margolis, et al.          Expires June 18, 2017                [Page 13]
+Margolis, et al.         Expires August 19, 2017               [Page 13]
 
-Internet-Draft                   MTA-STS                   December 2016
+Internet-Draft                   MTA-STS                   February 2017
 
 
    [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
@@ -781,9 +781,9 @@ Authors' Addresses
 
 
 
-Margolis, et al.          Expires June 18, 2017                [Page 14]
+Margolis, et al.         Expires August 19, 2017               [Page 14]
 
-Internet-Draft                   MTA-STS                   December 2016
+Internet-Draft                   MTA-STS                   February 2017
 
 
    Mark Risher
@@ -801,7 +801,7 @@ Internet-Draft                   MTA-STS                   December 2016
    Alexander Brotman
    Comcast, Inc
 
-   Email: alexander_brotman (at) cable.comcast (dot com)
+   Email: alex_brotman (at) comcast.com
 
 
    Janet Jones
@@ -837,4 +837,4 @@ Internet-Draft                   MTA-STS                   December 2016
 
 
 
-Margolis, et al.          Expires June 18, 2017                [Page 15]
+Margolis, et al.         Expires August 19, 2017               [Page 15]
