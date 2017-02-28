@@ -139,7 +139,7 @@ they appear in this document, are to be interpreted as described in <xref target
 </t>
 <t>
 <list style="symbols">
-<t>STS Policy: A committment by the Policy Domain to support PKIX authenticated
+<t>STS Policy: A commitment by the Policy Domain to support PKIX authenticated
 TLS for the specified MX hosts.</t>
 <t>Policy Domain: The domain for which an STS Policy is defined. (For
 example, when sending mail to &quot;alice@example.com&quot;, the policy domain is
@@ -455,7 +455,7 @@ time) publish a new policy updating the cached, malicious policy, though this
 does require the victim domain to both obtain a valid CA-signed certificate and
 to understand and properly configure SMTP STS.
 </t>
-<t>Similarly, we consider the possibilty of domains that deliberately allow
+<t>Similarly, we consider the possibility of domains that deliberately allow
 untrusted users to serve untrusted content on user-specified subdomains. In some
 cases (e.g. the service Tumblr.com) this takes the form of providing HTTPS
 hosting of user-registered subdomains; in other cases (e.g. dynamic DNS

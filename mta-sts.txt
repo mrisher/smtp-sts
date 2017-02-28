@@ -136,7 +136,7 @@ Internet-Draft                   MTA-STS                   February 2017
 
    We also define the following terms for further use in this document:
 
-   o  STS Policy: A committment by the Policy Domain to support PKIX
+   o  STS Policy: A commitment by the Policy Domain to support PKIX
       authenticated TLS for the specified MX hosts.
 
    o  Policy Domain: The domain for which an STS Policy is defined.
@@ -517,7 +517,7 @@ Internet-Draft                   MTA-STS                   February 2017
    valid CA-signed certificate and to understand and properly configure
    SMTP STS.
 
-   Similarly, we consider the possibilty of domains that deliberately
+   Similarly, we consider the possibility of domains that deliberately
    allow untrusted users to serve untrusted content on user-specified
    subdomains.  In some cases (e.g. the service Tumblr.com) this takes
    the form of providing HTTPS hosting of user-registered subdomains; in
