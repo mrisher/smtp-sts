@@ -176,7 +176,10 @@ This JSON object contains the following key/value pairs:
   be handled by any MX with a hostname at `example.com` or `example.net`. Valid
   patterns can be either hostname literals (e.g. "mx1.example.com") or wildcard
   matches, so long as the wildcard occupies the full left-most label in the
-  pattern. (Thus `*.example.com` is valid but `mx*.example.com` is not.)
+  pattern. (Thus `*.example.com` is valid but `mx*.example.com` is not.) In the
+  case of Internationalized Domain Names ([@!RFC5891]), the MX MUST specify the
+  Punycode-encoded A-label, as per [@!RFC3492], and not the Unicode-encoded
+  U-label.
 
 An example JSON policy is as below:
 
