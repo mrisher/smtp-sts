@@ -87,7 +87,7 @@ they appear in this document, are to be interpreted as described in [@!RFC2119].
 
 We also define the following terms for further use in this document:
 
-* STS Policy: A committment by the Policy Domain to support PKIX authenticated
+* STS Policy: A commitment by the Policy Domain to support PKIX authenticated
   TLS for the specified MX hosts.
 * Policy Domain: The domain for which an STS Policy is defined. (For
   example, when sending mail to "alice@example.com", the policy domain is
@@ -370,7 +370,7 @@ time) publish a new policy updating the cached, malicious policy, though this
 does require the victim domain to both obtain a valid CA-signed certificate and
 to understand and properly configure SMTP STS.
 
-Similarly, we consider the possibilty of domains that deliberately allow
+Similarly, we consider the possibility of domains that deliberately allow
 untrusted users to serve untrusted content on user-specified subdomains. In some
 cases (e.g. the service Tumblr.com) this takes the form of providing HTTPS
 hosting of user-registered subdomains; in other cases (e.g. dynamic DNS
