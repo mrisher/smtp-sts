@@ -52,8 +52,8 @@
 .# Abstract
 
 A number of protocols exist for establishing encrypted channels between SMTP
-Mail Transfer Agents, including STARTTLS [@!RFC3207], DANE [@!RFC6698], and SMTP
-MTA STS (TODO: Add ref). These protocols can fail due to misconfiguration or
+Mail Transfer Agents, including STARTTLS [@!RFC3207], DANE [@!RFC6698], and
+MTA-STS (TODO: Add ref). These protocols can fail due to misconfiguration or
 active attack, leading to undelivered messages or delivery over unencrypted or
 unauthenticated channels. This document describes a reporting mechanism and
 format by which sending systems can share statistics and specific information
@@ -99,15 +99,15 @@ they appear in this document, are to be interpreted as described in [@!RFC2119].
 
 We also define the following terms for further use in this document:
 
-* STS Policy: A definition of the expected TLS availability, behavior, and
+* MTA-STS Policy: A definition of the expected TLS availability, behavior, and
   desired actions for a given domain when a sending MTA encounters
-  problems in negotiating a secure channel. STS is defined in [TODO]
+  problems in negotiating a secure channel. MTA-STS is defined in [TODO]
 * DANE Policy: A mechanism for enabling the administrators of domain names to
   specify the keys used in that domain's TLS servers. DANE is defined in
   [@!RFC6698]
 * TLSRPT Policy: A policy specifying the endpoint to which sending MTAs should
   deliver reports.
-* Policy Domain: The domain against which an STS or DANE Policy is defined.
+* Policy Domain: The domain against which an MTA-STS or DANE Policy is defined.
 * Sending MTA: The MTA initiating the delivery of an email message.
 
 # Related Technologies
@@ -138,7 +138,7 @@ Policies consist of the following directives:
            ([@!RFC2818]) to the specified URI.
   * In the case of `mailto`, reports should be submitted to the specified
            email address. When sending failure reports via SMTP, sending MTAs
-           MUST NOT honor SMTP STS or DANE TLSA failures.
+           MUST NOT honor MTA-STS or DANE TLSA failures.
 * `ruf`: Future use. (There may also be a need for enabling more detailed
      "forensic" reporting during initial stages of a deployment. To address
      this, the authors consider the possibility of an optional additional
@@ -198,7 +198,7 @@ Aggregate reports contain the following fields:
   * The reporting date range for the report
 * Policy, consisting of:
   * One of the following policy types:
-    (1) The SMTP MTA STS policy applied (as a string)
+    (1) The MTA-STS policy applied (as a string)
     (2) The DANE TLSA record applied (as a string)
     (3) The literal string `no-policy-found`, if neither a TLSA nor
     MTA-STS policy could be found.
@@ -251,7 +251,7 @@ to grow over time based on real-world experience. The initial set is:
 * `starttls-not-supported`: This indicates that the recipient MX did not
     support STARTTLS.
 * `certificate-host-mismatch`: This indicates that the certificate presented
-    did not adhere to the constraints specified in the STS or DANE policy, e.g.
+    did not adhere to the constraints specified in the MTA-STS or DANE policy, e.g.
     if the CN field did not match the hostname of the MX.
 * `certificate-expired`: This indicates that the certificate has expired.
 * `certificate-not-trusted`: This a label that covers multiple certificate
@@ -272,7 +272,7 @@ to grow over time based on real-world experience. The initial set is:
 * `dnssec-invalid`: This indicates a failure to authenticate DNS records for a
     Policy Domain with a published TLSA record.
 
-#### STS-specific Policy Failures
+#### MTA-STS-specific Policy Failures
 
 * `sts-invalid`: This indicates a validation error for the overall MTA-STS
     policy.
@@ -379,7 +379,7 @@ gzip` if compressed (see [@!RFC6713]), and `text/json` otherwise.
          Report-ID: <735ff.e317+bf22029@mailexample.net>
 
 Note that, when sending failure reports via SMTP, sending MTAs MUST NOT honor
-SMTP STS or DANE TLSA failures.
+MTA-STS or DANE TLSA failures.
 
 ## HTTPS Transport
 
@@ -504,7 +504,7 @@ Figure: JSON Report Format
     Presently, the only three valid choices are `tlsa`, `sts`, and the literal
     string `no-policy-found`. It is provided as a string.
 * `policy-string`: The string serialization of the policy, whether TLSA record
-    or STS policy. Any linefeeds from the original policy MUST be replaced with
+    or MTA-STS policy. Any linefeeds from the original policy MUST be replaced with
     [SP]. TODO: Help with specifics.
 * `domain`: The Policy Domain upon which the policy was applied. For messages
     sent to `user@example.com` this field would contain `example.com`. It is
