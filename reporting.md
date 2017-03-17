@@ -102,9 +102,9 @@ We also define the following terms for further use in this document:
 * MTA-STS Policy: A definition of the expected TLS availability, behavior, and
   desired actions for a given domain when a sending MTA encounters
   problems in negotiating a secure channel. MTA-STS is defined in [TODO]
-* DANE Policy: A mechanism for enabling the administrators of domain names to
-  specify the keys used in that domain's TLS servers. DANE is defined in
-  [@!RFC6698]
+* DANE Policy: A mechanism by which administrators can supply a record that can
+  be used to validate the certificate presented by an MTA. DANE is defined
+  in [@!RFC6698].
 * TLSRPT Policy: A policy specifying the endpoint to which sending MTAs should
   deliver reports.
 * Policy Domain: The domain against which an MTA-STS or DANE Policy is defined.
@@ -267,8 +267,9 @@ to grow over time based on real-world experience. The initial set is:
 * `tlsa-invalid`: This indicates a validation error in the TLSA record
     associated with a DANE policy.  None of the records in the RRset were found
     to be valid.
-* `dnssec-invalid`: This indicates a failure to authenticate DNS records for a
-    Policy Domain with a published TLSA record.
+* `dnssec-invalid`: This would indicate that no valid records were returned from 
+    the recursive resolver.  The request returned with SERVFAIL for the requested
+    TLSA record.
 
 #### MTA-STS-specific Policy Failures
 
