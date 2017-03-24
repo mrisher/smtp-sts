@@ -241,18 +241,14 @@ easier correlation of failure events.
 The list of result types will start with the minimal set below, and is expected
 to grow over time based on real-world experience. The initial set is:
 
-### Routing Failures
-
-* `mx-mismatch`: This indicates that the MX resolved for the recipient domain
-    did not match the MX constraint specified in the policy.
-
 ### Negotiation Failures
 
 * `starttls-not-supported`: This indicates that the recipient MX did not
     support STARTTLS.
 * `certificate-host-mismatch`: This indicates that the certificate presented
     did not adhere to the constraints specified in the MTA-STS or DANE policy, e.g.
-    if the CN field did not match the hostname of the MX.
+    if the MX does not match any identities listed in the Subject Alternate 
+    Name (SAN) [RFC5280].
 * `certificate-expired`: This indicates that the certificate has expired.
 * `certificate-not-trusted`: This a label that covers multiple certificate
     related failures that include, but not limited to errors such as
