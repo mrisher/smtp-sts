@@ -22,14 +22,14 @@ Abstract
 
    A number of protocols exist for establishing encrypted channels
    between SMTP Mail Transfer Agents, including STARTTLS [RFC3207], DANE
-   [RFC6698], and SMTP MTA STS (TODO: Add ref).  These protocols can
-   fail due to misconfiguration or active attack, leading to undelivered
-   messages or delivery over unencrypted or unauthenticated channels.
-   This document describes a reporting mechanism and format by which
-   sending systems can share statistics and specific information about
-   potential failures with recipient domains.  Recipient domains can
-   then use this information to both detect potential attackers and
-   diagnose unintentional misconfigurations.
+   [RFC6698], and MTA-STS (TODO: Add ref).  These protocols can fail due
+   to misconfiguration or active attack, leading to undelivered messages
+   or delivery over unencrypted or unauthenticated channels.  This
+   document describes a reporting mechanism and format by which sending
+   systems can share statistics and specific information about potential
+   failures with recipient domains.  Recipient domains can then use this
+   information to both detect potential attackers and diagnose
+   unintentional misconfigurations.
 
 Status of This Memo
 
@@ -156,10 +156,10 @@ Internet-Draft                 SMTP-TLSRPT                 February 2017
 
    We also define the following terms for further use in this document:
 
-   o  STS Policy: A definition of the expected TLS availability,
+   o  MTA-STS Policy: A definition of the expected TLS availability,
       behavior, and desired actions for a given domain when a sending
-      MTA encounters problems in negotiating a secure channel.  STS is
-      defined in [TODO]
+      MTA encounters problems in negotiating a secure channel.  MTA-STS
+      is defined in [TODO]
 
 
 
@@ -177,8 +177,8 @@ Internet-Draft                 SMTP-TLSRPT                 February 2017
    o  TLSRPT Policy: A policy specifying the endpoint to which sending
       MTAs should deliver reports.
 
-   o  Policy Domain: The domain against which an STS or DANE Policy is
-      defined.
+   o  Policy Domain: The domain against which an MTA-STS or DANE Policy
+      is defined.
 
    o  Sending MTA: The MTA initiating the delivery of an email message.
 
@@ -226,7 +226,7 @@ Margolis, et al.         Expires August 19, 2017                [Page 4]
 Internet-Draft                 SMTP-TLSRPT                 February 2017
 
 
-         SMTP, sending MTAs MUST NOT honor SMTP STS or DANE TLSA
+         SMTP, sending MTAs MUST NOT honor MTA-STS or DANE TLSA
          failures.
 
    o  "ruf": Future use.  (There may also be a need for enabling more
@@ -302,7 +302,7 @@ Internet-Draft                 SMTP-TLSRPT                 February 2017
 
    o  Policy, consisting of:
 
-      *  One of the following policy types: (1) The SMTP MTA STS policy
+      *  One of the following policy types: (1) The MTA-STS policy
          applied (as a string) (2) The DANE TLSA record applied (as a
          string) (3) The literal string "no-policy-found", if neither a
          TLSA nor MTA-STS policy could be found.
@@ -375,9 +375,9 @@ Internet-Draft                 SMTP-TLSRPT                 February 2017
       not support STARTTLS.
 
    o  "certificate-host-mismatch": This indicates that the certificate
-      presented did not adhere to the constraints specified in the STS
-      or DANE policy, e.g.  if the CN field did not match the hostname
-      of the MX.
+      presented did not adhere to the constraints specified in the MTA-
+      STS or DANE policy, e.g.  if the CN field did not match the
+      hostname of the MX.
 
    o  "certificate-expired": This indicates that the certificate has
       expired.
@@ -412,7 +412,7 @@ Internet-Draft                 SMTP-TLSRPT                 February 2017
    o  "dnssec-invalid": This indicates a failure to authenticate DNS
       records for a Policy Domain with a published TLSA record.
 
-4.3.3.2.  STS-specific Policy Failures
+4.3.3.2.  MTA-STS-specific Policy Failures
 
    o  "sts-invalid": This indicates a validation error for the overall
       MTA-STS policy.
@@ -544,7 +544,7 @@ Internet-Draft                 SMTP-TLSRPT                 February 2017
                 Report-ID: <735ff.e317+bf22029@mailexample.net>
 
    Note that, when sending failure reports via SMTP, sending MTAs MUST
-   NOT honor SMTP STS or DANE TLSA failures.
+   NOT honor MTA-STS or DANE TLSA failures.
 
 5.4.  HTTPS Transport
 
@@ -736,8 +736,8 @@ Internet-Draft                 SMTP-TLSRPT                 February 2017
       as a string.
 
    o  "policy-string": The string serialization of the policy, whether
-      TLSA record or STS policy.  Any linefeeds from the original policy
-      MUST be replaced with [SP].  TODO: Help with specifics.
+      TLSA record or MTA-STS policy.  Any linefeeds from the original
+      policy MUST be replaced with [SP].  TODO: Help with specifics.
 
    o  "domain": The Policy Domain upon which the policy was applied.
       For messages sent to "user@example.com" this field would contain
