@@ -502,16 +502,15 @@ func tryMxAccordingTo(message, mx, policy) {
   if !connection {
     return false  // Can't connect to the MX so it's not an MTA-STS error.
   }
-  status := !(tryStartTls(mx, &connection) && certMatches(connection, mx)) 
-  status = true
+  secure := true
   if !tryStartTls(mx, &connection) {
-    status = false
+    secure = false
     reportError(E_NO_VALID_TLS)
   } else if certMatches(connection, mx) {
-    status = false
+    secure = false
     reportError(E_CERT_MISMATCH)
   }
-  if status || !isEnforce(policy) {
+  if secure || !isEnforce(policy) {
     return tryDeliverMail(connection, message)
   }
   return false
