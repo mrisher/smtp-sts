@@ -192,10 +192,10 @@ An example JSON policy is as below:
 }
 ```
 
-A lenient parser SHOULD accept TXT records and policy files which are
-syntactically valid (i.e. valid key-value pairs separated by semi-colons for
-TXT records and valid JSON for policy files) and implementing a superset of this
-specification, in which case unknown fields SHALL be ignored.
+Parsers SHOULD accept TXT records and policy files which are syntactically valid
+(i.e. valid key-value pairs separated by semi-colons for TXT records and valid
+JSON for policy files) and implementing a superset of this specification, in
+which case unknown fields SHALL be ignored.
 
 ## HTTPS Policy Fetching
 

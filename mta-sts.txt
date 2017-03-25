@@ -271,7 +271,7 @@ Internet-Draft                   MTA-STS                   February 2017
                         "max_age": 123456
                       }
 
-   A lenient parser SHOULD accept TXT records and policy files which are
+   Parsers SHOULD accept TXT records and policy files which are
    syntactically valid (i.e. valid key-value pairs separated by semi-
    colons for TXT records and valid JSON for policy files) and
 
