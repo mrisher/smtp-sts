@@ -82,7 +82,7 @@ Table of Contents
      5.1.  MX Preference . . . . . . . . . . . . . . . . . . . . . .   8
      5.2.  Policy Application Control Flow . . . . . . . . . . . . .   8
    6.  Operational Considerations  . . . . . . . . . . . . . . . . .   8
-     6.1.  Policy Updates  . . . . . . . . . . . . . . . . . . . . .   8
+     6.1.  Policy Updates  . . . . . . . . . . . . . . . . . . . . .   9
    7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
    8.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
    9.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  11
@@ -428,8 +428,9 @@ Internet-Draft                   MTA-STS                   February 2017
    3.  Filter candidate MXs against the current policy.
 
    4.  If no candidate MXs are valid and the policy mode is "enforce",
-       temporarily fail the message.  (Otherwise, generate a failure
-       report but deliver as though MTA-STS were not implemented.)
+       temporarily fail the message.  (If the mode is "report", generate
+       a failure report but deliver as though MTA-STS were not
+       implemented.)
 
    5.  For each candidate MX, in order of MX priority, attempt to
        deliver the message, enforcing STARTTLS and the MX host's PKIX
@@ -437,11 +438,10 @@ Internet-Draft                   MTA-STS                   February 2017
 
 6.  Operational Considerations
 
-6.1.  Policy Updates
 
-   Updating the policy requires that the owner make changes in two
-   places: the "_mta-sts" TXT record in the Policy Domain's DNS zone and
-   at the corresponding HTTPS endpoint.  As a result, recipients should
+
+
+
 
 
 
@@ -450,6 +450,11 @@ Margolis, et al.         Expires August 19, 2017                [Page 8]
 Internet-Draft                   MTA-STS                   February 2017
 
 
+6.1.  Policy Updates
+
+   Updating the policy requires that the owner make changes in two
+   places: the "_mta-sts" TXT record in the Policy Domain's DNS zone and
+   at the corresponding HTTPS endpoint.  As a result, recipients should
    thus expect a policy will continue to be used by senders until both
    the HTTPS and TXT endpoints are updated and the TXT record's TTL has
    passed.
@@ -493,11 +498,6 @@ Internet-Draft                   MTA-STS                   February 2017
    compromising a certificate authority) are thus able to circumvent STS
    authentication.
 
-   Since we use DNS TXT records for policy discovery, an attacker who is
-   able to block DNS responses can suppress the discovery of an MTA-STS
-   Policy, making the Policy Domain appear not to have an MTA-STS
-   Policy.  The sender policy cache is designed to resist this attack by
-   decreasing the frequency of policy discovery and thus reducing the
 
 
 
@@ -506,6 +506,11 @@ Margolis, et al.         Expires August 19, 2017                [Page 9]
 Internet-Draft                   MTA-STS                   February 2017
 
 
+   Since we use DNS TXT records for policy discovery, an attacker who is
+   able to block DNS responses can suppress the discovery of an MTA-STS
+   Policy, making the Policy Domain appear not to have an MTA-STS
+   Policy.  The sender policy cache is designed to resist this attack by
+   decreasing the frequency of policy discovery and thus reducing the
    window of vulnerability; it is nonetheless a risk that attackers who
    can predict or induce policy discovery--for example, by inducing a
    victim sending domain to send mail to a never-before-contacted
@@ -549,11 +554,6 @@ Internet-Draft                   MTA-STS                   February 2017
    temporarily working) MX records and also serve the "_mta-sts" TXT
    record on the same domain--something not, to our knowledge, widely
    provided to untrusted users.  This attack is additionally mitigated
-   by the aforementioned ability for a victim domain to update an
-   invalid policy at any future date.
-
-   Even if an attacker cannot modify a served policy, the potential
-   exists for configurations that allow attackers on the same domain to
 
 
 
@@ -562,6 +562,11 @@ Margolis, et al.         Expires August 19, 2017               [Page 10]
 Internet-Draft                   MTA-STS                   February 2017
 
 
+   by the aforementioned ability for a victim domain to update an
+   invalid policy at any future date.
+
+   Even if an attacker cannot modify a served policy, the potential
+   exists for configurations that allow attackers on the same domain to
    receive mail for that domain.  For example, an easy configuration
    option when authoring an MTA-STS Policy for "example.com" is to set
    the "mx" equal to "*.example.com"; recipient domains must consider in
@@ -603,12 +608,7 @@ Internet-Draft                   MTA-STS                   February 2017
 
    MTA-STS Policy JSON served as the response body at [1]
 
-              {
-                "version": "STSv1",
-                "mode": "report",
-                "mx": ["mx1.example.com", "mx2.example.com"],
-                "max_age": 12345678
-              }
+
 
 
 
@@ -616,6 +616,14 @@ Internet-Draft                   MTA-STS                   February 2017
 Margolis, et al.         Expires August 19, 2017               [Page 11]
 
 Internet-Draft                   MTA-STS                   February 2017
+
+
+              {
+                "version": "STSv1",
+                "mode": "report",
+                "mx": ["mx1.example.com", "mx2.example.com"],
+                "max_age": 12345678
+              }
 
 
 11.  Appendix 2: Message delivery pseudocode
@@ -658,6 +666,14 @@ func getMxsForPolicy(domain, policy) {
   // to "policy".
 }
 
+
+
+
+Margolis, et al.         Expires August 19, 2017               [Page 12]
+
+Internet-Draft                   MTA-STS                   February 2017
+
+
 func tryGetNewPolicy(domain) {
   // Check for an MTA-STS TXT record for "domain" in DNS, and return the
   // indicated policy.
@@ -666,13 +682,6 @@ func tryGetNewPolicy(domain) {
 func cachePolicy(domain, policy) {
   // Store "policy" as the cached policy for "domain".
 }
-
-
-
-Margolis, et al.         Expires August 19, 2017               [Page 12]
-
-Internet-Draft                   MTA-STS                   February 2017
-
 
 func tryGetCachedPolicy(domain, policy) {
   // Return a cached policy for "domain".
@@ -713,6 +722,14 @@ func tryWithPolicy(message, domain, policy) {
     }
   }
   return false
+
+
+
+Margolis, et al.         Expires August 19, 2017               [Page 13]
+
+Internet-Draft                   MTA-STS                   February 2017
+
+
 }
 
 func handleMessage(message) {
@@ -722,14 +739,6 @@ func handleMessage(message) {
   if newPolicy {
     cachePolicy(domain, newPolicy)
     oldPolicy = newPolicy
-
-
-
-Margolis, et al.         Expires August 19, 2017               [Page 13]
-
-Internet-Draft                   MTA-STS                   February 2017
-
-
   }
   if oldPolicy {
     return tryWithPolicy(message, oldPolicy)
@@ -766,15 +775,6 @@ Internet-Draft                   MTA-STS                   February 2017
               4033, DOI 10.17487/RFC4033, March 2005,
               <http://www.rfc-editor.org/info/rfc4033>.
 
-   [RFC4627]  Crockford, D., "The application/json Media Type for
-              JavaScript Object Notation (JSON)", RFC 4627, DOI 10
-              .17487/RFC4627, July 2006,
-              <http://www.rfc-editor.org/info/rfc4627>.
-
-   [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
-              Specifications: ABNF", STD 68, RFC 5234, DOI 10.17487/
-              RFC5234, January 2008,
-              <http://www.rfc-editor.org/info/rfc5234>.
 
 
 
@@ -785,6 +785,16 @@ Margolis, et al.         Expires August 19, 2017               [Page 14]
 
 Internet-Draft                   MTA-STS                   February 2017
 
+
+   [RFC4627]  Crockford, D., "The application/json Media Type for
+              JavaScript Object Notation (JSON)", RFC 4627, DOI 10
+              .17487/RFC4627, July 2006,
+              <http://www.rfc-editor.org/info/rfc4627>.
+
+   [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
+              Specifications: ABNF", STD 68, RFC 5234, DOI 10.17487/
+              RFC5234, January 2008,
+              <http://www.rfc-editor.org/info/rfc5234>.
 
    [RFC5785]  Nottingham, M. and E. Hammer-Lahav, "Defining Well-Known
               Uniform Resource Identifiers (URIs)", RFC 5785, DOI 10
@@ -821,6 +831,17 @@ Authors' Addresses
    Email: dmargolis (at) google.com
 
 
+
+
+
+
+
+
+Margolis, et al.         Expires August 19, 2017               [Page 15]
+
+Internet-Draft                   MTA-STS                   February 2017
+
+
    Mark Risher
    Google, Inc
 
@@ -833,15 +854,6 @@ Authors' Addresses
    Email: rbinu (at) yahoo-inc (dot com)
 
 
-
-
-
-
-Margolis, et al.         Expires August 19, 2017               [Page 15]
-
-Internet-Draft                   MTA-STS                   February 2017
-
-
    Alexander Brotman
    Comcast, Inc
 
@@ -852,18 +864,6 @@ Internet-Draft                   MTA-STS                   February 2017
    Microsoft, Inc
 
    Email: janet.jones (at) microsoft (dot com)
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

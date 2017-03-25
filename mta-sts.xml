@@ -382,8 +382,8 @@ sending MTAs may unconditionally check for a new policy at this step.)</t>
 <t>If no policy is present, proceed with non-STS delivery.</t>
 <t>Filter candidate MXs against the current policy.</t>
 <t>If no candidate MXs are valid and the policy mode is <spanx style="verb">enforce</spanx>, temporarily
-fail the message.  (Otherwise, generate a failure report but deliver as
-though MTA-STS were not implemented.)</t>
+fail the message.  (If the mode is <spanx style="verb">report</spanx>, generate a failure report but
+deliver as though MTA-STS were not implemented.)</t>
 <t>For each candidate MX, in order of MX priority, attempt to deliver the
 message, enforcing STARTTLS and the MX host's PKIX certificate validation.</t>
 </list>

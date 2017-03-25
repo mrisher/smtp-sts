@@ -302,8 +302,8 @@ An example control flow for a compliant sender consists of the following steps:
 2. If no policy is present, proceed with non-STS delivery.
 3. Filter candidate MXs against the current policy.
 4. If no candidate MXs are valid and the policy mode is `enforce`, temporarily
-   fail the message.  (Otherwise, generate a failure report but deliver as
-   though MTA-STS were not implemented.)
+   fail the message.  (If the mode is `report`, generate a failure report but
+   deliver as though MTA-STS were not implemented.)
 5. For each candidate MX, in order of MX priority, attempt to deliver the
    message, enforcing STARTTLS and the MX host's PKIX certificate validation.
 
