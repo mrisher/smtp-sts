@@ -217,6 +217,10 @@ Senders MAY impose a timeout on the HTTPS GET to avoid long delays imposed by
 attempted policy updates. A suggested timeout is one minute; policy hosts SHOULD
 respond to requests with a complete policy body within that timeout.
 
+If a valid TXT record is found but no policy can be fetched via HTTPS, and there
+is no valid (non-expired) previously-cached policy, senders MUST treat the
+recipient domain as one that has not implemented MTA-STS.
+
 ## Policy Selection for Smart Hosts
 
 When sending mail via a "smart host"--an intermediate SMTP relay rather than the

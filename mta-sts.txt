@@ -5,21 +5,21 @@
 Using TLS in Applications                                    D. Margolis
 Internet-Draft                                                 M. Risher
 Intended status: Standards Track                             Google, Inc
-Expires: August 19, 2017                                 B. Ramakrishnan
+Expires: September 28, 2017                              B. Ramakrishnan
                                                              Yahoo!, Inc
                                                               A. Brotman
                                                             Comcast, Inc
                                                                 J. Jones
                                                           Microsoft, Inc
-                                                       February 15, 2017
+                                                          March 27, 2017
 
 
               SMTP MTA Strict Transport Security (MTA-STS)
-                       draft-ietf-uta-mta-sts-03
+                       draft-ietf-uta-mta-sts-04
 
 Abstract
 
-   SMTP Mail Transfer Agent Strict Transport Security (SMTP STS) is a
+   SMTP Mail Transfer Agent Strict Transport Security (MTA-STS) is a
    mechanism enabling mail service providers to declare their ability to
    receive TLS-secured connections and an expected validity of
    certificates presented by their MX hosts, and to specify whether
@@ -41,7 +41,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on August 19, 2017.
+   This Internet-Draft will expire on September 28, 2017.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Margolis, et al.         Expires August 19, 2017                [Page 1]
+Margolis, et al.       Expires September 28, 2017               [Page 1]
 
-Internet-Draft                   MTA-STS                   February 2017
+Internet-Draft                   MTA-STS                      March 2017
 
 
    (http://trustee.ietf.org/license-info) in effect on the date of
@@ -87,7 +87,7 @@ Table of Contents
    7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
    8.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
    9.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  11
-   10. Appendix 1: Domain Owner STS example record . . . . . . . . .  11
+   10. Appendix 1: Domain Owner MTA-STS example record . . . . . . .  11
      10.1.  Example 1  . . . . . . . . . . . . . . . . . . . . . . .  11
    11. Appendix 2: Message delivery pseudocode . . . . . . . . . . .  11
    12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  13
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Margolis, et al.         Expires August 19, 2017                [Page 2]
+Margolis, et al.       Expires September 28, 2017               [Page 2]
 
-Internet-Draft                   MTA-STS                   February 2017
+Internet-Draft                   MTA-STS                      March 2017
 
 
    (perhaps by overwriting the resolved MX record of the delivery
@@ -136,15 +136,15 @@ Internet-Draft                   MTA-STS                   February 2017
 
    We also define the following terms for further use in this document:
 
-   o  STS Policy: A commitment by the Policy Domain to support PKIX
+   o  MTA-STS Policy: A commitment by the Policy Domain to support PKIX
       authenticated TLS for the specified MX hosts.
 
-   o  Policy Domain: The domain for which an STS Policy is defined.
+   o  Policy Domain: The domain for which an MTA-STS Policy is defined.
       (For example, when sending mail to "alice@example.com", the policy
       domain is "example.com".)
 
-   o  Policy Authentication: Authentication of the STS policy retrieved
-      for a recipient domain by the sender.
+   o  Policy Authentication: Authentication of the MTA-STS policy
+      retrieved for a recipient domain by the sender.
 
 2.  Related Technologies
 
@@ -156,7 +156,7 @@ Internet-Draft                   MTA-STS                   February 2017
    thorough discussion of this trade-off, see the section _Security_
    _Considerations_.
 
-   In addition, SMTP STS provides an optional report-only mode, enabling
+   In addition, MTA-STS provides an optional report-only mode, enabling
    soft deployments to detect policy failures.
 
 
@@ -165,14 +165,14 @@ Internet-Draft                   MTA-STS                   February 2017
 
 
 
-Margolis, et al.         Expires August 19, 2017                [Page 3]
+Margolis, et al.       Expires September 28, 2017               [Page 3]
 
-Internet-Draft                   MTA-STS                   February 2017
+Internet-Draft                   MTA-STS                      March 2017
 
 
 3.  Policy Discovery
 
-   SMTP STS policies are distributed via HTTPS from a "well-known"
+   MTA-STS policies are distributed via HTTPS from a "well-known"
    [RFC5785] path served within the Policy Domain, and their presence
    and current version are indicated by a TXT record at the Policy
    Domain.  These TXT records additionally contain a policy "id" field,
@@ -221,12 +221,12 @@ Internet-Draft                   MTA-STS                   February 2017
 
 
 
-Margolis, et al.         Expires August 19, 2017                [Page 4]
+Margolis, et al.       Expires September 28, 2017               [Page 4]
 
-Internet-Draft                   MTA-STS                   February 2017
+Internet-Draft                   MTA-STS                      March 2017
 
 
-   recipient domain does not implement MTA STS and skip the remaining
+   recipient domain does not implement MTA-STS and skip the remaining
    steps of policy discovery.
 
 3.2.  MTA-STS Policies
@@ -277,9 +277,9 @@ Internet-Draft                   MTA-STS                   February 2017
 
 
 
-Margolis, et al.         Expires August 19, 2017                [Page 5]
+Margolis, et al.       Expires September 28, 2017               [Page 5]
 
-Internet-Draft                   MTA-STS                   February 2017
+Internet-Draft                   MTA-STS                      March 2017
 
 
    A lenient parser SHOULD accept TXT records and policy files which are
@@ -311,6 +311,11 @@ Internet-Draft                   MTA-STS                   February 2017
    minute; policy hosts SHOULD respond to requests with a complete
    policy body within that timeout.
 
+   If a valid TXT record is found but no policy can be fetched via
+   HTTPS, and there is no valid (non-expired) previously-cached policy,
+   senders MUST treat the recipient domain as one that has not
+   implemented MTA-STS.
+
 3.4.  Policy Selection for Smart Hosts
 
    When sending mail via a "smart host"--an intermediate SMTP relay
@@ -321,22 +326,23 @@ Internet-Draft                   MTA-STS                   February 2017
 4.  Policy Validation
 
    When sending to an MX at a domain for which the sender has a valid
-   and non-expired SMTP MTA-STS policy, a sending MTA honoring SMTP STS
-   MUST validate:
+   and non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST
+   validate:
+
+
+
+
+
+Margolis, et al.       Expires September 28, 2017               [Page 6]
+
+Internet-Draft                   MTA-STS                      March 2017
+
 
    1.  That the recipient MX matches the "mx" pattern from the recipient
        domain's policy.
 
    2.  That the recipient MX supports STARTTLS and offers a valid PKIX
        based TLS certificate.
-
-
-
-
-Margolis, et al.         Expires August 19, 2017                [Page 6]
-
-Internet-Draft                   MTA-STS                   February 2017
-
 
    This section does not dictate the behavior of sending MTAs when
    policies fail to validate; in particular, validation failures of
@@ -373,26 +379,24 @@ Internet-Draft                   MTA-STS                   February 2017
 5.  Policy Application
 
    When sending to an MX at a domain for which the sender has a valid,
-   non-expired STS policy, a sending MTA honoring SMTP STS applies the
-   result of a policy validation one of two ways, depending on the value
-   of the policy "mode" field:
+   non-expired MTA-STS policy, a sending MTA honoring MTA-STS applies
+   the result of a policy validation one of two ways, depending on the
+   value of the policy "mode" field:
 
    1.  "report": In this mode, sending MTAs merely send a report (as
        described in the TLSRPT specification (TODO: add ref)) indicating
        policy application failures.
 
+
+
+Margolis, et al.       Expires September 28, 2017               [Page 7]
+
+Internet-Draft                   MTA-STS                      March 2017
+
+
    2.  "enforce": In this mode, sending MTAs treat STS policy failures
        as a mail delivery error, and MUST NOT deliver the message to
        this host.
-
-
-
-
-
-Margolis, et al.         Expires August 19, 2017                [Page 7]
-
-Internet-Draft                   MTA-STS                   February 2017
-
 
    When a message fails to deliver due to an "enforce" policy, a
    compliant MTA MUST check for the presence of an updated policy at the
@@ -410,9 +414,10 @@ Internet-Draft                   MTA-STS                   February 2017
    When applying a policy, sending MTAs SHOULD select recipient MXs by
    first eliminating any MXs at lower priority than the current host (if
    in the MX candidate set), then eliminating any non-matching (as
-   specified by the STS Policy) MX hosts from the candidate MX set, and
-   then attempting delivery to matching hosts as indicated by their MX
-   priority, until delivery succeeds or the MX candidate set is empty.
+   specified by the MTA-STS Policy) MX hosts from the candidate MX set,
+   and then attempting delivery to matching hosts as indicated by their
+   MX priority, until delivery succeeds or the MX candidate set is
+   empty.
 
 5.2.  Policy Application Control Flow
 
@@ -428,7 +433,7 @@ Internet-Draft                   MTA-STS                   February 2017
 
    3.  If no candidate MXs are valid and the policy mode is "enforce",
        temporarily fail the message.  (Otherwise, generate a failure
-       report but deliver as though MTA STS were not implemented.)
+       report but deliver as though MTA-STS were not implemented.)
 
    4.  For each candidate MX, in order of MX priority, attempt to
        deliver the message, enforcing STARTTLS and the MX host's PKIX
@@ -440,14 +445,9 @@ Internet-Draft                   MTA-STS                   February 2017
 
 
 
-
-
-
-
-
-Margolis, et al.         Expires August 19, 2017                [Page 8]
+Margolis, et al.       Expires September 28, 2017               [Page 8]
 
-Internet-Draft                   MTA-STS                   February 2017
+Internet-Draft                   MTA-STS                      March 2017
 
 
 6.  Operational Considerations
@@ -490,39 +490,39 @@ Internet-Draft                   MTA-STS                   February 2017
        intended for the legitimate recipient server (for example, by
        altering BGP routing tables).
 
-   SMTP Strict Transport Security relies on certificate validation via
-   PKIX based TLS identity checking [RFC6125].  Attackers who are able
-   to obtain a valid certificate for the targeted recipient mail service
-   (e.g. by compromising a certificate authority) are thus able to
-   circumvent STS authentication.
+   SMTP MTA-STS relies on certificate validation via PKIX based TLS
+   identity checking [RFC6125].  Attackers who are able to obtain a
+   valid certificate for the targeted recipient mail service (e.g. by
+   compromising a certificate authority) are thus able to circumvent STS
+   authentication.
 
    Since we use DNS TXT records for policy discovery, an attacker who is
-   able to block DNS responses can suppress the discovery of an STS
+   able to block DNS responses can suppress the discovery of an MTA-STS
 
 
 
-Margolis, et al.         Expires August 19, 2017                [Page 9]
+Margolis, et al.       Expires September 28, 2017               [Page 9]
 
-Internet-Draft                   MTA-STS                   February 2017
+Internet-Draft                   MTA-STS                      March 2017
 
 
-   Policy, making the Policy Domain appear not to have an STS Policy.
-   The sender policy cache is designed to resist this attack.
+   Policy, making the Policy Domain appear not to have an MTA-STS
+   Policy.  The sender policy cache is designed to resist this attack.
 
    We additionally consider the Denial of Service risk posed by an
    attacker who can modify the DNS records for a victim domain.  Absent
-   SMTP STS, such an attacker can cause a sending MTA to cache invalid
-   MX records for a long TTL.  With SMTP STS, the attacker can
-   additionally advertise a new, long-"max_age" SMTP STS policy with
-   "mx" constraints that validate the malicious MX record, causing
-   senders to cache the policy and refuse to deliver messages once the
-   victim has resecured the MX records.
+   MTA-STS, such an attacker can cause a sending MTA to cache invalid MX
+   records for a long TTL.  With MTA- STS, the attacker can additionally
+   advertise a new, long-"max_age" MTA-STS policy with "mx" constraints
+   that validate the malicious MX record, causing senders to cache the
+   policy and refuse to deliver messages once the victim has resecured
+   the MX records.
 
    This attack is mitigated in part by the ability of a victim domain to
    (at any time) publish a new policy updating the cached, malicious
    policy, though this does require the victim domain to both obtain a
    valid CA-signed certificate and to understand and properly configure
-   SMTP STS.
+   MTA-STS.
 
    Similarly, we consider the possibility of domains that deliberately
    allow untrusted users to serve untrusted content on user-specified
@@ -534,32 +534,32 @@ Internet-Draft                   MTA-STS                   February 2017
 
    In these cases, there is a risk that untrusted users would be able to
    serve custom content at the "mta-sts" host, including serving an
-   illegitimate SMTP STS policy.  We believe this attack is rendered
-   more difficult by the need for the attacker to both inject malicious
-   (but temporarily working) MX records and also serve the "_mta-sts"
-   TXT record on the same domain--something not, to our knowledge,
-   widely provided to untrusted users.  This attack is additionally
-   mitigated by the aforementioned ability for a victim domain to update
-   an invalid policy at any future date.
+   illegitimate MTA-STS policy.  We believe this attack is rendered more
+   difficult by the need for the attacker to both inject malicious (but
+   temporarily working) MX records and also serve the "_mta-sts" TXT
+   record on the same domain--something not, to our knowledge, widely
+   provided to untrusted users.  This attack is additionally mitigated
+   by the aforementioned ability for a victim domain to update an
+   invalid policy at any future date.
 
    Even if an attacker cannot modify a served policy, the potential
    exists for configurations that allow attackers on the same domain to
    receive mail for that domain.  For example, an easy configuration
-   option when authoring an STS Policy for "example.com" is to set the
-   "mx" equal to "*.example.com"; recipient domains must consider in
+   option when authoring an MTA-STS Policy for "example.com" is to set
+   the "mx" equal to "*.example.com"; recipient domains must consider in
    this case the risk that any user possessing a valid hostname and CA-
    signed certificate (for example, "dhcp-123.example.com") will, from
-   the perspective of STS Policy validation, be a valid MX host for that
-   domain.
+   the perspective of MTA-STS Policy validation, be a valid MX host for
+   that domain.
 
 
 
 
 
 
-Margolis, et al.         Expires August 19, 2017               [Page 10]
+Margolis, et al.       Expires September 28, 2017              [Page 10]
 
-Internet-Draft                   MTA-STS                   February 2017
+Internet-Draft                   MTA-STS                      March 2017
 
 
 9.  Contributors
@@ -578,21 +578,22 @@ Internet-Draft                   MTA-STS                   February 2017
    Markus Laber 1&1 Mail & Media Development & Technology GmbH
    markus.laber (at) 1und1 (dot de)
 
-10.  Appendix 1: Domain Owner STS example record
+10.  Appendix 1: Domain Owner MTA-STS example record
 
 10.1.  Example 1
 
-   The owner of "example.com" wishes to begin using STS with a policy
-   that will solicit reports from receivers without affecting how the
-   messages are processed, in order to verify the identity of MXs that
-   handle mail for "example.com", confirm that TLS is correctly used,
-   and ensure that certificates presented by the recipient MX validate.
+   The owner of "example.com" wishes to begin using MTA-STS with a
+   policy that will solicit reports from receivers without affecting how
+   the messages are processed, in order to verify the identity of MXs
+   that handle mail for "example.com", confirm that TLS is correctly
+   used, and ensure that certificates presented by the recipient MX
+   validate.
 
-   STS policy indicator TXT RR:
+   MTA-STS policy indicator TXT RR:
 
        _mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
 
-   STS Policy JSON served as the response body at [1]
+   MTA-STS Policy JSON served as the response body at [1]
 
               {
                 "version": "STSv1",
@@ -612,10 +613,9 @@ Internet-Draft                   MTA-STS                   February 2017
 
 
 
-
-Margolis, et al.         Expires August 19, 2017               [Page 11]
+Margolis, et al.       Expires September 28, 2017              [Page 11]
 
-Internet-Draft                   MTA-STS                   February 2017
+Internet-Draft                   MTA-STS                      March 2017
 
 
 func isEnforce(policy) {
@@ -644,7 +644,7 @@ func getMxsForPolicy(domain, policy) {
 }
 
 func tryGetNewPolicy(domain) {
-  // Check for an MTA STS TXT record for "domain" in DNS, and return the
+  // Check for an MTA-STS TXT record for "domain" in DNS, and return the
   // indicated policy (or a local cache of the unvalidated policy).
 }
 
@@ -663,26 +663,25 @@ func reportError(error) {
 func tryMxAccordingTo(message, mx, policy) {
   connection := connect(mx)
   if !connection {
-    return false  // Can't connect to the MX so it's not an STS error.
+    return false  // Can't connect to the MX so it's not an MTA-STS error.
   }
-  status := !(tryStartTls(mx, &connection) && certMatches(connection, mx))
+  secure := true
 
 
 
-Margolis, et al.         Expires August 19, 2017               [Page 12]
+Margolis, et al.       Expires September 28, 2017              [Page 12]
 
-Internet-Draft                   MTA-STS                   February 2017
+Internet-Draft                   MTA-STS                      March 2017
 
 
-  status = true
   if !tryStartTls(mx, &connection) {
-    status = false
+    secure = false
     reportError(E_NO_VALID_TLS)
   } else if certMatches(connection, mx) {
-    status = false
+    secure = false
     reportError(E_CERT_MISMATCH)
   }
-  if status || !isEnforce(policy) {
+  if secure || !isEnforce(policy) {
     return tryDeliverMail(connection, message)
   }
   return false
@@ -713,7 +712,7 @@ func handleMessage(message) {
     return tryWithPolicy(message, oldPolicy)
   }
   // There is no policy or there's a new policy that did not work.
-  // Try to deliver the message normally (i.e. without STS).
+  // Try to deliver the message normally (i.e. without MTA-STS).
 }
 
 
@@ -725,9 +724,10 @@ func handleMessage(message) {
 
 
 
-Margolis, et al.         Expires August 19, 2017               [Page 13]
+
+Margolis, et al.       Expires September 28, 2017              [Page 13]
 
-Internet-Draft                   MTA-STS                   February 2017
+Internet-Draft                   MTA-STS                      March 2017
 
 
 12.1.  Normative References
@@ -781,9 +781,9 @@ Internet-Draft                   MTA-STS                   February 2017
 
 
 
-Margolis, et al.         Expires August 19, 2017               [Page 14]
+Margolis, et al.       Expires September 28, 2017              [Page 14]
 
-Internet-Draft                   MTA-STS                   February 2017
+Internet-Draft                   MTA-STS                      March 2017
 
 
    [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
@@ -837,4 +837,4 @@ Authors' Addresses
 
 
 
-Margolis, et al.         Expires August 19, 2017               [Page 15]
+Margolis, et al.       Expires September 28, 2017              [Page 15]

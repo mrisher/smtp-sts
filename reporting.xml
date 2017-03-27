@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE rfc SYSTEM 'rfc2629.dtd' []>
-<rfc ipr="trust200902" category="std" docName="draft-ietf-uta-smtp-tlsrpt-03">
+<rfc ipr="trust200902" category="std" docName="draft-ietf-uta-smtp-tlsrpt-04">
 <?rfc toc="yes"?>
 <?rfc symrefs="yes"?>
 <?rfc sortrefs="yes"?>
@@ -87,7 +87,7 @@
 <uri></uri>
 </address>
 </author>
-<date year="2017" month="February" day="15"/>
+<date year="2017" month="March" day="27"/>
 
 <area>Applications</area>
 <workgroup>Using TLS in Applications</workgroup>
@@ -115,7 +115,7 @@ misconfigurations.
 <section anchor="introduction" title="Introduction">
 <t>The STARTTLS extension to SMTP <xref target="RFC3207"/> allows SMTP clients and hosts to
 establish secure SMTP sessions over TLS. The protocol design is based on
-&quot;Opportunistic Security&quot; (OS) <xref target="RFC7435"/>, which provides interoperability for
+&quot;Opportunistic Security&quot; (OS) <xref target="RFC7435"/>, which maintains interoperability with
 clients that do not support STARTTLS but means that any attacker who can delete
 parts of the SMTP session (such as the &quot;250 STARTTLS&quot; response) or redirect the
 entire SMTP session (perhaps by overwriting the resolved MX record of the
@@ -123,7 +123,7 @@ delivery domain) can perform a downgrade or interception attack.
 </t>
 <t>Because such &quot;downgrade attacks&quot; are not necessarily apparent to the receiving
 MTA, this document defines a mechanism for sending domains to report on failures
-at multiple parts of the MTA-to-MTA conversation.
+at multiple stages of the MTA-to-MTA conversation.
 </t>
 <t>Recipient domains may also use the mechanisms defined by MTA-STS (TODO: Add ref)
 or DANE <xref target="RFC6698"/> to publish additional encryption and authentication
@@ -152,9 +152,9 @@ they appear in this document, are to be interpreted as described in <xref target
 <t>MTA-STS Policy: A definition of the expected TLS availability, behavior, and
 desired actions for a given domain when a sending MTA encounters
 problems in negotiating a secure channel. MTA-STS is defined in [TODO]</t>
-<t>DANE Policy: A mechanism for enabling the administrators of domain names to
-specify the keys used in that domain's TLS servers. DANE is defined in
-<xref target="RFC6698"/></t>
+<t>DANE Policy: A mechanism by which administrators can supply a record that can
+be used to validate the certificate presented by an MTA. DANE is defined
+in <xref target="RFC6698"/>.</t>
 <t>TLSRPT Policy: A policy specifying the endpoint to which sending MTAs should
 deliver reports.</t>
 <t>Policy Domain: The domain against which an MTA-STS or DANE Policy is defined.</t>
@@ -198,13 +198,9 @@ recipient's TLSRPT policy can be retrieved from <spanx style="verb">_smtp-tlsrpt
    (<xref target="RFC2818"/>) to the specified URI.</t>
 <t>In the case of <spanx style="verb">mailto</spanx>, reports should be submitted to the specified
    email address. When sending failure reports via SMTP, sending MTAs
-   MUST NOT honor MTA-STS or DANE TLSA failures.</t>
+   MUST deliver reports despite any TLS-related failures.  This may
+mean that the reports are delivered in the clear.</t>
 </list></t>
-<t><spanx style="verb">ruf</spanx>: Future use. (There may also be a need for enabling more detailed
- &quot;forensic&quot; reporting during initial stages of a deployment. To address
- this, the authors consider the possibility of an optional additional
- &quot;forensic reporting mode&quot; in which more details--such as certificate chains
- and MTA banners--may be reported.)</t>
 </list>
 </t>
 <t>The formal definition of the <spanx style="verb">_smtp-tlsrpt</spanx> TXT record, defined using
@@ -272,7 +268,8 @@ contents of the report</t>
 <list style="symbols">
 <t>One of the following policy types:
 (1) The MTA-STS policy applied (as a string)
-(2) The DANE TLSA record applied (as a string)
+(2) The DANE TLSA record applied (as a string, with each RR entry of the
+RRset listed and separated by a semicolon)
 (3) The literal string <spanx style="verb">no-policy-found</spanx>, if neither a TLSA nor
 MTA-STS policy could be found.</t>
 <t>The domain for which the policy is applied</t>
@@ -330,15 +327,6 @@ contains an aggregate count of failed connections.
 to grow over time based on real-world experience. The initial set is:
 </t>
 
-<section anchor="routing-failures" title="Routing Failures">
-<t>
-<list style="symbols">
-<t><spanx style="verb">mx-mismatch</spanx>: This indicates that the MX resolved for the recipient domain
-did not match the MX constraint specified in the policy.</t>
-</list>
-</t>
-</section>
-
 <section anchor="negotiation-failures" title="Negotiation Failures">
 <t>
 <list style="symbols">
@@ -346,11 +334,12 @@ did not match the MX constraint specified in the policy.</t>
 support STARTTLS.</t>
 <t><spanx style="verb">certificate-host-mismatch</spanx>: This indicates that the certificate presented
 did not adhere to the constraints specified in the MTA-STS or DANE policy, e.g.
-if the CN field did not match the hostname of the MX.</t>
+if the MX does not match any identities listed in the Subject Alternate
+Name (SAN) [RFC5280].</t>
 <t><spanx style="verb">certificate-expired</spanx>: This indicates that the certificate has expired.</t>
 <t><spanx style="verb">certificate-not-trusted</spanx>: This a label that covers multiple certificate
 related failures that include, but not limited to errors such as
-untrusted/unknown CAs, certificate name contraints, certificate chain
+untrusted/unknown CAs, certificate name constraints, certificate chain
 errors etc. When using this declaration, the reporting MTA SHOULD utilize
 the <spanx style="verb">failure-reason</spanx> to provide more information to the receiving entity.</t>
 <t><spanx style="verb">validation-failure</spanx>: This indicates a general failure for a reason not matching
@@ -366,9 +355,11 @@ the <spanx style="verb">failure-reason</spanx> to provide more information to th
 <t>
 <list style="symbols">
 <t><spanx style="verb">tlsa-invalid</spanx>: This indicates a validation error in the TLSA record
-associated with a DANE policy.</t>
-<t><spanx style="verb">dnssec-invalid</spanx>: This indicates a failure to authenticate DNS records for a
-Policy Domain with a published TLSA record.</t>
+associated with a DANE policy.  None of the records in the RRset were found
+to be valid.</t>
+<t><spanx style="verb">dnssec-invalid</spanx>: This would indicate that no valid records were returned from
+the recursive resolver.  The request returned with SERVFAIL for the requested
+TLSA record.</t>
 </list>
 </t>
 </section>
