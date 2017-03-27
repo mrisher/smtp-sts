@@ -5,17 +5,17 @@
 Using TLS in Applications                                    D. Margolis
 Internet-Draft                                                 M. Risher
 Intended status: Standards Track                             Google, Inc
-Expires: August 19, 2017                                 B. Ramakrishnan
+Expires: September 28, 2017                              B. Ramakrishnan
                                                              Yahoo!, Inc
                                                               A. Brotman
                                                             Comcast, Inc
                                                                 J. Jones
                                                           Microsoft, Inc
-                                                       February 15, 2017
+                                                          March 27, 2017
 
 
               SMTP MTA Strict Transport Security (MTA-STS)
-                       draft-ietf-uta-mta-sts-03
+                       draft-ietf-uta-mta-sts-04
 
 Abstract
 
@@ -40,7 +40,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on August 19, 2017.
+   This Internet-Draft will expire on September 28, 2017.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Margolis, et al.         Expires August 19, 2017                [Page 1]
+Margolis, et al.       Expires September 28, 2017               [Page 1]
 
-Internet-Draft                   MTA-STS                   February 2017
+Internet-Draft                   MTA-STS                      March 2017
 
 
    publication of this document.  Please review these documents
@@ -81,7 +81,7 @@ Table of Contents
    5.  Policy Application  . . . . . . . . . . . . . . . . . . . . .   7
      5.1.  MX Preference . . . . . . . . . . . . . . . . . . . . . .   8
      5.2.  Policy Application Control Flow . . . . . . . . . . . . .   8
-   6.  Operational Considerations  . . . . . . . . . . . . . . . . .   8
+   6.  Operational Considerations  . . . . . . . . . . . . . . . . .   9
      6.1.  Policy Updates  . . . . . . . . . . . . . . . . . . . . .   9
    7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
    8.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Margolis, et al.         Expires August 19, 2017                [Page 2]
+Margolis, et al.       Expires September 28, 2017               [Page 2]
 
-Internet-Draft                   MTA-STS                   February 2017
+Internet-Draft                   MTA-STS                      March 2017
 
 
    This document defines a mechanism for recipient domains to publish
@@ -165,9 +165,9 @@ Internet-Draft                   MTA-STS                   February 2017
 
 
 
-Margolis, et al.         Expires August 19, 2017                [Page 3]
+Margolis, et al.       Expires September 28, 2017               [Page 3]
 
-Internet-Draft                   MTA-STS                   February 2017
+Internet-Draft                   MTA-STS                      March 2017
 
 
    allowing sending MTAs to check the currency of a cached policy
@@ -221,9 +221,9 @@ Internet-Draft                   MTA-STS                   February 2017
 
 
 
-Margolis, et al.         Expires August 19, 2017                [Page 4]
+Margolis, et al.       Expires September 28, 2017               [Page 4]
 
-Internet-Draft                   MTA-STS                   February 2017
+Internet-Draft                   MTA-STS                      March 2017
 
 
 3.2.  MTA-STS Policies
@@ -277,9 +277,9 @@ Internet-Draft                   MTA-STS                   February 2017
 
 
 
-Margolis, et al.         Expires August 19, 2017                [Page 5]
+Margolis, et al.       Expires September 28, 2017               [Page 5]
 
-Internet-Draft                   MTA-STS                   February 2017
+Internet-Draft                   MTA-STS                      March 2017
 
 
    implementing a superset of this specification, in which case unknown
@@ -308,6 +308,11 @@ Internet-Draft                   MTA-STS                   February 2017
    minute; policy hosts SHOULD respond to requests with a complete
    policy body within that timeout.
 
+   If a valid TXT record is found but no policy can be fetched via
+   HTTPS, and there is no valid (non-expired) previously-cached policy,
+   senders MUST treat the recipient domain as one that has not
+   implemented MTA-STS.
+
 3.4.  Policy Selection for Smart Hosts
 
    When sending mail via a "smart host"--an intermediate SMTP relay
@@ -324,19 +329,18 @@ Internet-Draft                   MTA-STS                   February 2017
    1.  That the recipient MX matches the "mx" pattern from the recipient
        domain's policy (as defined in the section "MX Matching").
 
+
+
+
+
+Margolis, et al.       Expires September 28, 2017               [Page 6]
+
+Internet-Draft                   MTA-STS                      March 2017
+
+
    2.  That the recipient MX supports STARTTLS and offers a valid PKIX
        based TLS certificate (as defined in the section "MX Certificate
        Validation").
-
-
-
-
-
-
-Margolis, et al.         Expires August 19, 2017                [Page 6]
-
-Internet-Draft                   MTA-STS                   February 2017
-
 
    Of note, not all validation failures affect mail delivery; the
    behavior of sending MTAs when a host does not validate is described
@@ -383,17 +387,16 @@ Internet-Draft                   MTA-STS                   February 2017
        message to hosts which fail MX matching or certificate
        validation.
 
+
+
+Margolis, et al.       Expires September 28, 2017               [Page 7]
+
+Internet-Draft                   MTA-STS                      March 2017
+
+
    When a message fails to deliver due to an "enforce" policy, a
    compliant MTA MUST NOT permanently fail to deliver messages before
    checking for the presence of an updated policy at the Policy Domain.
-
-
-
-Margolis, et al.         Expires August 19, 2017                [Page 7]
-
-Internet-Draft                   MTA-STS                   February 2017
-
-
    (In all cases, MTAs SHOULD treat such failures as transient errors
    and retry delivery later.)  This allows implementing domains to
    update long-lived policies on the fly.
@@ -436,19 +439,18 @@ Internet-Draft                   MTA-STS                   February 2017
        deliver the message, enforcing STARTTLS and the MX host's PKIX
        certificate validation.
 
-6.  Operational Considerations
 
 
 
 
 
 
-
-
-Margolis, et al.         Expires August 19, 2017                [Page 8]
+Margolis, et al.       Expires September 28, 2017               [Page 8]
 
-Internet-Draft                   MTA-STS                   February 2017
+Internet-Draft                   MTA-STS                      March 2017
 
+
+6.  Operational Considerations
 
 6.1.  Policy Updates
 
@@ -495,16 +497,17 @@ Internet-Draft                   MTA-STS                   February 2017
    SMTP MTA-STS relies on certificate validation via PKIX based TLS
    identity checking [RFC6125].  Attackers who are able to obtain a
    valid certificate for the targeted recipient mail service (e.g. by
+
+
+
+
+Margolis, et al.       Expires September 28, 2017               [Page 9]
+
+Internet-Draft                   MTA-STS                      March 2017
+
+
    compromising a certificate authority) are thus able to circumvent STS
    authentication.
-
-
-
-
-Margolis, et al.         Expires August 19, 2017                [Page 9]
-
-Internet-Draft                   MTA-STS                   February 2017
-
 
    Since we use DNS TXT records for policy discovery, an attacker who is
    able to block DNS responses can suppress the discovery of an MTA-STS
@@ -551,17 +554,17 @@ Internet-Draft                   MTA-STS                   February 2017
    serve custom content at the "mta-sts" host, including serving an
    illegitimate MTA-STS policy.  We believe this attack is rendered more
    difficult by the need for the attacker to both inject malicious (but
+
+
+
+Margolis, et al.       Expires September 28, 2017              [Page 10]
+
+Internet-Draft                   MTA-STS                      March 2017
+
+
    temporarily working) MX records and also serve the "_mta-sts" TXT
    record on the same domain--something not, to our knowledge, widely
    provided to untrusted users.  This attack is additionally mitigated
-
-
-
-Margolis, et al.         Expires August 19, 2017               [Page 10]
-
-Internet-Draft                   MTA-STS                   February 2017
-
-
    by the aforementioned ability for a victim domain to update an
    invalid policy at any future date.
 
@@ -610,12 +613,9 @@ Internet-Draft                   MTA-STS                   February 2017
 
 
 
-
-
-
-Margolis, et al.         Expires August 19, 2017               [Page 11]
+Margolis, et al.       Expires September 28, 2017              [Page 11]
 
-Internet-Draft                   MTA-STS                   February 2017
+Internet-Draft                   MTA-STS                      March 2017
 
 
               {
@@ -669,9 +669,9 @@ func getMxsForPolicy(domain, policy) {
 
 
 
-Margolis, et al.         Expires August 19, 2017               [Page 12]
+Margolis, et al.       Expires September 28, 2017              [Page 12]
 
-Internet-Draft                   MTA-STS                   February 2017
+Internet-Draft                   MTA-STS                      March 2017
 
 
 func tryGetNewPolicy(domain) {
@@ -696,16 +696,15 @@ func tryMxAccordingTo(message, mx, policy) {
   if !connection {
     return false  // Can't connect to the MX so it's not an MTA-STS error.
   }
-  status := !(tryStartTls(mx, &connection) && certMatches(connection, mx))
-  status = true
+  secure := true
   if !tryStartTls(mx, &connection) {
-    status = false
+    secure = false
     reportError(E_NO_VALID_TLS)
-  } else if !certMatches(connection, mx) {
-    status = false
+  } else if certMatches(connection, mx) {
+    secure = false
     reportError(E_CERT_MISMATCH)
   }
-  if status || !isEnforce(policy) {
+  if secure || !isEnforce(policy) {
     return tryDeliverMail(connection, message)
   }
   return false
@@ -722,15 +721,14 @@ func tryWithPolicy(message, domain, policy) {
     }
   }
   return false
-
-
-
-Margolis, et al.         Expires August 19, 2017               [Page 13]
-
-Internet-Draft                   MTA-STS                   February 2017
-
-
 }
+
+
+
+Margolis, et al.       Expires September 28, 2017              [Page 13]
+
+Internet-Draft                   MTA-STS                      March 2017
+
 
 func handleMessage(message) {
   domain := ... // domain part after '@' from recipient
@@ -775,21 +773,18 @@ func handleMessage(message) {
               4033, DOI 10.17487/RFC4033, March 2005,
               <http://www.rfc-editor.org/info/rfc4033>.
 
-
-
-
-
-
-
-Margolis, et al.         Expires August 19, 2017               [Page 14]
-
-Internet-Draft                   MTA-STS                   February 2017
-
-
    [RFC4627]  Crockford, D., "The application/json Media Type for
               JavaScript Object Notation (JSON)", RFC 4627, DOI 10
               .17487/RFC4627, July 2006,
               <http://www.rfc-editor.org/info/rfc4627>.
+
+
+
+
+Margolis, et al.       Expires September 28, 2017              [Page 14]
+
+Internet-Draft                   MTA-STS                      March 2017
+
 
    [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
               Specifications: ABNF", STD 68, RFC 5234, DOI 10.17487/
@@ -831,21 +826,20 @@ Authors' Addresses
    Email: dmargolis (at) google.com
 
 
-
-
-
-
-
-
-Margolis, et al.         Expires August 19, 2017               [Page 15]
-
-Internet-Draft                   MTA-STS                   February 2017
-
-
    Mark Risher
    Google, Inc
 
    Email: risher (at) google (dot com)
+
+
+
+
+
+
+
+Margolis, et al.       Expires September 28, 2017              [Page 15]
+
+Internet-Draft                   MTA-STS                      March 2017
 
 
    Binu Ramakrishnan
@@ -893,4 +887,10 @@ Internet-Draft                   MTA-STS                   February 2017
 
 
 
-Margolis, et al.         Expires August 19, 2017               [Page 16]
+
+
+
+
+
+
+Margolis, et al.       Expires September 28, 2017              [Page 16]

@@ -3,13 +3,13 @@
    Title = "SMTP MTA Strict Transport Security (MTA-STS)"
    abbrev = "MTA-STS"
    category = "std"
-   docName = "draft-ietf-uta-mta-sts-03"
+   docName = "draft-ietf-uta-mta-sts-04"
    ipr = "trust200902"
    area = "Applications"
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2017-02-15T00:00:00Z
+   date = 2017-03-27T00:00:00Z
 
    [[author]]
    initials="D."
@@ -216,6 +216,10 @@ resource-constrained recipients with cascading failures.
 Senders MAY impose a timeout on the HTTPS GET to avoid long delays imposed by
 attempted policy updates. A suggested timeout is one minute; policy hosts SHOULD
 respond to requests with a complete policy body within that timeout.
+
+If a valid TXT record is found but no policy can be fetched via HTTPS, and there
+is no valid (non-expired) previously-cached policy, senders MUST treat the
+recipient domain as one that has not implemented MTA-STS.
 
 ## Policy Selection for Smart Hosts
 
@@ -520,16 +524,15 @@ func tryMxAccordingTo(message, mx, policy) {
   if !connection {
     return false  // Can't connect to the MX so it's not an MTA-STS error.
   }
-  status := !(tryStartTls(mx, &connection) && certMatches(connection, mx)) 
-  status = true
+  secure := true
   if !tryStartTls(mx, &connection) {
-    status = false
+    secure = false
     reportError(E_NO_VALID_TLS)
-  } else if !certMatches(connection, mx) {
-    status = false
+  } else if certMatches(connection, mx) {
+    secure = false
     reportError(E_CERT_MISMATCH)
   }
-  if status || !isEnforce(policy) {
+  if secure || !isEnforce(policy) {
     return tryDeliverMail(connection, message)
   }
   return false

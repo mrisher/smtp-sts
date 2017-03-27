@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE rfc SYSTEM 'rfc2629.dtd' []>
-<rfc ipr="trust200902" category="std" docName="draft-ietf-uta-mta-sts-03">
+<rfc ipr="trust200902" category="std" docName="draft-ietf-uta-mta-sts-04">
 <?rfc toc="yes"?>
 <?rfc symrefs="yes"?>
 <?rfc sortrefs="yes"?>
@@ -87,7 +87,7 @@
 <uri></uri>
 </address>
 </author>
-<date year="2017" month="February" day="15"/>
+<date year="2017" month="March" day="27"/>
 
 <area>Applications</area>
 <workgroup>Using TLS in Applications</workgroup>
@@ -282,6 +282,10 @@ resource-constrained recipients with cascading failures.
 <t>Senders MAY impose a timeout on the HTTPS GET to avoid long delays imposed by
 attempted policy updates. A suggested timeout is one minute; policy hosts SHOULD
 respond to requests with a complete policy body within that timeout.
+</t>
+<t>If a valid TXT record is found but no policy can be fetched via HTTPS, and there
+is no valid (non-expired) previously-cached policy, senders MUST treat the
+recipient domain as one that has not implemented MTA-STS.
 </t>
 </section>
 
@@ -615,16 +619,15 @@ func tryMxAccordingTo(message, mx, policy) {
   if !connection {
     return false  // Can't connect to the MX so it's not an MTA-STS error.
   }
-  status := !(tryStartTls(mx, &amp;connection) &amp;&amp; certMatches(connection, mx)) 
-  status = true
+  secure := true
   if !tryStartTls(mx, &amp;connection) {
-    status = false
+    secure = false
     reportError(E_NO_VALID_TLS)
-  } else if !certMatches(connection, mx) {
-    status = false
+  } else if certMatches(connection, mx) {
+    secure = false
     reportError(E_CERT_MISMATCH)
   }
-  if status || !isEnforce(policy) {
+  if secure || !isEnforce(policy) {
     return tryDeliverMail(connection, message)
   }
   return false

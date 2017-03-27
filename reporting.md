@@ -3,13 +3,13 @@
    Title = "SMTP TLS Reporting"
    abbrev = "SMTP-TLSRPT"
    category = "std"
-   docName = "draft-ietf-uta-smtp-tlsrpt-03"
+   docName = "draft-ietf-uta-smtp-tlsrpt-04"
    ipr = "trust200902"
    area = "Applications"
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2017-02-15T00:00:00Z
+   date = 2017-03-27T00:00:00Z
    
    [[author]]
    initials="D."
@@ -67,7 +67,7 @@ misconfigurations.
 
 The STARTTLS extension to SMTP [@!RFC3207] allows SMTP clients and hosts to
 establish secure SMTP sessions over TLS. The protocol design is based on
-"Opportunistic Security" (OS) [@!RFC7435], which provides interoperability for
+"Opportunistic Security" (OS) [@!RFC7435], which maintains interoperability with
 clients that do not support STARTTLS but means that any attacker who can delete
 parts of the SMTP session (such as the "250 STARTTLS" response) or redirect the
 entire SMTP session (perhaps by overwriting the resolved MX record of the
@@ -75,7 +75,7 @@ delivery domain) can perform a downgrade or interception attack.
 
 Because such "downgrade attacks" are not necessarily apparent to the receiving
 MTA, this document defines a mechanism for sending domains to report on failures
-at multiple parts of the MTA-to-MTA conversation.
+at multiple stages of the MTA-to-MTA conversation.
 
 Recipient domains may also use the mechanisms defined by MTA-STS (TODO: Add ref)
 or DANE [@!RFC6698] to publish additional encryption and authentication
@@ -102,9 +102,9 @@ We also define the following terms for further use in this document:
 * MTA-STS Policy: A definition of the expected TLS availability, behavior, and
   desired actions for a given domain when a sending MTA encounters
   problems in negotiating a secure channel. MTA-STS is defined in [TODO]
-* DANE Policy: A mechanism for enabling the administrators of domain names to
-  specify the keys used in that domain's TLS servers. DANE is defined in
-  [@!RFC6698]
+* DANE Policy: A mechanism by which administrators can supply a record that can
+  be used to validate the certificate presented by an MTA. DANE is defined
+  in [@!RFC6698].
 * TLSRPT Policy: A policy specifying the endpoint to which sending MTAs should
   deliver reports.
 * Policy Domain: The domain against which an MTA-STS or DANE Policy is defined.
@@ -138,12 +138,8 @@ Policies consist of the following directives:
            ([@!RFC2818]) to the specified URI.
   * In the case of `mailto`, reports should be submitted to the specified
            email address. When sending failure reports via SMTP, sending MTAs
-           MUST NOT honor MTA-STS or DANE TLSA failures.
-* `ruf`: Future use. (There may also be a need for enabling more detailed
-     "forensic" reporting during initial stages of a deployment. To address
-     this, the authors consider the possibility of an optional additional
-     "forensic reporting mode" in which more details--such as certificate chains
-     and MTA banners--may be reported.)
+           MUST deliver reports despite any TLS-related failures.  This may
+	   mean that the reports are delivered in the clear.
 
 The formal definition of the `_smtp-tlsrpt` TXT record, defined using
 [@!RFC5234], is as follows:
@@ -199,7 +195,8 @@ Aggregate reports contain the following fields:
 * Policy, consisting of:
   * One of the following policy types:
     (1) The MTA-STS policy applied (as a string)
-    (2) The DANE TLSA record applied (as a string)
+    (2) The DANE TLSA record applied (as a string, with each RR entry of the
+    RRset listed and separated by a semicolon)
     (3) The literal string `no-policy-found`, if neither a TLSA nor
     MTA-STS policy could be found.
   * The domain for which the policy is applied
@@ -241,22 +238,18 @@ easier correlation of failure events.
 The list of result types will start with the minimal set below, and is expected
 to grow over time based on real-world experience. The initial set is:
 
-### Routing Failures
-
-* `mx-mismatch`: This indicates that the MX resolved for the recipient domain
-    did not match the MX constraint specified in the policy.
-
 ### Negotiation Failures
 
 * `starttls-not-supported`: This indicates that the recipient MX did not
     support STARTTLS.
 * `certificate-host-mismatch`: This indicates that the certificate presented
     did not adhere to the constraints specified in the MTA-STS or DANE policy, e.g.
-    if the CN field did not match the hostname of the MX.
+    if the MX does not match any identities listed in the Subject Alternate 
+    Name (SAN) [RFC5280].
 * `certificate-expired`: This indicates that the certificate has expired.
 * `certificate-not-trusted`: This a label that covers multiple certificate
     related failures that include, but not limited to errors such as
-    untrusted/unknown CAs, certificate name contraints, certificate chain
+    untrusted/unknown CAs, certificate name constraints, certificate chain
     errors etc. When using this declaration, the reporting MTA SHOULD utilize
     the `failure-reason` to provide more information to the receiving entity.
 * `validation-failure`: This indicates a general failure for a reason not matching 
@@ -268,9 +261,11 @@ to grow over time based on real-world experience. The initial set is:
 #### DANE-specific Policy Failures
 
 * `tlsa-invalid`: This indicates a validation error in the TLSA record
-    associated with a DANE policy.
-* `dnssec-invalid`: This indicates a failure to authenticate DNS records for a
-    Policy Domain with a published TLSA record.
+    associated with a DANE policy.  None of the records in the RRset were found
+    to be valid.
+* `dnssec-invalid`: This would indicate that no valid records were returned from 
+    the recursive resolver.  The request returned with SERVFAIL for the requested
+    TLSA record.
 
 #### MTA-STS-specific Policy Failures
 
