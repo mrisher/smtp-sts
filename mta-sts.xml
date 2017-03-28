@@ -160,7 +160,9 @@ downgrades.  For a thorough discussion of this trade-off, see the section
 &quot;Security Considerations&quot;.
 </t>
 <t>In addition, MTA-STS provides an optional report-only mode, enabling soft
-deployments to detect policy failures.
+deployments to detect policy failures; partial deployments can be achieved in
+DANE by deploying TLSA records only for some of a domain's MXs, but such a
+mechanism is not possible for the per-domain policies used by MTA STS.
 </t>
 </section>
 

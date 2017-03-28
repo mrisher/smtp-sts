@@ -105,7 +105,9 @@ downgrades.  For a thorough discussion of this trade-off, see the section
 "Security Considerations".
 
 In addition, MTA-STS provides an optional report-only mode, enabling soft
-deployments to detect policy failures.
+deployments to detect policy failures; partial deployments can be achieved in
+DANE by deploying TLSA records only for some of a domain's MXs, but such a
+mechanism is not possible for the per-domain policies used by MTA STS.
 
 # Policy Discovery
 
@@ -337,9 +339,9 @@ Change Controller: IETF
 
 # Security Considerations
 
-SMTP Strict Transport Security attempts to protect against an active attacker
-who wishes to intercept or tamper with mail between hosts who support STARTTLS.
-There are two classes of attacks considered:
+SMTP MTA Strict Transport Security attempts to protect against an active
+attacker who wishes to intercept or tamper with mail between hosts who support
+STARTTLS. There are two classes of attacks considered:
 
 1. Foiling TLS negotiation, for example by deleting the "250 STARTTLS" response
    from a server or altering TLS session negotiation. This would result in the
@@ -352,25 +354,40 @@ There are two classes of attacks considered:
    connections intended for the legitimate recipient server (for example, by
    altering BGP routing tables).
 
-SMTP MTA-STS relies on certificate validation via PKIX based
-TLS identity checking [@!RFC6125]. Attackers who are able to obtain a valid
-certificate for the targeted recipient mail service (e.g. by compromising a
-certificate authority) are thus able to circumvent STS authentication.
+MTA STS can thwart such attacks only if the sender is able to previously obtain
+and cache a policy for the recipient domain, and only if the attacker is unable
+to obtain a valid certificate that complies with that policy. Below, we consider
+specific attacks on this model.
 
-Since we use DNS TXT records for policy discovery, an attacker who is able to
-block DNS responses can suppress the discovery of an MTA-STS Policy, making the
-Policy Domain appear not to have an MTA-STS Policy. The sender policy cache is
-designed to resist this attack by decreasing the frequency of policy discovery
-and thus reducing the window of vulnerability; it is nonetheless a risk that
-attackers who can predict or induce policy discovery--for example, by inducing
-a victim sending domain to send mail to a never-before-contacted recipient while
-carrying out a man-in-the-middle attack--may be able to foil policy discovery
-and effectively downgrade the security of the message delivery.
+## Obtaining a Signed Certificate
+
+SMTP MTA-STS relies on certificate validation via PKIX based TLS identity
+checking [@!RFC6125]. Attackers who are able to obtain a valid certificate for
+the targeted recipient mail service (e.g. by compromising a certificate
+authority) are thus able to circumvent STS authentication.
+
+## Preventing Policy Discovery
+
+Since MTA STS uses DNS TXT records for policy discovery, an attacker who is able
+to block DNS responses can suppress the discovery of an MTA-STS Policy, making
+the Policy Domain appear not to have an MTA-STS Policy. The sender policy cache
+is designed to resist this attack by decreasing the frequency of policy
+discovery and thus reducing the window of vulnerability; it is nonetheless a
+risk that attackers who can predict or induce policy discovery--for example, by
+inducing a victim sending domain to send mail to a never-before-contacted
+recipient while carrying out a man-in-the-middle attack--may be able to foil
+policy discovery and effectively downgrade the security of the message delivery.
+
+Since this attack depends upon intercepting initial policy discovery, we
+strongly recommend implementors to prefer policy `max_age` values to be as long
+as is practical.
 
 Resistence to downgrade attacks of this nature--due to the ability to
 authoritatively determine "lack of a record" even for non-participating
 recipients--is a feature of DANE, due to its leverage of DNSSEC for policy
 discovery.
+
+## Denial of Service
 
 We additionally consider the Denial of Service risk posed by an attacker who can
 modify the DNS records for a victim domain. Absent MTA-STS, such an attacker can
@@ -401,6 +418,8 @@ serve the `_mta-sts` TXT record on the same domain--something not, to our
 knowledge, widely provided to untrusted users. This attack is additionally
 mitigated by the aforementioned ability for a victim domain to update an invalid
 policy at any future date.
+
+## Weak Policy Constraints
 
 Even if an attacker cannot modify a served policy, the potential exists for
 configurations that allow attackers on the same domain to receive mail for that

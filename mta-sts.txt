@@ -70,7 +70,7 @@ Table of Contents
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.1.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   3
    2.  Related Technologies  . . . . . . . . . . . . . . . . . . . .   3
-   3.  Policy Discovery  . . . . . . . . . . . . . . . . . . . . . .   3
+   3.  Policy Discovery  . . . . . . . . . . . . . . . . . . . . . .   4
      3.1.  MTA-STS TXT Records . . . . . . . . . . . . . . . . . . .   4
      3.2.  MTA-STS Policies  . . . . . . . . . . . . . . . . . . . .   5
      3.3.  HTTPS Policy Fetching . . . . . . . . . . . . . . . . . .   6
@@ -153,14 +153,14 @@ Internet-Draft                   MTA-STS                      March 2017
    section "Security Considerations".
 
    In addition, MTA-STS provides an optional report-only mode, enabling
-   soft deployments to detect policy failures.
+   soft deployments to detect policy failures; partial deployments can
+   be achieved in DANE by deploying TLSA records only for some of a
+   domain's MXs, but such a mechanism is not possible for the per-domain
+   policies used by MTA STS.
 
-3.  Policy Discovery
 
-   MTA-STS policies are distributed via HTTPS from a "well-known"
-   [RFC5785] path served within the Policy Domain, and their presence
-   and current version are indicated by a TXT record at the Policy
-   Domain.  These TXT records additionally contain a policy "id" field,
+
+
 
 
 
@@ -170,6 +170,12 @@ Margolis, et al.       Expires September 28, 2017               [Page 3]
 Internet-Draft                   MTA-STS                      March 2017
 
 
+3.  Policy Discovery
+
+   MTA-STS policies are distributed via HTTPS from a "well-known"
+   [RFC5785] path served within the Policy Domain, and their presence
+   and current version are indicated by a TXT record at the Policy
+   Domain.  These TXT records additionally contain a policy "id" field,
    allowing sending MTAs to check the currency of a cached policy
    without performing an HTTPS request.
 
@@ -211,12 +217,6 @@ Internet-Draft                   MTA-STS                      March 2017
    If multiple TXT records for "_mta-sts" are returned by the resolver,
    records which do not begin with "v=STSv1;" are discarded.  If the
    number of resulting records is not one, senders MUST assume the
-   recipient domain does not implement MTA-STS and skip the remaining
-   steps of policy discovery.
-
-
-
-
 
 
 
@@ -225,6 +225,9 @@ Margolis, et al.       Expires September 28, 2017               [Page 4]
 
 Internet-Draft                   MTA-STS                      March 2017
 
+
+   recipient domain does not implement MTA-STS and skip the remaining
+   steps of policy discovery.
 
 3.2.  MTA-STS Policies
 
@@ -271,9 +274,6 @@ Internet-Draft                   MTA-STS                      March 2017
                         "max_age": 123456
                       }
 
-   Parsers SHOULD accept TXT records and policy files which are
-   syntactically valid (i.e. valid key-value pairs separated by semi-
-   colons for TXT records and valid JSON for policy files) and
 
 
 
@@ -282,6 +282,9 @@ Margolis, et al.       Expires September 28, 2017               [Page 5]
 Internet-Draft                   MTA-STS                      March 2017
 
 
+   Parsers SHOULD accept TXT records and policy files which are
+   syntactically valid (i.e. valid key-value pairs separated by semi-
+   colons for TXT records and valid JSON for policy files) and
    implementing a superset of this specification, in which case unknown
    fields SHALL be ignored.
 
@@ -326,9 +329,6 @@ Internet-Draft                   MTA-STS                      March 2017
    and non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST
    ensure:
 
-   1.  That the recipient MX matches the "mx" pattern from the recipient
-       domain's policy (as defined in the section "MX Matching").
-
 
 
 
@@ -337,6 +337,9 @@ Margolis, et al.       Expires September 28, 2017               [Page 6]
 
 Internet-Draft                   MTA-STS                      March 2017
 
+
+   1.  That the recipient MX matches the "mx" pattern from the recipient
+       domain's policy (as defined in the section "MX Matching").
 
    2.  That the recipient MX supports STARTTLS and offers a valid PKIX
        based TLS certificate (as defined in the section "MX Certificate
@@ -383,9 +386,6 @@ Internet-Draft                   MTA-STS                      March 2017
        described in the TLSRPT specification (TODO: add ref)) indicating
        policy application failures.
 
-   2.  "enforce": In this mode, sending MTAs MUST NOT deliver the
-       message to hosts which fail MX matching or certificate
-       validation.
 
 
 
@@ -393,6 +393,10 @@ Margolis, et al.       Expires September 28, 2017               [Page 7]
 
 Internet-Draft                   MTA-STS                      March 2017
 
+
+   2.  "enforce": In this mode, sending MTAs MUST NOT deliver the
+       message to hosts which fail MX matching or certificate
+       validation.
 
    When a message fails to deliver due to an "enforce" policy, a
    compliant MTA MUST NOT permanently fail to deliver messages before
@@ -438,10 +442,6 @@ Internet-Draft                   MTA-STS                      March 2017
    5.  For each candidate MX, in order of MX priority, attempt to
        deliver the message, enforcing STARTTLS and the MX host's PKIX
        certificate validation.
-
-
-
-
 
 
 
