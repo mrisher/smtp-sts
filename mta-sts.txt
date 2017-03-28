@@ -128,10 +128,9 @@ Internet-Draft                   MTA-STS                      March 2017
 
 1.1.  Terminology
 
-   The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL", when
-   they appear in this document, are to be interpreted as described in
-   [RFC2119].
+   The keywords MUST, MUST NOT, REQUIRED, SHALL, SHALL NOT, SHOULD,
+   SHOULD NOT, RECOMMENDED, MAY, and OPTIONAL, when they appear in this
+   document, are to be interpreted as described in [RFC2119].
 
    We also define the following terms for further use in this document:
 
@@ -161,7 +160,8 @@ Internet-Draft                   MTA-STS                      March 2017
    domain's MXs, but such a mechanism is not possible for the per-domain
    policies used by MTA-STS.
 
-
+   The primary motivation of MTA-STS is to provide a mechanism for
+   domains to upgrade their transport security even when deploying
 
 
 
@@ -170,8 +170,6 @@ Margolis, et al.       Expires September 28, 2017               [Page 3]
 Internet-Draft                   MTA-STS                      March 2017
 
 
-   The primary motivation of MTA-STS is to provide a mechanism for
-   domains to upgrade their transport security even when deploying
    DNSSEC is undesirable or impractical.  However, MTA-STS is designed
    not to interfere with DANE deployments when the two overlap; in
    particular, senders who implement MTA-STS validation MUST NOT allow a
@@ -214,6 +212,8 @@ Internet-Draft                   MTA-STS                      March 2017
 
    The formal definition of the "_mta-sts" TXT record, defined using
    [RFC5234], is as follows:
+
+
 
 
 
