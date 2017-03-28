@@ -107,7 +107,7 @@ downgrades.  For a thorough discussion of this trade-off, see the section
 In addition, MTA-STS provides an optional report-only mode, enabling soft
 deployments to detect policy failures; partial deployments can be achieved in
 DANE by deploying TLSA records only for some of a domain's MXs, but such a
-mechanism is not possible for the per-domain policies used by MTA STS.
+mechanism is not possible for the per-domain policies used by MTA-STS.
 
 # Policy Discovery
 
@@ -354,7 +354,7 @@ STARTTLS. There are two classes of attacks considered:
    connections intended for the legitimate recipient server (for example, by
    altering BGP routing tables).
 
-MTA STS can thwart such attacks only if the sender is able to previously obtain
+MTA-STS can thwart such attacks only if the sender is able to previously obtain
 and cache a policy for the recipient domain, and only if the attacker is unable
 to obtain a valid certificate that complies with that policy. Below, we consider
 specific attacks on this model.
@@ -368,7 +368,7 @@ authority) are thus able to circumvent STS authentication.
 
 ## Preventing Policy Discovery
 
-Since MTA STS uses DNS TXT records for policy discovery, an attacker who is able
+Since MTA-STS uses DNS TXT records for policy discovery, an attacker who is able
 to block DNS responses can suppress the discovery of an MTA-STS Policy, making
 the Policy Domain appear not to have an MTA-STS Policy. The sender policy cache
 is designed to resist this attack by decreasing the frequency of policy
