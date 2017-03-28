@@ -109,6 +109,13 @@ deployments to detect policy failures; partial deployments can be achieved in
 DANE by deploying TLSA records only for some of a domain's MXs, but such a
 mechanism is not possible for the per-domain policies used by MTA-STS.
 
+The primary motivation of MTA-STS is to provide a mechanism for domains to
+upgrade their transport security even when deploying DNSSEC is undesirable or
+impractical. However, MTA-STS is designed not to interfere with DANE deployments
+when the two overlap; in particular, senders who implement MTA-STS validation
+MUST NOT allow a "valid" or "report-only" MTA-STS validation to override a
+failing DANE validation.
+
 # Policy Discovery
 
 MTA-STS policies are distributed via HTTPS from a "well-known" [@!RFC5785] path served
