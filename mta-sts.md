@@ -233,11 +233,16 @@ If a valid TXT record is found but no policy can be fetched via HTTPS, and there
 is no valid (non-expired) previously-cached policy, senders MUST treat the
 recipient domain as one that has not implemented MTA-STS.
 
-## Policy Selection for Smart Hosts
+## Policy Selection for Smart Hosts and Subdomains
 
 When sending mail via a "smart host"--an intermediate SMTP relay rather than the
 message recipient's server--compliant senders MUST treat the smart host domain
 as the policy domain for the purposes of policy discovery and application.
+
+When sending mail to a mailbox at a subdomain, compliant senders MUST NOT
+attempt to fetch a policy from the parent zone. Thus for mail sent to
+"user@mail.example.com", the policy can be fetched only from "mail.example.com",
+not "example.com".
 
 #  Policy Validation
 

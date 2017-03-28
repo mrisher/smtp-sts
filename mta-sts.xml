@@ -301,10 +301,15 @@ recipient domain as one that has not implemented MTA-STS.
 </t>
 </section>
 
-<section anchor="policy-selection-for-smart-hosts" title="Policy Selection for Smart Hosts">
+<section anchor="policy-selection-for-smart-hosts-and-subdomains" title="Policy Selection for Smart Hosts and Subdomains">
 <t>When sending mail via a &quot;smart host&quot;--an intermediate SMTP relay rather than the
 message recipient's server--compliant senders MUST treat the smart host domain
 as the policy domain for the purposes of policy discovery and application.
+</t>
+<t>When sending mail to a mailbox at a subdomain, compliant senders MUST NOT
+attempt to fetch a policy from the parent zone. Thus for mail sent to
+&quot;user@mail.example.com&quot;, the policy can be fetched only from &quot;mail.example.com&quot;,
+not &quot;example.com&quot;.
 </t>
 </section>
 </section>
