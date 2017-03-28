@@ -74,7 +74,7 @@ record of the delivery domain) can perform downgrade or interception attacks.
 This document defines a mechanism for recipient domains to publish policies
 specifying:
 
-   * whether MTAs sending mail to this domain can expect PKIX authenticated TLS
+   * whether MTAs sending mail to this domain can expect PKIX-authenticated TLS
      support
    * what a conforming client should do with messages when TLS cannot be
      successfully negotiated
@@ -181,17 +181,17 @@ This JSON object contains the following key/value pairs:
   weeks or greater.
 * `mx`: MX identity patterns (list of plain-text strings, required). One or more
   patterns matching a Common Name ([@!RFC6125]) or Subject Alternative Name
-  ([@!RFC5280]) present in the X.509 certificate presented by any MX receiving
-  mail for this domain.  For example, `["mail.example.com", ".example.net"]`
-  indicates that mail for this domain might be handled by any MX with a
-  certificate valid for a host at `example.com` or `example.net`.  Valid
-  patterns can be either fully specified names (`example.com`) or suffixes
+  ([@!RFC5280]) DNS-ID present in the X.509 certificate presented by any MX
+  receiving mail for this domain.  For example, `["mail.example.com",
+  ".example.net"]` indicates that mail for this domain might be handled by any
+  MX with a certificate valid for a host at `example.com` or `example.net`.
+  Valid patterns can be either fully specified names (`example.com`) or suffixes
   (`.example.net`) matching the right-hand parts of a server's identity; the
   latter case are distinguished by a leading period.  In the case of
   Internationalized Domain Names ([@!RFC5891]), the MX MUST specify the
-  Punycode-encoded A-label, as per [@!RFC3492], and not the Unicode-encoded
-  U-label. The full semantics of certificate validation are described in "MX
-  Certificate Validation."
+  Punycode-encoded A-label [@!RFC3492] and not the Unicode-encoded U-label. The
+  full semantics of certificate validation are described in "MX Certificate
+  Validation."
 
 An example JSON policy is as below:
 
@@ -244,7 +244,7 @@ as the policy domain for the purposes of policy discovery and application.
 When sending to an MX at a domain for which the sender has a valid and
 non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST validate:
 
-1.  That the recipient MX supports STARTTLS and offers a valid PKIX based TLS
+1.  That the recipient MX supports STARTTLS and offers a valid PKIX-based TLS
     certificate.
 
 2.  That at least one of the policy's "mx" patterns matches at least one of the
@@ -284,7 +284,8 @@ Appendix.
 
 When sending to an MX at a domain for which the sender has a valid, non-expired 
 MTA-STS policy, a sending MTA honoring MTA-STS applies the result of a policy
-validation one of two ways, depending on the value of the policy `mode` field:
+validation failure one of two ways, depending on the value of the policy `mode`
+field:
 
 1. `report`: In this mode, sending MTAs merely send a report (as described in
    the TLSRPT specification (TODO: add ref)) indicating policy application
@@ -310,12 +311,12 @@ An example control flow for a compliant sender consists of the following steps:
 
 1. Check for a cached policy whose time-since-fetch has not exceeded its
    `max_age`. If none exists, attempt to fetch a new policy (perhaps
-   asynchronously, so as not to block message delivery). (Optionally, sending
-   MTAs may unconditionally check for a new policy at this step.)
+   asynchronously, so as not to block message delivery). Optionally, sending
+   MTAs may unconditionally check for a new policy at this step.
 2. For each candidate MX, in order of MX priority, attempt to deliver the
-   message, enforcing STARTTLS, PKIX certificate validation, and (assuming a
-   policy is present), certificate validation as described in "MX Certificate
-   Validation."
+   message, enforcing STARTTLS and, assuming a policy is present, PKIX
+   certificate validation, and certificate validation as described in "MX
+   Certificate Validation."
 3. Upon message retries, a message MAY be permanently failed following first
    checking for the presence of a new policy (as indicated by the `id` field in
    the `_mta-sts` TXT record).
@@ -350,16 +351,16 @@ SMTP MTA Strict Transport Security attempts to protect against an active
 attacker who wishes to intercept or tamper with mail between hosts who support
 STARTTLS. There are two classes of attacks considered:
 
-1. Foiling TLS negotiation, for example by deleting the "250 STARTTLS" response
-   from a server or altering TLS session negotiation. This would result in the
-   SMTP session occurring over plaintext, despite both parties supporting TLS.
+* Foiling TLS negotiation, for example by deleting the "250 STARTTLS" response
+  from a server or altering TLS session negotiation. This would result in the
+  SMTP session occurring over plaintext, despite both parties supporting TLS.
 
-2. Impersonating the destination mail server, whereby the sender might deliver
-   the message to an impostor, who could then monitor and/or modify messages
-   despite opportunistic TLS. This impersonation could be accomplished by
-   spoofing the DNS MX record for the recipient domain, or by redirecting client
-   connections intended for the legitimate recipient server (for example, by
-   altering BGP routing tables).
+* Impersonating the destination mail server, whereby the sender might deliver
+  the message to an impostor, who could then monitor and/or modify messages
+  despite opportunistic TLS. This impersonation could be accomplished by
+  spoofing the DNS MX record for the recipient domain, or by redirecting client
+  connections intended for the legitimate recipient server (for example, by
+  altering BGP routing tables).
 
 MTA-STS can thwart such attacks only if the sender is able to previously obtain
 and cache a policy for the recipient domain, and only if the attacker is unable
@@ -391,15 +392,14 @@ as is practical.
 
 Resistence to downgrade attacks of this nature--due to the ability to
 authoritatively determine "lack of a record" even for non-participating
-recipients--is a feature of DANE, due to its leverage of DNSSEC for policy
-discovery.
+recipients--is a feature of DANE, due to its use of DNSSEC for policy discovery.
 
 ## Denial of Service
 
 We additionally consider the Denial of Service risk posed by an attacker who can
 modify the DNS records for a victim domain. Absent MTA-STS, such an attacker can
 cause a sending MTA to cache invalid MX records, but only for however long the
-sending resolver caches those records. With MTA- STS, the attacker can
+sending resolver caches those records. With MTA-STS, the attacker can
 additionally advertise a new, long-`max_age` MTA-STS policy with `mx`
 constraints that validate the malicious MX record, causing senders to cache the
 policy and refuse to deliver messages once the victim has resecured the MX
@@ -420,18 +420,17 @@ DNS records at the provider's domain.
 In these cases, there is a risk that untrusted users would be able to serve
 custom content at the `mta-sts` host, including serving an illegitimate MTA-STS
 policy.  We believe this attack is rendered more difficult by the need for the
-attacker to both inject malicious (but temporarily working) MX records and also
-serve the `_mta-sts` TXT record on the same domain--something not, to our
-knowledge, widely provided to untrusted users. This attack is additionally
-mitigated by the aforementioned ability for a victim domain to update an invalid
-policy at any future date.
+attacker to also serve the `_mta-sts` TXT record on the same domain--something
+not, to our knowledge, widely provided to untrusted users. This attack is
+additionally mitigated by the aforementioned ability for a victim domain to
+update an invalid policy at any future date.
 
 ## Weak Policy Constraints
 
 Even if an attacker cannot modify a served policy, the potential exists for
 configurations that allow attackers on the same domain to receive mail for that
 domain. For example, an easy configuration option when authoring an MTA-STS Policy
-for `example.com` is to set the `mx` equal to `*.example.com`; recipient domains
+for `example.com` is to set the `mx` equal to `.example.com`; recipient domains
 must consider in this case the risk that any user possessing a valid hostname
 and CA-signed certificate (for example, `dhcp-123.example.com`) will, from the
 perspective of MTA-STS Policy validation, be a valid MX host for that domain.
@@ -465,10 +464,10 @@ markus.laber (at) 1und1 (dot de)
 # Appendix 1: MTA-STS example record & policy
 
 The owner of `example.com` wishes to begin using MTA-STS with a policy that will
-solicit reports from receivers without affecting how the messages are
-processed, in order to verify the identity of MXs that handle mail for
-`example.com`, confirm that TLS is correctly used, and ensure that certificates
-presented by the recipient MX validate.
+solicit reports from senders without affecting how the messages are processed,
+in order to verify the identity of MXs that handle mail for `example.com`,
+confirm that TLS is correctly used, and ensure that certificates presented by
+the recipient MX validate.
 
 MTA-STS policy indicator TXT RR:
 ~~~~~~~~~
@@ -489,9 +488,7 @@ https://mta-sts.example.com/.well-known/mta-sts.json:
 
 # Appendix 2: Message delivery pseudocode
 
-Below is pseudocode demonstrating the logic of a compliant sending MTA. This
-implements the "two-pass" approach, first attempting delivery with a newly
-fetched policy (if present) before falling back to a cached policy (if present).
+Below is pseudocode demonstrating the logic of a compliant sending MTA. 
 
 While this pseudocode implementation suggests synchronous policy retrieval in
 the delivery path, in a working implementation that may be undesirable, and we
@@ -513,8 +510,25 @@ func tryStartTls(mx) {
 }
 
 func certMatches(connection, mx) {
-  // Return if the server certificate from "connection" matches the "mx" host.
-  // See "MX Certificate Validation".
+  // For simplicity, we are not checking CNs here.
+  for san in getSansFromCert(connection) {
+    // Return if the server certificate from "connection" matches the "mx" host.
+    if san[0] == '*' {
+      // Invalid wildcard!
+      if san[1] != '.' return false
+      san = san[1:]
+    }
+    if san[0] == '.' && HasSuffix(mx, san) {
+      return true
+    }
+    if mx[0] == '.' && HasSuffix(san, mx) {
+      return true
+    }
+    if mx == san {
+      return true
+    }
+  }
+  return false
 }
 
 func tryDeliverMail(connection, message) {
@@ -530,7 +544,7 @@ func cachePolicy(domain, policy) {
   // Store "policy" as the cached policy for "domain".
 }
 
-func tryGetCachedPolicy(domain, policy) {
+func tryGetCachedPolicy(domain) {
   // Return a cached policy for "domain".
 }
 
@@ -547,7 +561,7 @@ func tryMxAccordingTo(message, mx, policy) {
   if !tryStartTls(mx, &connection) {
     secure = false
     reportError(E_NO_VALID_TLS)
-  } else if certMatches(connection, mx) {
+  } else if !certMatches(connection, mx) {
     secure = false
     reportError(E_CERT_MISMATCH)
   }
@@ -568,38 +582,18 @@ func tryWithPolicy(message, domain, policy) {
 
 func handleMessage(message) {
   domain := ... // domain part after '@' from recipient
-  oldPolicy := tryGetCachedPolicy(domain)
-  newPolicy := tryGetNewPolicy(domain)
-  if newPolicy {
-    cachePolicy(domain, newPolicy)
-    oldPolicy = newPolicy
+  policy := tryGetNewPolicy(domain)
+  if policy {
+    cachePolicy(domain, policy)
+  } else {
+    policy = tryGetCachedPolicy(domain)
   }
-  if oldPolicy {
-    return tryWithPolicy(message, oldPolicy)
+  if policy {
+    return tryWithPolicy(message, policy)
   }
-  // There is no policy or there's a new policy that did not work.
   // Try to deliver the message normally (i.e. without MTA-STS).
 }
 
-~~~~~~~~~
-
-# Appendix 3: Certificate Validation Pseuocode
-
-~~~~~~~~~
-func match(mx, san) {
-  if san[0] == '*' {
-    // Invalid wildcard!
-    if san[1] != '.' return false
-    san = san[1:]
-  }
-  if san[0] == '.' {
-    return HasSuffix(mx, san)
-  }
-  if mx[0] == '.' {
-    return HasSuffix(san, mx)
-  }
-  return mx == san
-}
 ~~~~~~~~~
 
 {backmatter}

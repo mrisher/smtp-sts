@@ -90,10 +90,9 @@ Table of Contents
    9.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  11
    10. Appendix 1: MTA-STS example record & policy . . . . . . . . .  12
    11. Appendix 2: Message delivery pseudocode . . . . . . . . . . .  12
-   12. Appendix 3: Certificate Validation Pseuocode  . . . . . . . .  14
-   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  14
-     13.1.  Normative References . . . . . . . . . . . . . . . . . .  15
-     13.2.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  16
+   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  14
+     12.1.  Normative References . . . . . . . . . . . . . . . . . .  14
+     12.2.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  16
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
 
 1.  Introduction
@@ -109,6 +108,7 @@ Table of Contents
 
 
 
+
 Margolis, et al.       Expires September 28, 2017               [Page 2]
 
 Internet-Draft                   MTA-STS                      March 2017
@@ -120,7 +120,7 @@ Internet-Draft                   MTA-STS                      March 2017
    This document defines a mechanism for recipient domains to publish
    policies specifying:
 
-   o  whether MTAs sending mail to this domain can expect PKIX
+   o  whether MTAs sending mail to this domain can expect PKIX-
       authenticated TLS support
 
    o  what a conforming client should do with messages when TLS cannot
@@ -265,15 +265,15 @@ Internet-Draft                   MTA-STS                      March 2017
 
    o  "mx": MX identity patterns (list of plain-text strings, required).
       One or more patterns matching a Common Name ([RFC6125]) or Subject
-      Alternative Name ([RFC5280]) present in the X.509 certificate
-      presented by any MX receiving mail for this domain.  For example,
-      "["mail.example.com", ".example.net"]" indicates that mail for
-      this domain might be handled by any MX with a certificate valid
-      for a host at "example.com" or "example.net".  Valid patterns can
-      be either fully specified names ("example.com") or suffixes
-      (".example.net") matching the right-hand parts of a server's
-      identity; the latter case are distinguished by a leading period.
-      In the case of Internationalized Domain Names ([RFC5891]), the MX
+      Alternative Name ([RFC5280]) DNS-ID present in the X.509
+      certificate presented by any MX receiving mail for this domain.
+      For example, "["mail.example.com", ".example.net"]" indicates that
+      mail for this domain might be handled by any MX with a certificate
+      valid for a host at "example.com" or "example.net".  Valid
+      patterns can be either fully specified names ("example.com") or
+      suffixes (".example.net") matching the right-hand parts of a
+      server's identity; the latter case are distinguished by a leading
+      period.  In the case of Internationalized Domain Names
 
 
 
@@ -282,9 +282,9 @@ Margolis, et al.       Expires September 28, 2017               [Page 5]
 Internet-Draft                   MTA-STS                      March 2017
 
 
-      MUST specify the Punycode-encoded A-label, as per [RFC3492], and
-      not the Unicode-encoded U-label.  The full semantics of
-      certificate validation are described in "MX Certificate
+      ([RFC5891]), the MX MUST specify the Punycode-encoded A-label
+      [RFC3492] and not the Unicode-encoded U-label.  The full semantics
+      of certificate validation are described in "MX Certificate
       Validation."
 
    An example JSON policy is as below:
@@ -351,7 +351,7 @@ Internet-Draft                   MTA-STS                      March 2017
    and non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST
    validate:
 
-   1.  That the recipient MX supports STARTTLS and offers a valid PKIX
+   1.  That the recipient MX supports STARTTLS and offers a valid PKIX-
        based TLS certificate.
 
    2.  That at least one of the policy's "mx" patterns matches at least
@@ -401,8 +401,8 @@ Internet-Draft                   MTA-STS                      March 2017
 
    When sending to an MX at a domain for which the sender has a valid,
    non-expired MTA-STS policy, a sending MTA honoring MTA-STS applies
-   the result of a policy validation one of two ways, depending on the
-   value of the policy "mode" field:
+   the result of a policy validation failure one of two ways, depending
+   on the value of the policy "mode" field:
 
    1.  "report": In this mode, sending MTAs merely send a report (as
        described in the TLSRPT specification (TODO: add ref)) indicating
@@ -432,13 +432,13 @@ Internet-Draft                   MTA-STS                      March 2017
    1.  Check for a cached policy whose time-since-fetch has not exceeded
        its "max_age".  If none exists, attempt to fetch a new policy
        (perhaps asynchronously, so as not to block message delivery).
-       (Optionally, sending MTAs may unconditionally check for a new
-       policy at this step.)
+       Optionally, sending MTAs may unconditionally check for a new
+       policy at this step.
 
    2.  For each candidate MX, in order of MX priority, attempt to
-       deliver the message, enforcing STARTTLS, PKIX certificate
-       validation, and (assuming a policy is present), certificate
-       validation as described in "MX Certificate Validation."
+       deliver the message, enforcing STARTTLS and, assuming a policy is
+       present, PKIX certificate validation, and certificate validation
+       as described in "MX Certificate Validation."
 
 
 
@@ -486,18 +486,18 @@ Internet-Draft                   MTA-STS                      March 2017
    hosts who support STARTTLS.  There are two classes of attacks
    considered:
 
-   1.  Foiling TLS negotiation, for example by deleting the "250
-       STARTTLS" response from a server or altering TLS session
-       negotiation.  This would result in the SMTP session occurring
-       over plaintext, despite both parties supporting TLS.
+   o  Foiling TLS negotiation, for example by deleting the "250
+      STARTTLS" response from a server or altering TLS session
+      negotiation.  This would result in the SMTP session occurring over
+      plaintext, despite both parties supporting TLS.
 
-   2.  Impersonating the destination mail server, whereby the sender
-       might deliver the message to an impostor, who could then monitor
-       and/or modify messages despite opportunistic TLS.  This
-       impersonation could be accomplished by spoofing the DNS MX record
-       for the recipient domain, or by redirecting client connections
-       intended for the legitimate recipient server (for example, by
-       altering BGP routing tables).
+   o  Impersonating the destination mail server, whereby the sender
+      might deliver the message to an impostor, who could then monitor
+      and/or modify messages despite opportunistic TLS.  This
+      impersonation could be accomplished by spoofing the DNS MX record
+      for the recipient domain, or by redirecting client connections
+      intended for the legitimate recipient server (for example, by
+      altering BGP routing tables).
 
 
 
@@ -540,8 +540,8 @@ Internet-Draft                   MTA-STS                      March 2017
 
    Resistence to downgrade attacks of this nature--due to the ability to
    authoritatively determine "lack of a record" even for non-
-   participating recipients--is a feature of DANE, due to its leverage
-   of DNSSEC for policy discovery.
+   participating recipients--is a feature of DANE, due to its use of
+   DNSSEC for policy discovery.
 
 8.3.  Denial of Service
 
@@ -549,7 +549,7 @@ Internet-Draft                   MTA-STS                      March 2017
    attacker who can modify the DNS records for a victim domain.  Absent
    MTA-STS, such an attacker can cause a sending MTA to cache invalid MX
    records, but only for however long the sending resolver caches those
-   records.  With MTA- STS, the attacker can additionally advertise a
+   records.  With MTA-STS, the attacker can additionally advertise a
    new, long-"max_age" MTA-STS policy with "mx" constraints that
    validate the malicious MX record, causing senders to cache the policy
    and refuse to deliver messages once the victim has resecured the MX
@@ -579,12 +579,11 @@ Internet-Draft                   MTA-STS                      March 2017
    In these cases, there is a risk that untrusted users would be able to
    serve custom content at the "mta-sts" host, including serving an
    illegitimate MTA-STS policy.  We believe this attack is rendered more
-   difficult by the need for the attacker to both inject malicious (but
-   temporarily working) MX records and also serve the "_mta-sts" TXT
-   record on the same domain--something not, to our knowledge, widely
-   provided to untrusted users.  This attack is additionally mitigated
-   by the aforementioned ability for a victim domain to update an
-   invalid policy at any future date.
+   difficult by the need for the attacker to also serve the "_mta-sts"
+   TXT record on the same domain--something not, to our knowledge,
+   widely provided to untrusted users.  This attack is additionally
+   mitigated by the aforementioned ability for a victim domain to update
+   an invalid policy at any future date.
 
 8.4.  Weak Policy Constraints
 
@@ -592,7 +591,7 @@ Internet-Draft                   MTA-STS                      March 2017
    exists for configurations that allow attackers on the same domain to
    receive mail for that domain.  For example, an easy configuration
    option when authoring an MTA-STS Policy for "example.com" is to set
-   the "mx" equal to "*.example.com"; recipient domains must consider in
+   the "mx" equal to ".example.com"; recipient domains must consider in
    this case the risk that any user possessing a valid hostname and CA-
    signed certificate (for example, "dhcp-123.example.com") will, from
    the perspective of MTA-STS Policy validation, be a valid MX host for
@@ -613,6 +612,7 @@ Internet-Draft                   MTA-STS                      March 2017
 
 
 
+
 Margolis, et al.       Expires September 28, 2017              [Page 11]
 
 Internet-Draft                   MTA-STS                      March 2017
@@ -624,7 +624,7 @@ Internet-Draft                   MTA-STS                      March 2017
 10.  Appendix 1: MTA-STS example record & policy
 
    The owner of "example.com" wishes to begin using MTA-STS with a
-   policy that will solicit reports from receivers without affecting how
+   policy that will solicit reports from senders without affecting how
    the messages are processed, in order to verify the identity of MXs
    that handle mail for "example.com", confirm that TLS is correctly
    used, and ensure that certificates presented by the recipient MX
@@ -647,9 +647,7 @@ Internet-Draft                   MTA-STS                      March 2017
 11.  Appendix 2: Message delivery pseudocode
 
    Below is pseudocode demonstrating the logic of a compliant sending
-   MTA.  This implements the "two-pass" approach, first attempting
-   delivery with a newly fetched policy (if present) before falling back
-   to a cached policy (if present).
+   MTA.
 
    While this pseudocode implementation suggests synchronous policy
    retrieval in the delivery path, in a working implementation that may
@@ -666,6 +664,8 @@ func isNonExpired(policy) {
   // Return true if the policy is not expired.
 }
 
+func tryStartTls(mx) {
+  // Attempt to open an SMTP connection with STARTTLS with the MX.
 
 
 
@@ -674,13 +674,28 @@ Margolis, et al.       Expires September 28, 2017              [Page 12]
 Internet-Draft                   MTA-STS                      March 2017
 
 
-func tryStartTls(mx) {
-  // Attempt to open an SMTP connection with STARTTLS with the MX.
 }
 
 func certMatches(connection, mx) {
-  // Return if the server certificate from "connection" matches the "mx" host.
-  // See "MX Certificate Validation".
+  // For simplicity, we are not checking CNs here.
+  for san in getSansFromCert(connection) {
+    // Return if the server certificate from "connection" matches the "mx" host.
+    if san[0] == '*' {
+      // Invalid wildcard!
+      if san[1] != '.' return false
+      san = san[1:]
+    }
+    if san[0] == '.' && HasSuffix(mx, san) {
+      return true
+    }
+    if mx[0] == '.' && HasSuffix(san, mx) {
+      return true
+    }
+    if mx == san {
+      return true
+    }
+  }
+  return false
 }
 
 func tryDeliverMail(connection, message) {
@@ -696,7 +711,7 @@ func cachePolicy(domain, policy) {
   // Store "policy" as the cached policy for "domain".
 }
 
-func tryGetCachedPolicy(domain, policy) {
+func tryGetCachedPolicy(domain) {
   // Return a cached policy for "domain".
 }
 
@@ -707,13 +722,21 @@ func reportError(error) {
 func tryMxAccordingTo(message, mx, policy) {
   connection := connect(mx)
   if !connection {
+
+
+
+Margolis, et al.       Expires September 28, 2017              [Page 13]
+
+Internet-Draft                   MTA-STS                      March 2017
+
+
     return false  // Can't connect to the MX so it's not an MTA-STS error.
   }
   secure := true
   if !tryStartTls(mx, &connection) {
     secure = false
     reportError(E_NO_VALID_TLS)
-  } else if certMatches(connection, mx) {
+  } else if !certMatches(connection, mx) {
     secure = false
     reportError(E_CERT_MISMATCH)
   }
@@ -722,13 +745,6 @@ func tryMxAccordingTo(message, mx, policy) {
   }
   return false
 }
-
-
-
-Margolis, et al.       Expires September 28, 2017              [Page 13]
-
-Internet-Draft                   MTA-STS                      March 2017
-
 
 func tryWithPolicy(message, domain, policy) {
   for mx in mxes {
@@ -741,43 +757,27 @@ func tryWithPolicy(message, domain, policy) {
 
 func handleMessage(message) {
   domain := ... // domain part after '@' from recipient
-  oldPolicy := tryGetCachedPolicy(domain)
-  newPolicy := tryGetNewPolicy(domain)
-  if newPolicy {
-    cachePolicy(domain, newPolicy)
-    oldPolicy = newPolicy
+  policy := tryGetNewPolicy(domain)
+  if policy {
+    cachePolicy(domain, policy)
+  } else {
+    policy = tryGetCachedPolicy(domain)
   }
-  if oldPolicy {
-    return tryWithPolicy(message, oldPolicy)
+  if policy {
+    return tryWithPolicy(message, policy)
   }
-  // There is no policy or there's a new policy that did not work.
   // Try to deliver the message normally (i.e. without MTA-STS).
 }
 
 
-12.  Appendix 3: Certificate Validation Pseuocode
+12.  References
 
-                     func match(mx, san) {
-                       if san[0] == '*' {
-                         // Invalid wildcard!
-                         if san[1] != '.' return false
-                         san = san[1:]
-                       }
-                       if san[0] == '.' {
-                         return HasSuffix(mx, san)
-                       }
-                       if mx[0] == '.' {
-                         return HasSuffix(san, mx)
-                       }
-                       return mx == san
-                     }
+12.1.  Normative References
 
-13.  References
-
-
-
-
-
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
+              RFC2119, March 1997,
+              <http://www.rfc-editor.org/info/rfc2119>.
 
 
 
@@ -785,13 +785,6 @@ Margolis, et al.       Expires September 28, 2017              [Page 14]
 
 Internet-Draft                   MTA-STS                      March 2017
 
-
-13.1.  Normative References
-
-   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
-              Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
-              RFC2119, March 1997,
-              <http://www.rfc-editor.org/info/rfc2119>.
 
    [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
               Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
@@ -833,6 +826,13 @@ Internet-Draft                   MTA-STS                      March 2017
               RFC5891, August 2010,
               <http://www.rfc-editor.org/info/rfc5891>.
 
+   [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
+              Verification of Domain-Based Application Service Identity
+              within Internet Public Key Infrastructure Using X.509
+              (PKIX) Certificates in the Context of Transport Layer
+              Security (TLS)", RFC 6125, DOI 10.17487/RFC6125, March
+              2011, <http://www.rfc-editor.org/info/rfc6125>.
+
 
 
 
@@ -842,20 +842,13 @@ Margolis, et al.       Expires September 28, 2017              [Page 15]
 Internet-Draft                   MTA-STS                      March 2017
 
 
-   [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
-              Verification of Domain-Based Application Service Identity
-              within Internet Public Key Infrastructure Using X.509
-              (PKIX) Certificates in the Context of Transport Layer
-              Security (TLS)", RFC 6125, DOI 10.17487/RFC6125, March
-              2011, <http://www.rfc-editor.org/info/rfc6125>.
-
    [RFC7672]  Dukhovni, V. and W. Hardaker, "SMTP Security via
               Opportunistic DNS-Based Authentication of Named Entities
               (DANE) Transport Layer Security (TLS)", RFC 7672, DOI 10
               .17487/RFC7672, October 2015,
               <http://www.rfc-editor.org/info/rfc7672>.
 
-13.2.  URIs
+12.2.  URIs
 
    [1] https://mta-sts.example.com/.well-known/mta-sts.json:
 
@@ -889,6 +882,13 @@ Authors' Addresses
    Microsoft, Inc
 
    Email: janet.jones (at) microsoft (dot com)
+
+
+
+
+
+
+
 
 
 
