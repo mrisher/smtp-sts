@@ -243,16 +243,19 @@ seconds, required).  Well-behaved clients SHOULD cache a policy for up to this v
 from last policy fetch time. To mitigate the risks of attacks at policy
 refresh time, it is expected that this value typically be in the range of
 weeks or greater.</t>
-<t><spanx style="verb">mx</spanx>: MX patterns (list of plain-text MX match strings, required). One or more
-patterns matching the expected MX for this domain. For example,
-<spanx style="verb">["*.example.com", "*.example.net"]</spanx> indicates that mail for this domain might
-be handled by any MX with a hostname at <spanx style="verb">example.com</spanx> or <spanx style="verb">example.net</spanx>. Valid
-patterns can be either hostname literals (e.g. &quot;mx1.example.com&quot;) or wildcard
-matches, so long as the wildcard occupies the full left-most label in the
-pattern. (Thus <spanx style="verb">*.example.com</spanx> is valid but <spanx style="verb">mx*.example.com</spanx> is not.) In the
-case of Internationalized Domain Names (<xref target="RFC5891"/>), the MX MUST specify the
+<t><spanx style="verb">mx</spanx>: MX identity patterns (list of plain-text strings, required). One or more
+patterns matching a Common Name (<xref target="RFC6125"/>) or Subject Alternative Name
+(<xref target="RFC5280"/>) present in the X.509 certificate presented by any MX receiving
+mail for this domain.  For example, <spanx style="verb">["mail.example.com", ".example.net"]</spanx>
+indicates that mail for this domain might be handled by any MX with a
+certificate valid for a host at <spanx style="verb">example.com</spanx> or <spanx style="verb">example.net</spanx>.  Valid
+patterns can be either fully specified names (<spanx style="verb">example.com</spanx>) or suffixes
+(<spanx style="verb">.example.net</spanx>) matching the right-hand parts of a server's identity; the
+latter case are distinguished by a leading period.  In the case of
+Internationalized Domain Names (<xref target="RFC5891"/>), the MX MUST specify the
 Punycode-encoded A-label, as per <xref target="RFC3492"/>, and not the Unicode-encoded
-U-label.</t>
+U-label. The full semantics of certificate validation are described in &quot;MX
+Certificate Validation.&quot;</t>
 </list>
 </t>
 <t>An example JSON policy is as below:
@@ -262,7 +265,7 @@ U-label.</t>
 {
   "version": "STSv1",
   "mode": "enforce",
-  "mx": ["*.mail.example.com"],
+  "mx": [".mail.example.com"],
   "max_age": 123456
 }
 </artwork></figure>
@@ -275,7 +278,7 @@ which case unknown fields SHALL be ignored.
 
 <section anchor="https-policy-fetching" title="HTTPS Policy Fetching">
 <t>When fetching a new policy or updating a policy, the HTTPS endpoint MUST present
-a TLS certificate which is valid for the <spanx style="verb">mta-sts</spanx> host (as described in
+a X.509 certificate which is valid for the <spanx style="verb">mta-sts</spanx> host (as described in
 <xref target="RFC6125"/>), chain to a root CA that is trusted by the sending MTA, and be
 non-expired. It is expected that sending MTAs use a set of trusted CAs similar
 to those in widely deployed Web browsers and operating systems.
@@ -304,47 +307,49 @@ message recipient's server--compliant senders MUST treat the smart host domain
 as the policy domain for the purposes of policy discovery and application.
 </t>
 </section>
-</section>
 
-<section anchor="mx-host-validation" title="MX Host Validation">
+<section anchor="policy-validation" title="Policy Validation">
 <t>When sending to an MX at a domain for which the sender has a valid and
-non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST ensure:
+non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST validate:
 </t>
 <t>
 <list style="numbers">
-<t>That the recipient MX matches the <spanx style="verb">mx</spanx> pattern from the recipient domain's
-policy (as defined in the section &quot;MX Matching&quot;).</t>
 <t>That the recipient MX supports STARTTLS and offers a valid PKIX based TLS
-certificate (as defined in the section &quot;MX Certificate Validation&quot;).</t>
+certificate.</t>
+<t>That at least one of the policy's &quot;mx&quot; patterns matches at least one of the
+identities presented in the MX's X.509 certificate, as descriped in &quot;MX
+Certificate Validation&quot;.</t>
 </list>
 </t>
-<t>Of note, not all validation failures affect mail delivery; the behavior of
-sending MTAs when a host does not validate is described in the section &quot;Policy
-Application&quot;.
-</t>
-
-<section anchor="mx-matching" title="MX Matching">
-<t>When delivering mail for the Policy Domain to a recipient MX host, the sender
-matches the MX hostname against the <spanx style="verb">mx</spanx> pattern from the applied STS policy,
-ensuring that only matching MX hosts are used in delivery attempts.
-</t>
-<t>MX patterns may contain a wildcard character <spanx style="verb">*</spanx> which matches any single domain
-name component or component fragment, though only as the leftmost component in a
-pattern. For example, <spanx style="verb">*.example.com</spanx> is a valid pattern, but
-<spanx style="verb">foo.*.example.com</spanx> is not. Given the pattern <spanx style="verb">*.example.com</spanx>, <spanx style="verb">mx1.example.com</spanx>
-is a valid MX host, but <spanx style="verb">1234.dhcp.example.com</spanx> is not.
+<t>This section does not dictate the behavior of sending MTAs when policies fail
+to validate; in particular, validation failures of policies which specify
+&quot;report&quot; mode MUST NOT be interpreted as delivery failures, as described in the
+section &quot;Policy Application&quot;.
 </t>
 </section>
 
 <section anchor="mx-certificate-validation" title="MX Certificate Validation">
-<t>The certificate presented by the receiving MX MUST be valid for the MX hostname
-and chain to a root CA that is trusted by the sending MTA. The certificate MUST
-have a CN or SAN matching the MX hostname (as described in <xref target="RFC6125"/>) and be
-non-expired.
+<t>The certificate presented by the receiving MX MUST chain to a root CA that is
+trusted by the sending MTA and be non-expired. The certificate MUST have a CN-ID
+(<xref target="RFC6125"/>) or SAN (<xref target="RFC5280"/>) with a DNS-ID matching the <spanx style="verb">mx</spanx> pattern.
 </t>
-<t>In the case of an &quot;implicit&quot; MX record (as specified in <xref target="RFC2821"/>) where no MX
-RR exists for the recipient domain but there is an A RR, the MX hostname is
-assumed to be that of the A RR and should be validated as such.
+<t>Because the <spanx style="verb">mx</spanx> patterns are not hostnames, however, matching is not identical
+to other common cases of X.509 certificate authentication (as described, for
+example, in [!<xref target="RFC6125"/>]). Consider the example policy given above, with an <spanx style="verb">mx</spanx>
+pattern containing <spanx style="verb">".example.net"</spanx>. In this case, if the MX server's X.509
+certificate contains a SAN matching <spanx style="verb">"*.example.net"</spanx>, we are required to
+implement &quot;wildcard-to-wildcard&quot; matching.
+</t>
+<t>To simplify this case, we impose the following constraints on wildcard
+certificates, identical to those in [!<xref target="RFC7672"/>] section 3.2.3: wildcards are
+valid in DNS-IDs or CN-IDs, but must be the entire first label of the
+identifier (that is, <spanx style="verb">"*.example.com"</spanx>, not <spanx style="verb">"mail*.example.com"</spanx>). Senders who
+are comparing a &quot;suffix&quot; MX pattern with a wildcard identifier should thus strip
+the wildcard and ensure that the two sides match label-by-label, until all
+labels of the shorter side (if unequal length) are consumed.
+</t>
+<t>A simple pseudocode implementation of this algorithm is presented in the
+Appendix.
 </t>
 </section>
 </section>
@@ -374,31 +379,22 @@ with the applied policy result in failure reports to the policy domain, as
 described in the TLSRPT specification (TODO: add ref).
 </t>
 
-<section anchor="mx-preference" title="MX Preference">
-<t>When applying a policy, sending MTAs SHOULD select recipient MXs by first
-eliminating any MXs at lower priority than the current host (if in the MX
-candidate set), then eliminating any non-matching (as specified by the MTA-STS
-Policy) MX hosts from the candidate MX set, and then attempting delivery to
-matching hosts as indicated by their MX priority, until delivery succeeds or the
-MX candidate set is empty.
-</t>
-</section>
-
 <section anchor="policy-application-control-flow" title="Policy Application Control Flow">
 <t>An example control flow for a compliant sender consists of the following steps:
 </t>
 <t>
 <list style="numbers">
 <t>Check for a cached policy whose time-since-fetch has not exceeded its
-<spanx style="verb">max_age</spanx>. If none exists, attempt to fetch a new policy. (Optionally,
-sending MTAs may unconditionally check for a new policy at this step.)</t>
-<t>If no policy is present, proceed with non-STS delivery.</t>
-<t>Filter candidate MXs against the current policy.</t>
-<t>If no candidate MXs are valid and the policy mode is <spanx style="verb">enforce</spanx>, temporarily
-fail the message.  (If the mode is <spanx style="verb">report</spanx>, generate a failure report but
-deliver as though MTA-STS were not implemented.)</t>
+<spanx style="verb">max_age</spanx>. If none exists, attempt to fetch a new policy (perhaps
+asynchronously, so as not to block message delivery). (Optionally, sending
+MTAs may unconditionally check for a new policy at this step.)</t>
 <t>For each candidate MX, in order of MX priority, attempt to deliver the
-message, enforcing STARTTLS and the MX host's PKIX certificate validation.</t>
+message, enforcing STARTTLS, PKIX certificate validation, and (assuming a
+policy is present), certificate validation as described in &quot;MX Certificate
+Validation.&quot;</t>
+<t>Upon message retries, a message MAY be permanently failed following first
+checking for the presence of a new policy (as indicated by the <spanx style="verb">id</spanx> field in
+the <spanx style="verb">_mta-sts</spanx> TXT record).</t>
 </list>
 </t>
 </section>
@@ -622,11 +618,6 @@ func tryDeliverMail(connection, message) {
   // Attempt to deliver "message" via "connection".
 }
 
-func getMxsForPolicy(domain, policy) {
-  // Sort the MXs by priority, filtering out those which are invalid according
-  // to "policy".
-}
-
 func tryGetNewPolicy(domain) {
   // Check for an MTA-STS TXT record for "domain" in DNS, and return the
   // indicated policy.
@@ -664,10 +655,6 @@ func tryMxAccordingTo(message, mx, policy) {
 }
 
 func tryWithPolicy(message, domain, policy) {
-  mxes := getMxesForPolicy(domain, policy)
-  if mxs is empty {
-    reportError(E_NO_VALID_MXES)
-  }
   for mx in mxes {
     if tryMxAccordingTo(message, mx, policy) {
       return true
@@ -694,16 +681,36 @@ func handleMessage(message) {
 </artwork></figure>
 </section>
 
+<section anchor="appendix-3-certificate-validation-pseuocode" title="Appendix 3: Certificate Validation Pseuocode">
+
+<figure align="center"><artwork align="center">
+func match(mx, san) {
+  if san[0] == '*' {
+    // Invalid wildcard!
+    if san[1] != '.' return false
+    san = san[1:]
+  }
+  if san[0] == '.' {
+    return HasSuffix(mx, san)
+  }
+  if mx[0] == '.' {
+    return HasSuffix(san, mx)
+  }
+  return mx == san
+}
+</artwork></figure>
+</section>
+
 </middle>
 <back>
 <references title="Normative References">
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"?>
-<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2821.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3492.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4033.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4627.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5234.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5280.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5785.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5891.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6125.xml"?>

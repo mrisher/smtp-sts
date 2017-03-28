@@ -179,16 +179,19 @@ This JSON object contains the following key/value pairs:
   from last policy fetch time. To mitigate the risks of attacks at policy
   refresh time, it is expected that this value typically be in the range of
   weeks or greater.
-* `mx`: MX patterns (list of plain-text MX match strings, required). One or more
-  patterns matching the expected MX for this domain. For example,
-  `["*.example.com", "*.example.net"]` indicates that mail for this domain might
-  be handled by any MX with a hostname at `example.com` or `example.net`. Valid
-  patterns can be either hostname literals (e.g. "mx1.example.com") or wildcard
-  matches, so long as the wildcard occupies the full left-most label in the
-  pattern. (Thus `*.example.com` is valid but `mx*.example.com` is not.) In the
-  case of Internationalized Domain Names ([@!RFC5891]), the MX MUST specify the
+* `mx`: MX identity patterns (list of plain-text strings, required). One or more
+  patterns matching a Common Name ([@!RFC6125]) or Subject Alternative Name
+  ([@!RFC5280]) present in the X.509 certificate presented by any MX receiving
+  mail for this domain.  For example, `["mail.example.com", ".example.net"]`
+  indicates that mail for this domain might be handled by any MX with a
+  certificate valid for a host at `example.com` or `example.net`.  Valid
+  patterns can be either fully specified names (`example.com`) or suffixes
+  (`.example.net`) matching the right-hand parts of a server's identity; the
+  latter case are distinguished by a leading period.  In the case of
+  Internationalized Domain Names ([@!RFC5891]), the MX MUST specify the
   Punycode-encoded A-label, as per [@!RFC3492], and not the Unicode-encoded
-  U-label.
+  U-label. The full semantics of certificate validation are described in "MX
+  Certificate Validation."
 
 An example JSON policy is as below:
 
@@ -196,7 +199,7 @@ An example JSON policy is as below:
 {
   "version": "STSv1",
   "mode": "enforce",
-  "mx": ["*.mail.example.com"],
+  "mx": [".mail.example.com"],
   "max_age": 123456
 }
 ```
@@ -209,7 +212,7 @@ which case unknown fields SHALL be ignored.
 ## HTTPS Policy Fetching
 
 When fetching a new policy or updating a policy, the HTTPS endpoint MUST present
-a TLS certificate which is valid for the `mta-sts` host (as described in
+a X.509 certificate which is valid for the `mta-sts` host (as described in
 [@!RFC6125]), chain to a root CA that is trusted by the sending MTA, and be
 non-expired. It is expected that sending MTAs use a set of trusted CAs similar
 to those in widely deployed Web browsers and operating systems.
@@ -236,42 +239,46 @@ When sending mail via a "smart host"--an intermediate SMTP relay rather than the
 message recipient's server--compliant senders MUST treat the smart host domain
 as the policy domain for the purposes of policy discovery and application.
 
-# MX Host Validation
+##  Policy Validation
 
 When sending to an MX at a domain for which the sender has a valid and
-non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST ensure:
+non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST validate:
 
-1. That the recipient MX matches the `mx` pattern from the recipient domain's
-   policy (as defined in the section "MX Matching").
-2. That the recipient MX supports STARTTLS and offers a valid PKIX based TLS
-   certificate (as defined in the section "MX Certificate Validation").
+1.  That the recipient MX supports STARTTLS and offers a valid PKIX based TLS
+    certificate.
 
-Of note, not all validation failures affect mail delivery; the behavior of
-sending MTAs when a host does not validate is described in the section "Policy
-Application".
+2.  That at least one of the policy's "mx" patterns matches at least one of the
+    identities presented in the MX's X.509 certificate, as descriped in "MX
+    Certificate Validation".
 
-## MX Matching
-
-When delivering mail for the Policy Domain to a recipient MX host, the sender
-matches the MX hostname against the `mx` pattern from the applied STS policy,
-ensuring that only matching MX hosts are used in delivery attempts.
-
-MX patterns may contain a wildcard character `*` which matches any single domain
-name component or component fragment, though only as the leftmost component in a
-pattern. For example, `*.example.com` is a valid pattern, but
-`foo.*.example.com` is not. Given the pattern `*.example.com`, `mx1.example.com`
-is a valid MX host, but `1234.dhcp.example.com` is not.
+This section does not dictate the behavior of sending MTAs when policies fail
+to validate; in particular, validation failures of policies which specify
+"report" mode MUST NOT be interpreted as delivery failures, as described in the
+section "Policy Application".
 
 ## MX Certificate Validation
 
-The certificate presented by the receiving MX MUST be valid for the MX hostname
-and chain to a root CA that is trusted by the sending MTA. The certificate MUST
-have a CN or SAN matching the MX hostname (as described in [@!RFC6125]) and be
-non-expired.
+The certificate presented by the receiving MX MUST chain to a root CA that is
+trusted by the sending MTA and be non-expired. The certificate MUST have a CN-ID
+([@!RFC6125]) or SAN ([@!RFC5280]) with a DNS-ID matching the `mx` pattern.
 
-In the case of an "implicit" MX record (as specified in [@!RFC2821]) where no MX
-RR exists for the recipient domain but there is an A RR, the MX hostname is
-assumed to be that of the A RR and should be validated as such.
+Because the `mx` patterns are not hostnames, however, matching is not identical
+to other common cases of X.509 certificate authentication (as described, for
+example, in [!@RFC6125]). Consider the example policy given above, with an `mx`
+pattern containing `".example.net"`. In this case, if the MX server's X.509
+certificate contains a SAN matching `"*.example.net"`, we are required to
+implement "wildcard-to-wildcard" matching.
+
+To simplify this case, we impose the following constraints on wildcard
+certificates, identical to those in [!@RFC7672] section 3.2.3: wildcards are
+valid in DNS-IDs or CN-IDs, but must be the entire first label of the
+identifier (that is, `"*.example.com"`, not `"mail*.example.com"`). Senders who
+are comparing a "suffix" MX pattern with a wildcard identifier should thus strip
+the wildcard and ensure that the two sides match label-by-label, until all
+labels of the shorter side (if unequal length) are consumed.
+
+A simple pseudocode implementation of this algorithm is presented in the
+Appendix.
 
 # Policy Application
 
@@ -296,29 +303,22 @@ Finally, in both `enforce` and `report` modes, failures to deliver in compliance
 with the applied policy result in failure reports to the policy domain, as
 described in the TLSRPT specification (TODO: add ref).
 
-## MX Preference
-
-When applying a policy, sending MTAs SHOULD select recipient MXs by first
-eliminating any MXs at lower priority than the current host (if in the MX
-candidate set), then eliminating any non-matching (as specified by the MTA-STS
-Policy) MX hosts from the candidate MX set, and then attempting delivery to
-matching hosts as indicated by their MX priority, until delivery succeeds or the
-MX candidate set is empty.
 
 ## Policy Application Control Flow
 
 An example control flow for a compliant sender consists of the following steps:
 
 1. Check for a cached policy whose time-since-fetch has not exceeded its
-   `max_age`. If none exists, attempt to fetch a new policy. (Optionally,
-   sending MTAs may unconditionally check for a new policy at this step.)
-2. If no policy is present, proceed with non-STS delivery.
-3. Filter candidate MXs against the current policy.
-4. If no candidate MXs are valid and the policy mode is `enforce`, temporarily
-   fail the message.  (If the mode is `report`, generate a failure report but
-   deliver as though MTA-STS were not implemented.)
-5. For each candidate MX, in order of MX priority, attempt to deliver the
-   message, enforcing STARTTLS and the MX host's PKIX certificate validation.
+   `max_age`. If none exists, attempt to fetch a new policy (perhaps
+   asynchronously, so as not to block message delivery). (Optionally, sending
+   MTAs may unconditionally check for a new policy at this step.)
+2. For each candidate MX, in order of MX priority, attempt to deliver the
+   message, enforcing STARTTLS, PKIX certificate validation, and (assuming a
+   policy is present), certificate validation as described in "MX Certificate
+   Validation."
+3. Upon message retries, a message MAY be permanently failed following first
+   checking for the presence of a new policy (as indicated by the `id` field in
+   the `_mta-sts` TXT record).
 
 # Operational Considerations
 
@@ -523,11 +523,6 @@ func tryDeliverMail(connection, message) {
   // Attempt to deliver "message" via "connection".
 }
 
-func getMxsForPolicy(domain, policy) {
-  // Sort the MXs by priority, filtering out those which are invalid according
-  // to "policy".
-}
-
 func tryGetNewPolicy(domain) {
   // Check for an MTA-STS TXT record for "domain" in DNS, and return the
   // indicated policy.
@@ -565,10 +560,6 @@ func tryMxAccordingTo(message, mx, policy) {
 }
 
 func tryWithPolicy(message, domain, policy) {
-  mxes := getMxesForPolicy(domain, policy)
-  if mxs is empty {
-    reportError(E_NO_VALID_MXES)
-  }
   for mx in mxes {
     if tryMxAccordingTo(message, mx, policy) {
       return true
@@ -594,5 +585,23 @@ func handleMessage(message) {
 
 ~~~~~~~~~
 
+# Appendix 3: Certificate Validation Pseuocode
+
+~~~~~~~~~
+func match(mx, san) {
+  if san[0] == '*' {
+    // Invalid wildcard!
+    if san[1] != '.' return false
+    san = san[1:]
+  }
+  if san[0] == '.' {
+    return HasSuffix(mx, san)
+  }
+  if mx[0] == '.' {
+    return HasSuffix(san, mx)
+  }
+  return mx == san
+}
+~~~~~~~~~
 
 {backmatter}
