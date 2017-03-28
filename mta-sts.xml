@@ -307,6 +307,7 @@ message recipient's server--compliant senders MUST treat the smart host domain
 as the policy domain for the purposes of policy discovery and application.
 </t>
 </section>
+</section>
 
 <section anchor="policy-validation" title="Policy Validation">
 <t>When sending to an MX at a domain for which the sender has a valid and
@@ -326,7 +327,6 @@ to validate; in particular, validation failures of policies which specify
 &quot;report&quot; mode MUST NOT be interpreted as delivery failures, as described in the
 section &quot;Policy Application&quot;.
 </t>
-</section>
 
 <section anchor="mx-certificate-validation" title="MX Certificate Validation">
 <t>The certificate presented by the receiving MX MUST chain to a root CA that is
@@ -335,15 +335,15 @@ trusted by the sending MTA and be non-expired. The certificate MUST have a CN-ID
 </t>
 <t>Because the <spanx style="verb">mx</spanx> patterns are not hostnames, however, matching is not identical
 to other common cases of X.509 certificate authentication (as described, for
-example, in [!<xref target="RFC6125"/>]). Consider the example policy given above, with an <spanx style="verb">mx</spanx>
-pattern containing <spanx style="verb">".example.net"</spanx>. In this case, if the MX server's X.509
-certificate contains a SAN matching <spanx style="verb">"*.example.net"</spanx>, we are required to
+example, in <xref target="RFC6125"/>). Consider the example policy given above, with an <spanx style="verb">mx</spanx>
+pattern containing <spanx style="verb">.example.net</spanx>. In this case, if the MX server's X.509
+certificate contains a SAN matching <spanx style="verb">*.example.net</spanx>, we are required to
 implement &quot;wildcard-to-wildcard&quot; matching.
 </t>
 <t>To simplify this case, we impose the following constraints on wildcard
-certificates, identical to those in [!<xref target="RFC7672"/>] section 3.2.3: wildcards are
+certificates, identical to those in <xref target="RFC7672"/> section 3.2.3: wildcards are
 valid in DNS-IDs or CN-IDs, but must be the entire first label of the
-identifier (that is, <spanx style="verb">"*.example.com"</spanx>, not <spanx style="verb">"mail*.example.com"</spanx>). Senders who
+identifier (that is, <spanx style="verb">*.example.com</spanx>, not <spanx style="verb">mail*.example.com</spanx>). Senders who
 are comparing a &quot;suffix&quot; MX pattern with a wildcard identifier should thus strip
 the wildcard and ensure that the two sides match label-by-label, until all
 labels of the shorter side (if unequal length) are consumed.
@@ -553,9 +553,7 @@ markus.laber (at) 1und1 (dot de)
 </t>
 </section>
 
-<section anchor="appendix-1-domain-owner-mtasts-example-record" title="Appendix 1: Domain Owner MTA-STS example record">
-
-<section anchor="example-1" title="Example 1">
+<section anchor="appendix-1-mtasts-example-record--policy" title="Appendix 1: MTA-STS example record &amp; policy">
 <t>The owner of <spanx style="verb">example.com</spanx> wishes to begin using MTA-STS with a policy that will
 solicit reports from receivers without affecting how the messages are
 processed, in order to verify the identity of MXs that handle mail for
@@ -581,7 +579,6 @@ _mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
 }
 
 </artwork></figure>
-</section>
 </section>
 
 <section anchor="appendix-2-message-delivery-pseudocode" title="Appendix 2: Message delivery pseudocode">

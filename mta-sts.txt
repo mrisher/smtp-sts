@@ -75,26 +75,25 @@ Table of Contents
      3.2.  MTA-STS Policies  . . . . . . . . . . . . . . . . . . . .   5
      3.3.  HTTPS Policy Fetching . . . . . . . . . . . . . . . . . .   6
      3.4.  Policy Selection for Smart Hosts  . . . . . . . . . . . .   7
-     3.5.  Policy Validation . . . . . . . . . . . . . . . . . . . .   7
-     3.6.  MX Certificate Validation . . . . . . . . . . . . . . . .   7
-   4.  Policy Application  . . . . . . . . . . . . . . . . . . . . .   8
-     4.1.  Policy Application Control Flow . . . . . . . . . . . . .   8
-   5.  Operational Considerations  . . . . . . . . . . . . . . . . .   9
-     5.1.  Policy Updates  . . . . . . . . . . . . . . . . . . . . .   9
-   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
-   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
-     7.1.  Obtaining a Signed Certificate  . . . . . . . . . . . . .  10
-     7.2.  Preventing Policy Discovery . . . . . . . . . . . . . . .  10
-     7.3.  Denial of Service . . . . . . . . . . . . . . . . . . . .  10
-     7.4.  Weak Policy Constraints . . . . . . . . . . . . . . . . .  11
-   8.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  11
-   9.  Appendix 1: Domain Owner MTA-STS example record . . . . . . .  12
-     9.1.  Example 1 . . . . . . . . . . . . . . . . . . . . . . . .  12
-   10. Appendix 2: Message delivery pseudocode . . . . . . . . . . .  12
-   11. Appendix 3: Certificate Validation Pseuocode  . . . . . . . .  14
-   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  15
-     12.1.  Normative References . . . . . . . . . . . . . . . . . .  15
-     12.2.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  16
+   4.  Policy Validation . . . . . . . . . . . . . . . . . . . . . .   7
+     4.1.  MX Certificate Validation . . . . . . . . . . . . . . . .   7
+   5.  Policy Application  . . . . . . . . . . . . . . . . . . . . .   8
+     5.1.  Policy Application Control Flow . . . . . . . . . . . . .   8
+   6.  Operational Considerations  . . . . . . . . . . . . . . . . .   9
+     6.1.  Policy Updates  . . . . . . . . . . . . . . . . . . . . .   9
+   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
+   8.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
+     8.1.  Obtaining a Signed Certificate  . . . . . . . . . . . . .  10
+     8.2.  Preventing Policy Discovery . . . . . . . . . . . . . . .  10
+     8.3.  Denial of Service . . . . . . . . . . . . . . . . . . . .  10
+     8.4.  Weak Policy Constraints . . . . . . . . . . . . . . . . .  11
+   9.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  11
+   10. Appendix 1: MTA-STS example record & policy . . . . . . . . .  12
+   11. Appendix 2: Message delivery pseudocode . . . . . . . . . . .  12
+   12. Appendix 3: Certificate Validation Pseuocode  . . . . . . . .  14
+   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  14
+     13.1.  Normative References . . . . . . . . . . . . . . . . . .  15
+     13.2.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  16
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
 
 1.  Introduction
@@ -106,6 +105,7 @@ Table of Contents
    While this _opportunistic_ encryption protocol by itself provides a
    high barrier against passive man-in-the-middle traffic interception,
    any attacker who can delete parts of the SMTP session (such as the
+   "250 STARTTLS" response) or who can redirect the entire SMTP session
 
 
 
@@ -114,7 +114,6 @@ Margolis, et al.       Expires September 28, 2017               [Page 2]
 Internet-Draft                   MTA-STS                      March 2017
 
 
-   "250 STARTTLS" response) or who can redirect the entire SMTP session
    (perhaps by overwriting the resolved MX record of the delivery
    domain) can perform downgrade or interception attacks.
 
@@ -161,6 +160,7 @@ Internet-Draft                   MTA-STS                      March 2017
    be achieved in DANE by deploying TLSA records only for some of a
    domain's MXs, but such a mechanism is not possible for the per-domain
    policies used by MTA-STS.
+
 
 
 
@@ -345,7 +345,7 @@ Internet-Draft                   MTA-STS                      March 2017
    treat the smart host domain as the policy domain for the purposes of
    policy discovery and application.
 
-3.5.  Policy Validation
+4.  Policy Validation
 
    When sending to an MX at a domain for which the sender has a valid
    and non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST
@@ -363,7 +363,7 @@ Internet-Draft                   MTA-STS                      March 2017
    policies which specify "report" mode MUST NOT be interpreted as
    delivery failures, as described in the section "Policy Application".
 
-3.6.  MX Certificate Validation
+4.1.  MX Certificate Validation
 
    The certificate presented by the receiving MX MUST chain to a root CA
    that is trusted by the sending MTA and be non-expired.  The
@@ -372,17 +372,17 @@ Internet-Draft                   MTA-STS                      March 2017
 
    Because the "mx" patterns are not hostnames, however, matching is not
    identical to other common cases of X.509 certificate authentication
-   (as described, for example, in [![RFC6125]]).  Consider the example
-   policy given above, with an "mx" pattern containing "".example.net"".
+   (as described, for example, in [RFC6125]).  Consider the example
+   policy given above, with an "mx" pattern containing ".example.net".
    In this case, if the MX server's X.509 certificate contains a SAN
-   matching ""*.example.net"", we are required to implement "wildcard-
-   to-wildcard" matching.
+   matching "*.example.net", we are required to implement "wildcard-to-
+   wildcard" matching.
 
    To simplify this case, we impose the following constraints on
-   wildcard certificates, identical to those in [![RFC7672]] section
-   3.2.3: wildcards are valid in DNS-IDs or CN-IDs, but must be the
-   entire first label of the identifier (that is, ""*.example.com"", not
-   ""mail*.example.com"").  Senders who are comparing a "suffix" MX
+   wildcard certificates, identical to those in [RFC7672] section 3.2.3:
+   wildcards are valid in DNS-IDs or CN-IDs, but must be the entire
+   first label of the identifier (that is, "*.example.com", not
+   "mail*.example.com").  Senders who are comparing a "suffix" MX
    pattern with a wildcard identifier should thus strip the wildcard and
    ensure that the two sides match label-by-label, until all labels of
    the shorter side (if unequal length) are consumed.
@@ -397,7 +397,7 @@ Internet-Draft                   MTA-STS                      March 2017
    A simple pseudocode implementation of this algorithm is presented in
    the Appendix.
 
-4.  Policy Application
+5.  Policy Application
 
    When sending to an MX at a domain for which the sender has a valid,
    non-expired MTA-STS policy, a sending MTA honoring MTA-STS applies
@@ -424,7 +424,7 @@ Internet-Draft                   MTA-STS                      March 2017
    policy domain, as described in the TLSRPT specification (TODO: add
    ref).
 
-4.1.  Policy Application Control Flow
+5.1.  Policy Application Control Flow
 
    An example control flow for a compliant sender consists of the
    following steps:
@@ -454,9 +454,9 @@ Internet-Draft                   MTA-STS                      March 2017
        following first checking for the presence of a new policy (as
        indicated by the "id" field in the "_mta-sts" TXT record).
 
-5.  Operational Considerations
+6.  Operational Considerations
 
-5.1.  Policy Updates
+6.1.  Policy Updates
 
    Updating the policy requires that the owner make changes in two
    places: the "_mta-sts" TXT record in the Policy Domain's DNS zone and
@@ -472,14 +472,14 @@ Internet-Draft                   MTA-STS                      March 2017
    continue to work for message delivery during this period of time, or
    risk message delays.
 
-6.  IANA Considerations
+7.  IANA Considerations
 
    A new .well-known URI will be registered in the Well-Known URIs
    registry as described below:
 
    URI Suffix: mta-sts.json Change Controller: IETF
 
-7.  Security Considerations
+8.  Security Considerations
 
    SMTP MTA Strict Transport Security attempts to protect against an
    active attacker who wishes to intercept or tamper with mail between
@@ -512,7 +512,7 @@ Internet-Draft                   MTA-STS                      March 2017
    complies with that policy.  Below, we consider specific attacks on
    this model.
 
-7.1.  Obtaining a Signed Certificate
+8.1.  Obtaining a Signed Certificate
 
    SMTP MTA-STS relies on certificate validation via PKIX based TLS
    identity checking [RFC6125].  Attackers who are able to obtain a
@@ -520,7 +520,7 @@ Internet-Draft                   MTA-STS                      March 2017
    compromising a certificate authority) are thus able to circumvent STS
    authentication.
 
-7.2.  Preventing Policy Discovery
+8.2.  Preventing Policy Discovery
 
    Since MTA-STS uses DNS TXT records for policy discovery, an attacker
    who is able to block DNS responses can suppress the discovery of an
@@ -543,7 +543,7 @@ Internet-Draft                   MTA-STS                      March 2017
    participating recipients--is a feature of DANE, due to its leverage
    of DNSSEC for policy discovery.
 
-7.3.  Denial of Service
+8.3.  Denial of Service
 
    We additionally consider the Denial of Service risk posed by an
    attacker who can modify the DNS records for a victim domain.  Absent
@@ -586,7 +586,7 @@ Internet-Draft                   MTA-STS                      March 2017
    by the aforementioned ability for a victim domain to update an
    invalid policy at any future date.
 
-7.4.  Weak Policy Constraints
+8.4.  Weak Policy Constraints
 
    Even if an attacker cannot modify a served policy, the potential
    exists for configurations that allow attackers on the same domain to
@@ -598,7 +598,7 @@ Internet-Draft                   MTA-STS                      March 2017
    the perspective of MTA-STS Policy validation, be a valid MX host for
    that domain.
 
-8.  Contributors
+9.  Contributors
 
    Nicolas Lidzborski Google, Inc nlidz (at) google (dot com)
 
@@ -621,9 +621,7 @@ Internet-Draft                   MTA-STS                      March 2017
    Markus Laber 1&1 Mail & Media Development & Technology GmbH
    markus.laber (at) 1und1 (dot de)
 
-9.  Appendix 1: Domain Owner MTA-STS example record
-
-9.1.  Example 1
+10.  Appendix 1: MTA-STS example record & policy
 
    The owner of "example.com" wishes to begin using MTA-STS with a
    policy that will solicit reports from receivers without affecting how
@@ -646,7 +644,7 @@ Internet-Draft                   MTA-STS                      March 2017
               }
 
 
-10.  Appendix 2: Message delivery pseudocode
+11.  Appendix 2: Message delivery pseudocode
 
    Below is pseudocode demonstrating the logic of a compliant sending
    MTA.  This implements the "two-pass" approach, first attempting
@@ -666,6 +664,8 @@ func isEnforce(policy) {
 
 func isNonExpired(policy) {
   // Return true if the policy is not expired.
+}
+
 
 
 
@@ -673,8 +673,6 @@ Margolis, et al.       Expires September 28, 2017              [Page 12]
 
 Internet-Draft                   MTA-STS                      March 2017
 
-
-}
 
 func tryStartTls(mx) {
   // Attempt to open an SMTP connection with STARTTLS with the MX.
@@ -722,6 +720,8 @@ func tryMxAccordingTo(message, mx, policy) {
   if secure || !isEnforce(policy) {
     return tryDeliverMail(connection, message)
   }
+  return false
+}
 
 
 
@@ -729,9 +729,6 @@ Margolis, et al.       Expires September 28, 2017              [Page 13]
 
 Internet-Draft                   MTA-STS                      March 2017
 
-
-  return false
-}
 
 func tryWithPolicy(message, domain, policy) {
   for mx in mxes {
@@ -758,7 +755,7 @@ func handleMessage(message) {
 }
 
 
-11.  Appendix 3: Certificate Validation Pseuocode
+12.  Appendix 3: Certificate Validation Pseuocode
 
                      func match(mx, san) {
                        if san[0] == '*' {
@@ -775,6 +772,9 @@ func handleMessage(message) {
                        return mx == san
                      }
 
+13.  References
+
+
 
 
 
@@ -786,9 +786,7 @@ Margolis, et al.       Expires September 28, 2017              [Page 14]
 Internet-Draft                   MTA-STS                      March 2017
 
 
-12.  References
-
-12.1.  Normative References
+13.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
@@ -837,6 +835,8 @@ Internet-Draft                   MTA-STS                      March 2017
 
 
 
+
+
 Margolis, et al.       Expires September 28, 2017              [Page 15]
 
 Internet-Draft                   MTA-STS                      March 2017
@@ -855,7 +855,7 @@ Internet-Draft                   MTA-STS                      March 2017
               .17487/RFC7672, October 2015,
               <http://www.rfc-editor.org/info/rfc7672>.
 
-12.2.  URIs
+13.2.  URIs
 
    [1] https://mta-sts.example.com/.well-known/mta-sts.json:
 

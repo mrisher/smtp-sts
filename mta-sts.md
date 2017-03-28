@@ -239,7 +239,7 @@ When sending mail via a "smart host"--an intermediate SMTP relay rather than the
 message recipient's server--compliant senders MUST treat the smart host domain
 as the policy domain for the purposes of policy discovery and application.
 
-##  Policy Validation
+#  Policy Validation
 
 When sending to an MX at a domain for which the sender has a valid and
 non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST validate:
@@ -264,15 +264,15 @@ trusted by the sending MTA and be non-expired. The certificate MUST have a CN-ID
 
 Because the `mx` patterns are not hostnames, however, matching is not identical
 to other common cases of X.509 certificate authentication (as described, for
-example, in [!@RFC6125]). Consider the example policy given above, with an `mx`
-pattern containing `".example.net"`. In this case, if the MX server's X.509
-certificate contains a SAN matching `"*.example.net"`, we are required to
+example, in [@!RFC6125]). Consider the example policy given above, with an `mx`
+pattern containing `.example.net`. In this case, if the MX server's X.509
+certificate contains a SAN matching `*.example.net`, we are required to
 implement "wildcard-to-wildcard" matching.
 
 To simplify this case, we impose the following constraints on wildcard
-certificates, identical to those in [!@RFC7672] section 3.2.3: wildcards are
+certificates, identical to those in [@!RFC7672] section 3.2.3: wildcards are
 valid in DNS-IDs or CN-IDs, but must be the entire first label of the
-identifier (that is, `"*.example.com"`, not `"mail*.example.com"`). Senders who
+identifier (that is, `*.example.com`, not `mail*.example.com`). Senders who
 are comparing a "suffix" MX pattern with a wildcard identifier should thus strip
 the wildcard and ensure that the two sides match label-by-label, until all
 labels of the shorter side (if unequal length) are consumed.
@@ -462,9 +462,7 @@ Markus Laber
 1&1 Mail & Media Development & Technology GmbH
 markus.laber (at) 1und1 (dot de)
 
-# Appendix 1: Domain Owner MTA-STS example record
-
-## Example 1
+# Appendix 1: MTA-STS example record & policy
 
 The owner of `example.com` wishes to begin using MTA-STS with a policy that will
 solicit reports from receivers without affecting how the messages are
