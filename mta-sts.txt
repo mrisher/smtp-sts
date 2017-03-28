@@ -461,12 +461,12 @@ Internet-Draft                   MTA-STS                      March 2017
    the HTTPS and TXT endpoints are updated and the TXT record's TTL has
    passed.
 
-   In other words, a sender who, upon applying a cache of a previous
-   version of the recipient's policy finds no valid MXs may be unable to
-   discover that a new, working policy has already been published until
-   the DNS TTL has passed.  Recipients should therefore ensure that old
-   policies continue to work for message delivery during this period of
-   time, or risk message delays.
+   In other words, a sender who is unable to successfully deliver a
+   message while applying a cache of the recipient's now-outdated policy
+   may be unable to discover that a new policy exists until the DNS TTL
+   has passed.  Recipients should therefore ensure that old policies
+   continue to work for message delivery during this period of time, or
+   risk message delays.
 
 7.  IANA Considerations
 
