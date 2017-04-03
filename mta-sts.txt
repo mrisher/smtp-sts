@@ -85,9 +85,9 @@ Table of Contents
    8.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
      8.1.  Obtaining a Signed Certificate  . . . . . . . . . . . . .  10
      8.2.  Preventing Policy Discovery . . . . . . . . . . . . . . .  10
-     8.3.  Denial of Service . . . . . . . . . . . . . . . . . . . .  10
+     8.3.  Denial of Service . . . . . . . . . . . . . . . . . . . .  11
      8.4.  Weak Policy Constraints . . . . . . . . . . . . . . . . .  11
-   9.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  11
+   9.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  12
    10. Appendix 1: MTA-STS example record & policy . . . . . . . . .  12
    11. Appendix 2: Message delivery pseudocode . . . . . . . . . . .  12
    12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  15
@@ -544,6 +544,24 @@ Internet-Draft                   MTA-STS                      March 2017
    we strongly recommend implementors to prefer policy "max_age" values
    to be as long as is practical.
 
+   Because this attack is also possible upon refresh of a cached policy,
+   we suggest implementors do not wait until a cached policy has expired
+   before checking for an update; if senders attempt to refresh the
+   cache regularly (for instance, by checking their cached version
+   string against the TXT record on each successful send, or in a
+   background task that runs daily or weekly), an attacker would have to
+   foil policy discovery consistently over the lifetime of a cached
+   policy to prevent a successful refresh.
+
+
+
+
+
+Margolis, et al.       Expires September 28, 2017              [Page 10]
+
+Internet-Draft                   MTA-STS                      March 2017
+
+
    Resistence to downgrade attacks of this nature--due to the ability to
    authoritatively determine "lack of a record" even for non-
    participating recipients--is a feature of DANE, due to its use of
@@ -554,14 +572,6 @@ Internet-Draft                   MTA-STS                      March 2017
    We additionally consider the Denial of Service risk posed by an
    attacker who can modify the DNS records for a victim domain.  Absent
    MTA-STS, such an attacker can cause a sending MTA to cache invalid MX
-
-
-
-Margolis, et al.       Expires September 28, 2017              [Page 10]
-
-Internet-Draft                   MTA-STS                      March 2017
-
-
    records, but only for however long the sending resolver caches those
    records.  With MTA-STS, the attacker can additionally advertise a
    new, long-"max_age" MTA-STS policy with "mx" constraints that
@@ -600,6 +610,14 @@ Internet-Draft                   MTA-STS                      March 2017
    option when authoring an MTA-STS Policy for "example.com" is to set
    the "mx" equal to ".example.com"; recipient domains must consider in
    this case the risk that any user possessing a valid hostname and CA-
+
+
+
+Margolis, et al.       Expires September 28, 2017              [Page 11]
+
+Internet-Draft                   MTA-STS                      March 2017
+
+
    signed certificate (for example, "dhcp-123.example.com") will, from
    the perspective of MTA-STS Policy validation, be a valid MX host for
    that domain.
@@ -609,14 +627,6 @@ Internet-Draft                   MTA-STS                      March 2017
    Nicolas Lidzborski Google, Inc nlidz (at) google (dot com)
 
    Wei Chuang Google, Inc weihaw (at) google (dot com)
-
-
-
-
-Margolis, et al.       Expires September 28, 2017              [Page 11]
-
-Internet-Draft                   MTA-STS                      March 2017
-
 
    Brandon Long Google, Inc blong (at) google (dot com)
 
@@ -656,6 +666,14 @@ Internet-Draft                   MTA-STS                      March 2017
    Below is pseudocode demonstrating the logic of a compliant sending
    MTA.
 
+
+
+
+Margolis, et al.       Expires September 28, 2017              [Page 12]
+
+Internet-Draft                   MTA-STS                      March 2017
+
+
    While this pseudocode implementation suggests synchronous policy
    retrieval in the delivery path, in a working implementation that may
    be undesirable, and we expect some implementors to instead prefer a
@@ -666,13 +684,6 @@ Internet-Draft                   MTA-STS                      March 2017
 func isEnforce(policy) {
   // Return true if the policy mode is "enforce".
 }
-
-
-
-Margolis, et al.       Expires September 28, 2017              [Page 12]
-
-Internet-Draft                   MTA-STS                      March 2017
-
 
 func isNonExpired(policy) {
   // Return true if the policy is not expired.
@@ -711,6 +722,14 @@ func tryDeliverMail(connection, message) {
 func tryGetNewPolicy(domain) {
   // Check for an MTA-STS TXT record for "domain" in DNS, and return the
   // indicated policy.
+
+
+
+Margolis, et al.       Expires September 28, 2017              [Page 13]
+
+Internet-Draft                   MTA-STS                      March 2017
+
+
 }
 
 func cachePolicy(domain, policy) {
@@ -722,14 +741,6 @@ func tryGetCachedPolicy(domain) {
 }
 
 func reportError(error) {
-
-
-
-Margolis, et al.       Expires September 28, 2017              [Page 13]
-
-Internet-Draft                   MTA-STS                      March 2017
-
-
   // Report an error via TLSRPT.
 }
 
@@ -767,6 +778,14 @@ func handleMessage(message) {
   if policy {
     cachePolicy(domain, policy)
   } else {
+
+
+
+Margolis, et al.       Expires September 28, 2017              [Page 14]
+
+Internet-Draft                   MTA-STS                      March 2017
+
+
     policy = tryGetCachedPolicy(domain)
   }
   if policy {
@@ -774,16 +793,6 @@ func handleMessage(message) {
   }
   // Try to deliver the message normally (i.e. without MTA-STS).
 }
-
-
-
-
-
-
-
-Margolis, et al.       Expires September 28, 2017              [Page 14]
-
-Internet-Draft                   MTA-STS                      March 2017
 
 
 12.  References
@@ -825,6 +834,14 @@ Internet-Draft                   MTA-STS                      March 2017
               (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
               <http://www.rfc-editor.org/info/rfc5280>.
 
+
+
+
+Margolis, et al.       Expires September 28, 2017              [Page 15]
+
+Internet-Draft                   MTA-STS                      March 2017
+
+
    [RFC5785]  Nottingham, M. and E. Hammer-Lahav, "Defining Well-Known
               Uniform Resource Identifiers (URIs)", RFC 5785, DOI 10
               .17487/RFC5785, April 2010,
@@ -834,13 +851,6 @@ Internet-Draft                   MTA-STS                      March 2017
               Applications (IDNA): Protocol", RFC 5891, DOI 10.17487/
               RFC5891, August 2010,
               <http://www.rfc-editor.org/info/rfc5891>.
-
-
-
-Margolis, et al.       Expires September 28, 2017              [Page 15]
-
-Internet-Draft                   MTA-STS                      March 2017
-
 
    [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
               Verification of Domain-Based Application Service Identity
@@ -879,6 +889,15 @@ Authors' Addresses
    Email: rbinu (at) yahoo-inc (dot com)
 
 
+
+
+
+
+Margolis, et al.       Expires September 28, 2017              [Page 16]
+
+Internet-Draft                   MTA-STS                      March 2017
+
+
    Alexander Brotman
    Comcast, Inc
 
@@ -893,4 +912,41 @@ Authors' Addresses
 
 
 
-Margolis, et al.       Expires September 28, 2017              [Page 16]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Margolis, et al.       Expires September 28, 2017              [Page 17]

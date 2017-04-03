@@ -395,6 +395,14 @@ Since this attack depends upon intercepting initial policy discovery, we
 strongly recommend implementors to prefer policy `max_age` values to be as long
 as is practical.
 
+Because this attack is also possible upon refresh of a cached policy, we suggest
+implementors do not wait until a cached policy has expired before checking for
+an update; if senders attempt to refresh the cache regularly (for instance, by
+checking their cached version string against the TXT record on each successful
+send, or in a background task that runs daily or weekly), an attacker would have
+to foil policy discovery consistently over the lifetime of a cached policy to
+prevent a successful refresh.
+
 Resistence to downgrade attacks of this nature--due to the ability to
 authoritatively determine "lack of a record" even for non-participating
 recipients--is a feature of DANE, due to its use of DNSSEC for policy discovery.
