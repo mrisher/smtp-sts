@@ -9,7 +9,7 @@
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2017-03-27T00:00:00Z
+   date = 2017-04-03T00:00:00Z
    
    [[author]]
    initials="D."
