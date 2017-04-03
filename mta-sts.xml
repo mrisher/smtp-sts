@@ -112,7 +112,7 @@ trusted server certificate.
 <t>The STARTTLS extension to SMTP <xref target="RFC3207"/> allows SMTP clients and hosts to
 negotiate the use of a TLS channel for encrypted mail transmission.
 </t>
-<t>While this <spanx style="emph">opportunistic</spanx> encryption protocol by itself provides a high barrier
+<t>While this opportunistic encryption protocol by itself provides a high barrier
 against passive man-in-the-middle traffic interception, any attacker who can
 delete parts of the SMTP session (such as the &quot;250 STARTTLS&quot; response) or who
 can redirect the entire SMTP session (perhaps by overwriting the resolved MX
