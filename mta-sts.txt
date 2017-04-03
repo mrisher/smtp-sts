@@ -5,13 +5,13 @@
 Using TLS in Applications                                    D. Margolis
 Internet-Draft                                                 M. Risher
 Intended status: Standards Track                             Google, Inc
-Expires: September 28, 2017                              B. Ramakrishnan
+Expires: October 5, 2017                                 B. Ramakrishnan
                                                              Yahoo!, Inc
                                                               A. Brotman
                                                             Comcast, Inc
                                                                 J. Jones
                                                           Microsoft, Inc
-                                                          March 27, 2017
+                                                           April 3, 2017
 
 
               SMTP MTA Strict Transport Security (MTA-STS)
@@ -40,7 +40,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on September 28, 2017.
+   This Internet-Draft will expire on October 5, 2017.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Margolis, et al.       Expires September 28, 2017               [Page 1]
+Margolis, et al.         Expires October 5, 2017                [Page 1]
 
-Internet-Draft                   MTA-STS                      March 2017
+Internet-Draft                   MTA-STS                      April 2017
 
 
    publication of this document.  Please review these documents
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Margolis, et al.       Expires September 28, 2017               [Page 2]
+Margolis, et al.         Expires October 5, 2017                [Page 2]
 
-Internet-Draft                   MTA-STS                      March 2017
+Internet-Draft                   MTA-STS                      April 2017
 
 
    (perhaps by overwriting the resolved MX record of the delivery
@@ -165,9 +165,9 @@ Internet-Draft                   MTA-STS                      March 2017
 
 
 
-Margolis, et al.       Expires September 28, 2017               [Page 3]
+Margolis, et al.         Expires October 5, 2017                [Page 3]
 
-Internet-Draft                   MTA-STS                      March 2017
+Internet-Draft                   MTA-STS                      April 2017
 
 
    DNSSEC is undesirable or impractical.  However, MTA-STS is designed
@@ -221,9 +221,9 @@ Internet-Draft                   MTA-STS                      March 2017
 
 
 
-Margolis, et al.       Expires September 28, 2017               [Page 4]
+Margolis, et al.         Expires October 5, 2017                [Page 4]
 
-Internet-Draft                   MTA-STS                      March 2017
+Internet-Draft                   MTA-STS                      April 2017
 
 
       sts-text-record = sts-version *WSP %x3B *WSP sts-id [%x3B]
@@ -277,9 +277,9 @@ Internet-Draft                   MTA-STS                      March 2017
 
 
 
-Margolis, et al.       Expires September 28, 2017               [Page 5]
+Margolis, et al.         Expires October 5, 2017                [Page 5]
 
-Internet-Draft                   MTA-STS                      March 2017
+Internet-Draft                   MTA-STS                      April 2017
 
 
       ([RFC5891]), the MX MUST specify the Punycode-encoded A-label
@@ -333,9 +333,9 @@ Internet-Draft                   MTA-STS                      March 2017
 
 
 
-Margolis, et al.       Expires September 28, 2017               [Page 6]
+Margolis, et al.         Expires October 5, 2017                [Page 6]
 
-Internet-Draft                   MTA-STS                      March 2017
+Internet-Draft                   MTA-STS                      April 2017
 
 
 3.4.  Policy Selection for Smart Hosts and Subdomains
@@ -389,9 +389,9 @@ Internet-Draft                   MTA-STS                      March 2017
 
 
 
-Margolis, et al.       Expires September 28, 2017               [Page 7]
+Margolis, et al.         Expires October 5, 2017                [Page 7]
 
-Internet-Draft                   MTA-STS                      March 2017
+Internet-Draft                   MTA-STS                      April 2017
 
 
    first label of the identifier (that is, "*.example.com", not
@@ -445,9 +445,9 @@ Internet-Draft                   MTA-STS                      March 2017
 
 
 
-Margolis, et al.       Expires September 28, 2017               [Page 8]
+Margolis, et al.         Expires October 5, 2017                [Page 8]
 
-Internet-Draft                   MTA-STS                      March 2017
+Internet-Draft                   MTA-STS                      April 2017
 
 
    2.  For each candidate MX, in order of MX priority, attempt to
@@ -501,9 +501,9 @@ Internet-Draft                   MTA-STS                      March 2017
 
 
 
-Margolis, et al.       Expires September 28, 2017               [Page 9]
+Margolis, et al.         Expires October 5, 2017                [Page 9]
 
-Internet-Draft                   MTA-STS                      March 2017
+Internet-Draft                   MTA-STS                      April 2017
 
 
       and/or modify messages despite opportunistic TLS.  This
@@ -557,9 +557,9 @@ Internet-Draft                   MTA-STS                      March 2017
 
 
 
-Margolis, et al.       Expires September 28, 2017              [Page 10]
+Margolis, et al.         Expires October 5, 2017               [Page 10]
 
-Internet-Draft                   MTA-STS                      March 2017
+Internet-Draft                   MTA-STS                      April 2017
 
 
    Resistence to downgrade attacks of this nature--due to the ability to
@@ -613,9 +613,9 @@ Internet-Draft                   MTA-STS                      March 2017
 
 
 
-Margolis, et al.       Expires September 28, 2017              [Page 11]
+Margolis, et al.         Expires October 5, 2017               [Page 11]
 
-Internet-Draft                   MTA-STS                      March 2017
+Internet-Draft                   MTA-STS                      April 2017
 
 
    signed certificate (for example, "dhcp-123.example.com") will, from
@@ -669,9 +669,9 @@ Internet-Draft                   MTA-STS                      March 2017
 
 
 
-Margolis, et al.       Expires September 28, 2017              [Page 12]
+Margolis, et al.         Expires October 5, 2017               [Page 12]
 
-Internet-Draft                   MTA-STS                      March 2017
+Internet-Draft                   MTA-STS                      April 2017
 
 
    While this pseudocode implementation suggests synchronous policy
@@ -725,9 +725,9 @@ func tryGetNewPolicy(domain) {
 
 
 
-Margolis, et al.       Expires September 28, 2017              [Page 13]
+Margolis, et al.         Expires October 5, 2017               [Page 13]
 
-Internet-Draft                   MTA-STS                      March 2017
+Internet-Draft                   MTA-STS                      April 2017
 
 
 }
@@ -781,9 +781,9 @@ func handleMessage(message) {
 
 
 
-Margolis, et al.       Expires September 28, 2017              [Page 14]
+Margolis, et al.         Expires October 5, 2017               [Page 14]
 
-Internet-Draft                   MTA-STS                      March 2017
+Internet-Draft                   MTA-STS                      April 2017
 
 
     policy = tryGetCachedPolicy(domain)
@@ -837,9 +837,9 @@ Internet-Draft                   MTA-STS                      March 2017
 
 
 
-Margolis, et al.       Expires September 28, 2017              [Page 15]
+Margolis, et al.         Expires October 5, 2017               [Page 15]
 
-Internet-Draft                   MTA-STS                      March 2017
+Internet-Draft                   MTA-STS                      April 2017
 
 
    [RFC5785]  Nottingham, M. and E. Hammer-Lahav, "Defining Well-Known
@@ -893,9 +893,9 @@ Authors' Addresses
 
 
 
-Margolis, et al.       Expires September 28, 2017              [Page 16]
+Margolis, et al.         Expires October 5, 2017               [Page 16]
 
-Internet-Draft                   MTA-STS                      March 2017
+Internet-Draft                   MTA-STS                      April 2017
 
 
    Alexander Brotman
@@ -949,4 +949,4 @@ Internet-Draft                   MTA-STS                      March 2017
 
 
 
-Margolis, et al.       Expires September 28, 2017              [Page 17]
+Margolis, et al.         Expires October 5, 2017               [Page 17]
