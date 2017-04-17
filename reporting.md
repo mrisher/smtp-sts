@@ -135,9 +135,9 @@ Policies consist of the following directives:
   * In the case of `https`, reports should be submitted via POST
            ([@!RFC2818]) to the specified URI.
   * In the case of `mailto`, reports should be submitted to the specified
-           email address ([@!RFC6068]). When sending failure reports via SMTP, sending MTAs
-           MUST deliver reports despite any TLS-related failures.  This may
-	   mean that the reports are delivered in the clear.
+           email address ([@!RFC6068]). When sending failure reports via SMTP,
+	   sending MTAs MUST deliver reports despite any TLS-related failures.
+	   This may mean that the reports are delivered in the clear.
 
 The formal definition of the `_smtp-tlsrpt` TXT record, defined using
 [@!RFC5234], is as follows:
@@ -497,10 +497,11 @@ Figure: JSON Report Format
     Presently, the only three valid choices are `tlsa`, `sts`, and the literal
     string `no-policy-found`. It is provided as a string.
 * `policy-string`: The string serialization of the policy, whether TLSA record
-    or MTA-STS policy. Any linefeeds from the original policy MUST be replaced with space.
-* `domain`: The Policy Domain upon which the policy was applied. For messages
-    sent to `user@example.com` this field would contain `example.com` ([@!RFC5890]). It is
-    provided as a string.
+    ([@!RFC6698] section 2.3) or MTA-STS policy. Any linefeeds from the original
+    policy MUST be replaced with space.
+* `domain`: The Policy Domain is the fully qualified DNS domain name ([@!RFC1035])
+    upon which the policy was applied ([@!RFC5890] for international domains). For
+    messages sent to `user@example.com` this field would contain `example.com`.
 * `mx-host-pattern`: The pattern of MX hostnames from the applied policy. It
     is provided as a string, and is interpreted in the same manner as the
     "Checking of Wildcard Certificates" rules in Section 6.4.3 of [@!RFC6125].
