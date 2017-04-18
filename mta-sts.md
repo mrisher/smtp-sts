@@ -184,7 +184,7 @@ This JSON object contains the following key/value pairs:
   ([@!RFC5280]) DNS-ID present in the X.509 certificate presented by any MX
   receiving mail for this domain.  For example, `["mail.example.com",
   ".example.net"]` indicates that mail for this domain might be handled by any
-  MX with a certificate valid for a host at `example.com` or `example.net`.
+  MX with a certificate valid for a host at `mail.example.com` or `example.net`.
   Valid patterns can be either fully specified names (`example.com`) or suffixes
   (`.example.net`) matching the right-hand parts of a server's identity; the
   latter case are distinguished by a leading period.  In the case of
