@@ -229,9 +229,11 @@ Senders MAY impose a timeout on the HTTPS GET to avoid long delays imposed by
 attempted policy updates. A suggested timeout is one minute; policy hosts SHOULD
 respond to requests with a complete policy body within that timeout.
 
-If a valid TXT record is found but no policy can be fetched via HTTPS, and there
-is no valid (non-expired) previously-cached policy, senders MUST treat the
-recipient domain as one that has not implemented MTA-STS.
+If a valid TXT record is found but no policy can be fetched via HTTPS (for any
+reason), and there is no valid (non-expired) previously-cached policy, senders
+MUST continue with delivery as though the domain has not implemented MTA-STS.
+Senders who implement TLSRPT (TODO: add ref) should, however, report this
+failure to the recipient domain if the domain implements TLSRPT as well.
 
 ## Policy Selection for Smart Hosts and Subdomains
 

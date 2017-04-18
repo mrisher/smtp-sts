@@ -325,10 +325,10 @@ Internet-Draft                   MTA-STS                      April 2017
    minute; policy hosts SHOULD respond to requests with a complete
    policy body within that timeout.
 
-   If a valid TXT record is found but no policy can be fetched via
-   HTTPS, and there is no valid (non-expired) previously-cached policy,
-   senders MUST treat the recipient domain as one that has not
-   implemented MTA-STS.
+   If a valid TXT record is found but no policy can be fetched via HTTPS
+   (for any reason), and there is no valid (non-expired) previously-
+   cached policy, senders MUST continue with delivery as though the
+   domain has not implemented MTA-STS.  Senders who implement TLSRPT
 
 
 
@@ -337,6 +337,9 @@ Margolis, et al.         Expires October 5, 2017                [Page 6]
 
 Internet-Draft                   MTA-STS                      April 2017
 
+
+   (TODO: add ref) should, however, report this failure to the recipient
+   domain if the domain implements TLSRPT as well.
 
 3.4.  Policy Selection for Smart Hosts and Subdomains
 
@@ -383,9 +386,6 @@ Internet-Draft                   MTA-STS                      April 2017
    matching "*.example.net", we are required to implement "wildcard-to-
    wildcard" matching.
 
-   To simplify this case, we impose the following constraints on
-   wildcard certificates, identical to those in [RFC7672] section 3.2.3:
-   wildcards are valid in DNS-IDs or CN-IDs, but must be the entire
 
 
 
@@ -394,6 +394,9 @@ Margolis, et al.         Expires October 5, 2017                [Page 7]
 Internet-Draft                   MTA-STS                      April 2017
 
 
+   To simplify this case, we impose the following constraints on
+   wildcard certificates, identical to those in [RFC7672] section 3.2.3:
+   wildcards are valid in DNS-IDs or CN-IDs, but must be the entire
    first label of the identifier (that is, "*.example.com", not
    "mail*.example.com").  Senders who are comparing a "suffix" MX
    pattern with a wildcard identifier should thus strip the wildcard and
@@ -438,9 +441,6 @@ Internet-Draft                   MTA-STS                      April 2017
    1.  Check for a cached policy whose time-since-fetch has not exceeded
        its "max_age".  If none exists, attempt to fetch a new policy
        (perhaps asynchronously, so as not to block message delivery).
-       Optionally, sending MTAs may unconditionally check for a new
-       policy at this step.
-
 
 
 
@@ -449,6 +449,9 @@ Margolis, et al.         Expires October 5, 2017                [Page 8]
 
 Internet-Draft                   MTA-STS                      April 2017
 
+
+       Optionally, sending MTAs may unconditionally check for a new
+       policy at this step.
 
    2.  For each candidate MX, in order of MX priority, attempt to
        deliver the message, enforcing STARTTLS and, assuming a policy is
@@ -496,9 +499,6 @@ Internet-Draft                   MTA-STS                      April 2017
       negotiation.  This would result in the SMTP session occurring over
       plaintext, despite both parties supporting TLS.
 
-   o  Impersonating the destination mail server, whereby the sender
-      might deliver the message to an impostor, who could then monitor
-
 
 
 Margolis, et al.         Expires October 5, 2017                [Page 9]
@@ -506,6 +506,8 @@ Margolis, et al.         Expires October 5, 2017                [Page 9]
 Internet-Draft                   MTA-STS                      April 2017
 
 
+   o  Impersonating the destination mail server, whereby the sender
+      might deliver the message to an impostor, who could then monitor
       and/or modify messages despite opportunistic TLS.  This
       impersonation could be accomplished by spoofing the DNS MX record
       for the recipient domain, or by redirecting client connections
@@ -552,8 +554,6 @@ Internet-Draft                   MTA-STS                      April 2017
    background task that runs daily or weekly), an attacker would have to
    foil policy discovery consistently over the lifetime of a cached
    policy to prevent a successful refresh.
-
-
 
 
 
