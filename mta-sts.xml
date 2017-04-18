@@ -325,7 +325,7 @@ non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST validate:
 <t>That the recipient MX supports STARTTLS and offers a valid PKIX-based TLS
 certificate.</t>
 <t>That at least one of the policy's &quot;mx&quot; patterns matches at least one of the
-identities presented in the MX's X.509 certificate, as descriped in &quot;MX
+identities presented in the MX's X.509 certificate, as described in &quot;MX
 Certificate Validation&quot;.</t>
 </list>
 </t>

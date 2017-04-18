@@ -364,7 +364,7 @@ Internet-Draft                   MTA-STS                      April 2017
 
    2.  That at least one of the policy's "mx" patterns matches at least
        one of the identities presented in the MX's X.509 certificate, as
-       descriped in "MX Certificate Validation".
+       described in "MX Certificate Validation".
 
    This section does not dictate the behavior of sending MTAs when
    policies fail to validate; in particular, validation failures of

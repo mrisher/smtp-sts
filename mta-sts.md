@@ -255,7 +255,7 @@ non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST validate:
     certificate.
 
 2.  That at least one of the policy's "mx" patterns matches at least one of the
-    identities presented in the MX's X.509 certificate, as descriped in "MX
+    identities presented in the MX's X.509 certificate, as described in "MX
     Certificate Validation".
 
 This section does not dictate the behavior of sending MTAs when policies fail
