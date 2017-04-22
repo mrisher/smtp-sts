@@ -153,10 +153,10 @@ is as follows:
 
     sts-text-record = sts-version *WSP %x3B *WSP sts-id [%x3B]
 
-    sts-version     = "v" *WSP "=" *WSP %x53 %x54        ; "STSv1" 
+    sts-version     = %x76 *WSP "=" *WSP %x53 %x54                 ; "v=STSv1" 
                       %x53 %x76 %x31
 
-    sts-id          = "id" *WSP "=" *WSP 1*32(ALPHA / DIGIT) 
+    sts-id          = %x69 %x64 *WSP "=" *WSP 1*32(ALPHA / DIGIT)  ; id=...
 
 If multiple TXT records for `_mta-sts` are returned by the resolver, records
 which do not begin with `v=STSv1;` are discarded. If the number of resulting

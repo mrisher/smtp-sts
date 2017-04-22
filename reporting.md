@@ -147,10 +147,10 @@ The formal definition of the `_smtp-tlsrpt` TXT record, defined using
 
         tlsrpt-record    = tlsrpt-version *WSP %x3B tlsrpt-rua
 
-        tlsrpt-version   = "v" *WSP "=" *WSP %x54 %x4C %x53
-                           %x52 %x50 %x54 %x76 %x31
+        tlsrpt-version   = %x76 *WSP "=" *WSP %x54 %x4C %x53
+                           %x52 %x50 %x54 %x76 %x31                ; "v=TSRPTv1"
 
-        tlsrpt-rua       = "rua" *WSP "=" *WSP tlsrpt-uri
+        tlsrpt-rua       = %x72 %x75 %x61 *WSP "=" *WSP tlsrpt-uri ; "rua=..."
 
         tlsrpt-uri       = URI
                          ; "URI" is imported from [@!RFC3986]; commas (ASCII
