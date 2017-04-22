@@ -92,7 +92,7 @@ Table of Contents
    11. Appendix 2: Message delivery pseudocode . . . . . . . . . . .  13
    12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  15
      12.1.  Normative References . . . . . . . . . . . . . . . . . .  15
-     12.2.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  17
+     12.2.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  16
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  17
 
 1.  Introduction
@@ -241,7 +241,7 @@ Internet-Draft                   MTA-STS                      April 2017
 
 3.2.  MTA-STS Policies
 
-   The policy itself is a JSON [RFC4627] object served via the HTTPS GET
+   The policy itself is a JSON [RFC7159] object served via the HTTPS GET
    method from the fixed [RFC5785] "well-known" path of ".well-known/
    mta-sts.json" served by the "mta-sts" host at the Policy Domain.
    Thus for "example.com" the path is "https://mta-sts.example.com
@@ -847,11 +847,6 @@ Internet-Draft                   MTA-STS                      April 2017
               4033, DOI 10.17487/RFC4033, March 2005,
               <http://www.rfc-editor.org/info/rfc4033>.
 
-   [RFC4627]  Crockford, D., "The application/json Media Type for
-              JavaScript Object Notation (JSON)", RFC 4627, DOI 10
-              .17487/RFC4627, July 2006,
-              <http://www.rfc-editor.org/info/rfc4627>.
-
    [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
               Specifications: ABNF", STD 68, RFC 5234, DOI 10.17487/
               RFC5234, January 2008,
@@ -880,14 +875,19 @@ Internet-Draft                   MTA-STS                      April 2017
               Security (TLS)", RFC 6125, DOI 10.17487/RFC6125, March
               2011, <http://www.rfc-editor.org/info/rfc6125>.
 
+   [RFC7159]  Bray, T., Ed., "The JavaScript Object Notation (JSON) Data
+              Interchange Format", RFC 7159, DOI 10.17487/RFC7159, March
+              2014, <http://www.rfc-editor.org/info/rfc7159>.
+
    [RFC7672]  Dukhovni, V. and W. Hardaker, "SMTP Security via
               Opportunistic DNS-Based Authentication of Named Entities
               (DANE) Transport Layer Security (TLS)", RFC 7672, DOI 10
               .17487/RFC7672, October 2015,
               <http://www.rfc-editor.org/info/rfc7672>.
 
+12.2.  URIs
 
-
+   [1] https://mta-sts.example.com/.well-known/mta-sts.json:
 
 
 
@@ -897,10 +897,6 @@ Margolis, et al.         Expires October 5, 2017               [Page 16]
 
 Internet-Draft                   MTA-STS                      April 2017
 
-
-12.2.  URIs
-
-   [1] https://mta-sts.example.com/.well-known/mta-sts.json:
 
 Authors' Addresses
 
@@ -932,6 +928,10 @@ Authors' Addresses
    Microsoft, Inc
 
    Email: janet.jones (at) microsoft (dot com)
+
+
+
+
 
 
 

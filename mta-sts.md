@@ -164,10 +164,10 @@ MTA-STS and skip the remaining steps of policy discovery.
 
 ## MTA-STS Policies
 
-The policy itself is a JSON [@!RFC4627] object served via the HTTPS GET method from
-the fixed [@!RFC5785] "well-known" path of `.well-known/mta-sts.json` served by
-the `mta-sts` host at the Policy Domain. Thus for `example.com` the path is
-`https://mta-sts.example.com/.well-known/mta-sts.json`.
+The policy itself is a JSON [@!RFC7159] object served via the HTTPS GET method
+from the fixed [@!RFC5785] "well-known" path of `.well-known/mta-sts.json`
+served by the `mta-sts` host at the Policy Domain. Thus for `example.com` the
+path is `https://mta-sts.example.com/.well-known/mta-sts.json`.
 
 This JSON object contains the following key/value pairs:
 
