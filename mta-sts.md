@@ -229,9 +229,11 @@ that the HTTPS GET fails, we suggest implementions may limit further attempts to
 a period of five minutes or longer per version ID, to avoid overwhelming
 resource-constrained recipients with cascading failures.
 
-Senders MAY impose a timeout on the HTTPS GET to avoid long delays imposed by
-attempted policy updates. A suggested timeout is one minute; policy hosts SHOULD
-respond to requests with a complete policy body within that timeout.
+Senders MAY impose a timeout on the HTTPS GET and/or a limit on the maximum size
+of the response body to avoid long delays or resource exhaustion during
+attempted policy updates. A suggested timeout is one minute, and a suggested
+maximum policy size 64 kilobytes; policy hosts SHOULD respond to requests with a
+complete policy body within that timeout and size limit.
 
 If a valid TXT record is found but no policy can be fetched via HTTPS (for any
 reason), and there is no valid (non-expired) previously-cached policy, senders
