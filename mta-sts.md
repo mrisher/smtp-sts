@@ -217,6 +217,10 @@ a X.509 certificate which is valid for the `mta-sts` host (as described in
 non-expired. It is expected that sending MTAs use a set of trusted CAs similar
 to those in widely deployed Web browsers and operating systems.
 
+The certificate MAY be checked for revocation via the Online Certificate Status
+Protocol (OCSP) [@!RFC2560], certificate revocation lists (CRLs), or some other
+mechanism.
+
 HTTP 3xx redirects MUST NOT be followed.
 
 Senders may wish to rate-limit the frequency of attempts to fetch the HTTPS
@@ -267,7 +271,9 @@ section "Policy Application".
 
 The certificate presented by the receiving MX MUST chain to a root CA that is
 trusted by the sending MTA and be non-expired. The certificate MUST have a CN-ID
-([@!RFC6125]) or SAN ([@!RFC5280]) with a DNS-ID matching the `mx` pattern.
+([@!RFC6125]) or SAN ([@!RFC5280]) with a DNS-ID matching the `mx` pattern. The
+MX's certificate MAY also be checked for revocation via OCSP [@!RFC2560],
+certificate revocation lists (CRLs), or some other mechanism.
 
 Because the `mx` patterns are not hostnames, however, matching is not identical
 to other common cases of X.509 certificate authentication (as described, for
