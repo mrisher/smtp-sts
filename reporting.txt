@@ -209,8 +209,8 @@ Internet-Draft                 SMTP-TLSRPT                    April 2017
    o  "v": This value MUST be equal to "TLSRPTv1".
 
    o  "rua": A URI specifying the endpoint to which aggregate
-      information about policy failures should be sent (see the section
-      _Reporting_ _Schema_ for more information).  Two URI schemes are
+      information about policy failures should be sent (see Section 4,
+      "Reporting Schema", for more information).  Two URI schemes are
       supported: "mailto" and "https".
 
       *  In the case of "https", reports should be submitted via POST
@@ -342,7 +342,7 @@ Internet-Draft                 SMTP-TLSRPT                    April 2017
 
    o  "failure-count": This indicates that the sending MTA was unable to
       successfully establish a connection with the receiving platform.
-      The "Result Types" section will elaborate on the failed
+      Section 4.3, "Result Types", will elaborate on the failed
       negotiation attempts.  This field contains an aggregate count of
       failed connections.
 
@@ -705,7 +705,7 @@ Internet-Draft                 SMTP-TLSRPT                    April 2017
       same manner as the "Checking of Wildcard Certificates" rules in
       Section 6.4.3 of [RFC6125].
 
-   o  "result-type": A value from the _Result Types_ section above.
+   o  "result-type": A value from Section 4.3, "Result Types", above.
 
    o  "ip-address": The IP address of the sending MTA that attempted the
       STARTTLS connection.  It is provided as a string representation of

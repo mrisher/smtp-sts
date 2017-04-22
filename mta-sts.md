@@ -92,7 +92,8 @@ We also define the following terms for further use in this document:
 * Policy Domain: The domain for which an MTA-STS Policy is defined. This is the
   next-hop domain; when sending mail to "alice@example.com" this would ordinarly
   be "example.com", but this may be overriden by explicit routing rules (as
-  described in "Policy Selection for Smart Hosts").
+  described in (#policy-selection-for-smart-hosts-and-subdomains),
+  "Policy Selection for Smart Hosts and Subdomains").
 
 # Related Technologies
 
@@ -101,8 +102,8 @@ upgrade unauthenticated encryption or plaintext transmission into authenticated,
 downgrade-resistent encrypted tarnsmission. DANE requires DNSSEC [@!RFC4033] for
 authentication; the mechanism described here instead relies on certificate
 authorities (CAs) and does not require DNSSEC, at a cost of risking malicious
-downgrades.  For a thorough discussion of this trade-off, see the section
-"Security Considerations".
+downgrades.  For a thorough discussion of this trade-off, see
+(#security-considerations), "Security Considerations".
 
 In addition, MTA-STS provides an optional report-only mode, enabling soft
 deployments to detect policy failures; partial deployments can be achieved in
@@ -190,8 +191,8 @@ This JSON object contains the following key/value pairs:
   latter case are distinguished by a leading period.  In the case of
   Internationalized Domain Names ([@!RFC5891]), the MX MUST specify the
   Punycode-encoded A-label [@!RFC3492] and not the Unicode-encoded U-label. The
-  full semantics of certificate validation are described in "MX Certificate
-  Validation."
+  full semantics of certificate validation are described in
+  (#mx-certificate-validation), "MX Certificate Validation."
 
 An example JSON policy is as below:
 
@@ -266,8 +267,8 @@ non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST validate:
 
 This section does not dictate the behavior of sending MTAs when policies fail
 to validate; in particular, validation failures of policies which specify
-"report" mode MUST NOT be interpreted as delivery failures, as described in the
-section "Policy Application".
+"report" mode MUST NOT be interpreted as delivery failures, as described in
+(#policy-application), "Policy Application".
 
 ## MX Certificate Validation
 
@@ -330,7 +331,7 @@ An example control flow for a compliant sender consists of the following steps:
    MTAs may unconditionally check for a new policy at this step.
 2. For each candidate MX, in order of MX priority, attempt to deliver the
    message, enforcing STARTTLS and, assuming a policy is present, PKIX
-   certificate validation, and certificate validation as described in "MX
+   certificate validation as described in (#mx-certificate-validation), "MX
    Certificate Validation."
 3. Upon message retries, a message MAY be permanently failed following first
    checking for the presence of a new policy (as indicated by the `id` field in

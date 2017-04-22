@@ -191,8 +191,9 @@ recipient's TLSRPT policy can be retrieved from <spanx style="verb">_smtp-tlsrpt
 <list style="symbols">
 <t><spanx style="verb">v</spanx>: This value MUST be equal to <spanx style="verb">TLSRPTv1</spanx>.</t>
 <t><spanx style="verb">rua</spanx>: A URI specifying the endpoint to which aggregate information about
- policy failures should be sent (see the section <spanx style="emph">Reporting</spanx> <spanx style="emph">Schema</spanx> for
- more information). Two URI schemes are supported: <spanx style="verb">mailto</spanx> and <spanx style="verb">https</spanx>.
+ policy failures should be sent (see <xref target="reporting-schema"/>, &quot;Reporting
+ Schema&quot;, for more information). Two URI schemes are supported: <spanx style="verb">mailto</spanx> and
+ <spanx style="verb">https</spanx>.
 <list style="symbols">
 <t>In the case of <spanx style="verb">https</spanx>, reports should be submitted via POST
    (<xref target="RFC2818"/>) to the specified URI.</t>
@@ -313,9 +314,9 @@ for the reporting system.
 <t>
 <list style="symbols">
 <t><spanx style="verb">failure-count</spanx>: This indicates that the sending MTA was unable to
-successfully establish a connection with the receiving platform.  The &quot;Result
-Types&quot; section will elaborate on the failed negotiation attempts.  This field
-contains an aggregate count of failed connections.
+successfully establish a connection with the receiving platform.
+<xref target="result-types"/>, &quot;Result Types&quot;, will elaborate on the failed negotiation
+attempts.  This field contains an aggregate count of failed connections.
 <vspace/></t>
 </list>
 </t>
@@ -635,7 +636,7 @@ provided as a string.</t>
 <t><spanx style="verb">mx-host-pattern</spanx>: The pattern of MX hostnames from the applied policy. It
 is provided as a string, and is interpreted in the same manner as the
 &quot;Checking of Wildcard Certificates&quot; rules in Section 6.4.3 of <xref target="RFC6125"/>.</t>
-<t><spanx style="verb">result-type</spanx>: A value from the <spanx style="emph">Result Types</spanx> section above.</t>
+<t><spanx style="verb">result-type</spanx>: A value from <xref target="result-types"/>, &quot;Result Types&quot;,  above.</t>
 <t><spanx style="verb">ip-address</spanx>: The IP address of the sending MTA that attempted the STARTTLS
 connection. It is provided as a string representation of an IPv4 or IPv6
 address in dot-decimal or colon-hexadecimal notation.</t>
@@ -711,19 +712,19 @@ respond to the <spanx style="verb">STARTTLS</spanx> command.  Additionally 3 ses
 </middle>
 <back>
 <references title="Normative References">
-<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"?>
-<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2818.xml"?>
-<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>
-<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3339.xml"?>
-<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5234.xml"?>
-<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5322.xml"?>
-<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6125.xml"?>
-<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6698.xml"?>
-<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6713.xml"?>
-<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7159.xml"?>
-<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7435.xml"?>
-<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7469.xml"?>
-<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7489.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2818.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3339.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5234.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5322.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6125.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6698.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6713.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7159.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7435.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7469.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7489.xml"?>
 </references>
 
 </back>

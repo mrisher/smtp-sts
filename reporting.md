@@ -132,8 +132,9 @@ Policies consist of the following directives:
 
 * `v`: This value MUST be equal to `TLSRPTv1`.
 * `rua`: A URI specifying the endpoint to which aggregate information about
-     policy failures should be sent (see the section _Reporting_ _Schema_ for
-     more information). Two URI schemes are supported: `mailto` and `https`.
+     policy failures should be sent (see (#reporting-schema), "Reporting
+     Schema", for more information). Two URI schemes are supported: `mailto` and
+     `https`.
   * In the case of `https`, reports should be submitted via POST
            ([@!RFC2818]) to the specified URI.
   * In the case of `mailto`, reports should be submitted to the specified
@@ -229,9 +230,9 @@ easier correlation of failure events.
 ### Failure Count
 
 * `failure-count`: This indicates that the sending MTA was unable to
-  successfully establish a connection with the receiving platform.  The "Result
-  Types" section will elaborate on the failed negotiation attempts.  This field
-  contains an aggregate count of failed connections.  
+  successfully establish a connection with the receiving platform.
+  (#result-types), "Result Types", will elaborate on the failed negotiation
+  attempts.  This field contains an aggregate count of failed connections.
 
 ## Result Types
 
@@ -507,7 +508,7 @@ Figure: JSON Report Format
 * `mx-host-pattern`: The pattern of MX hostnames from the applied policy. It
     is provided as a string, and is interpreted in the same manner as the
     "Checking of Wildcard Certificates" rules in Section 6.4.3 of [@!RFC6125].
-* `result-type`: A value from the _Result Types_ section above.
+* `result-type`: A value from (#result-types), "Result Types",  above.
 * `ip-address`: The IP address of the sending MTA that attempted the STARTTLS
     connection. It is provided as a string representation of an IPv4 or IPv6
     address in dot-decimal or colon-hexadecimal notation.

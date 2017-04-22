@@ -144,7 +144,8 @@ TLS for the specified MX hosts.</t>
 <t>Policy Domain: The domain for which an MTA-STS Policy is defined. This is the
 next-hop domain; when sending mail to &quot;alice@example.com&quot; this would ordinarly
 be &quot;example.com&quot;, but this may be overriden by explicit routing rules (as
-described in &quot;Policy Selection for Smart Hosts&quot;).</t>
+described in <xref target="policy-selection-for-smart-hosts-and-subdomains"/>,
+&quot;Policy Selection for Smart Hosts and Subdomains&quot;).</t>
 </list>
 </t>
 </section>
@@ -156,8 +157,8 @@ upgrade unauthenticated encryption or plaintext transmission into authenticated,
 downgrade-resistent encrypted tarnsmission. DANE requires DNSSEC <xref target="RFC4033"/> for
 authentication; the mechanism described here instead relies on certificate
 authorities (CAs) and does not require DNSSEC, at a cost of risking malicious
-downgrades.  For a thorough discussion of this trade-off, see the section
-&quot;Security Considerations&quot;.
+downgrades.  For a thorough discussion of this trade-off, see
+<xref target="security-considerations"/>, &quot;Security Considerations&quot;.
 </t>
 <t>In addition, MTA-STS provides an optional report-only mode, enabling soft
 deployments to detect policy failures; partial deployments can be achieved in
@@ -254,8 +255,8 @@ Valid patterns can be either fully specified names (<spanx style="verb">example.
 latter case are distinguished by a leading period.  In the case of
 Internationalized Domain Names (<xref target="RFC5891"/>), the MX MUST specify the
 Punycode-encoded A-label <xref target="RFC3492"/> and not the Unicode-encoded U-label. The
-full semantics of certificate validation are described in &quot;MX Certificate
-Validation.&quot;</t>
+full semantics of certificate validation are described in
+<xref target="mx-certificate-validation"/>, &quot;MX Certificate Validation.&quot;</t>
 </list>
 </t>
 <t>An example JSON policy is as below:
@@ -337,8 +338,8 @@ Certificate Validation&quot;.</t>
 </t>
 <t>This section does not dictate the behavior of sending MTAs when policies fail
 to validate; in particular, validation failures of policies which specify
-&quot;report&quot; mode MUST NOT be interpreted as delivery failures, as described in the
-section &quot;Policy Application&quot;.
+&quot;report&quot; mode MUST NOT be interpreted as delivery failures, as described in
+<xref target="policy-application"/>, &quot;Policy Application&quot;.
 </t>
 
 <section anchor="mx-certificate-validation" title="MX Certificate Validation">
@@ -406,7 +407,7 @@ asynchronously, so as not to block message delivery). Optionally, sending
 MTAs may unconditionally check for a new policy at this step.</t>
 <t>For each candidate MX, in order of MX priority, attempt to deliver the
 message, enforcing STARTTLS and, assuming a policy is present, PKIX
-certificate validation, and certificate validation as described in &quot;MX
+certificate validation as described in <xref target="mx-certificate-validation"/>, &quot;MX
 Certificate Validation.&quot;</t>
 <t>Upon message retries, a message MAY be permanently failed following first
 checking for the presence of a new policy (as indicated by the <spanx style="verb">id</spanx> field in

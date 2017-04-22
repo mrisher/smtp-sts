@@ -141,7 +141,7 @@ Internet-Draft                   MTA-STS                      April 2017
       This is the next-hop domain; when sending mail to
       "alice@example.com" this would ordinarly be "example.com", but
       this may be overriden by explicit routing rules (as described in
-      "Policy Selection for Smart Hosts").
+      Section 3.4, "Policy Selection for Smart Hosts and Subdomains").
 
 2.  Related Technologies
 
@@ -151,8 +151,8 @@ Internet-Draft                   MTA-STS                      April 2017
    tarnsmission.  DANE requires DNSSEC [RFC4033] for authentication; the
    mechanism described here instead relies on certificate authorities
    (CAs) and does not require DNSSEC, at a cost of risking malicious
-   downgrades.  For a thorough discussion of this trade-off, see the
-   section "Security Considerations".
+   downgrades.  For a thorough discussion of this trade-off, see
+   Section 8, "Security Considerations".
 
    In addition, MTA-STS provides an optional report-only mode, enabling
    soft deployments to detect policy failures; partial deployments can
@@ -284,8 +284,8 @@ Internet-Draft                   MTA-STS                      April 2017
 
       ([RFC5891]), the MX MUST specify the Punycode-encoded A-label
       [RFC3492] and not the Unicode-encoded U-label.  The full semantics
-      of certificate validation are described in "MX Certificate
-      Validation."
+      of certificate validation are described in Section 4.1, "MX
+      Certificate Validation."
 
    An example JSON policy is as below:
 
@@ -373,7 +373,7 @@ Internet-Draft                   MTA-STS                      April 2017
    This section does not dictate the behavior of sending MTAs when
    policies fail to validate; in particular, validation failures of
    policies which specify "report" mode MUST NOT be interpreted as
-   delivery failures, as described in the section "Policy Application".
+   delivery failures, as described in Section 5, "Policy Application".
 
 4.1.  MX Certificate Validation
 
@@ -463,8 +463,8 @@ Internet-Draft                   MTA-STS                      April 2017
 
    2.  For each candidate MX, in order of MX priority, attempt to
        deliver the message, enforcing STARTTLS and, assuming a policy is
-       present, PKIX certificate validation, and certificate validation
-       as described in "MX Certificate Validation."
+       present, PKIX certificate validation as described in Section 4.1,
+       "MX Certificate Validation."
 
    3.  Upon message retries, a message MAY be permanently failed
        following first checking for the presence of a new policy (as
