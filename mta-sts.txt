@@ -85,9 +85,9 @@ Table of Contents
    8.  Security Considerations . . . . . . . . . . . . . . . . . . .  10
      8.1.  Obtaining a Signed Certificate  . . . . . . . . . . . . .  11
      8.2.  Preventing Policy Discovery . . . . . . . . . . . . . . .  11
-     8.3.  Denial of Service . . . . . . . . . . . . . . . . . . . .  11
+     8.3.  Denial of Service . . . . . . . . . . . . . . . . . . . .  12
      8.4.  Weak Policy Constraints . . . . . . . . . . . . . . . . .  12
-   9.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  12
+   9.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  13
    10. Appendix 1: MTA-STS example record & policy . . . . . . . . .  13
    11. Appendix 2: Message delivery pseudocode . . . . . . . . . . .  13
    12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  16
@@ -493,10 +493,10 @@ Internet-Draft                   MTA-STS                      April 2017
        present, PKIX certificate validation as described in Section 4.1,
        "MX Certificate Validation."
 
-   3.  Upon message retries, a message MAY be permanently failed
-       following first checking for the presence of a new policy (as
-       indicated by the "id" field in the "_mta-sts" TXT record).
-
+   3.  A message delivery MUST NOT be permanently failed until the
+       sender has first checked for the presence of a new policy (as
+       indicated by the "id" field in the "_mta-sts" TXT record).  If a
+       new policy is not found, senders SHOULD apply existing rules for
 
 
 
@@ -505,6 +505,9 @@ Margolis, et al.         Expires October 5, 2017                [Page 9]
 
 Internet-Draft                   MTA-STS                      April 2017
 
+
+       the case of temporary message delivery failures (as discussed in
+       [RFC5321] section 4.5.4.1).
 
 6.  Operational Considerations
 
@@ -551,9 +554,6 @@ Internet-Draft                   MTA-STS                      April 2017
       intended for the legitimate recipient server (for example, by
       altering BGP routing tables).
 
-   MTA-STS can thwart such attacks only if the sender is able to
-   previously obtain and cache a policy for the recipient domain, and
-   only if the attacker is unable to obtain a valid certificate that
 
 
 
@@ -562,6 +562,9 @@ Margolis, et al.         Expires October 5, 2017               [Page 10]
 Internet-Draft                   MTA-STS                      April 2017
 
 
+   MTA-STS can thwart such attacks only if the sender is able to
+   previously obtain and cache a policy for the recipient domain, and
+   only if the attacker is unable to obtain a valid certificate that
    complies with that policy.  Below, we consider specific attacks on
    this model.
 
@@ -605,11 +608,8 @@ Internet-Draft                   MTA-STS                      April 2017
    participating recipients--is a feature of DANE, due to its use of
    DNSSEC for policy discovery.
 
-8.3.  Denial of Service
 
-   We additionally consider the Denial of Service risk posed by an
-   attacker who can modify the DNS records for a victim domain.  Absent
-   MTA-STS, such an attacker can cause a sending MTA to cache invalid MX
+
 
 
 
@@ -618,6 +618,11 @@ Margolis, et al.         Expires October 5, 2017               [Page 11]
 Internet-Draft                   MTA-STS                      April 2017
 
 
+8.3.  Denial of Service
+
+   We additionally consider the Denial of Service risk posed by an
+   attacker who can modify the DNS records for a victim domain.  Absent
+   MTA-STS, such an attacker can cause a sending MTA to cache invalid MX
    records, but only for however long the sending resolver caches those
    records.  With MTA-STS, the attacker can additionally advertise a
    new, long-"max_age" MTA-STS policy with "mx" constraints that
@@ -660,11 +665,6 @@ Internet-Draft                   MTA-STS                      April 2017
    the perspective of MTA-STS Policy validation, be a valid MX host for
    that domain.
 
-9.  Contributors
-
-   Nicolas Lidzborski Google, Inc nlidz (at) google (dot com)
-
-   Wei Chuang Google, Inc weihaw (at) google (dot com)
 
 
 
@@ -673,6 +673,12 @@ Margolis, et al.         Expires October 5, 2017               [Page 12]
 
 Internet-Draft                   MTA-STS                      April 2017
 
+
+9.  Contributors
+
+   Nicolas Lidzborski Google, Inc nlidz (at) google (dot com)
+
+   Wei Chuang Google, Inc weihaw (at) google (dot com)
 
    Brandon Long Google, Inc blong (at) google (dot com)
 
@@ -715,13 +721,7 @@ Internet-Draft                   MTA-STS                      April 2017
    While this pseudocode implementation suggests synchronous policy
    retrieval in the delivery path, in a working implementation that may
    be undesirable, and we expect some implementors to instead prefer a
-   background fetch that does not block delivery if no cached policy is
-   present.
 
-
-func isEnforce(policy) {
-  // Return true if the policy mode is "enforce".
-}
 
 
 
@@ -729,6 +729,14 @@ Margolis, et al.         Expires October 5, 2017               [Page 13]
 
 Internet-Draft                   MTA-STS                      April 2017
 
+
+   background fetch that does not block delivery if no cached policy is
+   present.
+
+
+func isEnforce(policy) {
+  // Return true if the policy mode is "enforce".
+}
 
 func isNonExpired(policy) {
   // Return true if the policy is not expired.
@@ -770,14 +778,6 @@ func tryGetNewPolicy(domain) {
 }
 
 func cachePolicy(domain, policy) {
-  // Store "policy" as the cached policy for "domain".
-}
-
-func tryGetCachedPolicy(domain) {
-  // Return a cached policy for "domain".
-}
-
-func reportError(error) {
 
 
 
@@ -786,6 +786,14 @@ Margolis, et al.         Expires October 5, 2017               [Page 14]
 Internet-Draft                   MTA-STS                      April 2017
 
 
+  // Store "policy" as the cached policy for "domain".
+}
+
+func tryGetCachedPolicy(domain) {
+  // Return a cached policy for "domain".
+}
+
+func reportError(error) {
   // Report an error via TLSRPT.
 }
 
@@ -826,20 +834,18 @@ func handleMessage(message) {
     policy = tryGetCachedPolicy(domain)
   }
   if policy {
-    return tryWithPolicy(message, policy)
-  }
-  // Try to deliver the message normally (i.e. without MTA-STS).
-}
-
-
-
-
 
 
 
 Margolis, et al.         Expires October 5, 2017               [Page 15]
 
 Internet-Draft                   MTA-STS                      April 2017
+
+
+    return tryWithPolicy(message, policy)
+  }
+  // Try to deliver the message normally (i.e. without MTA-STS).
+}
 
 
 12.  References
@@ -882,12 +888,6 @@ Internet-Draft                   MTA-STS                      April 2017
               (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
               <http://www.rfc-editor.org/info/rfc5280>.
 
-   [RFC5785]  Nottingham, M. and E. Hammer-Lahav, "Defining Well-Known
-              Uniform Resource Identifiers (URIs)", RFC 5785, DOI 10
-              .17487/RFC5785, April 2010,
-              <http://www.rfc-editor.org/info/rfc5785>.
-
-
 
 
 
@@ -897,6 +897,15 @@ Margolis, et al.         Expires October 5, 2017               [Page 16]
 
 Internet-Draft                   MTA-STS                      April 2017
 
+
+   [RFC5321]  Klensin, J., "Simple Mail Transfer Protocol", RFC 5321,
+              DOI 10.17487/RFC5321, October 2008,
+              <http://www.rfc-editor.org/info/rfc5321>.
+
+   [RFC5785]  Nottingham, M. and E. Hammer-Lahav, "Defining Well-Known
+              Uniform Resource Identifiers (URIs)", RFC 5785, DOI 10
+              .17487/RFC5785, April 2010,
+              <http://www.rfc-editor.org/info/rfc5785>.
 
    [RFC5891]  Klensin, J., "Internationalized Domain Names in
               Applications (IDNA): Protocol", RFC 5891, DOI 10.17487/
@@ -938,20 +947,17 @@ Authors' Addresses
    Email: risher (at) google (dot com)
 
 
-   Binu Ramakrishnan
-   Yahoo!, Inc
-
-   Email: rbinu (at) yahoo-inc (dot com)
-
-
-
-
-
 
 
 Margolis, et al.         Expires October 5, 2017               [Page 17]
 
 Internet-Draft                   MTA-STS                      April 2017
+
+
+   Binu Ramakrishnan
+   Yahoo!, Inc
+
+   Email: rbinu (at) yahoo-inc (dot com)
 
 
    Alexander Brotman
@@ -964,12 +970,6 @@ Internet-Draft                   MTA-STS                      April 2017
    Microsoft, Inc
 
    Email: janet.jones (at) microsoft (dot com)
-
-
-
-
-
-
 
 
 

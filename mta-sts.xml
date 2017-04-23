@@ -436,9 +436,11 @@ MTAs may unconditionally check for a new policy at this step.</t>
 message, enforcing STARTTLS and, assuming a policy is present, PKIX
 certificate validation as described in <xref target="mx-certificate-validation"/>, &quot;MX
 Certificate Validation.&quot;</t>
-<t>Upon message retries, a message MAY be permanently failed following first
-checking for the presence of a new policy (as indicated by the <spanx style="verb">id</spanx> field in
-the <spanx style="verb">_mta-sts</spanx> TXT record).</t>
+<t>A message delivery MUST NOT be permanently failed until the sender has first
+checked for the presence of a new policy (as indicated by the <spanx style="verb">id</spanx> field in
+the <spanx style="verb">_mta-sts</spanx> TXT record). If a new policy is not found, senders SHOULD
+apply existing rules for the case of temporary message delivery failures (as
+discussed in <xref target="RFC5321"/> section 4.5.4.1).</t>
 </list>
 </t>
 </section>
@@ -752,6 +754,7 @@ func handleMessage(message) {
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4033.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5234.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5280.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5321.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5785.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5891.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6125.xml"?>

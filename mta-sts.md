@@ -358,9 +358,11 @@ An example control flow for a compliant sender consists of the following steps:
    message, enforcing STARTTLS and, assuming a policy is present, PKIX
    certificate validation as described in (#mx-certificate-validation), "MX
    Certificate Validation."
-3. Upon message retries, a message MAY be permanently failed following first
-   checking for the presence of a new policy (as indicated by the `id` field in
-   the `_mta-sts` TXT record).
+3. A message delivery MUST NOT be permanently failed until the sender has first
+   checked for the presence of a new policy (as indicated by the `id` field in
+   the `_mta-sts` TXT record). If a new policy is not found, senders SHOULD
+   apply existing rules for the case of temporary message delivery failures (as
+   discussed in [@!RFC5321] section 4.5.4.1).
 
 # Operational Considerations
 
