@@ -151,12 +151,27 @@ An example TXT record is as below:
 The formal definition of the `_mta-sts` TXT record, defined using [@!RFC5234],
 is as follows:
 
-    sts-text-record = sts-version *WSP %x3B *WSP sts-id [%x3B]
+    sts-text-record = sts-version *WSP field-delim *WSP sts-id
+                      [field-delim [sts-extensions]]
 
-    sts-version     = %x76 *WSP "=" *WSP %x53 %x54                 ; "v=STSv1" 
+    field-delim     = %x3B                               ; ";"
+
+    sts-version     = %x76 *WSP "=" *WSP %x53 %x54       ; "v=STSv1" 
                       %x53 %x76 %x31
 
-    sts-id          = %x69 %x64 *WSP "=" *WSP 1*32(ALPHA / DIGIT)  ; id=...
+    sts-id          = %x69 %x64 *WSP "="
+                      *WSP 1*32(ALPHA / DIGIT)           ; "id="
+
+    sts-extensions  = sts-extension *(field-delim sts-extension)
+                      [field-delim]                      ; extension fields
+
+    sts-extension   = sts-ext-name *WSP "=" *WSP sts-ext-value
+
+    sts-ext-name    = (ALPHA / DIGIT) *31(ALPHA / DIGIT / "_" / "-" / ".")
+
+    sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)       ; chars excluding
+                                                         ; "=", ";", SP, and
+                                                         ; control chars
 
 If multiple TXT records for `_mta-sts` are returned by the resolver, records
 which do not begin with `v=STSv1;` are discarded. If the number of resulting

@@ -316,8 +316,7 @@ for the reporting system.
 <t><spanx style="verb">failure-count</spanx>: This indicates that the sending MTA was unable to
 successfully establish a connection with the receiving platform.
 <xref target="result-types"/>, &quot;Result Types&quot;, will elaborate on the failed negotiation
-attempts.  This field contains an aggregate count of failed connections.
-<vspace/></t>
+attempts.  This field contains an aggregate count of failed connections.</t>
 </list>
 </t>
 </section>
