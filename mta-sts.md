@@ -220,7 +220,7 @@ An example JSON policy is as below:
 }
 ```
 
-Parsers SHOULD accept TXT records and policy files which are syntactically valid
+Parsers MUST accept TXT records and policy files which are syntactically valid
 (i.e. valid key-value pairs separated by semi-colons for TXT records and valid
 JSON for policy files) and implementing a superset of this specification, in
 which case unknown fields SHALL be ignored.
