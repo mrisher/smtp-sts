@@ -80,31 +80,31 @@ Table of Contents
    2.  Related Technologies  . . . . . . . . . . . . . . . . . . . .   4
    3.  Reporting Policy  . . . . . . . . . . . . . . . . . . . . . .   4
      3.1.  Example Reporting Policy  . . . . . . . . . . . . . . . .   5
-       3.1.1.  Report using MAILTO . . . . . . . . . . . . . . . . .   5
-       3.1.2.  Report using HTTPS  . . . . . . . . . . . . . . . . .   5
-   4.  Reporting Schema  . . . . . . . . . . . . . . . . . . . . . .   5
-     4.1.  Report Time-frame . . . . . . . . . . . . . . . . . . . .   6
-     4.2.  Delivery Summary  . . . . . . . . . . . . . . . . . . . .   6
-       4.2.1.  Success Count . . . . . . . . . . . . . . . . . . . .   6
+       3.1.1.  Report using MAILTO . . . . . . . . . . . . . . . . .   6
+       3.1.2.  Report using HTTPS  . . . . . . . . . . . . . . . . .   6
+   4.  Reporting Schema  . . . . . . . . . . . . . . . . . . . . . .   6
+     4.1.  Report Time-frame . . . . . . . . . . . . . . . . . . . .   7
+     4.2.  Delivery Summary  . . . . . . . . . . . . . . . . . . . .   7
+       4.2.1.  Success Count . . . . . . . . . . . . . . . . . . . .   7
        4.2.2.  Failure Count . . . . . . . . . . . . . . . . . . . .   7
      4.3.  Result Types  . . . . . . . . . . . . . . . . . . . . . .   7
        4.3.1.  Negotiation Failures  . . . . . . . . . . . . . . . .   7
-       4.3.2.  Policy Failures . . . . . . . . . . . . . . . . . . .   7
+       4.3.2.  Policy Failures . . . . . . . . . . . . . . . . . . .   8
        4.3.3.  General Failures  . . . . . . . . . . . . . . . . . .   8
-       4.3.4.  Transient Failures  . . . . . . . . . . . . . . . . .   8
-   5.  Report Delivery . . . . . . . . . . . . . . . . . . . . . . .   8
-     5.1.  Report Filename . . . . . . . . . . . . . . . . . . . . .   8
-     5.2.  Compression . . . . . . . . . . . . . . . . . . . . . . .   9
-     5.3.  Email Transport . . . . . . . . . . . . . . . . . . . . .   9
-     5.4.  HTTPS Transport . . . . . . . . . . . . . . . . . . . . .  10
-     5.5.  Delivery Retry  . . . . . . . . . . . . . . . . . . . . .  10
+       4.3.4.  Transient Failures  . . . . . . . . . . . . . . . . .   9
+   5.  Report Delivery . . . . . . . . . . . . . . . . . . . . . . .   9
+     5.1.  Report Filename . . . . . . . . . . . . . . . . . . . . .   9
+     5.2.  Compression . . . . . . . . . . . . . . . . . . . . . . .  10
+     5.3.  Email Transport . . . . . . . . . . . . . . . . . . . . .  10
+     5.4.  HTTPS Transport . . . . . . . . . . . . . . . . . . . . .  11
+     5.5.  Delivery Retry  . . . . . . . . . . . . . . . . . . . . .  11
    6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  11
    7.  Security Considerations . . . . . . . . . . . . . . . . . . .  11
-   8.  Appendix 1: Example Reporting Policy  . . . . . . . . . . . .  11
-     8.1.  Report using MAILTO . . . . . . . . . . . . . . . . . . .  11
+   8.  Appendix 1: Example Reporting Policy  . . . . . . . . . . . .  12
+     8.1.  Report using MAILTO . . . . . . . . . . . . . . . . . . .  12
      8.2.  Report using HTTPS  . . . . . . . . . . . . . . . . . . .  12
    9.  Appendix 2: JSON Report Schema  . . . . . . . . . . . . . . .  12
-   10. Appendix 3: Example JSON Report . . . . . . . . . . . . . . .  14
+   10. Appendix 3: Example JSON Report . . . . . . . . . . . . . . .  15
    11. Normative References  . . . . . . . . . . . . . . . . . . . .  16
 
 
@@ -213,11 +213,11 @@ Internet-Draft                 SMTP-TLSRPT                    April 2017
       "Reporting Schema", for more information).  Two URI schemes are
       supported: "mailto" and "https".
 
-      *  In the case of "https", reports should be submitted via POST
-         ([RFC2818]) to the specified URI.
+   o  In the case of "https", reports should be submitted via POST
+      ([RFC2818]) to the specified URI.
 
-      *  In the case of "mailto", reports should be submitted to the
-         specified email address.  When sending failure reports via
+   o  In the case of "mailto", reports should be submitted to the
+      specified email address.  When sending failure reports via SMTP,
 
 
 
@@ -226,32 +226,61 @@ Margolis, et al.         Expires October 5, 2017                [Page 4]
 Internet-Draft                 SMTP-TLSRPT                    April 2017
 
 
-         SMTP, sending MTAs MUST deliver reports despite any TLS-related
-         failures.  This may mean that the reports are delivered in the
-         clear.
+      sending MTAs MUST deliver reports despite any TLS-related
+      failures.  This may mean that the reports are delivered in the
+      clear.
 
    The formal definition of the "_smtp-tlsrpt" TXT record, defined using
    [RFC5234], is as follows:
 
-    tlsrpt-record    = tlsrpt-version *WSP %x3B tlsrpt-rua
+    tlsrpt-record     = tlsrpt-version *WSP field-delim *WSP tlsrpt-rua
+                        [field-delim [tlsrpt-extensions]]
 
-    tlsrpt-version   = %x76 *WSP "=" *WSP %x54 %x4C %x53
-                       %x52 %x50 %x54 %x76 %x31                ; "v=TSRPTv1"
+    field-delim       = %x3B                                    ; ";"
 
-    tlsrpt-rua       = %x72 %x75 %x61 *WSP "=" *WSP tlsrpt-uri ; "rua=..."
+    tlsrpt-version    = %x76 *WSP "=" *WSP %x54 %x4C %x53 %x52
+                        %x50 %x54 %x76 %x31                ; "v=TSRPTv1"
 
-    tlsrpt-uri       = URI
-                     ; "URI" is imported from [@!RFC3986]; commas (ASCII
-                     ; 0x2C) and exclamation points (ASCII 0x21)
-                     ; MUST be encoded; the numeric portion MUST fit
-                     ; within an unsigned 64-bit integer
+    tlsrpt-rua        = %x72 %x75 %x61 *WSP "=" *WSP tlsrpt-uri ; "rua=..."
+
+    tlsrpt-uri        = URI
+                      ; "URI" is imported from [@!RFC3986]; commas (ASCII
+                      ; 0x2C) and exclamation points (ASCII 0x21)
+                      ; MUST be encoded; the numeric portion MUST fit
+                      ; within an unsigned 64-bit integer
+
+    tlsrpt-extensions = tlsrpt-extension *(field-delim tlsrpt-extension)
+                        [field-delim]
+                      ; extension fields
+
+    tlsrpt-extension  = tlsrpt-ext-name *WSP "=" *WSP tlsrpt-ext-value
+
+    tlsrpt-ext-name   = (ALPHA / DIGIT) *31(ALPHA / DIGIT / "_" / "-" / ".")
+
+    tlsrpt-ext-value  = 1*(%x21-3A / %x3C / %x3E-7E)       ; chars excluding
+                                                     ; "=", ";", SP, and
+                                                     ; control chars
 
    If multiple TXT records for "_smtp-tlsrpt" are returned by the
    resolver, records which do not begin with "v=TLSRPTv1;" are
    discarded.  If the number of resulting records is not one, senders
-   MUST assume the recipient domain does not implement TLSRPT.
+   MUST assume the recipient domain does not implement TLSRPT.  Parsers
+   MUST accept TXT records which are syntactically valid (i.e.  valid
+   key-value pairs seprated by semi-colons) and implementing a superset
+   of this specification, in which case unknown fields SHALL be ignored.
 
 3.1.  Example Reporting Policy
+
+
+
+
+
+
+
+Margolis, et al.         Expires October 5, 2017                [Page 5]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2017
+
 
 3.1.1.  Report using MAILTO
 
@@ -274,13 +303,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2017
    o  Report metadata:
 
       *  The organization responsible for the report
-
-
-
-Margolis, et al.         Expires October 5, 2017                [Page 5]
-
-Internet-Draft                 SMTP-TLSRPT                    April 2017
-
 
       *  Contact information for one or more responsible parties for the
          contents of the report
@@ -308,6 +330,14 @@ Internet-Draft                 SMTP-TLSRPT                    April 2017
       information field containing a URI for recipients to review
       further information on a failure type.
 
+
+
+
+Margolis, et al.         Expires October 5, 2017                [Page 6]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2017
+
+
    Note that the failure types are non-exclusive; an aggregate report
    may contain overlapping "counts" of failure types when a single send
    attempt encountered multiple errors.
@@ -327,16 +357,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2017
       reporting is functional and tabulating correctly.  This field
       contains an aggregate count of successful connections for the
       reporting system.
-
-
-
-
-
-
-Margolis, et al.         Expires October 5, 2017                [Page 6]
-
-Internet-Draft                 SMTP-TLSRPT                    April 2017
-
 
 4.2.2.  Failure Count
 
@@ -365,6 +385,15 @@ Internet-Draft                 SMTP-TLSRPT                    April 2017
    o  "certificate-expired": This indicates that the certificate has
       expired.
 
+
+
+
+
+Margolis, et al.         Expires October 5, 2017                [Page 7]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2017
+
+
    o  "certificate-not-trusted": This a label that covers multiple
       certificate related failures that include, but not limited to
       errors such as untrusted/unknown CAs, certificate name
@@ -384,15 +413,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2017
    o  "tlsa-invalid": This indicates a validation error in the TLSA
       record associated with a DANE policy.  None of the records in the
       RRset were found to be valid.
-
-
-
-
-
-Margolis, et al.         Expires October 5, 2017                [Page 7]
-
-Internet-Draft                 SMTP-TLSRPT                    April 2017
-
 
    o  "dnssec-invalid": This would indicate that no valid records were
       returned from the recursive resolver.  The request returned with
@@ -418,6 +438,18 @@ Internet-Draft                 SMTP-TLSRPT                    April 2017
    text field, and the contents of the field should be an error code or
    error text, such as "X509_V_ERR_UNHANDLED_CRITICAL_CRL_EXTENSION".
 
+
+
+
+
+
+
+
+Margolis, et al.         Expires October 5, 2017                [Page 8]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2017
+
+
 4.3.4.  Transient Failures
 
    Transient errors due to too-busy network, TCP timeouts, etc. are not
@@ -431,24 +463,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2017
 5.1.  Report Filename
 
    The filename is typically constructed using the following ABNF:
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Margolis, et al.         Expires October 5, 2017                [Page 8]
-
-Internet-Draft                 SMTP-TLSRPT                    April 2017
-
 
        filename = sender "!" policy-domain "!" begin-timestamp
                  "!" end-timestamp [ "!" unique-id ] "." extension
@@ -482,6 +496,16 @@ Internet-Draft                 SMTP-TLSRPT                    April 2017
 
  `mail.sender.example.com!example.net!1470013207!1470186007!001.json.gz`
 
+
+
+
+
+
+Margolis, et al.         Expires October 5, 2017                [Page 9]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2017
+
+
 5.2.  Compression
 
    The report SHOULD be subjected to GZIP compression for both email and
@@ -496,15 +520,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2017
    structure is required.  It is presumed that the aggregate reporting
    address will be equipped to extract MIME parts with the prescribed
    media type and filename and ignore the rest.
-
-
-
-
-
-Margolis, et al.         Expires October 5, 2017                [Page 9]
-
-Internet-Draft                 SMTP-TLSRPT                    April 2017
-
 
    If compressed, the report should use the media type "application/
    gzip" if compressed (see [RFC6713]), and "text/json" otherwise.
@@ -539,6 +554,14 @@ Internet-Draft                 SMTP-TLSRPT                    April 2017
    Note that, when sending failure reports via SMTP, sending MTAs MUST
    NOT honor MTA-STS or DANE TLSA failures.
 
+
+
+
+Margolis, et al.         Expires October 5, 2017               [Page 10]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2017
+
+
 5.4.  HTTPS Transport
 
    The report MAY be delivered by POST to HTTPS.  If compressed, the
@@ -553,14 +576,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2017
    while it is ideal to attempt redelivery, it is not required.  If
    multiple retries are attempted, they should be on a logarithmic
    scale.
-
-
-
-
-Margolis, et al.         Expires October 5, 2017               [Page 10]
-
-Internet-Draft                 SMTP-TLSRPT                    April 2017
-
 
 6.  IANA Considerations
 
@@ -595,6 +610,14 @@ Internet-Draft                 SMTP-TLSRPT                    April 2017
       reports that are outside the authority of the Policy Domain, which
       allows domains to delegate processing of reports to a partner
       organization.  However, an attacker who controls the Policy Domain
+
+
+
+Margolis, et al.         Expires October 5, 2017               [Page 11]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2017
+
+
       DNS could also use this mechanism to direct the reports to an
       unwitting victim, flooding that victim with excessive reports.
       DMARC [RFC7489] defines an elegant solution for verifying
@@ -610,14 +633,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2017
             _smtp-tlsrpt.mail.example.com. IN TXT \
                     "v=TLSRPTv1;rua=mailto:reports@example.com"
 
-
-
-
-Margolis, et al.         Expires October 5, 2017               [Page 11]
-
-Internet-Draft                 SMTP-TLSRPT                    April 2017
-
-
 8.2.  Report using HTTPS
 
            _smtp-tlsrpt.mail.example.com. IN TXT \
@@ -628,6 +643,36 @@ Internet-Draft                 SMTP-TLSRPT                    April 2017
 
    The JSON schema is derived from the HPKP JSON schema [RFC7469] (cf.
    Section 3)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Margolis, et al.         Expires October 5, 2017               [Page 12]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2017
+
 
          {
            "organization-name": organization-name,
@@ -665,15 +710,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2017
    o  "organization-name": The name of the organization responsible for
       the report.  It is provided as a string.
 
-
-
-
-
-Margolis, et al.         Expires October 5, 2017               [Page 12]
-
-Internet-Draft                 SMTP-TLSRPT                    April 2017
-
-
    o  "date-time": The date-time indicates the start- and end-times for
       the report range.  It is provided as a string formatted according
       to Section 5.6, "Internet Date/Time Format", of [RFC3339].  The
@@ -686,6 +722,13 @@ Internet-Draft                 SMTP-TLSRPT                    April 2017
    o  "report-id": A unique identifier for the report.  Report authors
       may use whatever scheme they prefer to generate a unique
       identifier.  It is provided as a string.
+
+
+
+Margolis, et al.         Expires October 5, 2017               [Page 13]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2017
+
 
    o  "policy-type": The type of policy that was applied by the sending
       domain.  Presently, the only three valid choices are "tlsa",
@@ -723,13 +766,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2017
       successfully negotiated SSL-enabled connections to the receiving
       site.
 
-
-
-Margolis, et al.         Expires October 5, 2017               [Page 13]
-
-Internet-Draft                 SMTP-TLSRPT                    April 2017
-
-
    o  "failure-aggregate": The aggregate number (integer) of failures to
       negotiate an SSL-enabled connection to the receiving site.
 
@@ -741,42 +777,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2017
       URI might host the complete certificate chain presented during an
       attempted STARTTLS session.
 
-   o  "failure-reason-code": A text field to include an SSL-related
-      error code or error message.
-
-10.  Appendix 3: Example JSON Report
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -785,6 +785,11 @@ Margolis, et al.         Expires October 5, 2017               [Page 14]
 
 Internet-Draft                 SMTP-TLSRPT                    April 2017
 
+
+   o  "failure-reason-code": A text field to include an SSL-related
+      error code or error message.
+
+10.  Appendix 3: Example JSON Report
 
 {
   "organization-name": "Company-X",
@@ -829,11 +834,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2017
    Company-Y, where 100 sessions were attempted to Company Y servers
    with an expired certificate and 200 sessions were attempted to
    Company Y servers that did not successfully respond to the "STARTTLS"
-   command.  Additionally 3 sessions failed due to
-   "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED".
-
-
-
 
 
 
@@ -841,6 +841,9 @@ Margolis, et al.         Expires October 5, 2017               [Page 15]
 
 Internet-Draft                 SMTP-TLSRPT                    April 2017
 
+
+   command.  Additionally 3 sessions failed due to
+   "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED".
 
 11.  Normative References
 
@@ -886,9 +889,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2017
               Media Types", RFC 6713, DOI 10.17487/RFC6713, August 2012,
               <http://www.rfc-editor.org/info/rfc6713>.
 
-   [RFC7159]  Bray, T., Ed., "The JavaScript Object Notation (JSON) Data
-              Interchange Format", RFC 7159, DOI 10.17487/RFC7159, March
-              2014, <http://www.rfc-editor.org/info/rfc7159>.
 
 
 
@@ -897,6 +897,10 @@ Margolis, et al.         Expires October 5, 2017               [Page 16]
 
 Internet-Draft                 SMTP-TLSRPT                    April 2017
 
+
+   [RFC7159]  Bray, T., Ed., "The JavaScript Object Notation (JSON) Data
+              Interchange Format", RFC 7159, DOI 10.17487/RFC7159, March
+              2014, <http://www.rfc-editor.org/info/rfc7159>.
 
    [RFC7435]  Dukhovni, V., "Opportunistic Security: Some Protection
               Most of the Time", RFC 7435, DOI 10.17487/RFC7435,
@@ -941,10 +945,6 @@ Authors' Addresses
    Google, Inc
 
    Email: risher (at) google (dot com)
-
-
-
-
 
 
 

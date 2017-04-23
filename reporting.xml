@@ -191,17 +191,14 @@ recipient's TLSRPT policy can be retrieved from <spanx style="verb">_smtp-tlsrpt
 <list style="symbols">
 <t><spanx style="verb">v</spanx>: This value MUST be equal to <spanx style="verb">TLSRPTv1</spanx>.</t>
 <t><spanx style="verb">rua</spanx>: A URI specifying the endpoint to which aggregate information about
- policy failures should be sent (see <xref target="reporting-schema"/>, &quot;Reporting
- Schema&quot;, for more information). Two URI schemes are supported: <spanx style="verb">mailto</spanx> and
- <spanx style="verb">https</spanx>.
-<list style="symbols">
-<t>In the case of <spanx style="verb">https</spanx>, reports should be submitted via POST
-   (<xref target="RFC2818"/>) to the specified URI.</t>
-<t>In the case of <spanx style="verb">mailto</spanx>, reports should be submitted to the specified
-   email address. When sending failure reports via SMTP, sending MTAs
-   MUST deliver reports despite any TLS-related failures.  This may
-mean that the reports are delivered in the clear.</t>
-</list></t>
+policy failures should be sent (see <xref target="reporting-schema"/>, &quot;Reporting Schema&quot;,
+for more information). Two URI schemes are supported: <spanx style="verb">mailto</spanx> and <spanx style="verb">https</spanx>.</t>
+<t>In the case of <spanx style="verb">https</spanx>, reports should be submitted via POST (<xref target="RFC2818"/>) to
+the specified URI.</t>
+<t>In the case of <spanx style="verb">mailto</spanx>, reports should be submitted to the specified email
+address. When sending failure reports via SMTP, sending MTAs MUST deliver
+reports despite any TLS-related failures.  This may mean that the reports are
+delivered in the clear.</t>
 </list>
 </t>
 <t>The formal definition of the <spanx style="verb">_smtp-tlsrpt</spanx> TXT record, defined using
@@ -209,23 +206,40 @@ mean that the reports are delivered in the clear.</t>
 </t>
 
 <figure align="center"><artwork align="center">
-    tlsrpt-record    = tlsrpt-version *WSP %x3B tlsrpt-rua
+    tlsrpt-record     = tlsrpt-version *WSP field-delim *WSP tlsrpt-rua
+                        [field-delim [tlsrpt-extensions]]
 
-    tlsrpt-version   = %x76 *WSP "=" *WSP %x54 %x4C %x53
-                       %x52 %x50 %x54 %x76 %x31                ; "v=TSRPTv1"
+    field-delim       = %x3B                                    ; ";"
 
-    tlsrpt-rua       = %x72 %x75 %x61 *WSP "=" *WSP tlsrpt-uri ; "rua=..."
+    tlsrpt-version    = %x76 *WSP "=" *WSP %x54 %x4C %x53 %x52
+                        %x50 %x54 %x76 %x31                ; "v=TSRPTv1"
 
-    tlsrpt-uri       = URI
-                     ; "URI" is imported from [@!RFC3986]; commas (ASCII
-                     ; 0x2C) and exclamation points (ASCII 0x21)
-                     ; MUST be encoded; the numeric portion MUST fit
-                     ; within an unsigned 64-bit integer
+    tlsrpt-rua        = %x72 %x75 %x61 *WSP "=" *WSP tlsrpt-uri ; "rua=..."
+
+    tlsrpt-uri        = URI
+                      ; "URI" is imported from [@!RFC3986]; commas (ASCII
+                      ; 0x2C) and exclamation points (ASCII 0x21)
+                      ; MUST be encoded; the numeric portion MUST fit
+                      ; within an unsigned 64-bit integer
+
+    tlsrpt-extensions = tlsrpt-extension *(field-delim tlsrpt-extension)
+                        [field-delim]                      
+                      ; extension fields
+
+    tlsrpt-extension  = tlsrpt-ext-name *WSP "=" *WSP tlsrpt-ext-value
+
+    tlsrpt-ext-name   = (ALPHA / DIGIT) *31(ALPHA / DIGIT / "_" / "-" / ".")
+
+    tlsrpt-ext-value  = 1*(%x21-3A / %x3C / %x3E-7E)       ; chars excluding
+                                                     ; "=", ";", SP, and
+                                                     ; control chars
 </artwork></figure>
 <t>If multiple TXT records for <spanx style="verb">_smtp-tlsrpt</spanx> are returned by the resolver, records
 which do not begin with <spanx style="verb">v=TLSRPTv1;</spanx> are discarded. If the number of resulting
 records is not one, senders MUST assume the recipient domain does not implement
-TLSRPT.
+TLSRPT. Parsers MUST accept TXT records which are syntactically valid (i.e.
+valid key-value pairs seprated by semi-colons) and implementing a superset of
+this specification, in which case unknown fields SHALL be ignored.
 </t>
 
 <section anchor="example-reporting-policy" title="Example Reporting Policy">

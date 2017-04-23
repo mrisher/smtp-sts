@@ -132,36 +132,53 @@ Policies consist of the following directives:
 
 * `v`: This value MUST be equal to `TLSRPTv1`.
 * `rua`: A URI specifying the endpoint to which aggregate information about
-     policy failures should be sent (see (#reporting-schema), "Reporting
-     Schema", for more information). Two URI schemes are supported: `mailto` and
-     `https`.
-  * In the case of `https`, reports should be submitted via POST
-           ([@!RFC2818]) to the specified URI.
-  * In the case of `mailto`, reports should be submitted to the specified
-           email address. When sending failure reports via SMTP, sending MTAs
-           MUST deliver reports despite any TLS-related failures.  This may
-	   mean that the reports are delivered in the clear.
+  policy failures should be sent (see (#reporting-schema), "Reporting Schema",
+  for more information). Two URI schemes are supported: `mailto` and `https`.
+* In the case of `https`, reports should be submitted via POST ([@!RFC2818]) to
+  the specified URI.
+* In the case of `mailto`, reports should be submitted to the specified email
+  address. When sending failure reports via SMTP, sending MTAs MUST deliver
+  reports despite any TLS-related failures.  This may mean that the reports are
+  delivered in the clear.
 
 The formal definition of the `_smtp-tlsrpt` TXT record, defined using
 [@!RFC5234], is as follows:
 
-        tlsrpt-record    = tlsrpt-version *WSP %x3B tlsrpt-rua
+        tlsrpt-record     = tlsrpt-version *WSP field-delim *WSP tlsrpt-rua
+                            [field-delim [tlsrpt-extensions]]
 
-        tlsrpt-version   = %x76 *WSP "=" *WSP %x54 %x4C %x53
-                           %x52 %x50 %x54 %x76 %x31                ; "v=TSRPTv1"
+        field-delim       = %x3B                                    ; ";"
 
-        tlsrpt-rua       = %x72 %x75 %x61 *WSP "=" *WSP tlsrpt-uri ; "rua=..."
+        tlsrpt-version    = %x76 *WSP "=" *WSP %x54 %x4C %x53 %x52
+                            %x50 %x54 %x76 %x31                ; "v=TSRPTv1"
 
-        tlsrpt-uri       = URI
-                         ; "URI" is imported from [@!RFC3986]; commas (ASCII
-                         ; 0x2C) and exclamation points (ASCII 0x21)
-                         ; MUST be encoded; the numeric portion MUST fit
-                         ; within an unsigned 64-bit integer
+        tlsrpt-rua        = %x72 %x75 %x61 *WSP "=" *WSP tlsrpt-uri ; "rua=..."
+
+        tlsrpt-uri        = URI
+                          ; "URI" is imported from [@!RFC3986]; commas (ASCII
+                          ; 0x2C) and exclamation points (ASCII 0x21)
+                          ; MUST be encoded; the numeric portion MUST fit
+                          ; within an unsigned 64-bit integer
+
+        tlsrpt-extensions = tlsrpt-extension *(field-delim tlsrpt-extension)
+                            [field-delim]                      
+                          ; extension fields
+
+        tlsrpt-extension  = tlsrpt-ext-name *WSP "=" *WSP tlsrpt-ext-value
+
+        tlsrpt-ext-name   = (ALPHA / DIGIT) *31(ALPHA / DIGIT / "_" / "-" / ".")
+
+        tlsrpt-ext-value  = 1*(%x21-3A / %x3C / %x3E-7E)       ; chars excluding
+                                                         ; "=", ";", SP, and
+                                                         ; control chars
+
 
 If multiple TXT records for `_smtp-tlsrpt` are returned by the resolver, records
 which do not begin with `v=TLSRPTv1;` are discarded. If the number of resulting
 records is not one, senders MUST assume the recipient domain does not implement
-TLSRPT.
+TLSRPT. Parsers MUST accept TXT records which are syntactically valid (i.e.
+valid key-value pairs seprated by semi-colons) and implementing a superset of
+this specification, in which case unknown fields SHALL be ignored.
 
 ## Example Reporting Policy
 
