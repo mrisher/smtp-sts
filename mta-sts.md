@@ -228,10 +228,19 @@ which case unknown fields SHALL be ignored.
 ## HTTPS Policy Fetching
 
 When fetching a new policy or updating a policy, the HTTPS endpoint MUST present
-a X.509 certificate which is valid for the `mta-sts` host (as described in
-[@!RFC6125]), chain to a root CA that is trusted by the sending MTA, and be
-non-expired. It is expected that sending MTAs use a set of trusted CAs similar
-to those in widely deployed Web browsers and operating systems.
+a X.509 certificate which is valid for the `mta-sts` host (as described below),
+chain to a root CA that is trusted by the sending MTA, and be non-expired. It is
+expected that sending MTAs use a set of trusted CAs similar to those in widely
+deployed Web browsers and operating systems.
+
+The certificate is valid for the `mta-sts` host with respect to the rules
+described in [@!RFC6125], with the following application-specific
+considerations:
+
+* Matching is performed only against the DNS-ID and CN-ID identifiers.
+
+* DNS domain names in server certificates MAY contain the wildcard character
+  '\*' as the complete left-most label within the identifier.
 
 The certificate MAY be checked for revocation via the Online Certificate Status
 Protocol (OCSP) [@!RFC2560], certificate revocation lists (CRLs), or some other
@@ -301,12 +310,13 @@ certificate contains a SAN matching `*.example.net`, we are required to
 implement "wildcard-to-wildcard" matching.
 
 To simplify this case, we impose the following constraints on wildcard
-certificates, identical to those in [@!RFC7672] section 3.2.3: wildcards are
-valid in DNS-IDs or CN-IDs, but must be the entire first label of the
-identifier (that is, `*.example.com`, not `mail*.example.com`). Senders who
-are comparing a "suffix" MX pattern with a wildcard identifier should thus strip
-the wildcard and ensure that the two sides match label-by-label, until all
-labels of the shorter side (if unequal length) are consumed.
+certificates, identical to those in [@!RFC7672] section 3.2.3 and [@!RFC6125
+section 6.4.3: wildcards are valid in DNS-IDs or CN-IDs, but must be the entire
+first label of the identifier (that is, `*.example.com`, not
+`mail*.example.com`). Senders who are comparing a "suffix" MX pattern with a
+wildcard identifier should thus strip the wildcard and ensure that the two sides
+match label-by-label, until all labels of the shorter side (if unequal length)
+are consumed.
 
 A simple pseudocode implementation of this algorithm is presented in the
 Appendix.
