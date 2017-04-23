@@ -561,8 +561,8 @@ func tryStartTls(mx) {
 }
 
 func certMatches(connection, mx) {
-  // For simplicity, we are not checking CNs here.
-  for san in getSansFromCert(connection) {
+  // Assume a handy function to return CN and DNS-ID SANs.
+  for san in getDnsIdSansAndCnFromCert(connection) {
     // Return if the server certificate from "connection" matches the "mx" host.
     if san[0] == '*' {
       // Invalid wildcard!
