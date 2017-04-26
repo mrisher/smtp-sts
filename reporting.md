@@ -496,12 +496,10 @@ Figure: JSON Report Format
 * `policy-type`: The type of policy that was applied by the sending domain.
     Presently, the only three valid choices are `tlsa`, `sts`, and the literal
     string `no-policy-found`. It is provided as a string.
-* `policy-string`: The string serialization of the policy, whether TLSA record
-    ([@!RFC6698] section 2.3) or MTA-STS policy. Any linefeeds from the original
-    policy MUST be replaced with space.
-* `domain`: The Policy Domain is the fully qualified DNS domain name ([@!RFC1035])
-    upon which the policy was applied ([@!RFC5890] for international domains). For
-    messages sent to `user@example.com` this field would contain `example.com`.
+* `policy-string`: The JSON string serialization ([@!RFC7159] section 7) of the
+   policy, whether TLSA record ([@!RFC6698] section 2.3) or MTA-STS policy.
+* `domain`: The Policy Domain is the domain against which the MTA-STS or DANE
+    policy is defined.
 * `mx-host-pattern`: The pattern of MX hostnames from the applied policy. It
     is provided as a string, and is interpreted in the same manner as the
     "Checking of Wildcard Certificates" rules in Section 6.4.3 of [@!RFC6125].
