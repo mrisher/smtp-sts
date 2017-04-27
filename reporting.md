@@ -130,35 +130,53 @@ Policies consist of the following directives:
 
 * `v`: This value MUST be equal to `TLSRPTv1`.
 * `rua`: A URI specifying the endpoint to which aggregate information about
-     policy failures should be sent (see the section _Reporting_ _Schema_ for
-     more information). Two URI schemes are supported: `mailto` and `https`.
-  * In the case of `https`, reports should be submitted via POST
-           ([@!RFC2818]) to the specified URI.
-  * In the case of `mailto`, reports should be submitted to the specified
-           email address ([@!RFC6068]). When sending failure reports via SMTP,
-	   sending MTAs MUST deliver reports despite any TLS-related failures.
-	   This may mean that the reports are delivered in the clear.
+  policy failures should be sent (see (#reporting-schema), "Reporting Schema",
+  for more information). Two URI schemes are supported: `mailto` and `https`.
+* In the case of `https`, reports should be submitted via POST ([@!RFC2818]) 
+  to the specified URI.
+* In the case of `mailto`, reports should be submitted to the specified
+  email address ([@!RFC6068]). When sending failure reports via SMTP,
+	sending MTAs MUST deliver reports despite any TLS-related failures.
+	This may mean that the reports are delivered in the clear.
 
 The formal definition of the `_smtp-tlsrpt` TXT record, defined using
 [@!RFC5234], is as follows:
 
-        tlsrpt-record    = tlsrpt-version *WSP %x3B tlsrpt-rua
+        tlsrpt-record     = tlsrpt-version *WSP field-delim *WSP tlsrpt-rua
+                            [field-delim [tlsrpt-extensions]]
 
-        tlsrpt-version   = "v" *WSP "=" *WSP %x54 %x4C %x53
-                           %x52 %x50 %x54 %x76 %x31
+        field-delim       = %x3B                                    ; ";"
 
-        tlsrpt-rua       = "rua" *WSP "=" *WSP tlsrpt-uri
+        tlsrpt-version    = %x76 *WSP "=" *WSP %x54 %x4C %x53 %x52
+                            %x50 %x54 %x76 %x31                ; "v=TSRPTv1"
 
-        tlsrpt-uri       = URI
-                         ; "URI" is imported from [@!RFC3986]; commas (ASCII
-                         ; 0x2C) and exclamation points (ASCII 0x21)
-                         ; MUST be encoded; the numeric portion MUST fit
-                         ; within an unsigned 64-bit integer
+        tlsrpt-rua        = %x72 %x75 %x61 *WSP "=" *WSP tlsrpt-uri ; "rua=..."
+
+        tlsrpt-uri        = URI
+                          ; "URI" is imported from [@!RFC3986]; commas (ASCII
+                          ; 0x2C) and exclamation points (ASCII 0x21)
+                          ; MUST be encoded; the numeric portion MUST fit
+                          ; within an unsigned 64-bit integer
+
+        tlsrpt-extensions = tlsrpt-extension *(field-delim tlsrpt-extension)
+                            [field-delim]                      
+                          ; extension fields
+
+        tlsrpt-extension  = tlsrpt-ext-name *WSP "=" *WSP tlsrpt-ext-value
+
+        tlsrpt-ext-name   = (ALPHA / DIGIT) *31(ALPHA / DIGIT / "_" / "-" / ".")
+
+        tlsrpt-ext-value  = 1*(%x21-3A / %x3C / %x3E-7E)       ; chars excluding
+                                                         ; "=", ";", SP, and
+                                                         ; control chars
+
 
 If multiple TXT records for `_smtp-tlsrpt` are returned by the resolver, records
 which do not begin with `v=TLSRPTv1;` are discarded. If the number of resulting
 records is not one, senders MUST assume the recipient domain does not implement
-TLSRPT.
+TLSRPT. Parsers MUST accept TXT records which are syntactically valid (i.e.
+valid key-value pairs seprated by semi-colons) and implementing a superset of
+this specification, in which case unknown fields SHALL be ignored.
 
 ## Example Reporting Policy
 
@@ -227,9 +245,9 @@ easier correlation of failure events.
 ### Failure Count
 
 * `failure-count`: This indicates that the sending MTA was unable to
-  successfully establish a connection with the receiving platform.  The "Result
-  Types" section will elaborate on the failed negotiation attempts.  This field
-  contains an aggregate count of failed connections.  
+  successfully establish a connection with the receiving platform.
+  (#result-types), "Result Types", will elaborate on the failed negotiation
+  attempts.  This field contains an aggregate count of failed connections.
 
 ## Result Types
 
@@ -503,7 +521,7 @@ Figure: JSON Report Format
 * `mx-host-pattern`: The pattern of MX hostnames from the applied policy. It
     is provided as a string, and is interpreted in the same manner as the
     "Checking of Wildcard Certificates" rules in Section 6.4.3 of [@!RFC6125].
-* `result-type`: A value from the _Result Types_ section above.
+* `result-type`: A value from (#result-types), "Result Types",  above.
 * `ip-address`: The IP address of the sending MTA that attempted the STARTTLS
     connection. It is provided as a string representation of an IPv4 or IPv6
     address in dot-decimal or colon-hexadecimal notation.

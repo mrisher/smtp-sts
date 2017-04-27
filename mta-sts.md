@@ -92,7 +92,8 @@ We also define the following terms for further use in this document:
 * Policy Domain: The domain for which an MTA-STS Policy is defined. This is the
   next-hop domain; when sending mail to "alice@example.com" this would ordinarly
   be "example.com", but this may be overriden by explicit routing rules (as
-  described in "Policy Selection for Smart Hosts").
+  described in (#policy-selection-for-smart-hosts-and-subdomains),
+  "Policy Selection for Smart Hosts and Subdomains").
 
 # Related Technologies
 
@@ -101,8 +102,8 @@ upgrade unauthenticated encryption or plaintext transmission into authenticated,
 downgrade-resistent encrypted tarnsmission. DANE requires DNSSEC [@!RFC4033] for
 authentication; the mechanism described here instead relies on certificate
 authorities (CAs) and does not require DNSSEC, at a cost of risking malicious
-downgrades.  For a thorough discussion of this trade-off, see the section
-"Security Considerations".
+downgrades.  For a thorough discussion of this trade-off, see
+(#security-considerations), "Security Considerations".
 
 In addition, MTA-STS provides an optional report-only mode, enabling soft
 deployments to detect policy failures; partial deployments can be achieved in
@@ -150,12 +151,27 @@ An example TXT record is as below:
 The formal definition of the `_mta-sts` TXT record, defined using [@!RFC5234],
 is as follows:
 
-    sts-text-record = sts-version *WSP %x3B *WSP sts-id [%x3B]
+    sts-text-record = sts-version *WSP field-delim *WSP sts-id
+                      [field-delim [sts-extensions]]
 
-    sts-version     = "v" *WSP "=" *WSP %x53 %x54        ; "STSv1" 
+    field-delim     = %x3B                               ; ";"
+
+    sts-version     = %x76 *WSP "=" *WSP %x53 %x54       ; "v=STSv1" 
                       %x53 %x76 %x31
 
-    sts-id          = "id" *WSP "=" *WSP 1*32(ALPHA / DIGIT) 
+    sts-id          = %x69 %x64 *WSP "="
+                      *WSP 1*32(ALPHA / DIGIT)           ; "id="
+
+    sts-extensions  = sts-extension *(field-delim sts-extension)
+                      [field-delim]                      ; extension fields
+
+    sts-extension   = sts-ext-name *WSP "=" *WSP sts-ext-value
+
+    sts-ext-name    = (ALPHA / DIGIT) *31(ALPHA / DIGIT / "_" / "-" / ".")
+
+    sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)       ; chars excluding
+                                                         ; "=", ";", SP, and
+                                                         ; control chars
 
 If multiple TXT records for `_mta-sts` are returned by the resolver, records
 which do not begin with `v=STSv1;` are discarded. If the number of resulting
@@ -164,10 +180,10 @@ MTA-STS and skip the remaining steps of policy discovery.
 
 ## MTA-STS Policies
 
-The policy itself is a JSON [@!RFC4627] object served via the HTTPS GET method from
-the fixed [@!RFC5785] "well-known" path of `.well-known/mta-sts.json` served by
-the `mta-sts` host at the Policy Domain. Thus for `example.com` the path is
-`https://mta-sts.example.com/.well-known/mta-sts.json`.
+The policy itself is a JSON [@!RFC7159] object served via the HTTPS GET method
+from the fixed [@!RFC5785] "well-known" path of `.well-known/mta-sts.json`
+served by the `mta-sts` host at the Policy Domain. Thus for `example.com` the
+path is `https://mta-sts.example.com/.well-known/mta-sts.json`.
 
 This JSON object contains the following key/value pairs:
 
@@ -184,14 +200,14 @@ This JSON object contains the following key/value pairs:
   ([@!RFC5280]) DNS-ID present in the X.509 certificate presented by any MX
   receiving mail for this domain.  For example, `["mail.example.com",
   ".example.net"]` indicates that mail for this domain might be handled by any
-  MX with a certificate valid for a host at `example.com` or `example.net`.
+  MX with a certificate valid for a host at `mail.example.com` or `example.net`.
   Valid patterns can be either fully specified names (`example.com`) or suffixes
   (`.example.net`) matching the right-hand parts of a server's identity; the
   latter case are distinguished by a leading period.  In the case of
   Internationalized Domain Names ([@!RFC5891]), the MX MUST specify the
   Punycode-encoded A-label [@!RFC3492] and not the Unicode-encoded U-label. The
-  full semantics of certificate validation are described in "MX Certificate
-  Validation."
+  full semantics of certificate validation are described in
+  (#mx-certificate-validation), "MX Certificate Validation."
 
 An example JSON policy is as below:
 
@@ -204,7 +220,7 @@ An example JSON policy is as below:
 }
 ```
 
-Parsers SHOULD accept TXT records and policy files which are syntactically valid
+Parsers MUST accept TXT records and policy files which are syntactically valid
 (i.e. valid key-value pairs separated by semi-colons for TXT records and valid
 JSON for policy files) and implementing a superset of this specification, in
 which case unknown fields SHALL be ignored.
@@ -212,10 +228,23 @@ which case unknown fields SHALL be ignored.
 ## HTTPS Policy Fetching
 
 When fetching a new policy or updating a policy, the HTTPS endpoint MUST present
-a X.509 certificate which is valid for the `mta-sts` host (as described in
-[@!RFC6125]), chain to a root CA that is trusted by the sending MTA, and be
-non-expired. It is expected that sending MTAs use a set of trusted CAs similar
-to those in widely deployed Web browsers and operating systems.
+a X.509 certificate which is valid for the `mta-sts` host (as described below),
+chain to a root CA that is trusted by the sending MTA, and be non-expired. It is
+expected that sending MTAs use a set of trusted CAs similar to those in widely
+deployed Web browsers and operating systems.
+
+The certificate is valid for the `mta-sts` host with respect to the rules
+described in [@!RFC6125], with the following application-specific
+considerations:
+
+* Matching is performed only against the DNS-ID and CN-ID identifiers.
+
+* DNS domain names in server certificates MAY contain the wildcard character
+  '\*' as the complete left-most label within the identifier.
+
+The certificate MAY be checked for revocation via the Online Certificate Status
+Protocol (OCSP) [@!RFC2560], certificate revocation lists (CRLs), or some other
+mechanism.
 
 HTTP 3xx redirects MUST NOT be followed.
 
@@ -225,13 +254,17 @@ that the HTTPS GET fails, we suggest implementions may limit further attempts to
 a period of five minutes or longer per version ID, to avoid overwhelming
 resource-constrained recipients with cascading failures.
 
-Senders MAY impose a timeout on the HTTPS GET to avoid long delays imposed by
-attempted policy updates. A suggested timeout is one minute; policy hosts SHOULD
-respond to requests with a complete policy body within that timeout.
+Senders MAY impose a timeout on the HTTPS GET and/or a limit on the maximum size
+of the response body to avoid long delays or resource exhaustion during
+attempted policy updates. A suggested timeout is one minute, and a suggested
+maximum policy size 64 kilobytes; policy hosts SHOULD respond to requests with a
+complete policy body within that timeout and size limit.
 
-If a valid TXT record is found but no policy can be fetched via HTTPS, and there
-is no valid (non-expired) previously-cached policy, senders MUST treat the
-recipient domain as one that has not implemented MTA-STS.
+If a valid TXT record is found but no policy can be fetched via HTTPS (for any
+reason), and there is no valid (non-expired) previously-cached policy, senders
+MUST continue with delivery as though the domain has not implemented MTA-STS.
+Senders who implement TLSRPT (TODO: add ref) should, however, report this
+failure to the recipient domain if the domain implements TLSRPT as well.
 
 ## Policy Selection for Smart Hosts and Subdomains
 
@@ -253,19 +286,21 @@ non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST validate:
     certificate.
 
 2.  That at least one of the policy's "mx" patterns matches at least one of the
-    identities presented in the MX's X.509 certificate, as descriped in "MX
+    identities presented in the MX's X.509 certificate, as described in "MX
     Certificate Validation".
 
 This section does not dictate the behavior of sending MTAs when policies fail
 to validate; in particular, validation failures of policies which specify
-"report" mode MUST NOT be interpreted as delivery failures, as described in the
-section "Policy Application".
+"report" mode MUST NOT be interpreted as delivery failures, as described in
+(#policy-application), "Policy Application".
 
 ## MX Certificate Validation
 
 The certificate presented by the receiving MX MUST chain to a root CA that is
 trusted by the sending MTA and be non-expired. The certificate MUST have a CN-ID
-([@!RFC6125]) or SAN ([@!RFC5280]) with a DNS-ID matching the `mx` pattern.
+([@!RFC6125]) or SAN ([@!RFC5280]) with a DNS-ID matching the `mx` pattern. The
+MX's certificate MAY also be checked for revocation via OCSP [@!RFC2560],
+certificate revocation lists (CRLs), or some other mechanism.
 
 Because the `mx` patterns are not hostnames, however, matching is not identical
 to other common cases of X.509 certificate authentication (as described, for
@@ -275,12 +310,13 @@ certificate contains a SAN matching `*.example.net`, we are required to
 implement "wildcard-to-wildcard" matching.
 
 To simplify this case, we impose the following constraints on wildcard
-certificates, identical to those in [@!RFC7672] section 3.2.3: wildcards are
-valid in DNS-IDs or CN-IDs, but must be the entire first label of the
-identifier (that is, `*.example.com`, not `mail*.example.com`). Senders who
-are comparing a "suffix" MX pattern with a wildcard identifier should thus strip
-the wildcard and ensure that the two sides match label-by-label, until all
-labels of the shorter side (if unequal length) are consumed.
+certificates, identical to those in [@!RFC7672] section 3.2.3 and [@!RFC6125
+section 6.4.3: wildcards are valid in DNS-IDs or CN-IDs, but must be the entire
+first label of the identifier (that is, `*.example.com`, not
+`mail*.example.com`). Senders who are comparing a "suffix" MX pattern with a
+wildcard identifier should thus strip the wildcard and ensure that the two sides
+match label-by-label, until all labels of the shorter side (if unequal length)
+are consumed.
 
 A simple pseudocode implementation of this algorithm is presented in the
 Appendix.
@@ -320,11 +356,13 @@ An example control flow for a compliant sender consists of the following steps:
    MTAs may unconditionally check for a new policy at this step.
 2. For each candidate MX, in order of MX priority, attempt to deliver the
    message, enforcing STARTTLS and, assuming a policy is present, PKIX
-   certificate validation, and certificate validation as described in "MX
+   certificate validation as described in (#mx-certificate-validation), "MX
    Certificate Validation."
-3. Upon message retries, a message MAY be permanently failed following first
-   checking for the presence of a new policy (as indicated by the `id` field in
-   the `_mta-sts` TXT record).
+3. A message delivery MUST NOT be permanently failed until the sender has first
+   checked for the presence of a new policy (as indicated by the `id` field in
+   the `_mta-sts` TXT record). If a new policy is not found, senders SHOULD
+   apply existing rules for the case of temporary message delivery failures (as
+   discussed in [@!RFC5321] section 4.5.4.1).
 
 # Operational Considerations
 
@@ -523,8 +561,8 @@ func tryStartTls(mx) {
 }
 
 func certMatches(connection, mx) {
-  // For simplicity, we are not checking CNs here.
-  for san in getSansFromCert(connection) {
+  // Assume a handy function to return CN and DNS-ID SANs.
+  for san in getDnsIdSansAndCnFromCert(connection) {
     // Return if the server certificate from "connection" matches the "mx" host.
     if san[0] == '*' {
       // Invalid wildcard!
