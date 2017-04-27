@@ -114,11 +114,9 @@ We also define the following terms for further use in this document:
 
 * This document is intended as a companion to the specification for SMTP MTA
     Strict Transport Security (MTA-STS, TODO: Add ref).
-* The Public Key Pinning Extension for HTTP [@!RFC7469] contains a JSON-based
-    definition for reporting individual pin validation failures.
-* The Domain-based Message Authentication, Reporting, and Conformance (DMARC)
-    [@!RFC7489] contains an XML-based reporting format for aggregate and
-    detailed email delivery errors.
+* SMTP-TLSRPT defines a mechanism for sending domains that are compatible with
+  MTA-STS or DANE to share success and failure statistics with recipient domains.
+  DANE is defined in [@!RFC6698] and MTA-STS is defined in [TODO]
 
 # Reporting Policy
 
@@ -134,12 +132,12 @@ Policies consist of the following directives:
 * `rua`: A URI specifying the endpoint to which aggregate information about
   policy failures should be sent (see (#reporting-schema), "Reporting Schema",
   for more information). Two URI schemes are supported: `mailto` and `https`.
-* In the case of `https`, reports should be submitted via POST ([@!RFC2818]) to
-  the specified URI.
-* In the case of `mailto`, reports should be submitted to the specified email
-  address. When sending failure reports via SMTP, sending MTAs MUST deliver
-  reports despite any TLS-related failures.  This may mean that the reports are
-  delivered in the clear.
+* In the case of `https`, reports should be submitted via POST ([@!RFC2818]) 
+  to the specified URI.
+* In the case of `mailto`, reports should be submitted to the specified
+  email address ([@!RFC6068]). When sending failure reports via SMTP,
+	sending MTAs MUST deliver reports despite any TLS-related failures.
+	This may mean that the reports are delivered in the clear.
 
 The formal definition of the `_smtp-tlsrpt` TXT record, defined using
 [@!RFC5234], is as follows:
@@ -363,7 +361,7 @@ to extract MIME parts with the prescribed media type and filename and ignore
 the rest.
 
 If compressed, the report should use the media type `application/
-gzip` if compressed (see [@!RFC6713]), and `text/json` otherwise.
+gzip` if compressed (see [@!RFC6713]), and `application/json` otherwise.
 
    The [@!RFC5322].Subject field for individual report submissions SHOULD
    conform to the following ABNF:
@@ -398,7 +396,7 @@ MTA-STS or DANE TLSA failures.
 
 The report MAY be delivered by POST to HTTPS. If compressed, the report should
 use the media type `application/gzip` (see [@!RFC6713]), and
-`text/json` otherwise.
+`application/json` otherwise.
 
 ## Delivery Retry
 
@@ -516,12 +514,10 @@ Figure: JSON Report Format
 * `policy-type`: The type of policy that was applied by the sending domain.
     Presently, the only three valid choices are `tlsa`, `sts`, and the literal
     string `no-policy-found`. It is provided as a string.
-* `policy-string`: The string serialization of the policy, whether TLSA record
-    or MTA-STS policy. Any linefeeds from the original policy MUST be replaced with
-    [SP]. TODO: Help with specifics.
-* `domain`: The Policy Domain upon which the policy was applied. For messages
-    sent to `user@example.com` this field would contain `example.com`. It is
-    provided as a string.
+* `policy-string`: The JSON string serialization ([@!RFC7159] section 7) of the
+   policy, whether TLSA record ([@!RFC6698] section 2.3) or MTA-STS policy.
+* `domain`: The Policy Domain is the domain against which the MTA-STS or DANE
+    policy is defined.
 * `mx-host-pattern`: The pattern of MX hostnames from the applied policy. It
     is provided as a string, and is interpreted in the same manner as the
     "Checking of Wildcard Certificates" rules in Section 6.4.3 of [@!RFC6125].
@@ -534,15 +530,15 @@ Figure: JSON Report Format
 * `receiving-mx-helo`: (optional) The HELO or EHLO string from the banner
     announced during the reported session.
 * `success-aggregate`: The aggregate number (integer) of successfully negotiated 
-    SSL-enabled connections to the receiving site.
+    TLS-enabled connections to the receiving site.
 * `failure-aggregate`: The aggregate number (integer) of failures to negotiate
-    an SSL-enabled connection to the receiving site.
+    an TLS-enabled connection to the receiving site.
 * `session-count`: The number of (attempted) sessions that match the relevant
     `result-type` for this section.
 * `additional-info-uri`: An optional URI pointing to additional information
     around the relevant `result-type`. For example, this URI might host the
     complete certificate chain presented during an attempted STARTTLS session.
-* `failure-reason-code`: A text field to include an SSL-related error
+* `failure-reason-code`: A text field to include an TLS-related error
     code or error message.
 
 # Appendix 3: Example JSON Report
