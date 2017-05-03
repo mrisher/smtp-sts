@@ -266,6 +266,10 @@ MUST continue with delivery as though the domain has not implemented MTA-STS.
 Senders who implement TLSRPT (TODO: add ref) should, however, report this
 failure to the recipient domain if the domain implements TLSRPT as well.
 
+Conversely, if no "live" policy can be discovered via DNS or fetched via HTTPS,
+but a valid (non-expired) policy exists in the sender's cache, the sender MUST
+apply that cached policy.
+
 ## Policy Selection for Smart Hosts and Subdomains
 
 When sending mail via a "smart host"--an intermediate SMTP relay rather than the

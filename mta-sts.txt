@@ -372,6 +372,10 @@ Internet-Draft                   MTA-STS                      April 2017
    (TODO: add ref) should, however, report this failure to the recipient
    domain if the domain implements TLSRPT as well.
 
+   Conversely, if no "live" policy can be discovered via DNS or fetched
+   via HTTPS, but a valid (non-expired) policy exists in the sender's
+   cache, the sender MUST apply that cached policy.
+
 3.4.  Policy Selection for Smart Hosts and Subdomains
 
    When sending mail via a "smart host"--an intermediate SMTP relay
@@ -381,10 +385,6 @@ Internet-Draft                   MTA-STS                      April 2017
 
    When sending mail to a mailbox at a subdomain, compliant senders MUST
    NOT attempt to fetch a policy from the parent zone.  Thus for mail
-   sent to "user@mail.example.com", the policy can be fetched only from
-   "mail.example.com", not "example.com".
-
-
 
 
 
@@ -393,6 +393,9 @@ Margolis, et al.         Expires October 5, 2017                [Page 7]
 
 Internet-Draft                   MTA-STS                      April 2017
 
+
+   sent to "user@mail.example.com", the policy can be fetched only from
+   "mail.example.com", not "example.com".
 
 4.  Policy Validation
 
@@ -439,9 +442,6 @@ Internet-Draft                   MTA-STS                      April 2017
    until all labels of the shorter side (if unequal length) are
    consumed.
 
-   A simple pseudocode implementation of this algorithm is presented in
-   the Appendix.
-
 
 
 
@@ -449,6 +449,9 @@ Margolis, et al.         Expires October 5, 2017                [Page 8]
 
 Internet-Draft                   MTA-STS                      April 2017
 
+
+   A simple pseudocode implementation of this algorithm is presented in
+   the Appendix.
 
 5.  Policy Application
 
@@ -495,9 +498,6 @@ Internet-Draft                   MTA-STS                      April 2017
 
    3.  A message delivery MUST NOT be permanently failed until the
        sender has first checked for the presence of a new policy (as
-       indicated by the "id" field in the "_mta-sts" TXT record).  If a
-       new policy is not found, senders SHOULD apply existing rules for
-
 
 
 
@@ -506,6 +506,8 @@ Margolis, et al.         Expires October 5, 2017                [Page 9]
 Internet-Draft                   MTA-STS                      April 2017
 
 
+       indicated by the "id" field in the "_mta-sts" TXT record).  If a
+       new policy is not found, senders SHOULD apply existing rules for
        the case of temporary message delivery failures (as discussed in
        [RFC5321] section 4.5.4.1).
 
@@ -551,8 +553,6 @@ Internet-Draft                   MTA-STS                      April 2017
       and/or modify messages despite opportunistic TLS.  This
       impersonation could be accomplished by spoofing the DNS MX record
       for the recipient domain, or by redirecting client connections
-      intended for the legitimate recipient server (for example, by
-      altering BGP routing tables).
 
 
 
@@ -561,6 +561,9 @@ Margolis, et al.         Expires October 5, 2017               [Page 10]
 
 Internet-Draft                   MTA-STS                      April 2017
 
+
+      intended for the legitimate recipient server (for example, by
+      altering BGP routing tables).
 
    MTA-STS can thwart such attacks only if the sender is able to
    previously obtain and cache a policy for the recipient domain, and
@@ -607,9 +610,6 @@ Internet-Draft                   MTA-STS                      April 2017
    authoritatively determine "lack of a record" even for non-
    participating recipients--is a feature of DANE, due to its use of
    DNSSEC for policy discovery.
-
-
-
 
 
 
