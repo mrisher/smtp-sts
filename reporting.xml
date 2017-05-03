@@ -169,11 +169,9 @@ deliver reports.</t>
 <list style="symbols">
 <t>This document is intended as a companion to the specification for SMTP MTA
 Strict Transport Security (MTA-STS, TODO: Add ref).</t>
-<t>The Public Key Pinning Extension for HTTP <xref target="RFC7469"/> contains a JSON-based
-definition for reporting individual pin validation failures.</t>
-<t>The Domain-based Message Authentication, Reporting, and Conformance (DMARC)
-<xref target="RFC7489"/> contains an XML-based reporting format for aggregate and
-detailed email delivery errors.</t>
+<t>SMTP-TLSRPT defines a mechanism for sending domains that are compatible with
+MTA-STS or DANE to share success and failure statistics with recipient domains.
+DANE is defined in <xref target="RFC6698"/> and MTA-STS is defined in [TODO]</t>
 </list>
 </t>
 </section>
@@ -193,12 +191,12 @@ recipient's TLSRPT policy can be retrieved from <spanx style="verb">_smtp-tlsrpt
 <t><spanx style="verb">rua</spanx>: A URI specifying the endpoint to which aggregate information about
 policy failures should be sent (see <xref target="reporting-schema"/>, &quot;Reporting Schema&quot;,
 for more information). Two URI schemes are supported: <spanx style="verb">mailto</spanx> and <spanx style="verb">https</spanx>.</t>
-<t>In the case of <spanx style="verb">https</spanx>, reports should be submitted via POST (<xref target="RFC2818"/>) to
-the specified URI.</t>
-<t>In the case of <spanx style="verb">mailto</spanx>, reports should be submitted to the specified email
-address. When sending failure reports via SMTP, sending MTAs MUST deliver
-reports despite any TLS-related failures.  This may mean that the reports are
-delivered in the clear.</t>
+<t>In the case of <spanx style="verb">https</spanx>, reports should be submitted via POST (<xref target="RFC2818"/>)
+to the specified URI.</t>
+<t>In the case of <spanx style="verb">mailto</spanx>, reports should be submitted to the specified
+email address (<xref target="RFC6068"/>). When sending failure reports via SMTP,
+sending MTAs MUST deliver reports despite any TLS-related failures.
+This may mean that the reports are delivered in the clear.</t>
 </list>
 </t>
 <t>The formal definition of the <spanx style="verb">_smtp-tlsrpt</spanx> TXT record, defined using
@@ -472,7 +470,7 @@ to extract MIME parts with the prescribed media type and filename and ignore
 the rest.
 </t>
 <t>If compressed, the report should use the media type <spanx style="verb">application/
-gzip</spanx> if compressed (see <xref target="RFC6713"/>), and <spanx style="verb">text/json</spanx> otherwise.
+gzip</spanx> if compressed (see <xref target="RFC6713"/>), and <spanx style="verb">application/json</spanx> otherwise.
 </t>
 <t>The <xref target="RFC5322"/>.Subject field for individual report submissions SHOULD
    conform to the following ABNF:
@@ -512,7 +510,7 @@ MTA-STS or DANE TLSA failures.
 <section anchor="https-transport" title="HTTPS Transport">
 <t>The report MAY be delivered by POST to HTTPS. If compressed, the report should
 use the media type <spanx style="verb">application/gzip</spanx> (see <xref target="RFC6713"/>), and
-<spanx style="verb">text/json</spanx> otherwise.
+<spanx style="verb">application/json</spanx> otherwise.
 </t>
 </section>
 
@@ -640,12 +638,10 @@ as a string.</t>
 <t><spanx style="verb">policy-type</spanx>: The type of policy that was applied by the sending domain.
 Presently, the only three valid choices are <spanx style="verb">tlsa</spanx>, <spanx style="verb">sts</spanx>, and the literal
 string <spanx style="verb">no-policy-found</spanx>. It is provided as a string.</t>
-<t><spanx style="verb">policy-string</spanx>: The string serialization of the policy, whether TLSA record
-or MTA-STS policy. Any linefeeds from the original policy MUST be replaced with
-[SP]. TODO: Help with specifics.</t>
-<t><spanx style="verb">domain</spanx>: The Policy Domain upon which the policy was applied. For messages
-sent to <spanx style="verb">user@example.com</spanx> this field would contain <spanx style="verb">example.com</spanx>. It is
-provided as a string.</t>
+<t><spanx style="verb">policy-string</spanx>: The JSON string serialization (<xref target="RFC7159"/> section 7) of the
+policy, whether TLSA record (<xref target="RFC6698"/> section 2.3) or MTA-STS policy.</t>
+<t><spanx style="verb">domain</spanx>: The Policy Domain is the domain against which the MTA-STS or DANE
+policy is defined.</t>
 <t><spanx style="verb">mx-host-pattern</spanx>: The pattern of MX hostnames from the applied policy. It
 is provided as a string, and is interpreted in the same manner as the
 &quot;Checking of Wildcard Certificates&quot; rules in Section 6.4.3 of <xref target="RFC6125"/>.</t>
@@ -658,15 +654,15 @@ which the sending MTA attempted to negotiate a STARTTLS connection.</t>
 <t><spanx style="verb">receiving-mx-helo</spanx>: (optional) The HELO or EHLO string from the banner
 announced during the reported session.</t>
 <t><spanx style="verb">success-aggregate</spanx>: The aggregate number (integer) of successfully negotiated
-SSL-enabled connections to the receiving site.</t>
+TLS-enabled connections to the receiving site.</t>
 <t><spanx style="verb">failure-aggregate</spanx>: The aggregate number (integer) of failures to negotiate
-an SSL-enabled connection to the receiving site.</t>
+an TLS-enabled connection to the receiving site.</t>
 <t><spanx style="verb">session-count</spanx>: The number of (attempted) sessions that match the relevant
 <spanx style="verb">result-type</spanx> for this section.</t>
 <t><spanx style="verb">additional-info-uri</spanx>: An optional URI pointing to additional information
 around the relevant <spanx style="verb">result-type</spanx>. For example, this URI might host the
 complete certificate chain presented during an attempted STARTTLS session.</t>
-<t><spanx style="verb">failure-reason-code</spanx>: A text field to include an SSL-related error
+<t><spanx style="verb">failure-reason-code</spanx>: A text field to include an TLS-related error
 code or error message.</t>
 </list>
 </t>
@@ -731,6 +727,7 @@ respond to the <spanx style="verb">STARTTLS</spanx> command.  Additionally 3 ses
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3339.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5234.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5322.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6068.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6125.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6698.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6713.xml"?>
