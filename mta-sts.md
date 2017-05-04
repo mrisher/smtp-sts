@@ -560,27 +560,29 @@ func isNonExpired(policy) {
   // Return true if the policy is not expired.
 }
 
-func tryStartTls(mx) {
+func tryStartTls(connection) {
   // Attempt to open an SMTP connection with STARTTLS with the MX.
 }
 
-func certMatches(connection, mx) {
+func certMatches(connection, policy) {
   // Assume a handy function to return CN and DNS-ID SANs.
   for san in getDnsIdSansAndCnFromCert(connection) {
-    // Return if the server certificate from "connection" matches the "mx" host.
-    if san[0] == '*' {
-      // Invalid wildcard!
-      if san[1] != '.' return false
-      san = san[1:]
-    }
-    if san[0] == '.' && HasSuffix(mx, san) {
-      return true
-    }
-    if mx[0] == '.' && HasSuffix(san, mx) {
-      return true
-    }
-    if mx == san {
-      return true
+    for mx in policy.mx {
+      // Return if the server certificate from "connection" matches the "mx" host.
+      if san[0] == '*' {
+        // Invalid wildcard!
+        if san[1] != '.' return false
+        san = san[1:]
+      }
+      if san[0] == '.' && HasSuffix(mx, san) {
+        return true
+      }
+      if mx[0] == '.' && HasSuffix(san, mx) {
+        return true
+      }
+      if mx == san {
+        return true
+      }
     }
   }
   return false
@@ -613,10 +615,10 @@ func tryMxAccordingTo(message, mx, policy) {
     return false  // Can't connect to the MX so it's not an MTA-STS error.
   }
   secure := true
-  if !tryStartTls(mx, &connection) {
+  if !tryStartTls(connection) {
     secure = false
     reportError(E_NO_VALID_TLS)
-  } else if !certMatches(connection, mx) {
+  } else if !certMatches(connection, policy) {
     secure = false
     reportError(E_CERT_MISMATCH)
   }
@@ -627,6 +629,7 @@ func tryMxAccordingTo(message, mx, policy) {
 }
 
 func tryWithPolicy(message, domain, policy) {
+  mxes := getMxForDomain(domain)
   for mx in mxes {
     if tryMxAccordingTo(message, mx, policy) {
       return true
@@ -644,7 +647,7 @@ func handleMessage(message) {
     policy = tryGetCachedPolicy(domain)
   }
   if policy {
-    return tryWithPolicy(message, policy)
+    return tryWithPolicy(message, domain, policy)
   }
   // Try to deliver the message normally (i.e. without MTA-STS).
 }
