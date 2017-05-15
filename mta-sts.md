@@ -571,7 +571,7 @@ func certMatches(connection, policy) {
       // Return if the server certificate from "connection" matches the "mx" host.
       if san[0] == '*' {
         // Invalid wildcard!
-        if san[1] != '.' return false
+        if san[1] != '.' continue
         san = san[1:]
       }
       if san[0] == '.' && HasSuffix(mx, san) {
