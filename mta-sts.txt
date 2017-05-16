@@ -518,8 +518,8 @@ Internet-Draft                   MTA-STS                        May 2017
    Updating the policy requires that the owner make changes in two
    places: the "_mta-sts" TXT record in the Policy Domain's DNS zone and
    at the corresponding HTTPS endpoint.  As a result, recipients should
-   thus expect a policy will continue to be used by senders until both
-   the HTTPS and TXT endpoints are updated and the TXT record's TTL has
+   expect a policy will continue to be used by senders until both the
+   HTTPS and TXT endpoints are updated and the TXT record's TTL has
    passed.
 
    In other words, a sender who is unable to successfully deliver a
@@ -528,6 +528,10 @@ Internet-Draft                   MTA-STS                        May 2017
    has passed.  Recipients should therefore ensure that old policies
    continue to work for message delivery during this period of time, or
    risk message delays.
+
+   Recipients should also prefer to update the HTTPS policy body before
+   updating the TXT record; this ordering avoids the risk that senders,
+   seeing a new TXT record, mistakenly cache the old policy from HTTPS.
 
 7.  IANA Considerations
 
@@ -550,10 +554,6 @@ Internet-Draft                   MTA-STS                        May 2017
 
    o  Impersonating the destination mail server, whereby the sender
       might deliver the message to an impostor, who could then monitor
-      and/or modify messages despite opportunistic TLS.  This
-      impersonation could be accomplished by spoofing the DNS MX record
-      for the recipient domain, or by redirecting client connections
-
 
 
 
@@ -562,6 +562,9 @@ Margolis, et al.        Expires November 4, 2017               [Page 10]
 Internet-Draft                   MTA-STS                        May 2017
 
 
+      and/or modify messages despite opportunistic TLS.  This
+      impersonation could be accomplished by spoofing the DNS MX record
+      for the recipient domain, or by redirecting client connections
       intended for the legitimate recipient server (for example, by
       altering BGP routing tables).
 
@@ -606,10 +609,7 @@ Internet-Draft                   MTA-STS                        May 2017
    foil policy discovery consistently over the lifetime of a cached
    policy to prevent a successful refresh.
 
-   Resistence to downgrade attacks of this nature--due to the ability to
-   authoritatively determine "lack of a record" even for non-
-   participating recipients--is a feature of DANE, due to its use of
-   DNSSEC for policy discovery.
+
 
 
 
@@ -617,6 +617,11 @@ Margolis, et al.        Expires November 4, 2017               [Page 11]
 
 Internet-Draft                   MTA-STS                        May 2017
 
+
+   Resistence to downgrade attacks of this nature--due to the ability to
+   authoritatively determine "lack of a record" even for non-
+   participating recipients--is a feature of DANE, due to its use of
+   DNSSEC for policy discovery.
 
 8.3.  Denial of Service
 
@@ -661,11 +666,6 @@ Internet-Draft                   MTA-STS                        May 2017
    option when authoring an MTA-STS Policy for "example.com" is to set
    the "mx" equal to ".example.com"; recipient domains must consider in
    this case the risk that any user possessing a valid hostname and CA-
-   signed certificate (for example, "dhcp-123.example.com") will, from
-   the perspective of MTA-STS Policy validation, be a valid MX host for
-   that domain.
-
-
 
 
 
@@ -673,6 +673,10 @@ Margolis, et al.        Expires November 4, 2017               [Page 12]
 
 Internet-Draft                   MTA-STS                        May 2017
 
+
+   signed certificate (for example, "dhcp-123.example.com") will, from
+   the perspective of MTA-STS Policy validation, be a valid MX host for
+   that domain.
 
 9.  Contributors
 
@@ -718,10 +722,6 @@ Internet-Draft                   MTA-STS                        May 2017
    Below is pseudocode demonstrating the logic of a compliant sending
    MTA.
 
-   While this pseudocode implementation suggests synchronous policy
-   retrieval in the delivery path, in a working implementation that may
-   be undesirable, and we expect some implementors to instead prefer a
-
 
 
 
@@ -730,6 +730,9 @@ Margolis, et al.        Expires November 4, 2017               [Page 13]
 Internet-Draft                   MTA-STS                        May 2017
 
 
+   While this pseudocode implementation suggests synchronous policy
+   retrieval in the delivery path, in a working implementation that may
+   be undesirable, and we expect some implementors to instead prefer a
    background fetch that does not block delivery if no cached policy is
    present.
 
@@ -775,9 +778,6 @@ func tryDeliverMail(connection, message) {
 }
 
 func tryGetNewPolicy(domain) {
-  // Check for an MTA-STS TXT record for "domain" in DNS, and return the
-  // indicated policy.
-}
 
 
 
@@ -785,6 +785,10 @@ Margolis, et al.        Expires November 4, 2017               [Page 14]
 
 Internet-Draft                   MTA-STS                        May 2017
 
+
+  // Check for an MTA-STS TXT record for "domain" in DNS, and return the
+  // indicated policy.
+}
 
 func cachePolicy(domain, policy) {
   // Store "policy" as the cached policy for "domain".
@@ -830,10 +834,6 @@ func tryWithPolicy(message, domain, policy) {
 func handleMessage(message) {
   domain := ... // domain part after '@' from recipient
   policy := tryGetNewPolicy(domain)
-  if policy {
-    cachePolicy(domain, policy)
-  } else {
-    policy = tryGetCachedPolicy(domain)
 
 
 
@@ -842,6 +842,10 @@ Margolis, et al.        Expires November 4, 2017               [Page 15]
 Internet-Draft                   MTA-STS                        May 2017
 
 
+  if policy {
+    cachePolicy(domain, policy)
+  } else {
+    policy = tryGetCachedPolicy(domain)
   }
   if policy {
     return tryWithPolicy(message, domain, policy)
@@ -884,11 +888,7 @@ Internet-Draft                   MTA-STS                        May 2017
               RFC5234, January 2008,
               <http://www.rfc-editor.org/info/rfc5234>.
 
-   [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
-              Housley, R., and W. Polk, "Internet X.509 Public Key
-              Infrastructure Certificate and Certificate Revocation List
-              (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
-              <http://www.rfc-editor.org/info/rfc5280>.
+
 
 
 
@@ -897,6 +897,12 @@ Margolis, et al.        Expires November 4, 2017               [Page 16]
 
 Internet-Draft                   MTA-STS                        May 2017
 
+
+   [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
+              Housley, R., and W. Polk, "Internet X.509 Public Key
+              Infrastructure Certificate and Certificate Revocation List
+              (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
+              <http://www.rfc-editor.org/info/rfc5280>.
 
    [RFC5321]  Klensin, J., "Simple Mail Transfer Protocol", RFC 5321,
               DOI 10.17487/RFC5321, October 2008,
@@ -941,17 +947,17 @@ Authors' Addresses
    Email: dmargolis (at) google.com
 
 
-   Mark Risher
-   Google, Inc
-
-   Email: risher (at) google (dot com)
-
-
 
 
 Margolis, et al.        Expires November 4, 2017               [Page 17]
 
 Internet-Draft                   MTA-STS                        May 2017
+
+
+   Mark Risher
+   Google, Inc
+
+   Email: risher (at) google (dot com)
 
 
    Binu Ramakrishnan
@@ -970,12 +976,6 @@ Internet-Draft                   MTA-STS                        May 2017
    Microsoft, Inc
 
    Email: janet.jones (at) microsoft (dot com)
-
-
-
-
-
-
 
 
 

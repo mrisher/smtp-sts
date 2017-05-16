@@ -374,15 +374,19 @@ An example control flow for a compliant sender consists of the following steps:
 
 Updating the policy requires that the owner make changes in two places: the
 `_mta-sts` TXT record in the Policy Domain's DNS zone and at the corresponding
-HTTPS endpoint. As a result, recipients should thus expect a policy will
-continue to be used by senders until both the HTTPS and TXT endpoints are
-updated and the TXT record's TTL has passed.
+HTTPS endpoint. As a result, recipients should expect a policy will continue to
+be used by senders until both the HTTPS and TXT endpoints are updated and the
+TXT record's TTL has passed.
 
 In other words, a sender who is unable to successfully deliver a message while
 applying a cache of the recipient's now-outdated policy may be unable to
 discover that a new policy exists until the DNS TTL has passed.  Recipients
 should therefore ensure that old policies continue to work for message delivery
 during this period of time, or risk message delays.
+
+Recipients should also prefer to update the HTTPS policy body before updating
+the TXT record; this ordering avoids the risk that senders, seeing a new TXT
+record, mistakenly cache the old policy from HTTPS.
 
 # IANA Considerations
 
