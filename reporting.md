@@ -113,10 +113,10 @@ We also define the following terms for further use in this document:
 # Related Technologies
 
 * This document is intended as a companion to the specification for SMTP MTA
-    Strict Transport Security (MTA-STS, TODO: Add ref).
+    Strict Transport Security (MTA-STS, TODO: Add RFC ref).
 * SMTP-TLSRPT defines a mechanism for sending domains that are compatible with
   MTA-STS or DANE to share success and failure statistics with recipient domains.
-  DANE is defined in [@!RFC6698] and MTA-STS is defined in [TODO]
+  DANE is defined in [@!RFC6698] and MTA-STS is defined in [TODO : Add RFC ref]
 
 # Reporting Policy
 
@@ -304,6 +304,86 @@ text, such as "X509_V_ERR_UNHANDLED_CRITICAL_CRL_EXTENSION".
 
 Transient errors due to too-busy network, TCP timeouts, etc. are not required to be reported. 
 
+## JSON Report Schema
+
+The JSON schema is derived from the HPKP JSON schema [@!RFC7469] (cf. Section 3)
+
+```
+{
+  "organization-name": organization-name,
+  "date-range": {
+    "start-datetime": date-time,
+    "end-datetime": date-time
+  },
+  "contact-info": email-address,
+  "report-id": report-id,
+  "policy": {
+    "policy-type": policy-type,
+    "policy-string": policy-string,
+    "policy-domain": domain,
+    "mx-host": mx-host-pattern
+  },
+  "summary": {
+    "success-aggregate": total-successful-session-count,
+    "failure-aggregate:" total-failure-session-count
+  }
+  "failure-details": [
+    {
+      "result-type": result-type,
+      "sending-mta-ip": ip-address,
+      "receiving-mx-hostname": receiving-mx-hostname,
+      "receiving-mx-helo": receiving-mx-helo,
+      "session-count": failed-session-count,
+      "additional-information": additional-info-uri,
+      "failure-reason-code": "Text body"
+    }
+  ]
+}
+```
+Figure: JSON Report Format
+
+* `organization-name`: The name of the organization responsible for the
+    report. It is provided as a string.
+* `date-time`: The date-time indicates the start- and end-times for the report
+    range. It is provided as a string formatted according to Section 5.6,
+    "Internet Date/Time Format", of [@!RFC3339].  The report should be for a
+    full UTC day, 0000-2400.
+* `email-address`: The contact information for a responsible party of the
+    report. It is provided as a string formatted according to Section 3.4.1,
+    "Addr-Spec", of [@!RFC5322].
+* `report-id`: A unique identifier for the report. Report authors may use
+    whatever scheme they prefer to generate a unique identifier. It is provided
+    as a string.
+* `policy-type`: The type of policy that was applied by the sending domain.
+    Presently, the only three valid choices are `tlsa`, `sts`, and the literal
+    string `no-policy-found`. It is provided as a string.
+* `policy-string`: The JSON string serialization ([@!RFC7159] section 7) of the
+   policy, whether TLSA record ([@!RFC6698] section 2.3) or MTA-STS policy.
+* `domain`: The Policy Domain is the domain against which the MTA-STS or DANE
+    policy is defined.
+* `mx-host-pattern`: The pattern of MX hostnames from the applied policy. It
+    is provided as a string, and is interpreted in the same manner as the
+    "Checking of Wildcard Certificates" rules in Section 6.4.3 of [@!RFC6125].
+* `result-type`: A value from (#result-types), "Result Types",  above.
+* `ip-address`: The IP address of the sending MTA that attempted the STARTTLS
+    connection. It is provided as a string representation of an IPv4 or IPv6
+    address in dot-decimal or colon-hexadecimal notation.
+* `receiving-mx-hostname`: The hostname of the receiving MTA MX record with
+    which the sending MTA attempted to negotiate a STARTTLS connection.
+* `receiving-mx-helo`: (optional) The HELO or EHLO string from the banner
+    announced during the reported session.
+* `success-aggregate`: The aggregate number (integer) of successfully negotiated 
+    TLS-enabled connections to the receiving site.
+* `failure-aggregate`: The aggregate number (integer) of failures to negotiate
+    an TLS-enabled connection to the receiving site.
+* `session-count`: The number of (attempted) sessions that match the relevant
+    `result-type` for this section.
+* `additional-info-uri`: An optional URI pointing to additional information
+    around the relevant `result-type`. For example, this URI might host the
+    complete certificate chain presented during an attempted STARTTLS session.
+* `failure-reason-code`: A text field to include an TLS-related error
+    code or error message.
+
 # Report Delivery
 
 Reports can be delivered either as an email message via SMTP or via HTTP
@@ -355,13 +435,15 @@ compute cost.
 
 ## Email Transport
 
-The report MAY be delivered by email. No specific MIME message structure is
-required. It is presumed that the aggregate reporting address will be equipped
+The report MAY be delivered by email. To make the reports machine parsable
+for the receivers, we define a top-level media type `multipart/report` with
+a new parameter `report-type=tlsrpt`. Inside it, there are two parts: The
+first part is human readable, typically `text/plain`, and the second part is
+machine readable with a new media type defined called `application/tlsrpt+gzip`.
+If compressed, the report should use the media type `application/tlsrpt+gzip`.
+It is presumed that the aggregate reporting address will be equipped
 to extract MIME parts with the prescribed media type and filename and ignore
 the rest.
-
-If compressed, the report should use the media type `application/
-gzip` if compressed (see [@!RFC6713]), and `application/json` otherwise.
 
    The [@!RFC5322].Subject field for individual report submissions SHOULD
    conform to the following ABNF:
@@ -389,14 +471,49 @@ gzip` if compressed (see [@!RFC6713]), and `application/json` otherwise.
          Submitter: mail.sender.example.com
          Report-ID: <735ff.e317+bf22029@mailexample.net>
 
+
+### tlsrpt Example 
+```
+ From: tlsrpt@mail.sender.example.com
+     Date: Fri, May 09 2017 16:54:30 -0800
+     To: mts-sts-tlsrpt@example.net
+     Subject: Report Domain: example.net
+         Submitter: mail.sender.example.com
+         Report-ID: <735ff.e317+bf22029@example.net>
+     MIME-Version: 1.0
+     Content-Type: multipart/report; report-type=tlsrpt
+         boundary="----=_NextPart_000_024E_01CC9B0A.AFE54C00"
+     Content-Language: en-us
+
+     This is a multipart message in MIME format.
+
+     ------=_NextPart_000_024E_01CC9B0A.AFE54C00
+     Content-Type: text/plain; charset="us-ascii"
+     Content-Transfer-Encoding: 7bit
+
+     This is an aggregate TLS report from mail.sender.example.
+
+     ------=_NextPart_000_024E_01CC9B0A.AFE54C00
+     Content-Type: application/tlsrpt+gzip
+     Content-Transfer-Encoding: base64
+     Content-Disposition: attachment;
+         filename="mail.sender.example!example.com!
+                   1013662812!1013749130.gz"
+
+     <gzipped content of report>
+
+------=_NextPart_000_024E_01CC9B0A.AFE54C00--
+...
+```
+
 Note that, when sending failure reports via SMTP, sending MTAs MUST NOT honor
 MTA-STS or DANE TLSA failures.
 
 ## HTTPS Transport
 
 The report MAY be delivered by POST to HTTPS. If compressed, the report should
-use the media type `application/gzip` (see [@!RFC6713]), and
-`application/json` otherwise.
+use the media type `application/tlsrpt+gzip`, and `application/tlsrpt+json`
+otherwise (see [TODO add IANA ref]).
 
 ## Delivery Retry
 
@@ -408,7 +525,7 @@ be on a logarithmic scale.
 
 # IANA Considerations
 
-There are no IANA considerations at this time.
+[TODO - Register new media types, and TLS validation failures with IANA]
 
 # Security Considerations
 
@@ -463,88 +580,7 @@ _smtp-tlsrpt.mail.example.com. IN TXT \
         rua=https://reporting.example.com/v1/tlsrpt"
 ```
 
-# Appendix 2: JSON Report Schema
-
-The JSON schema is derived from the HPKP JSON schema [@!RFC7469] (cf. Section 3)
-
-```
-{
-  "organization-name": organization-name,
-  "date-range": {
-    "start-datetime": date-time,
-    "end-datetime": date-time
-  },
-  "contact-info": email-address,
-  "report-id": report-id,
-  "policy": {
-    "policy-type": policy-type,
-    "policy-string": policy-string,
-    "policy-domain": domain,
-    "mx-host": mx-host-pattern
-  },
-  "summary": {
-    "success-aggregate": total-successful-session-count,
-    "failure-aggregate:" total-failure-session-count
-  }
-  "failure-details": [
-    {
-      "result-type": result-type,
-      "sending-mta-ip": ip-address,
-      "receiving-mx-hostname": receiving-mx-hostname,
-      "receiving-mx-helo": receiving-mx-helo,
-      "session-count": failed-session-count,
-      "additional-information": additional-info-uri,
-      "failure-reason-code": "Text body"
-    }
-  ]
-}
-```
-
-Figure: JSON Report Format
-
-* `organization-name`: The name of the organization responsible for the
-    report. It is provided as a string.
-* `date-time`: The date-time indicates the start- and end-times for the report
-    range. It is provided as a string formatted according to Section 5.6,
-    "Internet Date/Time Format", of [@!RFC3339].  The report should be for a
-    full UTC day, 0000-2400.
-* `email-address`: The contact information for a responsible party of the
-    report. It is provided as a string formatted according to Section 3.4.1,
-    "Addr-Spec", of [@!RFC5322].
-* `report-id`: A unique identifier for the report. Report authors may use
-    whatever scheme they prefer to generate a unique identifier. It is provided
-    as a string.
-* `policy-type`: The type of policy that was applied by the sending domain.
-    Presently, the only three valid choices are `tlsa`, `sts`, and the literal
-    string `no-policy-found`. It is provided as a string.
-* `policy-string`: The JSON string serialization ([@!RFC7159] section 7) of the
-   policy, whether TLSA record ([@!RFC6698] section 2.3) or MTA-STS policy.
-* `domain`: The Policy Domain is the domain against which the MTA-STS or DANE
-    policy is defined.
-* `mx-host-pattern`: The pattern of MX hostnames from the applied policy. It
-    is provided as a string, and is interpreted in the same manner as the
-    "Checking of Wildcard Certificates" rules in Section 6.4.3 of [@!RFC6125].
-* `result-type`: A value from (#result-types), "Result Types",  above.
-* `ip-address`: The IP address of the sending MTA that attempted the STARTTLS
-    connection. It is provided as a string representation of an IPv4 or IPv6
-    address in dot-decimal or colon-hexadecimal notation.
-* `receiving-mx-hostname`: The hostname of the receiving MTA MX record with
-    which the sending MTA attempted to negotiate a STARTTLS connection.
-* `receiving-mx-helo`: (optional) The HELO or EHLO string from the banner
-    announced during the reported session.
-* `success-aggregate`: The aggregate number (integer) of successfully negotiated 
-    TLS-enabled connections to the receiving site.
-* `failure-aggregate`: The aggregate number (integer) of failures to negotiate
-    an TLS-enabled connection to the receiving site.
-* `session-count`: The number of (attempted) sessions that match the relevant
-    `result-type` for this section.
-* `additional-info-uri`: An optional URI pointing to additional information
-    around the relevant `result-type`. For example, this URI might host the
-    complete certificate chain presented during an attempted STARTTLS session.
-* `failure-reason-code`: A text field to include an TLS-related error
-    code or error message.
-
-# Appendix 3: Example JSON Report
+# Appendix 2: Example JSON Report
 
 ```
 {
