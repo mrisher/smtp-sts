@@ -437,13 +437,25 @@ compute cost.
 
 The report MAY be delivered by email. To make the reports machine-parsable
 for the receivers, we define a top-level media type `multipart/report` with
-a new parameter `report-type=tlsrpt`. Inside it, there are two parts: The
+a new parameter `report-type="tlsrpt"`. Inside it, there are two parts: The
 first part is human readable, typically `text/plain`, and the second part is
 machine readable with a new media type defined called `application/tlsrpt+gzip`.
 If compressed, the report should use the media type `application/tlsrpt+gzip`.
-It is presumed that the aggregate reporting address will be equipped
-to extract MIME parts with the prescribed media type and filename and ignore
-the rest.
+
+In addition, the following two new top level message header fields are defined:
+
+```
+TLS-Report-Domain: Receiver-Domain
+TLS-Report-Submitter: Sender-Domain
+```
+These message headers would allow for easy searching for all reports submitted
+by a report domain or a particular submitter, for example in IMAP:
+
+`s SEARCH HEADER "TLS-Report-Domain" "example.com"`
+
+It is presumed that the aggregate reporting address will be equipped to process
+new message header fields and extract MIME parts with the prescribed media type
+and filename, and ignore the rest.
 
    The [@!RFC5322].Subject field for individual report submissions SHOULD
    conform to the following ABNF:
@@ -480,8 +492,10 @@ the rest.
      Subject: Report Domain: example.net
          Submitter: mail.sender.example.com
          Report-ID: <735ff.e317+bf22029@example.net>
+     TLS-Report-Domain: example.net
+     TLS-Report-Submitter: mail.sender.example.com
      MIME-Version: 1.0
-     Content-Type: multipart/report; report-type="tlsrpt"
+     Content-Type: multipart/report; report-type="tlsrpt";
          boundary="----=_NextPart_000_024E_01CC9B0A.AFE54C00"
      Content-Language: en-us
 
