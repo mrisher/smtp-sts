@@ -435,7 +435,7 @@ compute cost.
 
 ## Email Transport
 
-The report MAY be delivered by email. To make the reports machine parsable
+The report MAY be delivered by email. To make the reports machine-parsable
 for the receivers, we define a top-level media type `multipart/report` with
 a new parameter `report-type=tlsrpt`. Inside it, there are two parts: The
 first part is human readable, typically `text/plain`, and the second part is
@@ -481,7 +481,7 @@ the rest.
          Submitter: mail.sender.example.com
          Report-ID: <735ff.e317+bf22029@example.net>
      MIME-Version: 1.0
-     Content-Type: multipart/report; report-type=tlsrpt
+     Content-Type: multipart/report; report-type="tlsrpt"
          boundary="----=_NextPart_000_024E_01CC9B0A.AFE54C00"
      Content-Language: en-us
 
@@ -491,7 +491,7 @@ the rest.
      Content-Type: text/plain; charset="us-ascii"
      Content-Transfer-Encoding: 7bit
 
-     This is an aggregate TLS report from mail.sender.example.
+     This is an aggregate TLS report from mail.sender.example.com
 
      ------=_NextPart_000_024E_01CC9B0A.AFE54C00
      Content-Type: application/tlsrpt+gzip
