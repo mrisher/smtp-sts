@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE rfc SYSTEM 'rfc2629.dtd' []>
-<rfc ipr="trust200902" category="std" docName="draft-ietf-uta-smtp-tlsrpt-04">
+<rfc ipr="trust200902" category="std" docName="draft-ietf-uta-smtp-tlsrpt-06">
 <?rfc toc="yes"?>
 <?rfc symrefs="yes"?>
 <?rfc sortrefs="yes"?>
@@ -87,7 +87,7 @@
 <uri></uri>
 </address>
 </author>
-<date year="2017" month="May" day="3"/>
+<date year="2017" month="May" day="24"/>
 
 <area>Applications</area>
 <workgroup>Using TLS in Applications</workgroup>

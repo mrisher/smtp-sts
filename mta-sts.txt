@@ -5,17 +5,17 @@
 Using TLS in Applications                                    D. Margolis
 Internet-Draft                                                 M. Risher
 Intended status: Standards Track                             Google, Inc
-Expires: November 4, 2017                                B. Ramakrishnan
+Expires: November 25, 2017                               B. Ramakrishnan
                                                              Yahoo!, Inc
                                                               A. Brotman
                                                             Comcast, Inc
                                                                 J. Jones
                                                           Microsoft, Inc
-                                                             May 3, 2017
+                                                            May 24, 2017
 
 
               SMTP MTA Strict Transport Security (MTA-STS)
-                       draft-ietf-uta-mta-sts-04
+                       draft-ietf-uta-mta-sts-06
 
 Abstract
 
@@ -40,7 +40,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on November 4, 2017.
+   This Internet-Draft will expire on November 25, 2017.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Margolis, et al.        Expires November 4, 2017                [Page 1]
+Margolis, et al.        Expires November 25, 2017               [Page 1]
 
 Internet-Draft                   MTA-STS                        May 2017
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Margolis, et al.        Expires November 4, 2017                [Page 2]
+Margolis, et al.        Expires November 25, 2017               [Page 2]
 
 Internet-Draft                   MTA-STS                        May 2017
 
@@ -165,7 +165,7 @@ Internet-Draft                   MTA-STS                        May 2017
 
 
 
-Margolis, et al.        Expires November 4, 2017                [Page 3]
+Margolis, et al.        Expires November 25, 2017               [Page 3]
 
 Internet-Draft                   MTA-STS                        May 2017
 
@@ -221,7 +221,7 @@ Internet-Draft                   MTA-STS                        May 2017
 
 
 
-Margolis, et al.        Expires November 4, 2017                [Page 4]
+Margolis, et al.        Expires November 25, 2017               [Page 4]
 
 Internet-Draft                   MTA-STS                        May 2017
 
@@ -277,7 +277,7 @@ sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)       ; chars excluding
 
 
 
-Margolis, et al.        Expires November 4, 2017                [Page 5]
+Margolis, et al.        Expires November 25, 2017               [Page 5]
 
 Internet-Draft                   MTA-STS                        May 2017
 
@@ -333,7 +333,7 @@ Internet-Draft                   MTA-STS                        May 2017
 
 
 
-Margolis, et al.        Expires November 4, 2017                [Page 6]
+Margolis, et al.        Expires November 25, 2017               [Page 6]
 
 Internet-Draft                   MTA-STS                        May 2017
 
@@ -389,7 +389,7 @@ Internet-Draft                   MTA-STS                        May 2017
 
 
 
-Margolis, et al.        Expires November 4, 2017                [Page 7]
+Margolis, et al.        Expires November 25, 2017               [Page 7]
 
 Internet-Draft                   MTA-STS                        May 2017
 
@@ -445,7 +445,7 @@ Internet-Draft                   MTA-STS                        May 2017
 
 
 
-Margolis, et al.        Expires November 4, 2017                [Page 8]
+Margolis, et al.        Expires November 25, 2017               [Page 8]
 
 Internet-Draft                   MTA-STS                        May 2017
 
@@ -501,7 +501,7 @@ Internet-Draft                   MTA-STS                        May 2017
 
 
 
-Margolis, et al.        Expires November 4, 2017                [Page 9]
+Margolis, et al.        Expires November 25, 2017               [Page 9]
 
 Internet-Draft                   MTA-STS                        May 2017
 
@@ -557,7 +557,7 @@ Internet-Draft                   MTA-STS                        May 2017
 
 
 
-Margolis, et al.        Expires November 4, 2017               [Page 10]
+Margolis, et al.        Expires November 25, 2017              [Page 10]
 
 Internet-Draft                   MTA-STS                        May 2017
 
@@ -613,7 +613,7 @@ Internet-Draft                   MTA-STS                        May 2017
 
 
 
-Margolis, et al.        Expires November 4, 2017               [Page 11]
+Margolis, et al.        Expires November 25, 2017              [Page 11]
 
 Internet-Draft                   MTA-STS                        May 2017
 
@@ -669,7 +669,7 @@ Internet-Draft                   MTA-STS                        May 2017
 
 
 
-Margolis, et al.        Expires November 4, 2017               [Page 12]
+Margolis, et al.        Expires November 25, 2017              [Page 12]
 
 Internet-Draft                   MTA-STS                        May 2017
 
@@ -725,7 +725,7 @@ Internet-Draft                   MTA-STS                        May 2017
 
 
 
-Margolis, et al.        Expires November 4, 2017               [Page 13]
+Margolis, et al.        Expires November 25, 2017              [Page 13]
 
 Internet-Draft                   MTA-STS                        May 2017
 
@@ -781,7 +781,7 @@ func tryGetNewPolicy(domain) {
 
 
 
-Margolis, et al.        Expires November 4, 2017               [Page 14]
+Margolis, et al.        Expires November 25, 2017              [Page 14]
 
 Internet-Draft                   MTA-STS                        May 2017
 
@@ -837,7 +837,7 @@ func handleMessage(message) {
 
 
 
-Margolis, et al.        Expires November 4, 2017               [Page 15]
+Margolis, et al.        Expires November 25, 2017              [Page 15]
 
 Internet-Draft                   MTA-STS                        May 2017
 
@@ -893,7 +893,7 @@ Internet-Draft                   MTA-STS                        May 2017
 
 
 
-Margolis, et al.        Expires November 4, 2017               [Page 16]
+Margolis, et al.        Expires November 25, 2017              [Page 16]
 
 Internet-Draft                   MTA-STS                        May 2017
 
@@ -949,7 +949,7 @@ Authors' Addresses
 
 
 
-Margolis, et al.        Expires November 4, 2017               [Page 17]
+Margolis, et al.        Expires November 25, 2017              [Page 17]
 
 Internet-Draft                   MTA-STS                        May 2017
 
@@ -1005,4 +1005,4 @@ Internet-Draft                   MTA-STS                        May 2017
 
 
 
-Margolis, et al.        Expires November 4, 2017               [Page 18]
+Margolis, et al.        Expires November 25, 2017              [Page 18]
