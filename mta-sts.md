@@ -3,7 +3,7 @@
    Title = "SMTP MTA Strict Transport Security (MTA-STS)"
    abbrev = "MTA-STS"
    category = "std"
-   docName = "draft-ietf-uta-mta-sts-04"
+   docName = "draft-ietf-uta-mta-sts-06"
    ipr = "trust200902"
    area = "Applications"
    workgroup = "Using TLS in Applications"
