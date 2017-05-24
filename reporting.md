@@ -439,7 +439,7 @@ The report MAY be delivered by email. To make the reports machine-parsable
 for the receivers, we define a top-level media type `multipart/report` with
 a new parameter `report-type="tlsrpt"`. Inside it, there are two parts: The
 first part is human readable, typically `text/plain`, and the second part is
-machine readable with a new media type defined called `application/tlsrpt+gzip`.
+machine readable with a new media type defined called `application/tlsrpt+json`.
 If compressed, the report should use the media type `application/tlsrpt+gzip`.
 
 In addition, the following two new top level message header fields are defined:
