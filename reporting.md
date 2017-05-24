@@ -526,7 +526,7 @@ MTA-STS or DANE TLSA failures.
 
 The report MAY be delivered by POST to HTTPS. If compressed, the report should
 use the media type `application/tlsrpt+gzip`, and `application/tlsrpt+json`
-otherwise (see section [IANA Considerations](#IANA-Considerations)).
+otherwise (see section (#iana-considerations), "IANA Considerations").
 
 ## Delivery Retry
 
@@ -566,7 +566,7 @@ This document registers a new parameter `report-type="tlsrpt"` under
 The media type suitable for use as a report-type is defined in the
 following section.
 
-## `application/tlsrpt+*` Media Types
+## application/tlsrpt+* Media Types
  
 This document registers multiple media types, listed in Table 1 below.
 
@@ -642,8 +642,8 @@ initial entries in the registry are:
     | "validation-failure"          | 
     +-------------------------------+
    
-The above entries are described in section [Result Types](#Result-Types).
-New result types can be added to this registry without the need to update this
+The above entries are described in section (#result-types), "Result Types." New
+result types can be added to this registry without the need to update this
 document.
 
 # Security Considerations
