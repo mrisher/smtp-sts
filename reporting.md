@@ -285,9 +285,9 @@ to grow over time based on real-world experience. The initial set is:
 
 #### MTA-STS-specific Policy Failures
 
-* `sts-invalid`: This indicates a validation error for the overall MTA-STS
+* `sts-policy-invalid`: This indicates a validation error for the overall MTA-STS
     policy.
-* `webpki-invalid`: This indicates that the MTA-STS policy could not be
+* `sts-webpki-invalid`: This indicates that the MTA-STS policy could not be
     authenticated using PKIX validation.
     
 ### General Failures
@@ -483,8 +483,7 @@ and filename, and ignore the rest.
          Submitter: mail.sender.example.com
          Report-ID: <735ff.e317+bf22029@mailexample.net>
 
-
-### tlsrpt Example 
+### Example Report 
 ```
  From: tlsrpt@mail.sender.example.com
      Date: Fri, May 09 2017 16:54:30 -0800
@@ -527,7 +526,7 @@ MTA-STS or DANE TLSA failures.
 
 The report MAY be delivered by POST to HTTPS. If compressed, the report should
 use the media type `application/tlsrpt+gzip`, and `application/tlsrpt+json`
-otherwise (see [TODO add IANA ref]).
+otherwise (see section [IANA Considerations](#IANA-Considerations)).
 
 ## Delivery Retry
 
@@ -539,7 +538,113 @@ be on a logarithmic scale.
 
 # IANA Considerations
 
-[TODO - Register new media types, and TLS validation failures with IANA]
+The following are the IANA considerations discussed in this document.
+
+## Message headers
+
+Below is the Internet Assigned Numbers Authority (IANA) Permanent Message Header
+Field registration information per [@!RFC3864].
+     
+     Header field name:           TLS-Report-Domain
+     Applicable protocol:         smtp
+     Status:                      standard
+     Author/Change controller:    IETF
+     Specification document(s):   this one
+
+
+     Header field name:           TLS-Report-Submitter
+     Applicable protocol:         smtp
+     Status:                      standard
+     Author/Change controller:    IETF
+     Specification document(s):   this one
+
+## Report Type
+
+This document registers a new parameter `report-type="tlsrpt"` under
+`multipart/report` top-level media type for use with [@!RFC6522].
+
+The media type suitable for use as a report-type is defined in the
+following section.
+
+## `application/tlsrpt+*` Media Types
+ 
+This document registers multiple media types, listed in Table 1 below.
+
+    +-------------+----------------+-------------+-------------------+
+    | Type        | Subtype        | File extn   | Specification     |
+    +-------------+----------------+-------------+-------------------+
+    | application | tlsrpt+json    |  .json      | Section 5.3       |
+    | application | tlsrpt+gzip    |  .gz        | Section 5.3       |
+    +-------------+----------------+-------------+-------------------+
+                    Table 1: SMTP TLS Reporting Media Types
+
+   Type name: application
+
+   Subtype name: This documents registers multiple subtypes, as listed
+      in Table 1.
+
+   Required parameters: n/a
+
+   Optional parameters: n/a
+
+   Encoding considerations: Encoding considerations are identical to
+      those specified for the `application/json` media type. See
+      [@!RFC7159].
+
+   Security considerations: Security considerations relating to SMTP
+      TLS Reporting are discussed in Section 7.
+
+   Interoperability considerations: This document specifies format of
+      conforming messages and the interpretation thereof.
+
+   Published specification: This document is the specification for
+      these media types; see Table 1 for the section documenting each
+      media type.
+
+   Applications that use this media type: Mail User Agents (MUA) and
+      Mail Transfer Agents.
+
+   Additional information:
+
+      Magic number(s):  n/a
+
+      File extension(s):  As listed in Table 1.
+
+      Macintosh file type code(s):  n/a
+
+   Person & email address to contact for further information: See
+      Authors' Addresses section.
+
+   Intended usage:  COMMON
+
+   Restrictions on usage:  n/a
+
+   Author:  See Authors' Addresses section.
+
+   Change controller:  Internet Engineering Task Force
+      (mailto:iesg@ietf.org).
+
+## STARTTLS Validation Result Types
+
+This document creates a new registry, "STARTTLS Validation Result Types". The
+initial entries in the registry are:
+
+    +-------------------------------+
+    | Result Type                   | 
+    +-------------------------------+
+    | "starttls-not-supported"      | 
+    | "certificate-host-mismatch"   | 
+    | "certificate-expired"         | 
+    | "tlsa-invalid"                | 
+    | "dnssec-invalid"              | 
+    | "sts-policy-invalid"          | 
+    | "sts-webpki-invalid"          | 
+    | "validation-failure"          | 
+    +-------------------------------+
+   
+The above entries are described in section [Result Types](#Result-Types).
+New result types can be added to this registry without the need to update this
+document.
 
 # Security Considerations
 
