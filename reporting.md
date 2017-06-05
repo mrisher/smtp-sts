@@ -712,9 +712,9 @@ _smtp-tlsrpt.mail.example.com. IN TXT \
   "report-id": "5065427c-23d3-47ca-b6e0-946ea0e8c4be",
   "policy": {
     "policy-type": "sts",
-    "policy-string": "{ \"version\": \"STSv1\",\"mode\": \"report\", \"mx\": [\"*.mail.company-y.com\"], \"max_age\": 86400 }",
+    "policy-string": "{ \"version\": \"STSv1\",\"mode\": \"report\", \"mx\": [\".mail.company-y.com\"], \"max_age\": 86400 }",
     "policy-domain": "company-y.com",
-    "mx-host": "*.mail.company-y.com"
+    "mx-host": ".mail.company-y.com"
   },
   "summary": {
     "success-aggregate": 5326,
