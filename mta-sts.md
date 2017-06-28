@@ -390,11 +390,39 @@ record, mistakenly cache the old policy from HTTPS.
 
 # IANA Considerations
 
+## Well-Known URIs Registry
+
 A new .well-known URI will be registered in the Well-Known URIs registry as
 described below:
 
 URI Suffix: mta-sts.json
 Change Controller: IETF
+
+## MTA-STS TXT Record Fields
+
+IANA is requested to create a new registry titled "MTA-STS TXT Record Fields".
+The initial entries in the registry are:
+
+ Field Name | Description    | Reference 
+------------|----------------|-----------
+  v         | Record version | (#mtasts-txt-records) of RFC XXX 
+  id        | Policy instance ID | (#mtasts-txt-records) of RFC XXX 
+
+New fields are added to this registry using IANA's "Expert Review" policy.
+
+## MTA-STS Policy Fields
+
+IANA is requested to create a new registry titled "MTA-STS Policy Fields".  The
+initial entries in the registry are:
+
+ Field Name | Description          | Reference 
+------------|----------------------|-----------
+  version   | Policy version       | (#mtasts-policies) of RFC XXX 
+  mode      | Enforcement behavior | (#mtasts-policies) of RFC XXX 
+  max_age   | Policy lifetime      | (#mtasts-policies) of RFC XXX 
+  mx        | MX identities        | (#mtasts-policies) of RFC XXX 
+
+New fields are added to this registry using IANA's "Expert Review" policy.
 
 # Security Considerations
 

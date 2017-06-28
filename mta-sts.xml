@@ -473,12 +473,49 @@ record, mistakenly cache the old policy from HTTPS.
 </section>
 
 <section anchor="iana-considerations" title="IANA Considerations">
+
+<section anchor="wellknown-uris-registry" title="Well-Known URIs Registry">
 <t>A new .well-known URI will be registered in the Well-Known URIs registry as
 described below:
 </t>
 <t>URI Suffix: mta-sts.json
 Change Controller: IETF
 </t>
+</section>
+
+<section anchor="mtasts-txt-record-fields" title="MTA-STS TXT Record Fields">
+<t>IANA is requested to create a new registry titled &quot;MTA-STS TXT Record Fields&quot;.
+The initial entries in the registry are:
+</t>
+<texttable>
+<ttcol align="center">Field Name</ttcol>
+<ttcol align="center">Description</ttcol>
+<ttcol align="center">Reference</ttcol>
+
+<c>v</c><c>Record version</c><c><xref target="mtasts-txt-records"/> of RFC XXX</c>
+<c>id</c><c>Policy instance ID</c><c><xref target="mtasts-txt-records"/> of RFC XXX</c>
+</texttable>
+<t>New fields are added to this registry using IANA's &quot;Expert Review&quot; policy.
+</t>
+</section>
+
+<section anchor="mtasts-policy-fields" title="MTA-STS Policy Fields">
+<t>IANA is requested to create a new registry titled &quot;MTA-STS Policy Fields&quot;.  The
+initial entries in the registry are:
+</t>
+<texttable>
+<ttcol align="center">Field Name</ttcol>
+<ttcol align="center">Description</ttcol>
+<ttcol align="center">Reference</ttcol>
+
+<c>version</c><c>Policy version</c><c><xref target="mtasts-policies"/> of RFC XXX</c>
+<c>mode</c><c>Enforcement behavior</c><c><xref target="mtasts-policies"/> of RFC XXX</c>
+<c>max_age</c><c>Policy lifetime</c><c><xref target="mtasts-policies"/> of RFC XXX</c>
+<c>mx</c><c>MX identities</c><c><xref target="mtasts-policies"/> of RFC XXX</c>
+</texttable>
+<t>New fields are added to this registry using IANA's &quot;Expert Review&quot; policy.
+</t>
+</section>
 </section>
 
 <section anchor="security-considerations" title="Security Considerations">
