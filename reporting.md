@@ -335,7 +335,7 @@ The JSON schema is derived from the HPKP JSON schema [@!RFC7469] (cf. Section 3)
       "receiving-mx-helo": receiving-mx-helo,
       "session-count": failed-session-count,
       "additional-information": additional-info-uri,
-      "failure-reason-code": "Text body"
+      "failure-reason-code": "failure-reason-code"
     }
   ]
 }
@@ -360,29 +360,42 @@ Figure: JSON Report Format
 * `policy-string`: The JSON string serialization ([@!RFC7159] section 7) of the
    policy, whether TLSA record ([@!RFC6698] section 2.3) or MTA-STS policy.
 * `domain`: The Policy Domain is the domain against which the MTA-STS or DANE
-    policy is defined.
+    policy is defined. In the case of Internationalized Domain Names
+   ([@!RFC5891]), the domain is the Punycode-encoded A-label
+   ([@!RFC3492]) and not the U-label.
 * `mx-host-pattern`: The pattern of MX hostnames from the applied policy. It
     is provided as a string, and is interpreted in the same manner as the
     "Checking of Wildcard Certificates" rules in Section 6.4.3 of [@!RFC6125].
-* `result-type`: A value from (#result-types), "Result Types",  above.
+* `result-type`: A value from (#result-types), "Result Types",  above. In the 
+   case of Internationalized Domain Names ([@!RFC5891]), the domain is the 
+   Punycode-encoded A-label ([@!RFC3492]) and not the U-label.
 * `ip-address`: The IP address of the sending MTA that attempted the STARTTLS
-    connection. It is provided as a string representation of an IPv4 or IPv6
-    address in dot-decimal or colon-hexadecimal notation.
+    connection. It is provided as a string representation of an IPv4 (see below) 
+    or IPv6 ([@!RFC5952]) (address in dot-decimal or colon-hexadecimal notation.
 * `receiving-mx-hostname`: The hostname of the receiving MTA MX record with
     which the sending MTA attempted to negotiate a STARTTLS connection.
 * `receiving-mx-helo`: (optional) The HELO or EHLO string from the banner
     announced during the reported session.
-* `success-aggregate`: The aggregate number (integer) of successfully negotiated 
-    TLS-enabled connections to the receiving site.
-* `failure-aggregate`: The aggregate number (integer) of failures to negotiate
-    an TLS-enabled connection to the receiving site.
-* `session-count`: The number of (attempted) sessions that match the relevant
+* `total-successful-session-count`: The aggregate number (integer) of successfully 
+    negotiated TLS-enabled connections to the receiving site.
+* `total-failure-session-count`: The aggregate number (integer) of failures to 
+    negotiate an TLS-enabled connection to the receiving site.
+* `failed-session-count`: The number of (attempted) sessions that match the relevant
     `result-type` for this section.
-* `additional-info-uri`: An optional URI pointing to additional information
+* `additional-info-uri`: An optional URI [@!RFC3986] pointing to additional information
     around the relevant `result-type`. For example, this URI might host the
     complete certificate chain presented during an attempted STARTTLS session.
 * `failure-reason-code`: A text field to include an TLS-related error
     code or error message.
+    
+For report purposes, an IPv4 Address is defined as:
+     IPv4address   = dec-octet "." dec-octet "." dec-octet "." dec-octet
+     dec-octet     = DIGIT                 ; 0-9
+                    / %x31-39 DIGIT         ; 10-99
+                    / "1" 2DIGIT            ; 100-199
+                    / "2" %x30-34 DIGIT     ; 200-249
+                    / "25" %x30-35          ; 250-255
+		    
 
 # Report Delivery
 
@@ -448,8 +461,9 @@ In addition, the following two new top level message header fields are defined:
 TLS-Report-Domain: Receiver-Domain
 TLS-Report-Submitter: Sender-Domain
 ```
-These message headers would allow for easy searching for all reports submitted
-by a report domain or a particular submitter, for example in IMAP:
+These message headers MUST be included and should allow for easy searching for 
+all reports submitted by a report domain or a particular submitter, for example
+in IMAP [@!RFC3501]:
 
 `s SEARCH HEADER "TLS-Report-Domain" "example.com"`
 
@@ -546,14 +560,14 @@ Below is the Internet Assigned Numbers Authority (IANA) Permanent Message Header
 Field registration information per [@!RFC3864].
      
      Header field name:           TLS-Report-Domain
-     Applicable protocol:         smtp
+     Applicable protocol:         mail
      Status:                      standard
      Author/Change controller:    IETF
      Specification document(s):   this one
 
 
      Header field name:           TLS-Report-Submitter
-     Applicable protocol:         smtp
+     Applicable protocol:         mail
      Status:                      standard
      Author/Change controller:    IETF
      Specification document(s):   this one
@@ -717,26 +731,26 @@ _smtp-tlsrpt.mail.example.com. IN TXT \
     "mx-host": ".mail.company-y.com"
   },
   "summary": {
-    "success-aggregate": 5326,
-    "failure-aggregate": 303
+    "total-successful-session-count": 5326,
+    "total-failure-session-count": 303
   }
   "failure-details": [{
     "result-type": "certificate-expired",
     "sending-mta-ip": "98.136.216.25",
     "receiving-mx-hostname": "mx1.mail.company-y.com",
-    "session-count": 100
+    "failed-session-count": 100
   }, {
     "result-type": "starttls-not-supported",
     "sending-mta-ip": "98.22.33.99",
     "receiving-mx-hostname": "mx2.mail.company-y.com",
-    "session-count": 200,
+    "failed-session-count": 200,
     "additional-information": "hxxps://reports.company-x.com/
       report_info?id=5065427c-23d3#StarttlsNotSupported"
   }, {
     "result-type: "validation-failure",
     "sending-mta-ip": "47.97.15.2",
     "receiving-mx-hostname: "mx-backup.mail.company-y.com",
-    "session-count": 3,
+    "failed-session-count": 3,
     "failure-error-code": "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED"
   }]
 }
