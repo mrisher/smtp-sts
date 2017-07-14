@@ -566,22 +566,20 @@ This document registers a new parameter `report-type="tlsrpt"` under
 The media type suitable for use as a report-type is defined in the
 following section.
 
-## application/tlsrpt+* Media Types
+## application/tlsrpt+json Media Type
  
-This document registers multiple media types, listed in Table 1 below.
+This document registers multiple media types, beginning with Table 1 below.
 
     +-------------+----------------+-------------+-------------------+
     | Type        | Subtype        | File extn   | Specification     |
     +-------------+----------------+-------------+-------------------+
     | application | tlsrpt+json    |  .json      | Section 5.3       |
-    | application | tlsrpt+gzip    |  .gz        | Section 5.3       |
     +-------------+----------------+-------------+-------------------+
-                    Table 1: SMTP TLS Reporting Media Types
+                    Table 1: SMTP TLS Reporting Media Type
 
    Type name: application
 
-   Subtype name: This documents registers multiple subtypes, as listed
-      in Table 1.
+   Subtype name: tlsrpt+json
 
    Required parameters: n/a
 
@@ -597,9 +595,7 @@ This document registers multiple media types, listed in Table 1 below.
    Interoperability considerations: This document specifies format of
       conforming messages and the interpretation thereof.
 
-   Published specification: This document is the specification for
-      these media types; see Table 1 for the section documenting each
-      media type.
+   Published specification: Section 5.3 of this document.
 
    Applications that use this media type: Mail User Agents (MUA) and
       Mail Transfer Agents.
@@ -608,7 +604,60 @@ This document registers multiple media types, listed in Table 1 below.
 
       Magic number(s):  n/a
 
-      File extension(s):  As listed in Table 1.
+      File extension(s):  ".json"
+
+      Macintosh file type code(s):  n/a
+
+   Person & email address to contact for further information: See
+      Authors' Addresses section.
+
+   Intended usage:  COMMON
+
+   Restrictions on usage:  n/a
+
+   Author:  See Authors' Addresses section.
+
+   Change controller:  Internet Engineering Task Force
+      (mailto:iesg@ietf.org).
+
+## application/tlsrpt+gz Media Type
+ 
+
+    +-------------+----------------+-------------+-------------------+
+    | Type        | Subtype        | File extn   | Specification     |
+    +-------------+----------------+-------------+-------------------+
+    | application | tlsrpt+gzip    |  .gz        | Section 5.3       |
+    +-------------+----------------+-------------+-------------------+
+                    Table 2: SMTP TLS Reporting Media Type
+
+   Type name: application
+
+   Subtype name: tlsrpt+gzip
+   
+   Required parameters: n/a
+
+   Optional parameters: n/a
+
+   Encoding considerations: Encoding considerations are identical to
+      those specified for the `application/json` media type. See
+      [@!RFC7159].
+
+   Security considerations: Security considerations relating to SMTP
+      TLS Reporting are discussed in Section 7.
+
+   Interoperability considerations: This document specifies format of
+      conforming messages and the interpretation thereof.
+
+   Published specification: Section 5.3 of this document.
+
+   Applications that use this media type: Mail User Agents (MUA) and
+      Mail Transfer Agents.
+
+   Additional information:
+
+      Magic number(s):  n/a
+
+      File extension(s):  ".gz"
 
       Macintosh file type code(s):  n/a
 
