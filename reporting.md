@@ -657,8 +657,8 @@ initial entries in the registry are:
     +-------------------------------+
    
 The above entries are described in section (#result-types), "Result Types." New
-result types can be added to this registry without the need to update this
-document.
+result types can be added to this registry using "Expert Review" IANA 
+registration policy.
 
 # Security Considerations
 
