@@ -180,12 +180,12 @@ MTA-STS and skip the remaining steps of policy discovery.
 
 ## MTA-STS Policies
 
-The policy itself is a JSON [@!RFC7159] object served via the HTTPS GET method
-from the fixed [@!RFC5785] "well-known" path of `.well-known/mta-sts.json`
+The policy itself is a key-value file served via the HTTPS GET method
+from the fixed [@!RFC5785] "well-known" path of `.well-known/mta-sts.policy`
 served by the `mta-sts` host at the Policy Domain. Thus for `example.com` the
-path is `https://mta-sts.example.com/.well-known/mta-sts.json`.
+path is `https://mta-sts.example.com/.well-known/mta-sts.policy`.
 
-This JSON object contains the following key/value pairs:
+This key-value file contains the following key/value pairs:
 
 * `version`: (plain-text, required). Currently only "STSv1" is supported.
 * `mode`: (plain-text, required). Either "enforce" or "report", indicating the
@@ -214,7 +214,7 @@ This JSON object contains the following key/value pairs:
   Unicode-encoded U-label. The full semantics of certificate validation are 
   described in (#mx-certificate-validation), "MX Certificate Validation."
 
-An example JSON policy is as below:
+An example policy is as below:
 
 ```
 version: STSv1
@@ -226,9 +226,9 @@ max_age: 123456
 ```
 
 Parsers MUST accept TXT records and policy files which are syntactically valid
-(i.e. valid key-value pairs separated by semi-colons for TXT records and valid
-JSON for policy files) and implementing a superset of this specification, in
-which case unknown fields SHALL be ignored.
+(i.e. valid key-value pairs separated by semi-colons for TXT records) and 
+implementing a superset of this specification, in which case unknown fields
+SHALL be ignored.
 
 ## HTTPS Policy Fetching
 
@@ -400,7 +400,7 @@ record, mistakenly cache the old policy from HTTPS.
 A new .well-known URI will be registered in the Well-Known URIs registry as
 described below:
 
-URI Suffix: mta-sts.json
+URI Suffix: mta-sts.policy
 Change Controller: IETF
 
 ## MTA-STS TXT Record Fields
@@ -566,8 +566,8 @@ MTA-STS policy indicator TXT RR:
 _mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
 ~~~~~~~~~
 
-MTA-STS Policy JSON served as the response body at
-https://mta-sts.example.com/.well-known/mta-sts.json:
+MTA-STS Policy file served as the response body at
+https://mta-sts.example.com/.well-known/mta-sts.policy:
 ~~~~~~~~~
 version: STSv1
 mode: report
