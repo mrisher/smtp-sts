@@ -3,13 +3,13 @@
    Title = "SMTP MTA Strict Transport Security (MTA-STS)"
    abbrev = "MTA-STS"
    category = "std"
-   docName = "draft-ietf-uta-mta-sts-06"
+   docName = "draft-ietf-uta-mta-sts-07"
    ipr = "trust200902"
    area = "Applications"
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2017-05-31T00:00:00Z
+   date = 2017-07-15T00:00:00Z
 
    [[author]]
    initials="D."
@@ -198,26 +198,31 @@ This JSON object contains the following key/value pairs:
 * `mx`: MX identity patterns (list of plain-text strings, required). One or more
   patterns matching a Common Name ([@!RFC6125]) or Subject Alternative Name
   ([@!RFC5280]) DNS-ID present in the X.509 certificate presented by any MX
-  receiving mail for this domain.  For example, `["mail.example.com",
-  ".example.net"]` indicates that mail for this domain might be handled by any
+  receiving mail for this domain.  For example:
+  ```
+   mx: mail.example.com
+   mx: .example.net
+  ```
+  indicates that mail for this domain might be handled by any
   MX with a certificate valid for a host at `mail.example.com` or `example.net`.
   Valid patterns can be either fully specified names (`example.com`) or suffixes
   (`.example.net`) matching the right-hand parts of a server's identity; the
-  latter case are distinguished by a leading period.  In the case of
-  Internationalized Domain Names ([@!RFC5891]), the MX MUST specify the
-  Punycode-encoded A-label [@!RFC3492] and not the Unicode-encoded U-label. The
-  full semantics of certificate validation are described in
-  (#mx-certificate-validation), "MX Certificate Validation."
+  latter case are distinguished by a leading period.  If there are more than
+  one MX specified by the policy, they MUST be on separate lines within the
+  policy file.  In the case of Internationalized Domain Names ([@!RFC5891]), 
+  the MX MUST specify the Punycode-encoded A-label [@!RFC3492] and not the 
+  Unicode-encoded U-label. The full semantics of certificate validation are 
+  described in (#mx-certificate-validation), "MX Certificate Validation."
 
 An example JSON policy is as below:
 
 ```
-{
-  "version": "STSv1",
-  "mode": "enforce",
-  "mx": [".mail.example.com"],
-  "max_age": 123456
-}
+version: STSv1
+mode: enforce
+mx: mail.example.com
+mx: .example.net
+mx: backupmx.example.com
+max_age: 123456
 ```
 
 Parsers MUST accept TXT records and policy files which are syntactically valid
@@ -564,13 +569,12 @@ _mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
 MTA-STS Policy JSON served as the response body at
 https://mta-sts.example.com/.well-known/mta-sts.json:
 ~~~~~~~~~
-{
-  "version": "STSv1",
-  "mode": "report",
-  "mx": ["mx1.example.com", "mx2.example.com"],
-  "max_age": 12345678
-}
-
+version: STSv1
+mode: report
+mx: mx1.example.com
+mx: mx2.example.com
+mx: mx.backup-example.com
+max_age: 12345678
 ~~~~~~~~~
 
 # Appendix 2: Message delivery pseudocode
