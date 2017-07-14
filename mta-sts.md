@@ -228,7 +228,9 @@ max_age: 123456
 Parsers MUST accept TXT records and policy files which are syntactically valid
 (i.e. valid key-value pairs separated by semi-colons for TXT records) and 
 implementing a superset of this specification, in which case unknown fields
-SHALL be ignored.
+SHALL be ignored. If any field other than `mx` is duplicated, the first entry
+will be honored, the rest should be ignored.  For the `mx` field, all valid
+entries will be utilized when enforcing the stated policy.
 
 ## HTTPS Policy Fetching
 
