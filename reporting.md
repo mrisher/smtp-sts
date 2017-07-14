@@ -3,13 +3,13 @@
    Title = "SMTP TLS Reporting"
    abbrev = "SMTP-TLSRPT"
    category = "std"
-   docName = "draft-ietf-uta-smtp-tlsrpt-06"
+   docName = "draft-ietf-uta-smtp-tlsrpt-07"
    ipr = "trust200902"
    area = "Applications"
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2017-05-31T00:00:00Z
+   date = 2017-07-15T00:00:00Z
    
    [[author]]
    initials="D."
@@ -324,8 +324,8 @@ The JSON schema is derived from the HPKP JSON schema [@!RFC7469] (cf. Section 3)
     "mx-host": mx-host-pattern
   },
   "summary": {
-    "success-aggregate": total-successful-session-count,
-    "failure-aggregate:" total-failure-session-count
+    "total-successful-session-count": total-successful-session-count,
+    "total-failure-session-count:" total-failure-session-count
   }
   "failure-details": [
     {
@@ -333,7 +333,7 @@ The JSON schema is derived from the HPKP JSON schema [@!RFC7469] (cf. Section 3)
       "sending-mta-ip": ip-address,
       "receiving-mx-hostname": receiving-mx-hostname,
       "receiving-mx-helo": receiving-mx-helo,
-      "session-count": failed-session-count,
+      "failed-session-count": failed-session-count,
       "additional-information": additional-info-uri,
       "failure-reason-code": "failure-reason-code"
     }
