@@ -79,7 +79,7 @@ Table of Contents
      1.1.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   3
    2.  Related Technologies  . . . . . . . . . . . . . . . . . . . .   4
    3.  Reporting Policy  . . . . . . . . . . . . . . . . . . . . . .   4
-     3.1.  Example Reporting Policy  . . . . . . . . . . . . . . . .   5
+     3.1.  Example Reporting Policy  . . . . . . . . . . . . . . . .   6
        3.1.1.  Report using MAILTO . . . . . . . . . . . . . . . . .   6
        3.1.2.  Report using HTTPS  . . . . . . . . . . . . . . . . .   6
    4.  Reporting Schema  . . . . . . . . . . . . . . . . . . . . . .   6
@@ -103,9 +103,9 @@ Table of Contents
    6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  15
      6.1.  Message headers . . . . . . . . . . . . . . . . . . . . .  15
      6.2.  Report Type . . . . . . . . . . . . . . . . . . . . . . .  15
-     6.3.  application/tlsrpt+* Media Types  . . . . . . . . . . . .  15
-     6.4.  STARTTLS Validation Result Types  . . . . . . . . . . . .  16
-   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  17
+     6.3.  application/tlsrpt+json Media Type  . . . . . . . . . . .  15
+     6.4.  application/tlsrpt+gz Media Type  . . . . . . . . . . . .  16
+     6.5.  STARTTLS Validation Result Types  . . . . . . . . . . . .  18
 
 
 
@@ -114,12 +114,13 @@ Margolis, et al.        Expires December 2, 2017                [Page 2]
 Internet-Draft                 SMTP-TLSRPT                      May 2017
 
 
-   8.  Appendix 1: Example Reporting Policy  . . . . . . . . . . . .  18
-     8.1.  Report using MAILTO . . . . . . . . . . . . . . . . . . .  18
-     8.2.  Report using HTTPS  . . . . . . . . . . . . . . . . . . .  18
-   9.  Appendix 2: Example JSON Report . . . . . . . . . . . . . . .  18
-   10. Normative References  . . . . . . . . . . . . . . . . . . . .  20
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  21
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  18
+   8.  Appendix 1: Example Reporting Policy  . . . . . . . . . . . .  19
+     8.1.  Report using MAILTO . . . . . . . . . . . . . . . . . . .  19
+     8.2.  Report using HTTPS  . . . . . . . . . . . . . . . . . . .  19
+   9.  Appendix 2: Example JSON Report . . . . . . . . . . . . . . .  19
+   10. Normative References  . . . . . . . . . . . . . . . . . . . .  21
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  22
 
 1.  Introduction
 
@@ -160,8 +161,7 @@ Internet-Draft                 SMTP-TLSRPT                      May 2017
 
    We also define the following terms for further use in this document:
 
-   o  MTA-STS Policy: A definition of the expected TLS availability,
-      behavior, and desired actions for a given domain when a sending
+
 
 
 
@@ -170,6 +170,8 @@ Margolis, et al.        Expires December 2, 2017                [Page 3]
 Internet-Draft                 SMTP-TLSRPT                      May 2017
 
 
+   o  MTA-STS Policy: A definition of the expected TLS availability,
+      behavior, and desired actions for a given domain when a sending
       MTA encounters problems in negotiating a secure channel.  MTA-STS
       is defined in [TODO]
 
@@ -216,8 +218,6 @@ Internet-Draft                 SMTP-TLSRPT                      May 2017
    o  In the case of "https", reports should be submitted via POST
       ([RFC2818]) to the specified URI.
 
-   o  In the case of "mailto", reports should be submitted to the
-      specified email address ([RFC6068]).  When sending failure reports
 
 
 
@@ -226,6 +226,8 @@ Margolis, et al.        Expires December 2, 2017                [Page 4]
 Internet-Draft                 SMTP-TLSRPT                      May 2017
 
 
+   o  In the case of "mailto", reports should be submitted to the
+      specified email address ([RFC6068]).  When sending failure reports
       via SMTP, sending MTAs MUST deliver reports despite any TLS-
       related failures.  This may mean that the reports are delivered in
       the clear.
@@ -269,8 +271,6 @@ Internet-Draft                 SMTP-TLSRPT                      May 2017
    key-value pairs seprated by semi-colons) and implementing a superset
    of this specification, in which case unknown fields SHALL be ignored.
 
-3.1.  Example Reporting Policy
-
 
 
 
@@ -281,6 +281,8 @@ Margolis, et al.        Expires December 2, 2017                [Page 5]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2017
 
+
+3.1.  Example Reporting Policy
 
 3.1.1.  Report using MAILTO
 
@@ -327,8 +329,6 @@ Internet-Draft                 SMTP-TLSRPT                      May 2017
 
    o  Aggregate counts, comprising result type, sending MTA IP,
       receiving MTA hostname, session count, and an optional additional
-      information field containing a URI for recipients to review
-      further information on a failure type.
 
 
 
@@ -337,6 +337,9 @@ Margolis, et al.        Expires December 2, 2017                [Page 6]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2017
 
+
+      information field containing a URI for recipients to review
+      further information on a failure type.
 
    Note that the failure types are non-exclusive; an aggregate report
    may contain overlapping "counts" of failure types when a single send
@@ -382,9 +385,6 @@ Internet-Draft                 SMTP-TLSRPT                      May 2017
       STS or DANE policy, e.g.  if the MX does not match any identities
       listed in the Subject Alternate Name (SAN) [RFC5280].
 
-   o  "certificate-expired": This indicates that the certificate has
-      expired.
-
 
 
 
@@ -393,6 +393,9 @@ Margolis, et al.        Expires December 2, 2017                [Page 7]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2017
 
+
+   o  "certificate-expired": This indicates that the certificate has
+      expired.
 
    o  "certificate-not-trusted": This a label that covers multiple
       certificate related failures that include, but not limited to
@@ -437,9 +440,6 @@ Internet-Draft                 SMTP-TLSRPT                      May 2017
    feedback to the receiving entity.  This is intended to be a short
    text field, and the contents of the field should be an error code or
    error text, such as "X509_V_ERR_UNHANDLED_CRITICAL_CRL_EXTENSION".
-
-
-
 
 
 
@@ -820,20 +820,20 @@ Internet-Draft                 SMTP-TLSRPT                      May 2017
    The media type suitable for use as a report-type is defined in the
    following section.
 
-6.3.  application/tlsrpt+* Media Types
+6.3.  application/tlsrpt+json Media Type
 
-   This document registers multiple media types, listed in Table 1
+   This document registers multiple media types, beginning with Table 1
    below.
 
     +-------------+----------------+-------------+-------------------+
     | Type        | Subtype        | File extn   | Specification     |
     +-------------+----------------+-------------+-------------------+
     | application | tlsrpt+json    |  .json      | Section 5.3       |
-    | application | tlsrpt+gzip    |  .gz        | Section 5.3       |
     +-------------+----------------+-------------+-------------------+
-                    Table 1: SMTP TLS Reporting Media Types
+                    Table 1: SMTP TLS Reporting Media Type
 
    Type name: application
+
 
 
 
@@ -842,8 +842,7 @@ Margolis, et al.        Expires December 2, 2017               [Page 15]
 Internet-Draft                 SMTP-TLSRPT                      May 2017
 
 
-   Subtype name: This documents registers multiple subtypes, as listed
-   in Table 1.
+   Subtype name: tlsrpt+json
 
    Required parameters: n/a
 
@@ -859,19 +858,18 @@ Internet-Draft                 SMTP-TLSRPT                      May 2017
    Interoperability considerations: This document specifies format of
    conforming messages and the interpretation thereof.
 
-   Published specification: This document is the specification for these
-   media types; see Table 1 for the section documenting each media type.
+   Published specification: Section 5.3 of this document.
 
    Applications that use this media type: Mail User Agents (MUA) and
    Mail Transfer Agents.
 
    Additional information:
 
-                  Magic number(s):  n/a
+                      Magic number(s):  n/a
 
-                  File extension(s):  As listed in Table 1.
+                      File extension(s):  ".json"
 
-                  Macintosh file type code(s):  n/a
+                      Macintosh file type code(s):  n/a
 
    Person & email address to contact for further information: See
    Authors' Addresses section.
@@ -885,10 +883,12 @@ Internet-Draft                 SMTP-TLSRPT                      May 2017
    Change controller: Internet Engineering Task Force
    (mailto:iesg@ietf.org).
 
-6.4.  STARTTLS Validation Result Types
+6.4.  application/tlsrpt+gz Media Type
 
-   This document creates a new registry, "STARTTLS Validation Result
-   Types".  The initial entries in the registry are:
+
+
+
+
 
 
 
@@ -897,6 +897,70 @@ Margolis, et al.        Expires December 2, 2017               [Page 16]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2017
 
+
+    +-------------+----------------+-------------+-------------------+
+    | Type        | Subtype        | File extn   | Specification     |
+    +-------------+----------------+-------------+-------------------+
+    | application | tlsrpt+gzip    |  .gz        | Section 5.3       |
+    +-------------+----------------+-------------+-------------------+
+                    Table 2: SMTP TLS Reporting Media Type
+
+   Type name: application
+
+   Subtype name: tlsrpt+gzip
+
+   Required parameters: n/a
+
+   Optional parameters: n/a
+
+   Encoding considerations: Encoding considerations are identical to
+   those specified for the "application/json" media type.  See
+   [RFC7159].
+
+   Security considerations: Security considerations relating to SMTP TLS
+   Reporting are discussed in Section 7.
+
+   Interoperability considerations: This document specifies format of
+   conforming messages and the interpretation thereof.
+
+   Published specification: Section 5.3 of this document.
+
+   Applications that use this media type: Mail User Agents (MUA) and
+   Mail Transfer Agents.
+
+   Additional information:
+
+                      Magic number(s):  n/a
+
+                      File extension(s):  ".gz"
+
+                      Macintosh file type code(s):  n/a
+
+   Person & email address to contact for further information: See
+   Authors' Addresses section.
+
+   Intended usage: COMMON
+
+   Restrictions on usage: n/a
+
+   Author: See Authors' Addresses section.
+
+
+
+
+
+Margolis, et al.        Expires December 2, 2017               [Page 17]
+
+Internet-Draft                 SMTP-TLSRPT                      May 2017
+
+
+   Change controller: Internet Engineering Task Force
+   (mailto:iesg@ietf.org).
+
+6.5.  STARTTLS Validation Result Types
+
+   This document creates a new registry, "STARTTLS Validation Result
+   Types".  The initial entries in the registry are:
 
                      +-------------------------------+
                      | Result Type                   |
@@ -938,6 +1002,14 @@ Internet-Draft                 SMTP-TLSRPT                      May 2017
       receive statistics about a domain the attacker does not own.
       Since an attacker able to poison DNS is already able to receive
       counts of SMTP connections (and, absent DANE or MTA-STS policies,
+
+
+
+Margolis, et al.        Expires December 2, 2017               [Page 18]
+
+Internet-Draft                 SMTP-TLSRPT                      May 2017
+
+
       actual SMTP message payloads), this does not present a significant
       new vulnerability.
 
@@ -946,14 +1018,6 @@ Internet-Draft                 SMTP-TLSRPT                      May 2017
       allows domains to delegate processing of reports to a partner
       organization.  However, an attacker who controls the Policy Domain
       DNS could also use this mechanism to direct the reports to an
-
-
-
-Margolis, et al.        Expires December 2, 2017               [Page 17]
-
-Internet-Draft                 SMTP-TLSRPT                      May 2017
-
-
       unwitting victim, flooding that victim with excessive reports.
       DMARC [RFC7489] defines a solution for verifying delegation to
       avoid such attacks; the need for this is greater with DMARC,
@@ -997,15 +1061,7 @@ Internet-Draft                 SMTP-TLSRPT                      May 2017
 
 
 
-
-
-
-
-
-
-
-
-Margolis, et al.        Expires December 2, 2017               [Page 18]
+Margolis, et al.        Expires December 2, 2017               [Page 19]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2017
 
@@ -1061,7 +1117,7 @@ Internet-Draft                 SMTP-TLSRPT                      May 2017
 
 
 
-Margolis, et al.        Expires December 2, 2017               [Page 19]
+Margolis, et al.        Expires December 2, 2017               [Page 20]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2017
 
@@ -1117,7 +1173,7 @@ Internet-Draft                 SMTP-TLSRPT                      May 2017
 
 
 
-Margolis, et al.        Expires December 2, 2017               [Page 20]
+Margolis, et al.        Expires December 2, 2017               [Page 21]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2017
 
@@ -1173,7 +1229,7 @@ Authors' Addresses
 
 
 
-Margolis, et al.        Expires December 2, 2017               [Page 21]
+Margolis, et al.        Expires December 2, 2017               [Page 22]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2017
 
@@ -1229,4 +1285,4 @@ Internet-Draft                 SMTP-TLSRPT                      May 2017
 
 
 
-Margolis, et al.        Expires December 2, 2017               [Page 22]
+Margolis, et al.        Expires December 2, 2017               [Page 23]
