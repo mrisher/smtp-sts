@@ -339,9 +339,10 @@ MTA-STS policy, a sending MTA honoring MTA-STS applies the result of a policy
 validation failure one of two ways, depending on the value of the policy `mode`
 field:
 
-1. `report`: In this mode, sending MTAs merely send a report (as described in
-   the TLSRPT specification (TODO: add ref)) indicating policy application
-   failures.
+1. `report`: In this mode, sending MTAs which also implement the TLSRPT
+   specification (TODO: add ref) merely send a report indicating policy
+   application failures (so long as TLSRPT is also implemented by the recipient
+   domain).
 
 2. `enforce`: In this mode, sending MTAs MUST NOT deliver the message to hosts
    which fail MX matching or certificate validation.

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE rfc SYSTEM 'rfc2629.dtd' []>
-<rfc ipr="trust200902" category="std" docName="draft-ietf-uta-mta-sts-06">
+<rfc ipr="trust200902" category="std" docName="draft-ietf-uta-mta-sts-07">
 <?rfc toc="yes"?>
 <?rfc symrefs="yes"?>
 <?rfc sortrefs="yes"?>
@@ -87,7 +87,7 @@
 <uri></uri>
 </address>
 </author>
-<date year="2017" month="May" day="31"/>
+<date year="2017" month="July" day="15"/>
 
 <area>Applications</area>
 <workgroup>Using TLS in Applications</workgroup>
@@ -242,12 +242,12 @@ MTA-STS and skip the remaining steps of policy discovery.
 </section>
 
 <section anchor="mtasts-policies" title="MTA-STS Policies">
-<t>The policy itself is a JSON <xref target="RFC7159"/> object served via the HTTPS GET method
-from the fixed <xref target="RFC5785"/> &quot;well-known&quot; path of <spanx style="verb">.well-known/mta-sts.json</spanx>
+<t>The policy itself is a key-value file served via the HTTPS GET method
+from the fixed <xref target="RFC5785"/> &quot;well-known&quot; path of <spanx style="verb">.well-known/mta-sts.policy</spanx>
 served by the <spanx style="verb">mta-sts</spanx> host at the Policy Domain. Thus for <spanx style="verb">example.com</spanx> the
-path is <spanx style="verb">https://mta-sts.example.com/.well-known/mta-sts.json</spanx>.
+path is <spanx style="verb">https://mta-sts.example.com/.well-known/mta-sts.policy</spanx>.
 </t>
-<t>This JSON object contains the following key/value pairs:
+<t>This key-value file contains the following key/value pairs:
 </t>
 <t>
 <list style="symbols">
@@ -262,33 +262,38 @@ weeks or greater.</t>
 <t><spanx style="verb">mx</spanx>: MX identity patterns (list of plain-text strings, required). One or more
 patterns matching a Common Name (<xref target="RFC6125"/>) or Subject Alternative Name
 (<xref target="RFC5280"/>) DNS-ID present in the X.509 certificate presented by any MX
-receiving mail for this domain.  For example, <spanx style="verb">["mail.example.com",
-".example.net"]</spanx> indicates that mail for this domain might be handled by any
+receiving mail for this domain.  For example:
+<spanx style="verb">mx: mail.example.com
+mx: .example.net</spanx>
+indicates that mail for this domain might be handled by any
 MX with a certificate valid for a host at <spanx style="verb">mail.example.com</spanx> or <spanx style="verb">example.net</spanx>.
 Valid patterns can be either fully specified names (<spanx style="verb">example.com</spanx>) or suffixes
 (<spanx style="verb">.example.net</spanx>) matching the right-hand parts of a server's identity; the
-latter case are distinguished by a leading period.  In the case of
-Internationalized Domain Names (<xref target="RFC5891"/>), the MX MUST specify the
-Punycode-encoded A-label <xref target="RFC3492"/> and not the Unicode-encoded U-label. The
-full semantics of certificate validation are described in
-<xref target="mx-certificate-validation"/>, &quot;MX Certificate Validation.&quot;</t>
+latter case are distinguished by a leading period.  If there are more than
+one MX specified by the policy, they MUST be on separate lines within the
+policy file.  In the case of Internationalized Domain Names (<xref target="RFC5891"/>),
+the MX MUST specify the Punycode-encoded A-label <xref target="RFC3492"/> and not the
+Unicode-encoded U-label. The full semantics of certificate validation are
+described in <xref target="mx-certificate-validation"/>, &quot;MX Certificate Validation.&quot;</t>
 </list>
 </t>
-<t>An example JSON policy is as below:
+<t>An example policy is as below:
 </t>
 
 <figure align="center"><artwork align="center">
-{
-  "version": "STSv1",
-  "mode": "enforce",
-  "mx": [".mail.example.com"],
-  "max_age": 123456
-}
+version: STSv1
+mode: enforce
+mx: mail.example.com
+mx: .example.net
+mx: backupmx.example.com
+max_age: 123456
 </artwork></figure>
 <t>Parsers MUST accept TXT records and policy files which are syntactically valid
-(i.e. valid key-value pairs separated by semi-colons for TXT records and valid
-JSON for policy files) and implementing a superset of this specification, in
-which case unknown fields SHALL be ignored.
+(i.e. valid key-value pairs separated by semi-colons for TXT records) and
+implementing a superset of this specification, in which case unknown fields
+SHALL be ignored. If any field other than <spanx style="verb">mx</spanx> is duplicated, the first entry
+will be honored, the rest should be ignored.  For the <spanx style="verb">mx</spanx> field, all valid
+entries will be utilized when enforcing the stated policy.
 </t>
 </section>
 
@@ -409,9 +414,10 @@ field:
 </t>
 <t>
 <list style="numbers">
-<t><spanx style="verb">report</spanx>: In this mode, sending MTAs merely send a report (as described in
-the TLSRPT specification (TODO: add ref)) indicating policy application
-failures.</t>
+<t><spanx style="verb">report</spanx>: In this mode, sending MTAs which also implement the TLSRPT
+specification (TODO: add ref) merely send a report indicating policy
+application failures (so long as TLSRPT is also implemented by the recipient
+domain).</t>
 <t><spanx style="verb">enforce</spanx>: In this mode, sending MTAs MUST NOT deliver the message to hosts
 which fail MX matching or certificate validation.</t>
 </list>
@@ -478,7 +484,7 @@ record, mistakenly cache the old policy from HTTPS.
 <t>A new .well-known URI will be registered in the Well-Known URIs registry as
 described below:
 </t>
-<t>URI Suffix: mta-sts.json
+<t>URI Suffix: mta-sts.policy
 Change Controller: IETF
 </t>
 </section>
@@ -663,18 +669,17 @@ the recipient MX validate.
 <figure align="center"><artwork align="center">
 _mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
 </artwork></figure>
-<t>MTA-STS Policy JSON served as the response body at
-<eref target="https://mta-sts.example.com/.well-known/mta-sts.json:"/>
+<t>MTA-STS Policy file served as the response body at
+<eref target="https://mta-sts.example.com/.well-known/mta-sts.policy:"/>
 </t>
 
 <figure align="center"><artwork align="center">
-{
-  "version": "STSv1",
-  "mode": "report",
-  "mx": ["mx1.example.com", "mx2.example.com"],
-  "max_age": 12345678
-}
-
+version: STSv1
+mode: report
+mx: mx1.example.com
+mx: mx2.example.com
+mx: mx.backup-example.com
+max_age: 12345678
 </artwork></figure>
 </section>
 
@@ -806,7 +811,6 @@ func handleMessage(message) {
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5785.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5891.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6125.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7159.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7672.xml"?>
 </references>
 
