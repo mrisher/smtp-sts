@@ -3,13 +3,13 @@
    Title = "SMTP TLS Reporting"
    abbrev = "SMTP-TLSRPT"
    category = "std"
-   docName = "draft-ietf-uta-smtp-tlsrpt-06"
+   docName = "draft-ietf-uta-smtp-tlsrpt-07"
    ipr = "trust200902"
    area = "Applications"
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2017-05-31T00:00:00Z
+   date = 2017-07-31T00:00:00Z
    
    [[author]]
    initials="D."
