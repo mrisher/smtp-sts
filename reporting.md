@@ -197,8 +197,8 @@ _smtp-tlsrpt.example.com. IN TXT \
 
 # Reporting Schema
 
-The report is composed as a plain text file encoded in the JSON format
-([@!RFC7159]).
+The report is composed as a plain text file encoded in the I-JSON format
+([@!RFC7493]).
 
 Aggregate reports contain the following fields:
 
@@ -350,7 +350,7 @@ Figure: JSON Report Format
     full UTC day, 0000-2400.
 * `email-address`: The contact information for a responsible party of the
     report. It is provided as a string formatted according to Section 3.4.1,
-    "Addr-Spec", of [@!RFC5322].
+    "Addr-Spec", of [@!RFC5321].
 * `report-id`: A unique identifier for the report. Report authors may use
     whatever scheme they prefer to generate a unique identifier. It is provided
     as a string.
@@ -398,7 +398,7 @@ The filename is typically constructed using the following ABNF:
 
      unique-id = 1*(ALPHA / DIGIT)
 
-     sender = domain        ; imported from [@!RFC5322]
+     sender = domain        ; imported from [@!RFC5321]
 
      policy-domain   = domain
 
@@ -587,7 +587,7 @@ This document registers multiple media types, beginning with Table 1 below.
 
    Encoding considerations: Encoding considerations are identical to
       those specified for the `application/json` media type. See
-      [@!RFC7159].
+      [@!RFC7493].
 
    Security considerations: Security considerations relating to SMTP
       TLS Reporting are discussed in Section 7.
@@ -640,7 +640,7 @@ This document registers multiple media types, beginning with Table 1 below.
 
    Encoding considerations: Encoding considerations are identical to
       those specified for the `application/json` media type. See
-      [@!RFC7159].
+      [@!RFC7493].
 
    Security considerations: Security considerations relating to SMTP
       TLS Reporting are discussed in Section 7.
