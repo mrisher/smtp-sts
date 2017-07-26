@@ -371,7 +371,7 @@ Figure: JSON Report Format
    Punycode-encoded A-label ([@!RFC3492]) and not the U-label.
 * `ip-address`: The IP address of the sending MTA that attempted the STARTTLS
     connection. It is provided as a string representation of an IPv4 (see below) 
-    or IPv6 ([@!RFC5952]) (address in dot-decimal or colon-hexadecimal notation).
+    or IPv6 ([@!RFC5952]) address in dot-decimal or colon-hexadecimal notation.
 * `receiving-mx-hostname`: The hostname of the receiving MTA MX record with
     which the sending MTA attempted to negotiate a STARTTLS connection.
 * `receiving-mx-helo`: (optional) The HELO or EHLO string from the banner
