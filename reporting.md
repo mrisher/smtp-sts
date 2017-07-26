@@ -9,7 +9,7 @@
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2017-07-15T00:00:00Z
+   date = 2017-07-31T00:00:00Z
    
    [[author]]
    initials="D."
@@ -148,7 +148,7 @@ The formal definition of the `_smtp-tlsrpt` TXT record, defined using
         field-delim       = %x3B                                    ; ";"
 
         tlsrpt-version    = %x76 *WSP "=" *WSP %x54 %x4C %x53 %x52
-                            %x50 %x54 %x76 %x31                ; "v=TSRPTv1"
+                            %x50 %x54 %x76 %x31                ; "v=TLSRPTv1"
 
         tlsrpt-rua        = %x72 %x75 %x61 *WSP "=" *WSP tlsrpt-uri ; "rua=..."
 

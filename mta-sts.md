@@ -3,13 +3,13 @@
    Title = "SMTP MTA Strict Transport Security (MTA-STS)"
    abbrev = "MTA-STS"
    category = "std"
-   docName = "draft-ietf-uta-mta-sts-06"
+   docName = "draft-ietf-uta-mta-sts-07"
    ipr = "trust200902"
    area = "Applications"
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2017-05-31T00:00:00Z
+   date = 2017-07-15T00:00:00Z
 
    [[author]]
    initials="D."
@@ -180,12 +180,12 @@ MTA-STS and skip the remaining steps of policy discovery.
 
 ## MTA-STS Policies
 
-The policy itself is a JSON [@!RFC7159] object served via the HTTPS GET method
-from the fixed [@!RFC5785] "well-known" path of `.well-known/mta-sts.json`
+The policy itself is a key-value file served via the HTTPS GET method
+from the fixed [@!RFC5785] "well-known" path of `.well-known/mta-sts.policy`
 served by the `mta-sts` host at the Policy Domain. Thus for `example.com` the
-path is `https://mta-sts.example.com/.well-known/mta-sts.json`.
+path is `https://mta-sts.example.com/.well-known/mta-sts.policy`.
 
-This JSON object contains the following key/value pairs:
+This key-value file contains the following key/value pairs:
 
 * `version`: (plain-text, required). Currently only "STSv1" is supported.
 * `mode`: (plain-text, required). Either "enforce" or "report", indicating the
@@ -198,32 +198,39 @@ This JSON object contains the following key/value pairs:
 * `mx`: MX identity patterns (list of plain-text strings, required). One or more
   patterns matching a Common Name ([@!RFC6125]) or Subject Alternative Name
   ([@!RFC5280]) DNS-ID present in the X.509 certificate presented by any MX
-  receiving mail for this domain.  For example, `["mail.example.com",
-  ".example.net"]` indicates that mail for this domain might be handled by any
+  receiving mail for this domain.  For example:
+  ```
+   mx: mail.example.com
+   mx: .example.net
+  ```
+  indicates that mail for this domain might be handled by any
   MX with a certificate valid for a host at `mail.example.com` or `example.net`.
   Valid patterns can be either fully specified names (`example.com`) or suffixes
   (`.example.net`) matching the right-hand parts of a server's identity; the
-  latter case are distinguished by a leading period.  In the case of
-  Internationalized Domain Names ([@!RFC5891]), the MX MUST specify the
-  Punycode-encoded A-label [@!RFC3492] and not the Unicode-encoded U-label. The
-  full semantics of certificate validation are described in
-  (#mx-certificate-validation), "MX Certificate Validation."
+  latter case are distinguished by a leading period.  If there are more than
+  one MX specified by the policy, they MUST be on separate lines within the
+  policy file.  In the case of Internationalized Domain Names ([@!RFC5891]), 
+  the MX MUST specify the Punycode-encoded A-label [@!RFC3492] and not the 
+  Unicode-encoded U-label. The full semantics of certificate validation are 
+  described in (#mx-certificate-validation), "MX Certificate Validation."
 
-An example JSON policy is as below:
+An example policy is as below:
 
 ```
-{
-  "version": "STSv1",
-  "mode": "enforce",
-  "mx": [".mail.example.com"],
-  "max_age": 123456
-}
+version: STSv1
+mode: enforce
+mx: mail.example.com
+mx: .example.net
+mx: backupmx.example.com
+max_age: 123456
 ```
 
 Parsers MUST accept TXT records and policy files which are syntactically valid
-(i.e. valid key-value pairs separated by semi-colons for TXT records and valid
-JSON for policy files) and implementing a superset of this specification, in
-which case unknown fields SHALL be ignored.
+(i.e. valid key-value pairs separated by semi-colons for TXT records) and 
+implementing a superset of this specification, in which case unknown fields
+SHALL be ignored. If any field other than `mx` is duplicated, the first entry
+will be honored, the rest should be ignored.  For the `mx` field, all valid
+entries will be utilized when enforcing the stated policy.
 
 ## HTTPS Policy Fetching
 
@@ -332,9 +339,10 @@ MTA-STS policy, a sending MTA honoring MTA-STS applies the result of a policy
 validation failure one of two ways, depending on the value of the policy `mode`
 field:
 
-1. `report`: In this mode, sending MTAs merely send a report (as described in
-   the TLSRPT specification (TODO: add ref)) indicating policy application
-   failures.
+1. `report`: In this mode, sending MTAs which also implement the TLSRPT
+   specification (TODO: add ref) merely send a report indicating policy
+   application failures (so long as TLSRPT is also implemented by the recipient
+   domain).
 
 2. `enforce`: In this mode, sending MTAs MUST NOT deliver the message to hosts
    which fail MX matching or certificate validation.
@@ -395,7 +403,7 @@ record, mistakenly cache the old policy from HTTPS.
 A new .well-known URI will be registered in the Well-Known URIs registry as
 described below:
 
-URI Suffix: mta-sts.json
+URI Suffix: mta-sts.policy
 Change Controller: IETF
 
 ## MTA-STS TXT Record Fields
@@ -561,16 +569,15 @@ MTA-STS policy indicator TXT RR:
 _mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
 ~~~~~~~~~
 
-MTA-STS Policy JSON served as the response body at
-https://mta-sts.example.com/.well-known/mta-sts.json:
+MTA-STS Policy file served as the response body at
+https://mta-sts.example.com/.well-known/mta-sts.policy:
 ~~~~~~~~~
-{
-  "version": "STSv1",
-  "mode": "report",
-  "mx": ["mx1.example.com", "mx2.example.com"],
-  "max_age": 12345678
-}
-
+version: STSv1
+mode: report
+mx: mx1.example.com
+mx: mx2.example.com
+mx: mx.backup-example.com
+max_age: 12345678
 ~~~~~~~~~
 
 # Appendix 2: Message delivery pseudocode
