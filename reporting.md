@@ -197,8 +197,8 @@ _smtp-tlsrpt.example.com. IN TXT \
 
 # Reporting Schema
 
-The report is composed as a plain text file encoded in the JSON format
-([@!RFC7159]).
+The report is composed as a plain text file encoded in the I-JSON format
+([@!RFC7493]).
 
 Aggregate reports contain the following fields:
 
@@ -350,7 +350,7 @@ Figure: JSON Report Format
     full UTC day, 0000-2400.
 * `email-address`: The contact information for a responsible party of the
     report. It is provided as a string formatted according to Section 3.4.1,
-    "Addr-Spec", of [@!RFC5322].
+    "Addr-Spec", of [@!RFC5321].
 * `report-id`: A unique identifier for the report. Report authors may use
     whatever scheme they prefer to generate a unique identifier. It is provided
     as a string.
@@ -398,7 +398,7 @@ The filename is typically constructed using the following ABNF:
 
      unique-id = 1*(ALPHA / DIGIT)
 
-     sender = domain        ; imported from [@!RFC5322]
+     sender = domain        ; imported from [@!RFC5321]
 
      policy-domain   = domain
 
@@ -460,14 +460,15 @@ and filename, and ignore the rest.
    The [@!RFC5322].Subject field for individual report submissions SHOULD
    conform to the following ABNF:
 
-    tlsrpt-subject = %x52.65.70.6f.72.74 1*FWS       ; "Report"
-                     %x44.6f.6d.61.69.6e.3a 1*FWS    ; "Domain:"
-                     domain-name 1*FWS               ; from RFC 6376
-                     %x53.75.62.6d.69.74.74.65.72.3a ; "Submitter:"
-                     1*FWS domain-name 1*FWS
-                     %x52.65.70.6f.72.74.2d.49.44.3a ; "Report-ID:"
-                     msg-id                          ; from RFC 5322
-
+    tlsrpt-subject = %s"Report" FWS               ; "Report"
+                     %s"Domain:" FWS              ; "Domain:"
+		     domain-name FWS              ; per RFC6376
+		     %s"Submitter:" FWS           ; "Submitter:"
+		     domain-name FWS              ; per RFC6376
+		     %s"Report-ID:" FWS           ; "Report-ID:
+		     "<" id-left "@" id-right ">" ; per RFC5322
+		     [CFWS]                       ; per RFC5322 (as with FWS)
+    
    The first domain-name indicates the DNS domain name about which the
    report was generated.  The second domain-name indicates the DNS
    domain name representing the Sending MTA generating the report.
@@ -587,7 +588,7 @@ This document registers multiple media types, beginning with Table 1 below.
 
    Encoding considerations: Encoding considerations are identical to
       those specified for the `application/json` media type. See
-      [@!RFC7159].
+      [@!RFC7493].
 
    Security considerations: Security considerations relating to SMTP
       TLS Reporting are discussed in Section 7.
@@ -640,7 +641,7 @@ This document registers multiple media types, beginning with Table 1 below.
 
    Encoding considerations: Encoding considerations are identical to
       those specified for the `application/json` media type. See
-      [@!RFC7159].
+      [@!RFC7493].
 
    Security considerations: Security considerations relating to SMTP
       TLS Reporting are discussed in Section 7.
