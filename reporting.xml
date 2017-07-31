@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE rfc SYSTEM 'rfc2629.dtd' []>
-<rfc ipr="trust200902" category="std" docName="draft-ietf-uta-smtp-tlsrpt-06">
+<rfc ipr="trust200902" category="std" docName="draft-ietf-uta-smtp-tlsrpt-07">
 <?rfc toc="yes"?>
 <?rfc symrefs="yes"?>
 <?rfc sortrefs="yes"?>
@@ -87,7 +87,7 @@
 <uri></uri>
 </address>
 </author>
-<date year="2017" month="May" day="31"/>
+<date year="2017" month="July" day="31"/>
 
 <area>Applications</area>
 <workgroup>Using TLS in Applications</workgroup>
@@ -210,7 +210,7 @@ This may mean that the reports are delivered in the clear.</t>
     field-delim       = %x3B                                    ; ";"
 
     tlsrpt-version    = %x76 *WSP "=" *WSP %x54 %x4C %x53 %x52
-                        %x50 %x54 %x76 %x31                ; "v=TSRPTv1"
+                        %x50 %x54 %x76 %x31                ; "v=TLSRPTv1"
 
     tlsrpt-rua        = %x72 %x75 %x61 *WSP "=" *WSP tlsrpt-uri ; "rua=..."
 
@@ -262,8 +262,8 @@ _smtp-tlsrpt.example.com. IN TXT \
 </section>
 
 <section anchor="reporting-schema" title="Reporting Schema">
-<t>The report is composed as a plain text file encoded in the JSON format
-(<xref target="RFC7159"/>).
+<t>The report is composed as a plain text file encoded in the I-JSON format
+(<xref target="RFC7493"/>).
 </t>
 <t>Aggregate reports contain the following fields:
 </t>
@@ -428,8 +428,8 @@ text, such as &quot;X509_V_ERR_UNHANDLED_CRITICAL_CRL_EXTENSION&quot;.
     "mx-host": mx-host-pattern
   },
   "summary": {
-    "success-aggregate": total-successful-session-count,
-    "failure-aggregate:" total-failure-session-count
+    "total-successful-session-count": total-successful-session-count,
+    "total-failure-session-count:" total-failure-session-count
   }
   "failure-details": [
     {
@@ -437,9 +437,9 @@ text, such as &quot;X509_V_ERR_UNHANDLED_CRITICAL_CRL_EXTENSION&quot;.
       "sending-mta-ip": ip-address,
       "receiving-mx-hostname": receiving-mx-hostname,
       "receiving-mx-helo": receiving-mx-helo,
-      "session-count": failed-session-count,
+      "failed-session-count": failed-session-count,
       "additional-information": additional-info-uri,
-      "failure-reason-code": "Text body"
+      "failure-reason-code": "failure-reason-code"
     }
   ]
 }
@@ -454,7 +454,7 @@ range. It is provided as a string formatted according to Section 5.6,
 full UTC day, 0000-2400.</t>
 <t><spanx style="verb">email-address</spanx>: The contact information for a responsible party of the
 report. It is provided as a string formatted according to Section 3.4.1,
-&quot;Addr-Spec&quot;, of <xref target="RFC5322"/>.</t>
+&quot;Addr-Spec&quot;, of <xref target="RFC5321"/>.</t>
 <t><spanx style="verb">report-id</spanx>: A unique identifier for the report. Report authors may use
 whatever scheme they prefer to generate a unique identifier. It is provided
 as a string.</t>
@@ -464,30 +464,44 @@ string <spanx style="verb">no-policy-found</spanx>. It is provided as a string.<
 <t><spanx style="verb">policy-string</spanx>: The JSON string serialization (<xref target="RFC7159"/> section 7) of the
 policy, whether TLSA record (<xref target="RFC6698"/> section 2.3) or MTA-STS policy.</t>
 <t><spanx style="verb">domain</spanx>: The Policy Domain is the domain against which the MTA-STS or DANE
-policy is defined.</t>
+policy is defined. In the case of Internationalized Domain Names
+(<xref target="RFC5891"/>), the domain is the Punycode-encoded A-label
+(<xref target="RFC3492"/>) and not the U-label.</t>
 <t><spanx style="verb">mx-host-pattern</spanx>: The pattern of MX hostnames from the applied policy. It
 is provided as a string, and is interpreted in the same manner as the
 &quot;Checking of Wildcard Certificates&quot; rules in Section 6.4.3 of <xref target="RFC6125"/>.</t>
-<t><spanx style="verb">result-type</spanx>: A value from <xref target="result-types"/>, &quot;Result Types&quot;,  above.</t>
+<t><spanx style="verb">result-type</spanx>: A value from <xref target="result-types"/>, &quot;Result Types&quot;,  above. In the
+case of Internationalized Domain Names (<xref target="RFC5891"/>), the domain is the
+Punycode-encoded A-label (<xref target="RFC3492"/>) and not the U-label.</t>
 <t><spanx style="verb">ip-address</spanx>: The IP address of the sending MTA that attempted the STARTTLS
-connection. It is provided as a string representation of an IPv4 or IPv6
-address in dot-decimal or colon-hexadecimal notation.</t>
+connection. It is provided as a string representation of an IPv4 (see below)
+or IPv6 (<xref target="RFC5952"/>) address in dot-decimal or colon-hexadecimal notation.</t>
 <t><spanx style="verb">receiving-mx-hostname</spanx>: The hostname of the receiving MTA MX record with
 which the sending MTA attempted to negotiate a STARTTLS connection.</t>
 <t><spanx style="verb">receiving-mx-helo</spanx>: (optional) The HELO or EHLO string from the banner
 announced during the reported session.</t>
-<t><spanx style="verb">success-aggregate</spanx>: The aggregate number (integer) of successfully negotiated
-TLS-enabled connections to the receiving site.</t>
-<t><spanx style="verb">failure-aggregate</spanx>: The aggregate number (integer) of failures to negotiate
-an TLS-enabled connection to the receiving site.</t>
-<t><spanx style="verb">session-count</spanx>: The number of (attempted) sessions that match the relevant
+<t><spanx style="verb">total-successful-session-count</spanx>: The aggregate number (integer) of successfully
+negotiated TLS-enabled connections to the receiving site.</t>
+<t><spanx style="verb">total-failure-session-count</spanx>: The aggregate number (integer) of failures to
+negotiate an TLS-enabled connection to the receiving site.</t>
+<t><spanx style="verb">failed-session-count</spanx>: The number of (attempted) sessions that match the relevant
 <spanx style="verb">result-type</spanx> for this section.</t>
-<t><spanx style="verb">additional-info-uri</spanx>: An optional URI pointing to additional information
+<t><spanx style="verb">additional-info-uri</spanx>: An optional URI <xref target="RFC3986"/> pointing to additional information
 around the relevant <spanx style="verb">result-type</spanx>. For example, this URI might host the
 complete certificate chain presented during an attempted STARTTLS session.</t>
 <t><spanx style="verb">failure-reason-code</spanx>: A text field to include an TLS-related error
-code or error message.</t>
+code or error message.
+
+<vspace/></t>
 </list>
+</t>
+<t>For report purposes, an IPv4 Address is defined as:
+     IPv4address   = dec-octet &quot;.&quot; dec-octet &quot;.&quot; dec-octet &quot;.&quot; dec-octet
+     dec-octet     = DIGIT                 ; 0-9
+                    / %x31-39 DIGIT         ; 10-99
+                    / &quot;1&quot; 2DIGIT            ; 100-199
+                    / &quot;2&quot; %x30-34 DIGIT     ; 200-249
+                    / &quot;25&quot; %x30-35          ; 250-255
 </t>
 </section>
 </section>
@@ -507,7 +521,7 @@ POST.
 
  unique-id = 1*(ALPHA / DIGIT)
 
- sender = domain        ; imported from [@!RFC5322]
+ sender = domain        ; imported from [@!RFC5321]
 
  policy-domain   = domain
 
@@ -562,8 +576,9 @@ If compressed, the report should use the media type <spanx style="verb">applicat
 TLS-Report-Domain: Receiver-Domain
 TLS-Report-Submitter: Sender-Domain
 </artwork></figure>
-<t>These message headers would allow for easy searching for all reports submitted
-by a report domain or a particular submitter, for example in IMAP:
+<t>These message headers MUST be included and should allow for easy searching for
+all reports submitted by a report domain or a particular submitter, for example
+in IMAP <xref target="RFC3501"/>:
 </t>
 <t><spanx style="verb">s SEARCH HEADER "TLS-Report-Domain" "example.com"</spanx>
 </t>
@@ -576,13 +591,14 @@ and filename, and ignore the rest.
 </t>
 
 <figure align="center"><artwork align="center">
-tlsrpt-subject = %x52.65.70.6f.72.74 1*FWS       ; "Report"
-                 %x44.6f.6d.61.69.6e.3a 1*FWS    ; "Domain:"
-                 domain-name 1*FWS               ; from RFC 6376
-                 %x53.75.62.6d.69.74.74.65.72.3a ; "Submitter:"
-                 1*FWS domain-name 1*FWS
-                 %x52.65.70.6f.72.74.2d.49.44.3a ; "Report-ID:"
-                 msg-id                          ; from RFC 5322
+tlsrpt-subject = %s"Report" FWS               ; "Report"
+                 %s"Domain:" FWS              ; "Domain:"
+         domain-name FWS              ; per RFC6376
+         %s"Submitter:" FWS           ; "Submitter:"
+         domain-name FWS              ; per RFC6376
+         %s"Report-ID:" FWS           ; "Report-ID:
+         "&lt;" id-left "@" id-right "&gt;" ; per RFC5322
+         [CFWS]                       ; per RFC5322 (as with FWS)
 </artwork></figure>
 <t>The first domain-name indicates the DNS domain name about which the
    report was generated.  The second domain-name indicates the DNS
@@ -672,14 +688,14 @@ Field registration information per <xref target="RFC3864"/>.
 
 <figure align="center"><artwork align="center">
  Header field name:           TLS-Report-Domain
- Applicable protocol:         smtp
+ Applicable protocol:         mail
  Status:                      standard
  Author/Change controller:    IETF
  Specification document(s):   this one
 
 
  Header field name:           TLS-Report-Submitter
- Applicable protocol:         smtp
+ Applicable protocol:         mail
  Status:                      standard
  Author/Change controller:    IETF
  Specification document(s):   this one
@@ -695,8 +711,8 @@ following section.
 </t>
 </section>
 
-<section anchor="applicationtlsrpt-media-types" title="application/tlsrpt+* Media Types">
-<t>This document registers multiple media types, listed in Table 1 below.
+<section anchor="applicationtlsrptjson-media-type" title="application/tlsrpt+json Media Type">
+<t>This document registers multiple media types, beginning with Table 1 below.
 </t>
 
 <figure align="center"><artwork align="center">
@@ -704,14 +720,12 @@ following section.
 | Type        | Subtype        | File extn   | Specification     |
 +-------------+----------------+-------------+-------------------+
 | application | tlsrpt+json    |  .json      | Section 5.3       |
-| application | tlsrpt+gzip    |  .gz        | Section 5.3       |
 +-------------+----------------+-------------+-------------------+
-                Table 1: SMTP TLS Reporting Media Types
+                Table 1: SMTP TLS Reporting Media Type
 </artwork></figure>
 <t>Type name: application
 </t>
-<t>Subtype name: This documents registers multiple subtypes, as listed
-      in Table 1.
+<t>Subtype name: tlsrpt+json
 </t>
 <t>Required parameters: n/a
 </t>
@@ -719,7 +733,7 @@ following section.
 </t>
 <t>Encoding considerations: Encoding considerations are identical to
       those specified for the <spanx style="verb">application/json</spanx> media type. See
-      <xref target="RFC7159"/>.
+      <xref target="RFC7493"/>.
 </t>
 <t>Security considerations: Security considerations relating to SMTP
       TLS Reporting are discussed in Section 7.
@@ -727,9 +741,7 @@ following section.
 <t>Interoperability considerations: This document specifies format of
       conforming messages and the interpretation thereof.
 </t>
-<t>Published specification: This document is the specification for
-      these media types; see Table 1 for the section documenting each
-      media type.
+<t>Published specification: Section 5.3 of this document.
 </t>
 <t>Applications that use this media type: Mail User Agents (MUA) and
       Mail Transfer Agents.
@@ -740,7 +752,64 @@ following section.
 <figure align="center"><artwork align="center">
   Magic number(s):  n/a
 
-  File extension(s):  As listed in Table 1.
+  File extension(s):  ".json"
+
+  Macintosh file type code(s):  n/a
+</artwork></figure>
+<t>Person &amp; email address to contact for further information: See
+      Authors' Addresses section.
+</t>
+<t>Intended usage:  COMMON
+</t>
+<t>Restrictions on usage:  n/a
+</t>
+<t>Author:  See Authors' Addresses section.
+</t>
+<t>Change controller:  Internet Engineering Task Force
+      (mailto:iesg@ietf.org).
+</t>
+</section>
+
+<section anchor="applicationtlsrptgz-media-type" title="application/tlsrpt+gz Media Type">
+
+<figure align="center"><artwork align="center">
++-------------+----------------+-------------+-------------------+
+| Type        | Subtype        | File extn   | Specification     |
++-------------+----------------+-------------+-------------------+
+| application | tlsrpt+gzip    |  .gz        | Section 5.3       |
++-------------+----------------+-------------+-------------------+
+                Table 2: SMTP TLS Reporting Media Type
+</artwork></figure>
+<t>Type name: application
+</t>
+<t>Subtype name: tlsrpt+gzip
+</t>
+<t>Required parameters: n/a
+</t>
+<t>Optional parameters: n/a
+</t>
+<t>Encoding considerations: Encoding considerations are identical to
+      those specified for the <spanx style="verb">application/json</spanx> media type. See
+      <xref target="RFC7493"/>.
+</t>
+<t>Security considerations: Security considerations relating to SMTP
+      TLS Reporting are discussed in Section 7.
+</t>
+<t>Interoperability considerations: This document specifies format of
+      conforming messages and the interpretation thereof.
+</t>
+<t>Published specification: Section 5.3 of this document.
+</t>
+<t>Applications that use this media type: Mail User Agents (MUA) and
+      Mail Transfer Agents.
+</t>
+<t>Additional information:
+</t>
+
+<figure align="center"><artwork align="center">
+  Magic number(s):  n/a
+
+  File extension(s):  ".gz"
 
   Macintosh file type code(s):  n/a
 </artwork></figure>
@@ -778,8 +847,8 @@ initial entries in the registry are:
 +-------------------------------+
 </artwork></figure>
 <t>The above entries are described in section <xref target="result-types"/>, &quot;Result Types.&quot; New
-result types can be added to this registry without the need to update this
-document.
+result types can be added to this registry using &quot;Expert Review&quot; IANA
+registration policy.
 </t>
 </section>
 </section>
@@ -859,26 +928,26 @@ _smtp-tlsrpt.mail.example.com. IN TXT \
     "mx-host": ".mail.company-y.com"
   },
   "summary": {
-    "success-aggregate": 5326,
-    "failure-aggregate": 303
+    "total-successful-session-count": 5326,
+    "total-failure-session-count": 303
   }
   "failure-details": [{
     "result-type": "certificate-expired",
     "sending-mta-ip": "98.136.216.25",
     "receiving-mx-hostname": "mx1.mail.company-y.com",
-    "session-count": 100
+    "failed-session-count": 100
   }, {
     "result-type": "starttls-not-supported",
     "sending-mta-ip": "98.22.33.99",
     "receiving-mx-hostname": "mx2.mail.company-y.com",
-    "session-count": 200,
+    "failed-session-count": 200,
     "additional-information": "hxxps://reports.company-x.com/
       report_info?id=5065427c-23d3#StarttlsNotSupported"
   }, {
     "result-type: "validation-failure",
     "sending-mta-ip": "47.97.15.2",
     "receiving-mx-hostname: "mx-backup.mail.company-y.com",
-    "session-count": 3,
+    "failed-session-count": 3,
     "failure-error-code": "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED"
   }]
 }
@@ -898,9 +967,15 @@ respond to the <spanx style="verb">STARTTLS</spanx> command.  Additionally 3 ses
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2818.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3339.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3492.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3501.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3864.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3986.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5234.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5321.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5322.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5891.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5952.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6068.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6125.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6522.xml"?>
@@ -909,6 +984,7 @@ respond to the <spanx style="verb">STARTTLS</spanx> command.  Additionally 3 ses
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7435.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7469.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7489.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7493.xml"?>
 </references>
 
 </back>
