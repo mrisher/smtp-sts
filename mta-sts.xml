@@ -247,7 +247,7 @@ from the fixed <xref target="RFC5785"/> &quot;well-known&quot; path of <spanx st
 served by the <spanx style="verb">mta-sts</spanx> host at the Policy Domain. Thus for <spanx style="verb">example.com</spanx> the
 path is <spanx style="verb">https://mta-sts.example.com/.well-known/mta-sts.policy</spanx>.
 </t>
-<t>This resource contains the following key/value pairs:
+<t>This resource contains the following line-separated key/value pairs:
 </t>
 <t>
 <list style="symbols">
@@ -298,7 +298,7 @@ sts-policy-record        = sts-policy-version line-delim
                            sts-policy-mx line-delim [sts-policy-mx line-delim]
                            sts-policy-max-age
 
-line-delim               = %x0D / %x0d %x0A                   ; "CR" or "CRLF"
+line-delim               = %x0d %x0A                          ; "CRLF"
 
 field-delim              = %x3A WSP*                          ; ":"
 
