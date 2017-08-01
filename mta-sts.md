@@ -223,7 +223,7 @@ mx: backupmx.example.com
 max_age: 123456
 ```
 
-The formal definition of the policy resource, defined using [@!RFC5234], is as
+The formal definition of the policy resource, defined using [@!RFC7405], is as
 follows:
 
     sts-policy-record        = sts-policy-version line-delim
@@ -233,34 +233,33 @@ follows:
 
     line-delim               = %x0d %x0A                          ; "CRLF"
 
-    field-delim              = %x3A WSP*                          ; ":"
+    field-delim              = ":" WSP*
 
     sts-policy-version       = sts-policy-version-field field-delim
                                sts-policy-version-value
 
-    sts-policy-version-field = %x76 %x65 %x72 %x73 %x69 %x6f %x6e ; "version"
+    sts-policy-version-field = %s"version"
 
-    sts-policy-version-value = %x53 %x54 %x53 %x76 %x31           ; "STSv1"
+    sts-policy-version-value = %s"STSv1"
 
     sts-policy-mode          = sts-policy-mode-field field-delim
                                sts-policy-mode-value
 
-    sts-policy-mode-field    = %x6d %x6f %x64 %x65                ; "mode"
+    sts-policy-mode-field    = %s"mode"
 
-    sts-policy-model-value   = (%x72 %x65 %x70 %x6f %x72 %x74) /  ; "report"
-                             (%x65 %x6e %x66 %x6f %x72 %x63 %x65) ; "enforce"
+    sts-policy-model-value   =  %s"report" / %s"enforce"
 
     sts-policy-mx            = sts-policy-mx-field field-delim
                                sts-policy-mx-value
 
-    sts-policy-mx-field      = %x6d %x78                          ; "mx"
+    sts-policy-mx-field      = %s"mx"
 
     sts-policy-mx-value      = 1*(ALPHA / DIGIT / "_" / "-" / "~" / ".")
 
     sts-policy-max-age       = sts-policy-max-age-field field-delim
                                sts-policy-max-age-value
 
-    sts-policy-max-age-field = %x6d %x61 %x78 %x5f %x61 %x67 %x65 ; "max_age"
+    sts-policy-max-age-field = %s"max_age"
 
     sts-policy-max-age-value = 1*10DIGIT
 

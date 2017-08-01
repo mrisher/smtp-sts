@@ -95,7 +95,7 @@ Table of Contents
    11. Appendix 2: Message delivery pseudocode . . . . . . . . . . .  16
    12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  18
      12.1.  Normative References . . . . . . . . . . . . . . . . . .  18
-     12.2.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  20
+     12.2.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  19
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  20
 
 1.  Introduction
@@ -313,7 +313,7 @@ Internet-Draft                   MTA-STS                       July 2017
                          max_age: 123456
 
    The formal definition of the policy resource, defined using
-   [RFC5234], is as follows:
+   [RFC7405], is as follows:
 
 
 
@@ -345,34 +345,33 @@ sts-policy-record        = sts-policy-version line-delim
 
 line-delim               = %x0d %x0A                          ; "CRLF"
 
-field-delim              = %x3A WSP*                          ; ":"
+field-delim              = ":" WSP*
 
 sts-policy-version       = sts-policy-version-field field-delim
                            sts-policy-version-value
 
-sts-policy-version-field = %x76 %x65 %x72 %x73 %x69 %x6f %x6e ; "version"
+sts-policy-version-field = %s"version"
 
-sts-policy-version-value = %x53 %x54 %x53 %x76 %x31           ; "STSv1"
+sts-policy-version-value = %s"STSv1"
 
 sts-policy-mode          = sts-policy-mode-field field-delim
                            sts-policy-mode-value
 
-sts-policy-mode-field    = %x6d %x6f %x64 %x65                ; "mode"
+sts-policy-mode-field    = %s"mode"
 
-sts-policy-model-value   = (%x72 %x65 %x70 %x6f %x72 %x74) /  ; "report"
-                         (%x65 %x6e %x66 %x6f %x72 %x63 %x65) ; "enforce"
+sts-policy-model-value   =  %s"report" / %s"enforce"
 
 sts-policy-mx            = sts-policy-mx-field field-delim
                            sts-policy-mx-value
 
-sts-policy-mx-field      = %x6d %x78                          ; "mx"
+sts-policy-mx-field      = %s"mx"
 
 sts-policy-mx-value      = 1*(ALPHA / DIGIT / "_" / "-" / "~" / ".")
 
 sts-policy-max-age       = sts-policy-max-age-field field-delim
                            sts-policy-max-age-value
 
-sts-policy-max-age-field = %x6d %x61 %x78 %x5f %x61 %x67 %x65 ; "max_age"
+sts-policy-max-age-field = %s"max_age"
 
 sts-policy-max-age-value = 1*10DIGIT
 
@@ -383,6 +382,7 @@ sts-policy-max-age-value = 1*10DIGIT
    field other than "mx" is duplicated, the first entry will be honored,
    the rest should be ignored.  For the "mx" field, all valid entries
    will be utilized when enforcing the stated policy.
+
 
 
 
@@ -1015,11 +1015,6 @@ Internet-Draft                   MTA-STS                       July 2017
               4033, DOI 10.17487/RFC4033, March 2005,
               <http://www.rfc-editor.org/info/rfc4033>.
 
-   [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
-              Specifications: ABNF", STD 68, RFC 5234, DOI 10.17487/
-              RFC5234, January 2008,
-              <http://www.rfc-editor.org/info/rfc5234>.
-
    [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
               Housley, R., and W. Polk, "Internet X.509 Public Key
               Infrastructure Certificate and Certificate Revocation List
@@ -1057,6 +1052,11 @@ Internet-Draft                   MTA-STS                       July 2017
               .17487/RFC7672, October 2015,
               <http://www.rfc-editor.org/info/rfc7672>.
 
+12.2.  URIs
+
+   [1] https://mta-sts.example.com/.well-known/mta-sts.policy:
+
+
 
 
 
@@ -1065,10 +1065,6 @@ Margolis, et al.        Expires January 16, 2018               [Page 19]
 
 Internet-Draft                   MTA-STS                       July 2017
 
-
-12.2.  URIs
-
-   [1] https://mta-sts.example.com/.well-known/mta-sts.policy:
 
 Authors' Addresses
 
@@ -1100,6 +1096,10 @@ Authors' Addresses
    Microsoft, Inc
 
    Email: janet.jones (at) microsoft (dot com)
+
+
+
+
 
 
 
