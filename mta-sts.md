@@ -183,7 +183,7 @@ from the fixed [@!RFC5785] "well-known" path of `.well-known/mta-sts.policy`
 served by the `mta-sts` host at the Policy Domain. Thus for `example.com` the
 path is `https://mta-sts.example.com/.well-known/mta-sts.policy`.
 
-This resource contains the following key/value pairs:
+This resource contains the following line-separated key/value pairs:
 
 * `version`: (plain-text, required). Currently only "STSv1" is supported.
 * `mode`: (plain-text, required). Either "enforce" or "report", indicating the
@@ -231,7 +231,7 @@ follows:
                                sts-policy-mx line-delim [sts-policy-mx line-delim]
                                sts-policy-max-age
 
-    line-delim               = %x0D / %x0d %x0A                   ; "CR" or "CRLF"
+    line-delim               = %x0d %x0A                          ; "CRLF"
 
     field-delim              = %x3A WSP*                          ; ":"
 

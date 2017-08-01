@@ -260,7 +260,7 @@ sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)       ; chars excluding
    Domain.  Thus for "example.com" the path is "https://mta-
    sts.example.com/.well-known/mta-sts.policy".
 
-   This resource contains the following key/value pairs:
+   This resource contains the following line-separated key/value pairs:
 
    o  "version": (plain-text, required).  Currently only "STSv1" is
       supported.
@@ -343,7 +343,7 @@ sts-policy-record        = sts-policy-version line-delim
                            sts-policy-mx line-delim [sts-policy-mx line-delim]
                            sts-policy-max-age
 
-line-delim               = %x0D / %x0d %x0A                   ; "CR" or "CRLF"
+line-delim               = %x0d %x0A                          ; "CRLF"
 
 field-delim              = %x3A WSP*                          ; ":"
 
