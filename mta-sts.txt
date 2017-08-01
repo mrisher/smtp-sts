@@ -213,7 +213,7 @@ Internet-Draft                   MTA-STS                       July 2017
    "_mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;""
 
    The formal definition of the "_mta-sts" TXT record, defined using
-   [RFC5234], is as follows:
+   [RFC7405], is as follows:
 
 
 
@@ -226,21 +226,19 @@ Margolis, et al.        Expires January 16, 2018                [Page 4]
 Internet-Draft                   MTA-STS                       July 2017
 
 
-sts-text-record = sts-version *WSP field-delim *WSP sts-id
+sts-text-record = sts-version field-delim sts-id
                   [field-delim [sts-extensions]]
 
-field-delim     = %x3B                               ; ";"
+field-delim     = *WSP ";" *WSP
 
-sts-version     = %x76 *WSP "=" *WSP %x53 %x54       ; "v=STSv1"
-                  %x53 %x76 %x31
+sts-version     = %s"v=STSv1"
 
-sts-id          = %x69 %x64 *WSP "="
-                  *WSP 1*32(ALPHA / DIGIT)           ; "id="
+sts-id          = %s"id=" 1*32(ALPHA / DIGIT)        ; id=...
 
 sts-extensions  = sts-extension *(field-delim sts-extension)
                   [field-delim]                      ; extension fields
 
-sts-extension   = sts-ext-name *WSP "=" *WSP sts-ext-value
+sts-extension   = sts-ext-name "=" sts-ext-value     ; name=value
 
 sts-ext-name    = (ALPHA / DIGIT) *31(ALPHA / DIGIT / "_" / "-" / ".")
 
@@ -274,6 +272,8 @@ sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)       ; chars excluding
    o  "max_age": Max lifetime of the policy (plain-text non-negative
       integer seconds, required).  Well-behaved clients SHOULD cache a
       policy for up to this value from last policy fetch time.  To
+      mitigate the risks of attacks at policy refresh time, it is
+
 
 
 
@@ -282,7 +282,6 @@ Margolis, et al.        Expires January 16, 2018                [Page 5]
 Internet-Draft                   MTA-STS                       July 2017
 
 
-      mitigate the risks of attacks at policy refresh time, it is
       expected that this value typically be in the range of weeks or
       greater.
 
@@ -329,6 +328,7 @@ Internet-Draft                   MTA-STS                       July 2017
    sending MTA, and be non-expired.  It is expected that sending MTAs
    use a set of trusted CAs similar to those in widely deployed Web
    browsers and operating systems.
+
 
 
 
@@ -931,11 +931,6 @@ Internet-Draft                   MTA-STS                       July 2017
               4033, DOI 10.17487/RFC4033, March 2005,
               <http://www.rfc-editor.org/info/rfc4033>.
 
-   [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
-              Specifications: ABNF", STD 68, RFC 5234, DOI 10.17487/
-              RFC5234, January 2008,
-              <http://www.rfc-editor.org/info/rfc5234>.
-
    [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
               Housley, R., and W. Polk, "Internet X.509 Public Key
               Infrastructure Certificate and Certificate Revocation List
@@ -946,6 +941,11 @@ Internet-Draft                   MTA-STS                       July 2017
               DOI 10.17487/RFC5321, October 2008,
               <http://www.rfc-editor.org/info/rfc5321>.
 
+   [RFC5785]  Nottingham, M. and E. Hammer-Lahav, "Defining Well-Known
+              Uniform Resource Identifiers (URIs)", RFC 5785, DOI 10
+              .17487/RFC5785, April 2010,
+              <http://www.rfc-editor.org/info/rfc5785>.
+
 
 
 
@@ -953,11 +953,6 @@ Margolis, et al.        Expires January 16, 2018               [Page 17]
 
 Internet-Draft                   MTA-STS                       July 2017
 
-
-   [RFC5785]  Nottingham, M. and E. Hammer-Lahav, "Defining Well-Known
-              Uniform Resource Identifiers (URIs)", RFC 5785, DOI 10
-              .17487/RFC5785, April 2010,
-              <http://www.rfc-editor.org/info/rfc5785>.
 
    [RFC5891]  Klensin, J., "Internationalized Domain Names in
               Applications (IDNA): Protocol", RFC 5891, DOI 10.17487/
@@ -970,6 +965,10 @@ Internet-Draft                   MTA-STS                       July 2017
               (PKIX) Certificates in the Context of Transport Layer
               Security (TLS)", RFC 6125, DOI 10.17487/RFC6125, March
               2011, <http://www.rfc-editor.org/info/rfc6125>.
+
+   [RFC7405]  Kyzivat, P., "Case-Sensitive String Support in ABNF", RFC
+              7405, DOI 10.17487/RFC7405, December 2014,
+              <http://www.rfc-editor.org/info/rfc7405>.
 
    [RFC7672]  Dukhovni, V. and W. Hardaker, "SMTP Security via
               Opportunistic DNS-Based Authentication of Named Entities
@@ -999,6 +998,7 @@ Authors' Addresses
    Yahoo!, Inc
 
    Email: rbinu (at) yahoo-inc (dot com)
+
 
 
 

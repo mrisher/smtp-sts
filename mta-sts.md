@@ -148,24 +148,22 @@ An example TXT record is as below:
 
 `_mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"`
 
-The formal definition of the `_mta-sts` TXT record, defined using [@!RFC5234],
+The formal definition of the `_mta-sts` TXT record, defined using [@!RFC7405],
 is as follows:
 
-    sts-text-record = sts-version *WSP field-delim *WSP sts-id
+    sts-text-record = sts-version field-delim sts-id
                       [field-delim [sts-extensions]]
 
-    field-delim     = %x3B                               ; ";"
+    field-delim     = *WSP ";" *WSP
 
-    sts-version     = %x76 *WSP "=" *WSP %x53 %x54       ; "v=STSv1" 
-                      %x53 %x76 %x31
+    sts-version     = %s"v=STSv1"
 
-    sts-id          = %x69 %x64 *WSP "="
-                      *WSP 1*32(ALPHA / DIGIT)           ; "id="
+    sts-id          = %s"id=" 1*32(ALPHA / DIGIT)        ; id=...
 
     sts-extensions  = sts-extension *(field-delim sts-extension)
                       [field-delim]                      ; extension fields
 
-    sts-extension   = sts-ext-name *WSP "=" *WSP sts-ext-value
+    sts-extension   = sts-ext-name "=" sts-ext-value     ; name=value
 
     sts-ext-name    = (ALPHA / DIGIT) *31(ALPHA / DIGIT / "_" / "-" / ".")
 
