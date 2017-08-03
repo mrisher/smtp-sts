@@ -367,9 +367,9 @@ Figure: JSON Report Format
 * `mx-host-pattern`: The pattern of MX hostnames from the applied policy. It
     is provided as a string, and is interpreted in the same manner as the
     "Checking of Wildcard Certificates" rules in Section 6.4.3 of [@!RFC6125].
-* `result-type`: A value from (#result-types), "Result Types",  above. In the 
-   case of Internationalized Domain Names ([@!RFC5891]), the domain is the 
-   Punycode-encoded A-label ([@!RFC3492]) and not the U-label.
+     In the case of Internationalized Domain Names ([@!RFC5891]), the domain is 
+     the Punycode-encoded A-label ([@!RFC3492]) and not the U-label.
+* `result-type`: A value from (#result-types), "Result Types",  above.
 * `ip-address`: The IP address of the sending MTA that attempted the STARTTLS
     connection. It is provided as a string representation of an IPv4 (see below) 
     or IPv6 ([@!RFC5952]) address in dot-decimal or colon-hexadecimal notation.
