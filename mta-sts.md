@@ -226,14 +226,12 @@ max_age: 123456
 The formal definition of the policy resource, defined using [@!RFC7405], is as
 follows:
 
-    sts-policy-record        = sts-policy-version line-delim
-                               sts-policy-mode line-delim
-                               sts-policy-mx line-delim [sts-policy-mx line-delim]
+    sts-policy-record        = sts-policy-version CRLF
+                               sts-policy-mode CRLF
+                               sts-policy-mx CRLF [sts-policy-mx CRLF]
                                sts-policy-max-age
 
-    line-delim               = %x0d %x0A                          ; "CRLF"
-
-    field-delim              = ":" WSP*
+    field-delim              = ":" *WSP
 
     sts-policy-version       = sts-policy-version-field field-delim
                                sts-policy-version-value
@@ -254,7 +252,7 @@ follows:
 
     sts-policy-mx-field      = %s"mx"
 
-    sts-policy-mx-value      = 1*(ALPHA / DIGIT / "_" / "-" / "~" / ".")
+    sts-policy-mx-value      = 1*(ALPHA / DIGIT / "_" / "-" / ".")
 
     sts-policy-max-age       = sts-policy-max-age-field field-delim
                                sts-policy-max-age-value
