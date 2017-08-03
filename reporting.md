@@ -654,9 +654,7 @@ This document registers multiple media types, beginning with Table 1 below.
 
    Optional parameters: n/a
 
-   Encoding considerations: Encoding considerations are identical to
-      those specified for the `application/json` media type. See
-      [@!RFC7493].
+   Encoding considerations: Binary
 
    Security considerations: Security considerations relating to SMTP
       TLS Reporting are discussed in Section 7.
