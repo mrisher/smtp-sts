@@ -231,7 +231,9 @@ multiple errors.
 ## Report Time-frame
 
 The report SHOULD cover a full day, from 0000-2400 UTC.  This should allow for
-easier correlation of failure events.
+easier correlation of failure events.  To avoid a Denial of Service against the
+system processing the reports, the reports should be delivered after some
+delay, perhaps several hours.
 
 ## Delivery Summary
 
