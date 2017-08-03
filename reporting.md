@@ -130,8 +130,9 @@ Policies consist of the following directives:
 
 * `v`: This value MUST be equal to `TLSRPTv1`.
 * `rua`: A URI specifying the endpoint to which aggregate information about
-  policy failures should be sent (see (#reporting-schema), "Reporting Schema",
-  for more information). Two URI schemes are supported: `mailto` and `https`.
+  policy validation results should be sent (see (#reporting-schema), "Reporting 
+  Schema",  for more information). Two URI schemes are supported: `mailto` 
+  and `https`.
 * In the case of `https`, reports should be submitted via POST ([@!RFC2818]) 
   to the specified URI.
 * In the case of `mailto`, reports should be submitted to the specified
@@ -783,7 +784,7 @@ _smtp-tlsrpt.mail.example.com. IN TXT \
   "summary": {
     "total-successful-session-count": 5326,
     "total-failure-session-count": 303
-  }
+  },
   "failure-details": [{
     "result-type": "certificate-expired",
     "sending-mta-ip": "98.136.216.25",
@@ -797,9 +798,9 @@ _smtp-tlsrpt.mail.example.com. IN TXT \
     "additional-information": "hxxps://reports.company-x.com/
       report_info?id=5065427c-23d3#StarttlsNotSupported"
   }, {
-    "result-type: "validation-failure",
+    "result-type": "validation-failure",
     "sending-mta-ip": "47.97.15.2",
-    "receiving-mx-hostname: "mx-backup.mail.company-y.com",
+    "receiving-mx-hostname": "mx-backup.mail.company-y.com",
     "failed-session-count": 3,
     "failure-error-code": "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED"
   }]
