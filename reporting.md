@@ -636,7 +636,7 @@ This document registers multiple media types, beginning with Table 1 below.
    Change controller:  Internet Engineering Task Force
       (mailto:iesg@ietf.org).
 
-## application/tlsrpt+gz Media Type
+## application/tlsrpt+gzip Media Type
  
 
     +-------------+----------------+-------------+-------------------+
