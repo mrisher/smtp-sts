@@ -253,10 +253,10 @@ sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)       ; chars excluding
 
    The policy itself is a set of key/value pairs served via the HTTPS
    GET method from the fixed [RFC5785] "well-known" path of ".well-
-   known/mta-sts.policy" served by the "mta-sts" host at the Policy
-   Domain; the [RFC2616] "Content-Type" header MUST be "text/plain".
-   Thus for "example.com" the path is "https://mta-sts.example.com
-   /.well-known/mta-sts.policy".
+   known/mta-sts.txt" served by the "mta-sts" host at the Policy Domain;
+   the [RFC2616] "Content-Type" header MUST be "text/plain".  Thus for
+   "example.com" the path is "https://mta-sts.example.com/.well-known/
+   mta-sts.txt".
 
    This resource contains the following line-separated key/value pairs:
 
@@ -338,40 +338,40 @@ Margolis, et al.        Expires January 16, 2018                [Page 6]
 Internet-Draft                   MTA-STS                       July 2017
 
 
-    sts-policy-record        = sts-policy-version CRLF
-                               sts-policy-mode CRLF
-                               sts-policy-mx CRLF [sts-policy-mx CRLF]
-                               sts-policy-max-age
+      sts-policy-record        = sts-policy-version CRLF
+                                 sts-policy-mode CRLF
+                                 1*(sts-policy-mx CRLF)
+                                 sts-policy-max-age
 
-    field-delim              = ":" *WSP
+      field-delim              = ":" *WSP
 
-    sts-policy-version       = sts-policy-version-field field-delim
-                               sts-policy-version-value
+      sts-policy-version       = sts-policy-version-field field-delim
+                                 sts-policy-version-value
 
-    sts-policy-version-field = %s"version"
+      sts-policy-version-field = %s"version"
 
-    sts-policy-version-value = %s"STSv1"
+      sts-policy-version-value = %s"STSv1"
 
-    sts-policy-mode          = sts-policy-mode-field field-delim
-                               sts-policy-mode-value
+      sts-policy-mode          = sts-policy-mode-field field-delim
+                                 sts-policy-mode-value
 
-    sts-policy-mode-field    = %s"mode"
+      sts-policy-mode-field    = %s"mode"
 
-    sts-policy-model-value   =  %s"report" / %s"enforce"
+      sts-policy-model-value   =  %s"report" / %s"enforce"
 
-    sts-policy-mx            = sts-policy-mx-field field-delim
-                               sts-policy-mx-value
+      sts-policy-mx            = sts-policy-mx-field field-delim
+                                 sts-policy-mx-value
 
-    sts-policy-mx-field      = %s"mx"
+      sts-policy-mx-field      = %s"mx"
 
-    sts-policy-mx-value      = 1*(ALPHA / DIGIT / "_" / "-" / ".")
+      sts-policy-mx-value      = 1*(ALPHA / DIGIT / "_" / "-" / ".")
 
-    sts-policy-max-age       = sts-policy-max-age-field field-delim
-                               sts-policy-max-age-value
+      sts-policy-max-age       = sts-policy-max-age-field field-delim
+                                 sts-policy-max-age-value
 
-    sts-policy-max-age-field = %s"max_age"
+      sts-policy-max-age-field = %s"max_age"
 
-    sts-policy-max-age-value = 1*10(DIGIT)
+      sts-policy-max-age-value = 1*10(DIGIT)
 
    Parsers MUST accept TXT records and policy files which are
    syntactically valid (i.e. valid key/value pairs separated by semi-
@@ -607,7 +607,7 @@ Internet-Draft                   MTA-STS                       July 2017
    A new .well-known URI will be registered in the Well-Known URIs
    registry as described below:
 
-   URI Suffix: mta-sts.policy Change Controller: IETF
+   URI Suffix: mta-sts.txt Change Controller: IETF
 
 
 
@@ -1049,7 +1049,7 @@ Internet-Draft                   MTA-STS                       July 2017
 
 12.2.  URIs
 
-   [1] https://mta-sts.example.com/.well-known/mta-sts.policy:
+   [1] https://mta-sts.example.com/.well-known/mta-sts.txt:
 
 Authors' Addresses
 

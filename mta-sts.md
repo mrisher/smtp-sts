@@ -176,10 +176,10 @@ MTA-STS and skip the remaining steps of policy discovery.
 ## MTA-STS Policies
 
 The policy itself is a set of key/value pairs served via the HTTPS GET method
-from the fixed [@!RFC5785] "well-known" path of `.well-known/mta-sts.policy`
+from the fixed [@!RFC5785] "well-known" path of `.well-known/mta-sts.txt`
 served by the `mta-sts` host at the Policy Domain; the [@!RFC2616]
 "Content-Type" header MUST be "text/plain". Thus for `example.com` the path is
-`https://mta-sts.example.com/.well-known/mta-sts.policy`.
+`https://mta-sts.example.com/.well-known/mta-sts.txt`.
 
 This resource contains the following line-separated key/value pairs:
 
@@ -226,7 +226,7 @@ follows:
 
     sts-policy-record        = sts-policy-version CRLF
                                sts-policy-mode CRLF
-                               sts-policy-mx CRLF [sts-policy-mx CRLF]
+                               1*(sts-policy-mx CRLF)
                                sts-policy-max-age
 
     field-delim              = ":" *WSP
@@ -438,7 +438,7 @@ record, mistakenly cache the old policy from HTTPS.
 A new .well-known URI will be registered in the Well-Known URIs registry as
 described below:
 
-URI Suffix: mta-sts.policy
+URI Suffix: mta-sts.txt
 Change Controller: IETF
 
 ## MTA-STS TXT Record Fields
@@ -605,7 +605,7 @@ _mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
 ~~~~~~~~~
 
 MTA-STS Policy file served as the response body at
-https://mta-sts.example.com/.well-known/mta-sts.policy:
+https://mta-sts.example.com/.well-known/mta-sts.txt:
 ~~~~~~~~~
 version: STSv1
 mode: report
