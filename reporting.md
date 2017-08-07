@@ -214,7 +214,7 @@ Aggregate reports contain the following fields:
     (1) The MTA-STS policy applied (as a string)
     (2) The DANE TLSA record applied (as a string, with each RR entry of the
     RRset listed and separated by a semicolon)
-    (3) The literal string `no-policy-found`, if neither a TLSA nor
+    (3) The literal string `no-policy-found`, if neither a DANE nor
     MTA-STS policy could be found.
   * The domain for which the policy is applied
   * The MX host
@@ -407,7 +407,7 @@ POST.
 
 ## Report Filename
 
-The filename is typically constructed using the following ABNF:
+The filename SHOULD be constructed using the following ABNF:
 
      filename = sender "!" policy-domain "!" begin-timestamp
                "!" end-timestamp [ "!" unique-id ] "." extension
@@ -474,8 +474,8 @@ It is presumed that the aggregate reporting address will be equipped to process
 new message header fields and extract MIME parts with the prescribed media type
 and filename, and ignore the rest.
 
-   The [@!RFC5322].Subject field for individual report submissions SHOULD
-   conform to the following ABNF:
+   The [@!RFC5322].Subject field for report submissions SHOULD conform to the 
+   following ABNF:
 
     tlsrpt-subject = %s"Report" FWS               ; "Report"
                      %s"Domain:" FWS              ; "Domain:"
@@ -542,7 +542,7 @@ MTA-STS or DANE TLSA failures.
 
 ## HTTPS Transport
 
-The report MAY be delivered by POST to HTTPS. If compressed, the report should
+The report MAY be delivered by POST to HTTPS. If compressed, the report SHOULD
 use the media type `application/tlsrpt+gzip`, and `application/tlsrpt+json`
 otherwise (see section (#iana-considerations), "IANA Considerations").
 
@@ -551,8 +551,8 @@ otherwise (see section (#iana-considerations), "IANA Considerations").
 In the event of a delivery failure, regardless of the delivery method, a 
 sender SHOULD attempt redelivery for up to 24hrs after the initial attempt.  As
 previously stated the reports are optional, so while it is ideal to attempt
-redelivery, it is not required.  If multiple retries are attempted, they should
-be on a logarithmic scale.
+redelivery, it is not required.  If multiple retries are attempted, ideally they 
+would be on a logarithmic scale.
 
 # IANA Considerations
 
