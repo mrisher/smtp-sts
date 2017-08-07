@@ -227,16 +227,13 @@ Internet-Draft                   MTA-STS                       July 2017
 
 
 sts-text-record = sts-version field-delim sts-id
-                  [field-delim [sts-extensions]]
+                  *(field-delim sts-extension) [field-delim]
 
 field-delim     = *WSP ";" *WSP
 
 sts-version     = %s"v=STSv1"
 
 sts-id          = %s"id=" 1*32(ALPHA / DIGIT)        ; id=...
-
-sts-extensions  = sts-extension *(field-delim sts-extension)
-                  [field-delim]                      ; extension fields
 
 sts-extension   = sts-ext-name "=" sts-ext-value     ; name=value
 
@@ -257,8 +254,9 @@ sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)       ; chars excluding
    The policy itself is a set of key/value pairs served via the HTTPS
    GET method from the fixed [RFC5785] "well-known" path of ".well-
    known/mta-sts.policy" served by the "mta-sts" host at the Policy
-   Domain.  Thus for "example.com" the path is "https://mta-
-   sts.example.com/.well-known/mta-sts.policy".
+   Domain; the [RFC2616] "Content-Type" header MUST be "text/plain".
+   Thus for "example.com" the path is "https://mta-sts.example.com
+   /.well-known/mta-sts.policy".
 
    This resource contains the following line-separated key/value pairs:
 
@@ -273,6 +271,8 @@ sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)       ; chars excluding
       integer seconds, required).  Well-behaved clients SHOULD cache a
       policy for up to this value from last policy fetch time.  To
       mitigate the risks of attacks at policy refresh time, it is
+      expected that this value typically be in the range of weeks or
+      greater.
 
 
 
@@ -281,9 +281,6 @@ Margolis, et al.        Expires January 16, 2018                [Page 5]
 
 Internet-Draft                   MTA-STS                       July 2017
 
-
-      expected that this value typically be in the range of weeks or
-      greater.
 
    o  "mx": MX identity patterns (list of plain-text strings, required).
       One or more patterns matching a Common Name ([RFC6125]) or Subject
@@ -314,6 +311,9 @@ Internet-Draft                   MTA-STS                       July 2017
 
    The formal definition of the policy resource, defined using
    [RFC7405], is as follows:
+
+
+
 
 
 
@@ -371,7 +371,7 @@ Internet-Draft                   MTA-STS                       July 2017
 
     sts-policy-max-age-field = %s"max_age"
 
-    sts-policy-max-age-value = 1*10DIGIT
+    sts-policy-max-age-value = 1*10(DIGIT)
 
    Parsers MUST accept TXT records and policy files which are
    syntactically valid (i.e. valid key/value pairs separated by semi-
@@ -979,6 +979,12 @@ Internet-Draft                   MTA-STS                       July 2017
               .17487/RFC2560, June 1999,
               <http://www.rfc-editor.org/info/rfc2560>.
 
+   [RFC2616]  Fielding, R., Gettys, J., Mogul, J., Frystyk, H.,
+              Masinter, L., Leach, P., and T. Berners-Lee, "Hypertext
+              Transfer Protocol -- HTTP/1.1", RFC 2616, DOI 10.17487/
+              RFC2616, June 1999,
+              <http://www.rfc-editor.org/info/rfc2616>.
+
    [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
               Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
               February 2002, <http://www.rfc-editor.org/info/rfc3207>.
@@ -993,6 +999,17 @@ Internet-Draft                   MTA-STS                       July 2017
               4033, DOI 10.17487/RFC4033, March 2005,
               <http://www.rfc-editor.org/info/rfc4033>.
 
+
+
+
+
+
+
+Margolis, et al.        Expires January 16, 2018               [Page 18]
+
+Internet-Draft                   MTA-STS                       July 2017
+
+
    [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
               Housley, R., and W. Polk, "Internet X.509 Public Key
               Infrastructure Certificate and Certificate Revocation List
@@ -1002,13 +1019,6 @@ Internet-Draft                   MTA-STS                       July 2017
    [RFC5321]  Klensin, J., "Simple Mail Transfer Protocol", RFC 5321,
               DOI 10.17487/RFC5321, October 2008,
               <http://www.rfc-editor.org/info/rfc5321>.
-
-
-
-Margolis, et al.        Expires January 16, 2018               [Page 18]
-
-Internet-Draft                   MTA-STS                       July 2017
-
 
    [RFC5785]  Nottingham, M. and E. Hammer-Lahav, "Defining Well-Known
               Uniform Resource Identifiers (URIs)", RFC 5785, DOI 10
@@ -1049,21 +1059,17 @@ Authors' Addresses
    Email: dmargolis (at) google.com
 
 
-   Mark Risher
-   Google, Inc
-
-   Email: risher (at) google (dot com)
-
-
-
-
-
-
 
 
 Margolis, et al.        Expires January 16, 2018               [Page 19]
 
 Internet-Draft                   MTA-STS                       July 2017
+
+
+   Mark Risher
+   Google, Inc
+
+   Email: risher (at) google (dot com)
 
 
    Binu Ramakrishnan
@@ -1082,12 +1088,6 @@ Internet-Draft                   MTA-STS                       July 2017
    Microsoft, Inc
 
    Email: janet.jones (at) microsoft (dot com)
-
-
-
-
-
-
 
 
 

@@ -213,16 +213,13 @@ is as follows:
 
 <figure align="center"><artwork align="center">
 sts-text-record = sts-version field-delim sts-id
-                  [field-delim [sts-extensions]]
+                  *(field-delim sts-extension) [field-delim]
 
 field-delim     = *WSP ";" *WSP
 
 sts-version     = %s"v=STSv1"
 
 sts-id          = %s"id=" 1*32(ALPHA / DIGIT)        ; id=...
-
-sts-extensions  = sts-extension *(field-delim sts-extension)
-                  [field-delim]                      ; extension fields
 
 sts-extension   = sts-ext-name "=" sts-ext-value     ; name=value
 
@@ -242,8 +239,9 @@ MTA-STS and skip the remaining steps of policy discovery.
 <section anchor="mtasts-policies" title="MTA-STS Policies">
 <t>The policy itself is a set of key/value pairs served via the HTTPS GET method
 from the fixed <xref target="RFC5785"/> &quot;well-known&quot; path of <spanx style="verb">.well-known/mta-sts.policy</spanx>
-served by the <spanx style="verb">mta-sts</spanx> host at the Policy Domain. Thus for <spanx style="verb">example.com</spanx> the
-path is <spanx style="verb">https://mta-sts.example.com/.well-known/mta-sts.policy</spanx>.
+served by the <spanx style="verb">mta-sts</spanx> host at the Policy Domain; the <xref target="RFC2616"/>
+&quot;Content-Type&quot; header MUST be &quot;text/plain&quot;. Thus for <spanx style="verb">example.com</spanx> the path is
+<spanx style="verb">https://mta-sts.example.com/.well-known/mta-sts.policy</spanx>.
 </t>
 <t>This resource contains the following line-separated key/value pairs:
 </t>
@@ -324,7 +322,7 @@ sts-policy-max-age       = sts-policy-max-age-field field-delim
 
 sts-policy-max-age-field = %s"max_age"
 
-sts-policy-max-age-value = 1*10DIGIT
+sts-policy-max-age-value = 1*10(DIGIT)
 </artwork></figure>
 <t>Parsers MUST accept TXT records and policy files which are syntactically valid
 (i.e. valid key/value pairs separated by semi-colons for TXT records) and
@@ -840,6 +838,7 @@ func handleMessage(message) {
 <references title="Normative References">
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2560.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2616.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3492.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4033.xml"?>

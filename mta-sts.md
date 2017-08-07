@@ -152,16 +152,13 @@ The formal definition of the `_mta-sts` TXT record, defined using [@!RFC7405],
 is as follows:
 
     sts-text-record = sts-version field-delim sts-id
-                      [field-delim [sts-extensions]]
+                      *(field-delim sts-extension) [field-delim]
 
     field-delim     = *WSP ";" *WSP
 
     sts-version     = %s"v=STSv1"
 
     sts-id          = %s"id=" 1*32(ALPHA / DIGIT)        ; id=...
-
-    sts-extensions  = sts-extension *(field-delim sts-extension)
-                      [field-delim]                      ; extension fields
 
     sts-extension   = sts-ext-name "=" sts-ext-value     ; name=value
 
@@ -180,8 +177,9 @@ MTA-STS and skip the remaining steps of policy discovery.
 
 The policy itself is a set of key/value pairs served via the HTTPS GET method
 from the fixed [@!RFC5785] "well-known" path of `.well-known/mta-sts.policy`
-served by the `mta-sts` host at the Policy Domain. Thus for `example.com` the
-path is `https://mta-sts.example.com/.well-known/mta-sts.policy`.
+served by the `mta-sts` host at the Policy Domain; the [@!RFC2616]
+"Content-Type" header MUST be "text/plain". Thus for `example.com` the path is
+`https://mta-sts.example.com/.well-known/mta-sts.policy`.
 
 This resource contains the following line-separated key/value pairs:
 
@@ -259,7 +257,7 @@ follows:
 
     sts-policy-max-age-field = %s"max_age"
 
-    sts-policy-max-age-value = 1*10DIGIT
+    sts-policy-max-age-value = 1*10(DIGIT)
 
 
 Parsers MUST accept TXT records and policy files which are syntactically valid
