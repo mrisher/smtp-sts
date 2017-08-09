@@ -3,13 +3,13 @@
    Title = "SMTP TLS Reporting"
    abbrev = "SMTP-TLSRPT"
    category = "std"
-   docName = "draft-ietf-uta-smtp-tlsrpt-07"
+   docName = "draft-ietf-uta-smtp-tlsrpt-08"
    ipr = "trust200902"
    area = "Applications"
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2017-07-31T00:00:00Z
+   date = 2017-08-15T00:00:00Z
    
    [[author]]
    initials="D."
@@ -134,7 +134,8 @@ Policies consist of the following directives:
   Schema",  for more information). Two URI schemes are supported: `mailto` 
   and `https`.
 * In the case of `https`, reports should be submitted via POST ([@!RFC2818]) 
-  to the specified URI.
+  to the specified URI.  Report submitters MAY ignore certificate validation
+  errors when submitting reports via https.
 * In the case of `mailto`, reports should be submitted to the specified
   email address ([@!RFC6068]). When sending failure reports via SMTP,
 	sending MTAs MUST deliver reports despite any TLS-related failures.
@@ -284,7 +285,10 @@ to grow over time based on real-world experience. The initial set is:
     to be valid.
 * `dnssec-invalid`: This would indicate that no valid records were returned from 
     the recursive resolver.  The request returned with SERVFAIL for the requested
-    TLSA record.
+    TLSA record.  It should be noted that if the reporter's systems are having problems
+    resolving destination DNS records due to DNSSEC failures, it's possible they will 
+    also be unable to resolve the TLSRPT record, therefore these types of reports may
+    be rare.
 
 #### MTA-STS-specific Policy Failures
 
