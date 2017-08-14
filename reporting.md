@@ -132,7 +132,8 @@ Policies consist of the following directives:
 * `rua`: A URI specifying the endpoint to which aggregate information about
   policy validation results should be sent (see (#reporting-schema), "Reporting 
   Schema",  for more information). Two URI schemes are supported: `mailto` 
-  and `https`.
+  and `https`.  As with DMARC [@?RFC7489], the policy domain can specify a 
+  comma-separated list of URIs.
 * In the case of `https`, reports should be submitted via POST ([@!RFC2818]) 
   to the specified URI.  Report submitters MAY ignore certificate validation
   errors when submitting reports via https.
@@ -155,7 +156,8 @@ The formal definition of the `_smtp-tlsrpt` TXT record, defined using
         tlsrpt-version    = %x76 *WSP "=" *WSP %x54 %x4C %x53 %x52
                             %x50 %x54 %x76 %x31                ; "v=TLSRPTv1"
 
-        tlsrpt-rua        = %x72 %x75 %x61 *WSP "=" *WSP tlsrpt-uri ; "rua=..."
+        tlsrpt-rua        = %x72 %x75 %x61 *WSP "=" *WSP 
+	                    tlsrpt-uri *(*WSP "," *WSP tlsrpt-uri)  ; "rua=..."
 
         tlsrpt-uri        = URI
                           ; "URI" is imported from [@!RFC3986]; commas (ASCII
