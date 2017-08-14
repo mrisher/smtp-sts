@@ -140,7 +140,7 @@ Policies consist of the following directives:
   email address ([@!RFC6068]). When sending failure reports via SMTP,
 	sending MTAs MUST deliver reports despite any TLS-related failures.
 	This may mean that the reports are delivered in the clear.  Additionally,
-	 reports sent via SMTP MUST contain a valid DKIM [@?RFC6376] signature by
+	 reports sent via SMTP MUST contain a valid DKIM [@!RFC6376] signature by
 	 the reporting domain.  Reports lacking such a signature MUST be ignored
 	 by the recipient.
 
@@ -414,7 +414,7 @@ POST.
 
 ## Report Filename
 
-The filename SHOULD be constructed using the following ABNF:
+The filename is RECOMMENDED to be constructed using the following ABNF:
 
      filename = sender "!" policy-domain "!" begin-timestamp
                "!" end-timestamp [ "!" unique-id ] "." extension
@@ -479,7 +479,8 @@ in IMAP [@?FC3501]:
 
 It is presumed that the aggregate reporting address will be equipped to process
 new message header fields and extract MIME parts with the prescribed media type
-and filename, and ignore the rest.
+and filename, and ignore the rest.  These additional headers SHOULD be included
+in the DKIM [@!RFC6376] signature for the message.
 
    The [@!RFC5322].Subject field for report submissions SHOULD conform to the 
    following ABNF:
