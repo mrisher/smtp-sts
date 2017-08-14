@@ -139,7 +139,10 @@ Policies consist of the following directives:
 * In the case of `mailto`, reports should be submitted to the specified
   email address ([@!RFC6068]). When sending failure reports via SMTP,
 	sending MTAs MUST deliver reports despite any TLS-related failures.
-	This may mean that the reports are delivered in the clear.
+	This may mean that the reports are delivered in the clear.  Additionally,
+	 reports sent via SMTP MUST contain a valid DKIM [@?RFC6376] signature by
+	 the reporting domain.  Reports lacking such a signature MUST be ignored
+	 by the recipient.
 
 The formal definition of the `_smtp-tlsrpt` TXT record, defined using
 [@!RFC5234], is as follows:
