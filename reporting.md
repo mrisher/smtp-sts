@@ -52,7 +52,7 @@
 .# Abstract
 
 A number of protocols exist for establishing encrypted channels between SMTP
-Mail Transfer Agents, including STARTTLS [@!RFC3207], DANE [@!RFC6698], and
+Mail Transfer Agents, including STARTTLS [@?RFC3207], DANE [@!RFC6698], and
 MTA-STS (TODO: Add ref). These protocols can fail due to misconfiguration or
 active attack, leading to undelivered messages or delivery over unencrypted or
 unauthenticated channels. This document describes a reporting mechanism and
@@ -65,9 +65,9 @@ misconfigurations.
 
 # Introduction
 
-The STARTTLS extension to SMTP [@!RFC3207] allows SMTP clients and hosts to
+The STARTTLS extension to SMTP [@?RFC3207] allows SMTP clients and hosts to
 establish secure SMTP sessions over TLS. The protocol design is based on
-"Opportunistic Security" (OS) [@!RFC7435], which maintains interoperability with
+"Opportunistic Security" (OS) [@?RFC7435], which maintains interoperability with
 clients that do not support STARTTLS but means that any attacker who can delete
 parts of the SMTP session (such as the "250 STARTTLS" response) or redirect the
 entire SMTP session (perhaps by overwriting the resolved MX record of the
@@ -313,7 +313,7 @@ Transient errors due to too-busy network, TCP timeouts, etc. are not required to
 
 ## JSON Report Schema
 
-The JSON schema is derived from the HPKP JSON schema [@!RFC7469] (cf. Section 3)
+The JSON schema is derived from the HPKP JSON schema [@?RFC7469] (cf. Section 3)
 
 ```
 {
@@ -470,7 +470,7 @@ TLS-Report-Submitter: Sender-Domain
 ```
 These message headers MUST be included and should allow for easy searching for 
 all reports submitted by a report domain or a particular submitter, for example
-in IMAP [@!RFC3501]:
+in IMAP [@?FC3501]:
 
 `s SEARCH HEADER "TLS-Report-Domain" "example.com"`
 
@@ -565,7 +565,7 @@ The following are the IANA considerations discussed in this document.
 ## Message headers
 
 Below is the Internet Assigned Numbers Authority (IANA) Permanent Message Header
-Field registration information per [@!RFC3864].
+Field registration information per [@?RFC3864].
      
      Header field name:           TLS-Report-Domain
      Applicable protocol:         mail
@@ -742,14 +742,14 @@ several security risks presented by the existence of this reporting channel:
   delegate processing of reports to a partner organization. However, an attacker
   who controls the Policy Domain DNS could also use this mechanism to direct the
   reports to an unwitting victim, flooding that victim with excessive reports.
-  DMARC [@!RFC7489] defines a solution for verifying delegation to avoid such
+  DMARC [@?RFC7489] defines a solution for verifying delegation to avoid such
   attacks; the need for this is greater with DMARC, however, because DMARC
-  allows an attacker to trigger reports to a target from an innocent third party by sending that
-  third party mail (which triggers a report from the third party to the target).
-  In the case of TLSRPT, the attacker would have to induce the third party to
-  send the attacker mail in order to trigger reports from the third party to the
-  victim; this reduces the risk of such an attack and the need for a
-  verification mechanism.
+  allows an attacker to trigger reports to a target from an innocent third party
+  by sending that third party mail (which triggers a report from the third party
+  to the target).  In the case of TLSRPT, the attacker would have to induce the 
+  third party to send the attacker mail in order to trigger reports from the
+  third party to the victim; this reduces the risk of such an attack and the
+  need for a verification mechanism.
 
 # Appendix 1: Example Reporting Policy
 
