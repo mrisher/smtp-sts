@@ -562,6 +562,13 @@ previously stated the reports are optional, so while it is ideal to attempt
 redelivery, it is not required.  If multiple retries are attempted, ideally they 
 would be on a logarithmic scale.
 
+## Metadata Variances
+
+As stated above, there are a variable number of ways to declare information
+about the data therein.  If it should be the case that these objects were to
+disagree, then the report data contained within the JSON body MUST be considered 
+the authoritative source for those data elements.
+
 # IANA Considerations
 
 The following are the IANA considerations discussed in this document.
