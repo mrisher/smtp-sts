@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE rfc SYSTEM 'rfc2629.dtd' []>
-<rfc ipr="trust200902" category="std" docName="draft-ietf-uta-smtp-tlsrpt-07">
+<rfc ipr="trust200902" category="std" docName="draft-ietf-uta-smtp-tlsrpt-08">
 <?rfc toc="yes"?>
 <?rfc symrefs="yes"?>
 <?rfc sortrefs="yes"?>
@@ -87,7 +87,7 @@
 <uri></uri>
 </address>
 </author>
-<date year="2017" month="July" day="31"/>
+<date year="2017" month="August" day="15"/>
 
 <area>Applications</area>
 <workgroup>Using TLS in Applications</workgroup>
@@ -189,14 +189,20 @@ recipient's TLSRPT policy can be retrieved from <spanx style="verb">_smtp-tlsrpt
 <list style="symbols">
 <t><spanx style="verb">v</spanx>: This value MUST be equal to <spanx style="verb">TLSRPTv1</spanx>.</t>
 <t><spanx style="verb">rua</spanx>: A URI specifying the endpoint to which aggregate information about
-policy failures should be sent (see <xref target="reporting-schema"/>, &quot;Reporting Schema&quot;,
-for more information). Two URI schemes are supported: <spanx style="verb">mailto</spanx> and <spanx style="verb">https</spanx>.</t>
+policy validation results should be sent (see <xref target="reporting-schema"/>, &quot;Reporting
+Schema&quot;,  for more information). Two URI schemes are supported: <spanx style="verb">mailto</spanx>
+and <spanx style="verb">https</spanx>.  As with DMARC <xref target="RFC7489"/>, the policy domain can specify a
+comma-separated list of URIs.</t>
 <t>In the case of <spanx style="verb">https</spanx>, reports should be submitted via POST (<xref target="RFC2818"/>)
-to the specified URI.</t>
+to the specified URI.  Report submitters MAY ignore certificate validation
+errors when submitting reports via https.</t>
 <t>In the case of <spanx style="verb">mailto</spanx>, reports should be submitted to the specified
 email address (<xref target="RFC6068"/>). When sending failure reports via SMTP,
 sending MTAs MUST deliver reports despite any TLS-related failures.
-This may mean that the reports are delivered in the clear.</t>
+This may mean that the reports are delivered in the clear.  Additionally,
+ reports sent via SMTP MUST contain a valid DKIM <xref target="RFC6376"/> signature by
+ the reporting domain.  Reports lacking such a signature MUST be ignored
+ by the recipient.</t>
 </list>
 </t>
 <t>The formal definition of the <spanx style="verb">_smtp-tlsrpt</spanx> TXT record, defined using
@@ -212,7 +218,8 @@ This may mean that the reports are delivered in the clear.</t>
     tlsrpt-version    = %x76 *WSP "=" *WSP %x54 %x4C %x53 %x52
                         %x50 %x54 %x76 %x31                ; "v=TLSRPTv1"
 
-    tlsrpt-rua        = %x72 %x75 %x61 *WSP "=" *WSP tlsrpt-uri ; "rua=..."
+    tlsrpt-rua        = %x72 %x75 %x61 *WSP "=" *WSP 
+                    tlsrpt-uri *(*WSP "," *WSP tlsrpt-uri)  ; "rua=..."
 
     tlsrpt-uri        = URI
                       ; "URI" is imported from [@!RFC3986]; commas (ASCII
@@ -283,7 +290,7 @@ contents of the report</t>
 (1) The MTA-STS policy applied (as a string)
 (2) The DANE TLSA record applied (as a string, with each RR entry of the
 RRset listed and separated by a semicolon)
-(3) The literal string <spanx style="verb">no-policy-found</spanx>, if neither a TLSA nor
+(3) The literal string <spanx style="verb">no-policy-found</spanx>, if neither a DANE nor
 MTA-STS policy could be found.</t>
 <t>The domain for which the policy is applied</t>
 <t>The MX host</t>
@@ -302,7 +309,9 @@ multiple errors.
 
 <section anchor="report-timeframe" title="Report Time-frame">
 <t>The report SHOULD cover a full day, from 0000-2400 UTC.  This should allow for
-easier correlation of failure events.
+easier correlation of failure events.  To avoid a Denial of Service against the
+system processing the reports, the reports should be delivered after some
+delay, perhaps several hours.
 </t>
 </section>
 
@@ -371,7 +380,10 @@ associated with a DANE policy.  None of the records in the RRset were found
 to be valid.</t>
 <t><spanx style="verb">dnssec-invalid</spanx>: This would indicate that no valid records were returned from
 the recursive resolver.  The request returned with SERVFAIL for the requested
-TLSA record.</t>
+TLSA record.  It should be noted that if the reporter's systems are having problems
+resolving destination DNS records due to DNSSEC failures, it's possible they will
+also be unable to resolve the TLSRPT record, therefore these types of reports may
+be rare.</t>
 </list>
 </t>
 </section>
@@ -469,10 +481,10 @@ policy is defined. In the case of Internationalized Domain Names
 (<xref target="RFC3492"/>) and not the U-label.</t>
 <t><spanx style="verb">mx-host-pattern</spanx>: The pattern of MX hostnames from the applied policy. It
 is provided as a string, and is interpreted in the same manner as the
-&quot;Checking of Wildcard Certificates&quot; rules in Section 6.4.3 of <xref target="RFC6125"/>.</t>
-<t><spanx style="verb">result-type</spanx>: A value from <xref target="result-types"/>, &quot;Result Types&quot;,  above. In the
-case of Internationalized Domain Names (<xref target="RFC5891"/>), the domain is the
-Punycode-encoded A-label (<xref target="RFC3492"/>) and not the U-label.</t>
+&quot;Checking of Wildcard Certificates&quot; rules in Section 6.4.3 of <xref target="RFC6125"/>.
+ In the case of Internationalized Domain Names (<xref target="RFC5891"/>), the domain is
+ the Punycode-encoded A-label (<xref target="RFC3492"/>) and not the U-label.</t>
+<t><spanx style="verb">result-type</spanx>: A value from <xref target="result-types"/>, &quot;Result Types&quot;,  above.</t>
 <t><spanx style="verb">ip-address</spanx>: The IP address of the sending MTA that attempted the STARTTLS
 connection. It is provided as a string representation of an IPv4 (see below)
 or IPv6 (<xref target="RFC5952"/>) address in dot-decimal or colon-hexadecimal notation.</t>
@@ -496,12 +508,13 @@ code or error message.
 </list>
 </t>
 <t>For report purposes, an IPv4 Address is defined as:
-     IPv4address   = dec-octet &quot;.&quot; dec-octet &quot;.&quot; dec-octet &quot;.&quot; dec-octet
-     dec-octet     = DIGIT                 ; 0-9
-                    / %x31-39 DIGIT         ; 10-99
-                    / &quot;1&quot; 2DIGIT            ; 100-199
-                    / &quot;2&quot; %x30-34 DIGIT     ; 200-249
-                    / &quot;25&quot; %x30-35          ; 250-255
+     IPv4address = dec-octet &quot;.&quot; dec-octet &quot;.&quot; dec-octet &quot;.&quot; dec-octet
+<vspace/>
+                   dec-octet     = DIGIT                 ; 0-9
+                   / %x31-39 DIGIT         ; 10-99
+                   / &quot;1&quot; 2DIGIT            ; 100-199
+                   / &quot;2&quot; %x30-34 DIGIT     ; 200-249
+                   / &quot;25&quot; %x30-35          ; 250-255
 </t>
 </section>
 </section>
@@ -512,7 +525,7 @@ POST.
 </t>
 
 <section anchor="report-filename" title="Report Filename">
-<t>The filename is typically constructed using the following ABNF:
+<t>The filename is RECOMMENDED to be constructed using the following ABNF:
 </t>
 
 <figure align="center"><artwork align="center">
@@ -584,10 +597,11 @@ in IMAP <xref target="RFC3501"/>:
 </t>
 <t>It is presumed that the aggregate reporting address will be equipped to process
 new message header fields and extract MIME parts with the prescribed media type
-and filename, and ignore the rest.
+and filename, and ignore the rest.  These additional headers SHOULD be included
+in the DKIM <xref target="RFC6376"/> signature for the message.
 </t>
-<t>The <xref target="RFC5322"/>.Subject field for individual report submissions SHOULD
-   conform to the following ABNF:
+<t>The <xref target="RFC5322"/>.Subject field for report submissions SHOULD conform to the
+   following ABNF:
 </t>
 
 <figure align="center"><artwork align="center">
@@ -661,7 +675,7 @@ MTA-STS or DANE TLSA failures.
 </section>
 
 <section anchor="https-transport" title="HTTPS Transport">
-<t>The report MAY be delivered by POST to HTTPS. If compressed, the report should
+<t>The report MAY be delivered by POST to HTTPS. If compressed, the report SHOULD
 use the media type <spanx style="verb">application/tlsrpt+gzip</spanx>, and <spanx style="verb">application/tlsrpt+json</spanx>
 otherwise (see section <xref target="iana-considerations"/>, &quot;IANA Considerations&quot;).
 </t>
@@ -671,8 +685,16 @@ otherwise (see section <xref target="iana-considerations"/>, &quot;IANA Consider
 <t>In the event of a delivery failure, regardless of the delivery method, a
 sender SHOULD attempt redelivery for up to 24hrs after the initial attempt.  As
 previously stated the reports are optional, so while it is ideal to attempt
-redelivery, it is not required.  If multiple retries are attempted, they should
-be on a logarithmic scale.
+redelivery, it is not required.  If multiple retries are attempted, ideally they
+would be on a logarithmic scale.
+</t>
+</section>
+
+<section anchor="metadata-variances" title="Metadata Variances">
+<t>As stated above, there are a variable number of ways to declare information
+about the data therein.  If it should be the case that these objects were to
+disagree, then the report data contained within the JSON body MUST be considered
+the authoritative source for those data elements.
 </t>
 </section>
 </section>
@@ -770,7 +792,7 @@ following section.
 </t>
 </section>
 
-<section anchor="applicationtlsrptgz-media-type" title="application/tlsrpt+gz Media Type">
+<section anchor="applicationtlsrptgzip-media-type" title="application/tlsrpt+gzip Media Type">
 
 <figure align="center"><artwork align="center">
 +-------------+----------------+-------------+-------------------+
@@ -788,9 +810,7 @@ following section.
 </t>
 <t>Optional parameters: n/a
 </t>
-<t>Encoding considerations: Encoding considerations are identical to
-      those specified for the <spanx style="verb">application/json</spanx> media type. See
-      <xref target="RFC7493"/>.
+<t>Encoding considerations: Binary
 </t>
 <t>Security considerations: Security considerations relating to SMTP
       TLS Reporting are discussed in Section 7.
@@ -880,12 +900,12 @@ who controls the Policy Domain DNS could also use this mechanism to direct the
 reports to an unwitting victim, flooding that victim with excessive reports.
 DMARC <xref target="RFC7489"/> defines a solution for verifying delegation to avoid such
 attacks; the need for this is greater with DMARC, however, because DMARC
-allows an attacker to trigger reports to a target from an innocent third party by sending that
-third party mail (which triggers a report from the third party to the target).
-In the case of TLSRPT, the attacker would have to induce the third party to
-send the attacker mail in order to trigger reports from the third party to the
-victim; this reduces the risk of such an attack and the need for a
-verification mechanism.</t>
+allows an attacker to trigger reports to a target from an innocent third party
+by sending that third party mail (which triggers a report from the third party
+to the target).  In the case of TLSRPT, the attacker would have to induce the
+third party to send the attacker mail in order to trigger reports from the
+third party to the victim; this reduces the risk of such an attack and the
+need for a verification mechanism.</t>
 </list>
 </t>
 </section>
@@ -930,7 +950,7 @@ _smtp-tlsrpt.mail.example.com. IN TXT \
   "summary": {
     "total-successful-session-count": 5326,
     "total-failure-session-count": 303
-  }
+  },
   "failure-details": [{
     "result-type": "certificate-expired",
     "sending-mta-ip": "98.136.216.25",
@@ -944,9 +964,9 @@ _smtp-tlsrpt.mail.example.com. IN TXT \
     "additional-information": "hxxps://reports.company-x.com/
       report_info?id=5065427c-23d3#StarttlsNotSupported"
   }, {
-    "result-type: "validation-failure",
+    "result-type": "validation-failure",
     "sending-mta-ip": "47.97.15.2",
-    "receiving-mx-hostname: "mx-backup.mail.company-y.com",
+    "receiving-mx-hostname": "mx-backup.mail.company-y.com",
     "failed-session-count": 3,
     "failure-error-code": "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED"
   }]
@@ -965,11 +985,8 @@ respond to the <spanx style="verb">STARTTLS</spanx> command.  Additionally 3 ses
 <references title="Normative References">
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2818.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3339.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3492.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3501.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3864.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3986.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5234.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5321.xml"?>
@@ -978,13 +995,19 @@ respond to the <spanx style="verb">STARTTLS</spanx> command.  Additionally 3 ses
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5952.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6068.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6125.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6376.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6522.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6698.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7159.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7493.xml"?>
+</references>
+<references title="Informative References">
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3501.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3864.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7435.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7469.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7489.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7493.xml"?>
 </references>
 
 </back>

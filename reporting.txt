@@ -5,18 +5,18 @@
 Using TLS in Applications                                    D. Margolis
 Internet-Draft                                               Google, Inc
 Intended status: Standards Track                              A. Brotman
-Expires: February 1, 2018                                   Comcast, Inc
+Expires: February 16, 2018                                  Comcast, Inc
                                                          B. Ramakrishnan
                                                              Yahoo!, Inc
                                                                 J. Jones
                                                           Microsoft, Inc
                                                                M. Risher
                                                              Google, Inc
-                                                           July 31, 2017
+                                                         August 15, 2017
 
 
                            SMTP TLS Reporting
-                     draft-ietf-uta-smtp-tlsrpt-07
+                     draft-ietf-uta-smtp-tlsrpt-08
 
 Abstract
 
@@ -46,16 +46,16 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on February 1, 2018.
+   This Internet-Draft will expire on February 16, 2018.
 
 
 
 
 
 
-Margolis, et al.        Expires February 1, 2018                [Page 1]
+Margolis, et al.        Expires February 16, 2018               [Page 1]
 
-Internet-Draft                 SMTP-TLSRPT                     July 2017
+Internet-Draft                 SMTP-TLSRPT                   August 2017
 
 
 Copyright Notice
@@ -100,26 +100,29 @@ Table of Contents
        5.3.1.  Example Report  . . . . . . . . . . . . . . . . . . .  14
      5.4.  HTTPS Transport . . . . . . . . . . . . . . . . . . . . .  14
      5.5.  Delivery Retry  . . . . . . . . . . . . . . . . . . . . .  15
+     5.6.  Metadata Variances  . . . . . . . . . . . . . . . . . . .  15
    6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  15
      6.1.  Message headers . . . . . . . . . . . . . . . . . . . . .  15
      6.2.  Report Type . . . . . . . . . . . . . . . . . . . . . . .  15
-     6.3.  application/tlsrpt+json Media Type  . . . . . . . . . . .  15
-     6.4.  application/tlsrpt+gz Media Type  . . . . . . . . . . . .  17
-     6.5.  STARTTLS Validation Result Types  . . . . . . . . . . . .  18
+     6.3.  application/tlsrpt+json Media Type  . . . . . . . . . . .  16
+     6.4.  application/tlsrpt+gzip Media Type  . . . . . . . . . . .  17
 
 
 
-Margolis, et al.        Expires February 1, 2018                [Page 2]
+Margolis, et al.        Expires February 16, 2018               [Page 2]
 
-Internet-Draft                 SMTP-TLSRPT                     July 2017
+Internet-Draft                 SMTP-TLSRPT                   August 2017
 
 
+     6.5.  STARTTLS Validation Result Types  . . . . . . . . . . . .  18
    7.  Security Considerations . . . . . . . . . . . . . . . . . . .  18
    8.  Appendix 1: Example Reporting Policy  . . . . . . . . . . . .  19
      8.1.  Report using MAILTO . . . . . . . . . . . . . . . . . . .  19
      8.2.  Report using HTTPS  . . . . . . . . . . . . . . . . . . .  19
    9.  Appendix 2: Example JSON Report . . . . . . . . . . . . . . .  19
-   10. Normative References  . . . . . . . . . . . . . . . . . . . .  21
+   10. References  . . . . . . . . . . . . . . . . . . . . . . . . .  21
+     10.1.  Normative References . . . . . . . . . . . . . . . . . .  21
+     10.2.  Informative References . . . . . . . . . . . . . . . . .  22
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  23
 
 1.  Introduction
@@ -159,16 +162,15 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
    SHOULD NOT, RECOMMENDED, MAY, and OPTIONAL, when they appear in this
    document, are to be interpreted as described in [RFC2119].
 
-   We also define the following terms for further use in this document:
 
 
 
-
-
-Margolis, et al.        Expires February 1, 2018                [Page 3]
+Margolis, et al.        Expires February 16, 2018               [Page 3]
 
-Internet-Draft                 SMTP-TLSRPT                     July 2017
+Internet-Draft                 SMTP-TLSRPT                   August 2017
 
+
+   We also define the following terms for further use in this document:
 
    o  MTA-STS Policy: A definition of the expected TLS availability,
       behavior, and desired actions for a given domain when a sending
@@ -211,26 +213,30 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
    o  "v": This value MUST be equal to "TLSRPTv1".
 
    o  "rua": A URI specifying the endpoint to which aggregate
-      information about policy failures should be sent (see Section 4,
-      "Reporting Schema", for more information).  Two URI schemes are
-      supported: "mailto" and "https".
+      information about policy validation results should be sent (see
+      Section 4, "Reporting Schema", for more information).  Two URI
+      schemes are supported: "mailto" and "https".  As with DMARC
+      [RFC7489], the policy domain can specify a comma-separated list of
+      URIs.
+
+
+
+Margolis, et al.        Expires February 16, 2018               [Page 4]
+
+Internet-Draft                 SMTP-TLSRPT                   August 2017
+
 
    o  In the case of "https", reports should be submitted via POST
-      ([RFC2818]) to the specified URI.
-
-
-
-
-Margolis, et al.        Expires February 1, 2018                [Page 4]
-
-Internet-Draft                 SMTP-TLSRPT                     July 2017
-
+      ([RFC2818]) to the specified URI.  Report submitters MAY ignore
+      certificate validation errors when submitting reports via https.
 
    o  In the case of "mailto", reports should be submitted to the
       specified email address ([RFC6068]).  When sending failure reports
       via SMTP, sending MTAs MUST deliver reports despite any TLS-
       related failures.  This may mean that the reports are delivered in
-      the clear.
+      the clear.  Additionally, reports sent via SMTP MUST contain a
+      valid DKIM [RFC6376] signature by the reporting domain.  Reports
+      lacking such a signature MUST be ignored by the recipient.
 
    The formal definition of the "_smtp-tlsrpt" TXT record, defined using
    [RFC5234], is as follows:
@@ -243,7 +249,8 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
     tlsrpt-version    = %x76 *WSP "=" *WSP %x54 %x4C %x53 %x52
                         %x50 %x54 %x76 %x31                ; "v=TLSRPTv1"
 
-    tlsrpt-rua        = %x72 %x75 %x61 *WSP "=" *WSP tlsrpt-uri ; "rua=..."
+    tlsrpt-rua        = %x72 %x75 %x61 *WSP "=" *WSP
+                    tlsrpt-uri *(*WSP "," *WSP tlsrpt-uri)  ; "rua=..."
 
     tlsrpt-uri        = URI
                       ; "URI" is imported from [@!RFC3986]; commas (ASCII
@@ -267,20 +274,17 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
    resolver, records which do not begin with "v=TLSRPTv1;" are
    discarded.  If the number of resulting records is not one, senders
    MUST assume the recipient domain does not implement TLSRPT.  Parsers
+
+
+
+Margolis, et al.        Expires February 16, 2018               [Page 5]
+
+Internet-Draft                 SMTP-TLSRPT                   August 2017
+
+
    MUST accept TXT records which are syntactically valid (i.e.  valid
    key-value pairs seprated by semi-colons) and implementing a superset
    of this specification, in which case unknown fields SHALL be ignored.
-
-
-
-
-
-
-
-Margolis, et al.        Expires February 1, 2018                [Page 5]
-
-Internet-Draft                 SMTP-TLSRPT                     July 2017
-
 
 3.1.  Example Reporting Policy
 
@@ -319,7 +323,7 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
          applied (as a string) (2) The DANE TLSA record applied (as a
          string, with each RR entry of the RRset listed and separated by
          a semicolon) (3) The literal string "no-policy-found", if
-         neither a TLSA nor MTA-STS policy could be found.
+         neither a DANE nor MTA-STS policy could be found.
 
       *  The domain for which the policy is applied
 
@@ -327,17 +331,15 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
 
       *  An identifier for the policy (where applicable)
 
+
+
+Margolis, et al.        Expires February 16, 2018               [Page 6]
+
+Internet-Draft                 SMTP-TLSRPT                   August 2017
+
+
    o  Aggregate counts, comprising result type, sending MTA IP,
       receiving MTA hostname, session count, and an optional additional
-
-
-
-
-Margolis, et al.        Expires February 1, 2018                [Page 6]
-
-Internet-Draft                 SMTP-TLSRPT                     July 2017
-
-
       information field containing a URI for recipients to review
       further information on a failure type.
 
@@ -348,7 +350,9 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
 4.1.  Report Time-frame
 
    The report SHOULD cover a full day, from 0000-2400 UTC.  This should
-   allow for easier correlation of failure events.
+   allow for easier correlation of failure events.  To avoid a Denial of
+   Service against the system processing the reports, the reports should
+   be delivered after some delay, perhaps several hours.
 
 4.2.  Delivery Summary
 
@@ -382,17 +386,16 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
 
    o  "certificate-host-mismatch": This indicates that the certificate
       presented did not adhere to the constraints specified in the MTA-
+
+
+
+Margolis, et al.        Expires February 16, 2018               [Page 7]
+
+Internet-Draft                 SMTP-TLSRPT                   August 2017
+
+
       STS or DANE policy, e.g.  if the MX does not match any identities
       listed in the Subject Alternate Name (SAN) [RFC5280].
-
-
-
-
-
-Margolis, et al.        Expires February 1, 2018                [Page 7]
-
-Internet-Draft                 SMTP-TLSRPT                     July 2017
-
 
    o  "certificate-expired": This indicates that the certificate has
       expired.
@@ -419,7 +422,11 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
 
    o  "dnssec-invalid": This would indicate that no valid records were
       returned from the recursive resolver.  The request returned with
-      SERVFAIL for the requested TLSA record.
+      SERVFAIL for the requested TLSA record.  It should be noted that
+      if the reporter's systems are having problems resolving
+      destination DNS records due to DNSSEC failures, it's possible they
+      will also be unable to resolve the TLSRPT record, therefore these
+      types of reports may be rare.
 
 4.3.2.2.  MTA-STS-specific Policy Failures
 
@@ -435,20 +442,19 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
    "Negotiation Failures" stated above, the reporter SHOULD use the
    "validation-failure" category.  As TLS grows and becomes more
    complex, new mechanisms may not be easily categorized.  This allows
+
+
+
+Margolis, et al.        Expires February 16, 2018               [Page 8]
+
+Internet-Draft                 SMTP-TLSRPT                   August 2017
+
+
    for a generic feedback category.  When this category is used, the
    reporter SHOULD also use the "failure-reason-code" to give some
    feedback to the receiving entity.  This is intended to be a short
    text field, and the contents of the field should be an error code or
    error text, such as "X509_V_ERR_UNHANDLED_CRITICAL_CRL_EXTENSION".
-
-
-
-
-
-Margolis, et al.        Expires February 1, 2018                [Page 8]
-
-Internet-Draft                 SMTP-TLSRPT                     July 2017
-
 
 4.3.4.  Transient Failures
 
@@ -493,19 +499,18 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
 
                             JSON Report Format
 
+
+
+Margolis, et al.        Expires February 16, 2018               [Page 9]
+
+Internet-Draft                 SMTP-TLSRPT                   August 2017
+
+
    o  "organization-name": The name of the organization responsible for
       the report.  It is provided as a string.
 
    o  "date-time": The date-time indicates the start- and end-times for
       the report range.  It is provided as a string formatted according
-
-
-
-Margolis, et al.        Expires February 1, 2018                [Page 9]
-
-Internet-Draft                 SMTP-TLSRPT                     July 2017
-
-
       to Section 5.6, "Internet Date/Time Format", of [RFC3339].  The
       report should be for a full UTC day, 0000-2400.
 
@@ -534,12 +539,11 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
    o  "mx-host-pattern": The pattern of MX hostnames from the applied
       policy.  It is provided as a string, and is interpreted in the
       same manner as the "Checking of Wildcard Certificates" rules in
-      Section 6.4.3 of [RFC6125].
+      Section 6.4.3 of [RFC6125].  In the case of Internationalized
+      Domain Names ([RFC5891]), the domain is the Punycode-encoded
+      A-label ([RFC3492]) and not the U-label.
 
    o  "result-type": A value from Section 4.3, "Result Types", above.
-      In the case of Internationalized Domain Names ([RFC5891]), the
-      domain is the Punycode-encoded A-label ([RFC3492]) and not the
-      U-label.
 
    o  "ip-address": The IP address of the sending MTA that attempted the
       STARTTLS connection.  It is provided as a string representation of
@@ -550,17 +554,16 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
       record with which the sending MTA attempted to negotiate a
       STARTTLS connection.
 
+
+
+
+Margolis, et al.        Expires February 16, 2018              [Page 10]
+
+Internet-Draft                 SMTP-TLSRPT                   August 2017
+
+
    o  "receiving-mx-helo": (optional) The HELO or EHLO string from the
       banner announced during the reported session.
-
-
-
-
-
-Margolis, et al.        Expires February 1, 2018               [Page 10]
-
-Internet-Draft                 SMTP-TLSRPT                     July 2017
-
 
    o  "total-successful-session-count": The aggregate number (integer)
       of successfully negotiated TLS-enabled connections to the
@@ -582,9 +585,9 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
       error code or error message.
 
    For report purposes, an IPv4 Address is defined as: IPv4address =
-   dec-octet "." dec-octet "." dec-octet "." dec-octet dec-octet = DIGIT
-   ; 0-9 / %x31-39 DIGIT ; 10-99 / "1" 2DIGIT ; 100-199 / "2" %x30-34
-   DIGIT ; 200-249 / "25" %x30-35 ; 250-255
+   dec-octet "." dec-octet "." dec-octet "." dec-octet
+   dec-octet = DIGIT ; 0-9 / %x31-39 DIGIT ; 10-99 / "1" 2DIGIT ;
+   100-199 / "2" %x30-34 DIGIT ; 200-249 / "25" %x30-35 ; 250-255
 
 5.  Report Delivery
 
@@ -593,7 +596,8 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
 
 5.1.  Report Filename
 
-   The filename is typically constructed using the following ABNF:
+   The filename is RECOMMENDED to be constructed using the following
+   ABNF:
 
 
 
@@ -609,13 +613,9 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
 
 
 
-
-
-
-
-Margolis, et al.        Expires February 1, 2018               [Page 11]
+Margolis, et al.        Expires February 16, 2018              [Page 11]
 
-Internet-Draft                 SMTP-TLSRPT                     July 2017
+Internet-Draft                 SMTP-TLSRPT                   August 2017
 
 
        filename = sender "!" policy-domain "!" begin-timestamp
@@ -669,9 +669,9 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
 
 
 
-Margolis, et al.        Expires February 1, 2018               [Page 12]
+Margolis, et al.        Expires February 16, 2018              [Page 12]
 
-Internet-Draft                 SMTP-TLSRPT                     July 2017
+Internet-Draft                 SMTP-TLSRPT                   August 2017
 
 
    compressed, the report should use the media type "application/
@@ -691,10 +691,12 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
 
    It is presumed that the aggregate reporting address will be equipped
    to process new message header fields and extract MIME parts with the
-   prescribed media type and filename, and ignore the rest.
+   prescribed media type and filename, and ignore the rest.  These
+   additional headers SHOULD be included in the DKIM [RFC6376] signature
+   for the message.
 
-   The [RFC5322].Subject field for individual report submissions SHOULD
-   conform to the following ABNF:
+   The [RFC5322].Subject field for report submissions SHOULD conform to
+   the following ABNF:
 
      tlsrpt-subject = %s"Report" FWS               ; "Report"
                       %s"Domain:" FWS              ; "Domain:"
@@ -723,11 +725,9 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
 
 
 
-
-
-Margolis, et al.        Expires February 1, 2018               [Page 13]
+Margolis, et al.        Expires February 16, 2018              [Page 13]
 
-Internet-Draft                 SMTP-TLSRPT                     July 2017
+Internet-Draft                 SMTP-TLSRPT                   August 2017
 
 
 5.3.1.  Example Report
@@ -771,7 +771,7 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
 5.4.  HTTPS Transport
 
    The report MAY be delivered by POST to HTTPS.  If compressed, the
-   report should use the media type "application/tlsrpt+gzip", and
+   report SHOULD use the media type "application/tlsrpt+gzip", and
    "application/tlsrpt+json" otherwise (see section Section 6, "IANA
    Considerations").
 
@@ -781,9 +781,9 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
 
 
 
-Margolis, et al.        Expires February 1, 2018               [Page 14]
+Margolis, et al.        Expires February 16, 2018              [Page 14]
 
-Internet-Draft                 SMTP-TLSRPT                     July 2017
+Internet-Draft                 SMTP-TLSRPT                   August 2017
 
 
 5.5.  Delivery Retry
@@ -792,8 +792,16 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
    method, a sender SHOULD attempt redelivery for up to 24hrs after the
    initial attempt.  As previously stated the reports are optional, so
    while it is ideal to attempt redelivery, it is not required.  If
-   multiple retries are attempted, they should be on a logarithmic
-   scale.
+   multiple retries are attempted, ideally they would be on a
+   logarithmic scale.
+
+5.6.  Metadata Variances
+
+   As stated above, there are a variable number of ways to declare
+   information about the data therein.  If it should be the case that
+   these objects were to disagree, then the report data contained within
+   the JSON body MUST be considered the authoritative source for those
+   data elements.
 
 6.  IANA Considerations
 
@@ -825,22 +833,19 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
    The media type suitable for use as a report-type is defined in the
    following section.
 
+
+
+
+
+Margolis, et al.        Expires February 16, 2018              [Page 15]
+
+Internet-Draft                 SMTP-TLSRPT                   August 2017
+
+
 6.3.  application/tlsrpt+json Media Type
 
    This document registers multiple media types, beginning with Table 1
    below.
-
-
-
-
-
-
-
-
-Margolis, et al.        Expires February 1, 2018               [Page 15]
-
-Internet-Draft                 SMTP-TLSRPT                     July 2017
-
 
     +-------------+----------------+-------------+-------------------+
     | Type        | Subtype        | File extn   | Specification     |
@@ -885,23 +890,22 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
 
    Intended usage: COMMON
 
+
+
+
+Margolis, et al.        Expires February 16, 2018              [Page 16]
+
+Internet-Draft                 SMTP-TLSRPT                   August 2017
+
+
    Restrictions on usage: n/a
 
    Author: See Authors' Addresses section.
 
-
-
-
-
-Margolis, et al.        Expires February 1, 2018               [Page 16]
-
-Internet-Draft                 SMTP-TLSRPT                     July 2017
-
-
    Change controller: Internet Engineering Task Force
    (mailto:iesg@ietf.org).
 
-6.4.  application/tlsrpt+gz Media Type
+6.4.  application/tlsrpt+gzip Media Type
 
     +-------------+----------------+-------------+-------------------+
     | Type        | Subtype        | File extn   | Specification     |
@@ -918,9 +922,7 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
 
    Optional parameters: n/a
 
-   Encoding considerations: Encoding considerations are identical to
-   those specified for the "application/json" media type.  See
-   [RFC7493].
+   Encoding considerations: Binary
 
    Security considerations: Security considerations relating to SMTP TLS
    Reporting are discussed in Section 7.
@@ -944,15 +946,15 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
    Person & email address to contact for further information: See
    Authors' Addresses section.
 
-   Intended usage: COMMON
 
 
 
-
-Margolis, et al.        Expires February 1, 2018               [Page 17]
+Margolis, et al.        Expires February 16, 2018              [Page 17]
 
-Internet-Draft                 SMTP-TLSRPT                     July 2017
+Internet-Draft                 SMTP-TLSRPT                   August 2017
 
+
+   Intended usage: COMMON
 
    Restrictions on usage: n/a
 
@@ -999,16 +1001,17 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
 
    o  Untrusted content: An attacker could inject malicious code into
       the report, opening a vulnerability in the receiving domain.
+
+
+
+
+Margolis, et al.        Expires February 16, 2018              [Page 18]
+
+Internet-Draft                 SMTP-TLSRPT                   August 2017
+
+
       Implementers are advised to take precautions against evaluating
       the contents of the report.
-
-
-
-
-Margolis, et al.        Expires February 1, 2018               [Page 18]
-
-Internet-Draft                 SMTP-TLSRPT                     July 2017
-
 
    o  Report snooping: An attacker could create a bogus TLSRPT record to
       receive statistics about a domain the attacker does not own.
@@ -1058,12 +1061,9 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
 
 
 
-
-
-
-Margolis, et al.        Expires February 1, 2018               [Page 19]
+Margolis, et al.        Expires February 16, 2018              [Page 19]
 
-Internet-Draft                 SMTP-TLSRPT                     July 2017
+Internet-Draft                 SMTP-TLSRPT                   August 2017
 
 
 {
@@ -1083,7 +1083,7 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
   "summary": {
     "total-successful-session-count": 5326,
     "total-failure-session-count": 303
-  }
+  },
   "failure-details": [{
     "result-type": "certificate-expired",
     "sending-mta-ip": "98.136.216.25",
@@ -1097,9 +1097,9 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
     "additional-information": "hxxps://reports.company-x.com/
       report_info?id=5065427c-23d3#StarttlsNotSupported"
   }, {
-    "result-type: "validation-failure",
+    "result-type": "validation-failure",
     "sending-mta-ip": "47.97.15.2",
-    "receiving-mx-hostname: "mx-backup.mail.company-y.com",
+    "receiving-mx-hostname": "mx-backup.mail.company-y.com",
     "failed-session-count": 3,
     "failure-error-code": "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED"
   }]
@@ -1117,12 +1117,14 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
 
 
 
-Margolis, et al.        Expires February 1, 2018               [Page 20]
+Margolis, et al.        Expires February 16, 2018              [Page 20]
 
-Internet-Draft                 SMTP-TLSRPT                     July 2017
+Internet-Draft                 SMTP-TLSRPT                   August 2017
 
 
-10.  Normative References
+10.  References
+
+10.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
@@ -1133,10 +1135,6 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
               RFC2818, May 2000,
               <http://www.rfc-editor.org/info/rfc2818>.
 
-   [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
-              Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
-              February 2002, <http://www.rfc-editor.org/info/rfc3207>.
-
    [RFC3339]  Klyne, G. and C. Newman, "Date and Time on the Internet:
               Timestamps", RFC 3339, DOI 10.17487/RFC3339, July 2002,
               <http://www.rfc-editor.org/info/rfc3339>.
@@ -1145,15 +1143,6 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
               for Internationalized Domain Names in Applications
               (IDNA)", RFC 3492, DOI 10.17487/RFC3492, March 2003,
               <http://www.rfc-editor.org/info/rfc3492>.
-
-   [RFC3501]  Crispin, M., "INTERNET MESSAGE ACCESS PROTOCOL - VERSION
-              4rev1", RFC 3501, DOI 10.17487/RFC3501, March 2003,
-              <http://www.rfc-editor.org/info/rfc3501>.
-
-   [RFC3864]  Klyne, G., Nottingham, M., and J. Mogul, "Registration
-              Procedures for Message Header Fields", BCP 90, RFC 3864,
-              DOI 10.17487/RFC3864, September 2004,
-              <http://www.rfc-editor.org/info/rfc3864>.
 
    [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
               Resource Identifier (URI): Generic Syntax", STD 66, RFC
@@ -1169,15 +1158,6 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
               DOI 10.17487/RFC5321, October 2008,
               <http://www.rfc-editor.org/info/rfc5321>.
 
-
-
-
-
-Margolis, et al.        Expires February 1, 2018               [Page 21]
-
-Internet-Draft                 SMTP-TLSRPT                     July 2017
-
-
    [RFC5322]  Resnick, P., Ed., "Internet Message Format", RFC 5322, DOI
               10.17487/RFC5322, October 2008,
               <http://www.rfc-editor.org/info/rfc5322>.
@@ -1186,6 +1166,17 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
               Applications (IDNA): Protocol", RFC 5891, DOI 10.17487/
               RFC5891, August 2010,
               <http://www.rfc-editor.org/info/rfc5891>.
+
+
+
+
+
+
+
+Margolis, et al.        Expires February 16, 2018              [Page 21]
+
+Internet-Draft                 SMTP-TLSRPT                   August 2017
+
 
    [RFC5952]  Kawamura, S. and M. Kawashima, "A Recommendation for IPv6
               Address Text Representation", RFC 5952, DOI 10.17487/
@@ -1203,6 +1194,11 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
               Security (TLS)", RFC 6125, DOI 10.17487/RFC6125, March
               2011, <http://www.rfc-editor.org/info/rfc6125>.
 
+   [RFC6376]  Crocker, D., Ed., Hansen, T., Ed., and M. Kucherawy, Ed.,
+              "DomainKeys Identified Mail (DKIM) Signatures", STD 76,
+              RFC 6376, DOI 10.17487/RFC6376, September 2011,
+              <http://www.rfc-editor.org/info/rfc6376>.
+
    [RFC6522]  Kucherawy, M., Ed., "The Multipart/Report Media Type for
               the Reporting of Mail System Administrative Messages", STD
               73, RFC 6522, DOI 10.17487/RFC6522, January 2012,
@@ -1217,6 +1213,32 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
               Interchange Format", RFC 7159, DOI 10.17487/RFC7159, March
               2014, <http://www.rfc-editor.org/info/rfc7159>.
 
+   [RFC7493]  Bray, T., Ed., "The I-JSON Message Format", RFC 7493, DOI
+              10.17487/RFC7493, March 2015,
+              <http://www.rfc-editor.org/info/rfc7493>.
+
+10.2.  Informative References
+
+   [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
+              Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
+              February 2002, <http://www.rfc-editor.org/info/rfc3207>.
+
+   [RFC3501]  Crispin, M., "INTERNET MESSAGE ACCESS PROTOCOL - VERSION
+              4rev1", RFC 3501, DOI 10.17487/RFC3501, March 2003,
+              <http://www.rfc-editor.org/info/rfc3501>.
+
+
+
+Margolis, et al.        Expires February 16, 2018              [Page 22]
+
+Internet-Draft                 SMTP-TLSRPT                   August 2017
+
+
+   [RFC3864]  Klyne, G., Nottingham, M., and J. Mogul, "Registration
+              Procedures for Message Header Fields", BCP 90, RFC 3864,
+              DOI 10.17487/RFC3864, September 2004,
+              <http://www.rfc-editor.org/info/rfc3864>.
+
    [RFC7435]  Dukhovni, V., "Opportunistic Security: Some Protection
               Most of the Time", RFC 7435, DOI 10.17487/RFC7435,
               December 2014, <http://www.rfc-editor.org/info/rfc7435>.
@@ -1225,23 +1247,10 @@ Internet-Draft                 SMTP-TLSRPT                     July 2017
               Extension for HTTP", RFC 7469, DOI 10.17487/RFC7469, April
               2015, <http://www.rfc-editor.org/info/rfc7469>.
 
-
-
-
-
-Margolis, et al.        Expires February 1, 2018               [Page 22]
-
-Internet-Draft                 SMTP-TLSRPT                     July 2017
-
-
    [RFC7489]  Kucherawy, M., Ed. and E. Zwicky, Ed., "Domain-based
               Message Authentication, Reporting, and Conformance
               (DMARC)", RFC 7489, DOI 10.17487/RFC7489, March 2015,
               <http://www.rfc-editor.org/info/rfc7489>.
-
-   [RFC7493]  Bray, T., Ed., "The I-JSON Message Format", RFC 7493, DOI
-              10.17487/RFC7493, March 2015,
-              <http://www.rfc-editor.org/info/rfc7493>.
 
 Authors' Addresses
 
@@ -1276,13 +1285,4 @@ Authors' Addresses
 
 
 
-
-
-
-
-
-
-
-
-
-Margolis, et al.        Expires February 1, 2018               [Page 23]
+Margolis, et al.        Expires February 16, 2018              [Page 23]

@@ -475,7 +475,7 @@ TLS-Report-Submitter: Sender-Domain
 ```
 These message headers MUST be included and should allow for easy searching for 
 all reports submitted by a report domain or a particular submitter, for example
-in IMAP [@?FC3501]:
+in IMAP [@?RFC3501]:
 
 `s SEARCH HEADER "TLS-Report-Domain" "example.com"`
 
