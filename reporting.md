@@ -3,13 +3,13 @@
    Title = "SMTP TLS Reporting"
    abbrev = "SMTP-TLSRPT"
    category = "std"
-   docName = "draft-ietf-uta-smtp-tlsrpt-07"
+   docName = "draft-ietf-uta-smtp-tlsrpt-08"
    ipr = "trust200902"
    area = "Applications"
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2017-07-31T00:00:00Z
+   date = 2017-08-15T00:00:00Z
    
    [[author]]
    initials="D."
@@ -52,7 +52,7 @@
 .# Abstract
 
 A number of protocols exist for establishing encrypted channels between SMTP
-Mail Transfer Agents, including STARTTLS [@!RFC3207], DANE [@!RFC6698], and
+Mail Transfer Agents, including STARTTLS [@?RFC3207], DANE [@!RFC6698], and
 MTA-STS (TODO: Add ref). These protocols can fail due to misconfiguration or
 active attack, leading to undelivered messages or delivery over unencrypted or
 unauthenticated channels. This document describes a reporting mechanism and
@@ -65,9 +65,9 @@ misconfigurations.
 
 # Introduction
 
-The STARTTLS extension to SMTP [@!RFC3207] allows SMTP clients and hosts to
+The STARTTLS extension to SMTP [@?RFC3207] allows SMTP clients and hosts to
 establish secure SMTP sessions over TLS. The protocol design is based on
-"Opportunistic Security" (OS) [@!RFC7435], which maintains interoperability with
+"Opportunistic Security" (OS) [@?RFC7435], which maintains interoperability with
 clients that do not support STARTTLS but means that any attacker who can delete
 parts of the SMTP session (such as the "250 STARTTLS" response) or redirect the
 entire SMTP session (perhaps by overwriting the resolved MX record of the
@@ -130,14 +130,20 @@ Policies consist of the following directives:
 
 * `v`: This value MUST be equal to `TLSRPTv1`.
 * `rua`: A URI specifying the endpoint to which aggregate information about
-  policy failures should be sent (see (#reporting-schema), "Reporting Schema",
-  for more information). Two URI schemes are supported: `mailto` and `https`.
+  policy validation results should be sent (see (#reporting-schema), "Reporting 
+  Schema",  for more information). Two URI schemes are supported: `mailto` 
+  and `https`.  As with DMARC [@?RFC7489], the policy domain can specify a 
+  comma-separated list of URIs.
 * In the case of `https`, reports should be submitted via POST ([@!RFC2818]) 
-  to the specified URI.
+  to the specified URI.  Report submitters MAY ignore certificate validation
+  errors when submitting reports via https.
 * In the case of `mailto`, reports should be submitted to the specified
   email address ([@!RFC6068]). When sending failure reports via SMTP,
 	sending MTAs MUST deliver reports despite any TLS-related failures.
-	This may mean that the reports are delivered in the clear.
+	This may mean that the reports are delivered in the clear.  Additionally,
+	 reports sent via SMTP MUST contain a valid DKIM [@!RFC6376] signature by
+	 the reporting domain.  Reports lacking such a signature MUST be ignored
+	 by the recipient.
 
 The formal definition of the `_smtp-tlsrpt` TXT record, defined using
 [@!RFC5234], is as follows:
@@ -150,7 +156,8 @@ The formal definition of the `_smtp-tlsrpt` TXT record, defined using
         tlsrpt-version    = %x76 *WSP "=" *WSP %x54 %x4C %x53 %x52
                             %x50 %x54 %x76 %x31                ; "v=TLSRPTv1"
 
-        tlsrpt-rua        = %x72 %x75 %x61 *WSP "=" *WSP tlsrpt-uri ; "rua=..."
+        tlsrpt-rua        = %x72 %x75 %x61 *WSP "=" *WSP 
+	                    tlsrpt-uri *(*WSP "," *WSP tlsrpt-uri)  ; "rua=..."
 
         tlsrpt-uri        = URI
                           ; "URI" is imported from [@!RFC3986]; commas (ASCII
@@ -213,7 +220,7 @@ Aggregate reports contain the following fields:
     (1) The MTA-STS policy applied (as a string)
     (2) The DANE TLSA record applied (as a string, with each RR entry of the
     RRset listed and separated by a semicolon)
-    (3) The literal string `no-policy-found`, if neither a TLSA nor
+    (3) The literal string `no-policy-found`, if neither a DANE nor
     MTA-STS policy could be found.
   * The domain for which the policy is applied
   * The MX host
@@ -230,7 +237,9 @@ multiple errors.
 ## Report Time-frame
 
 The report SHOULD cover a full day, from 0000-2400 UTC.  This should allow for
-easier correlation of failure events.
+easier correlation of failure events.  To avoid a Denial of Service against the
+system processing the reports, the reports should be delivered after some
+delay, perhaps several hours.
 
 ## Delivery Summary
 
@@ -281,7 +290,10 @@ to grow over time based on real-world experience. The initial set is:
     to be valid.
 * `dnssec-invalid`: This would indicate that no valid records were returned from 
     the recursive resolver.  The request returned with SERVFAIL for the requested
-    TLSA record.
+    TLSA record.  It should be noted that if the reporter's systems are having problems
+    resolving destination DNS records due to DNSSEC failures, it's possible they will 
+    also be unable to resolve the TLSRPT record, therefore these types of reports may
+    be rare.
 
 #### MTA-STS-specific Policy Failures
 
@@ -306,7 +318,7 @@ Transient errors due to too-busy network, TCP timeouts, etc. are not required to
 
 ## JSON Report Schema
 
-The JSON schema is derived from the HPKP JSON schema [@!RFC7469] (cf. Section 3)
+The JSON schema is derived from the HPKP JSON schema [@?RFC7469] (cf. Section 3)
 
 ```
 {
@@ -366,9 +378,9 @@ Figure: JSON Report Format
 * `mx-host-pattern`: The pattern of MX hostnames from the applied policy. It
     is provided as a string, and is interpreted in the same manner as the
     "Checking of Wildcard Certificates" rules in Section 6.4.3 of [@!RFC6125].
-* `result-type`: A value from (#result-types), "Result Types",  above. In the 
-   case of Internationalized Domain Names ([@!RFC5891]), the domain is the 
-   Punycode-encoded A-label ([@!RFC3492]) and not the U-label.
+     In the case of Internationalized Domain Names ([@!RFC5891]), the domain is 
+     the Punycode-encoded A-label ([@!RFC3492]) and not the U-label.
+* `result-type`: A value from (#result-types), "Result Types",  above.
 * `ip-address`: The IP address of the sending MTA that attempted the STARTTLS
     connection. It is provided as a string representation of an IPv4 (see below) 
     or IPv6 ([@!RFC5952]) address in dot-decimal or colon-hexadecimal notation.
@@ -389,12 +401,12 @@ Figure: JSON Report Format
     code or error message.
     
 For report purposes, an IPv4 Address is defined as:
-     IPv4address   = dec-octet "." dec-octet "." dec-octet "." dec-octet
-     dec-octet     = DIGIT                 ; 0-9
-                    / %x31-39 DIGIT         ; 10-99
-                    / "1" 2DIGIT            ; 100-199
-                    / "2" %x30-34 DIGIT     ; 200-249
-                    / "25" %x30-35          ; 250-255
+     IPv4address = dec-octet "." dec-octet "." dec-octet "." dec-octet     
+                   dec-octet     = DIGIT                 ; 0-9
+                   / %x31-39 DIGIT         ; 10-99
+                   / "1" 2DIGIT            ; 100-199
+                   / "2" %x30-34 DIGIT     ; 200-249
+                   / "25" %x30-35          ; 250-255
 		    
 
 # Report Delivery
@@ -404,7 +416,7 @@ POST.
 
 ## Report Filename
 
-The filename is typically constructed using the following ABNF:
+The filename is RECOMMENDED to be constructed using the following ABNF:
 
      filename = sender "!" policy-domain "!" begin-timestamp
                "!" end-timestamp [ "!" unique-id ] "." extension
@@ -463,16 +475,17 @@ TLS-Report-Submitter: Sender-Domain
 ```
 These message headers MUST be included and should allow for easy searching for 
 all reports submitted by a report domain or a particular submitter, for example
-in IMAP [@!RFC3501]:
+in IMAP [@?FC3501]:
 
 `s SEARCH HEADER "TLS-Report-Domain" "example.com"`
 
 It is presumed that the aggregate reporting address will be equipped to process
 new message header fields and extract MIME parts with the prescribed media type
-and filename, and ignore the rest.
+and filename, and ignore the rest.  These additional headers SHOULD be included
+in the DKIM [@!RFC6376] signature for the message.
 
-   The [@!RFC5322].Subject field for individual report submissions SHOULD
-   conform to the following ABNF:
+   The [@!RFC5322].Subject field for report submissions SHOULD conform to the 
+   following ABNF:
 
     tlsrpt-subject = %s"Report" FWS               ; "Report"
                      %s"Domain:" FWS              ; "Domain:"
@@ -539,7 +552,7 @@ MTA-STS or DANE TLSA failures.
 
 ## HTTPS Transport
 
-The report MAY be delivered by POST to HTTPS. If compressed, the report should
+The report MAY be delivered by POST to HTTPS. If compressed, the report SHOULD
 use the media type `application/tlsrpt+gzip`, and `application/tlsrpt+json`
 otherwise (see section (#iana-considerations), "IANA Considerations").
 
@@ -548,8 +561,15 @@ otherwise (see section (#iana-considerations), "IANA Considerations").
 In the event of a delivery failure, regardless of the delivery method, a 
 sender SHOULD attempt redelivery for up to 24hrs after the initial attempt.  As
 previously stated the reports are optional, so while it is ideal to attempt
-redelivery, it is not required.  If multiple retries are attempted, they should
-be on a logarithmic scale.
+redelivery, it is not required.  If multiple retries are attempted, ideally they 
+would be on a logarithmic scale.
+
+## Metadata Variances
+
+As stated above, there are a variable number of ways to declare information
+about the data therein.  If it should be the case that these objects were to
+disagree, then the report data contained within the JSON body MUST be considered 
+the authoritative source for those data elements.
 
 # IANA Considerations
 
@@ -558,7 +578,7 @@ The following are the IANA considerations discussed in this document.
 ## Message headers
 
 Below is the Internet Assigned Numbers Authority (IANA) Permanent Message Header
-Field registration information per [@!RFC3864].
+Field registration information per [@?RFC3864].
      
      Header field name:           TLS-Report-Domain
      Applicable protocol:         mail
@@ -635,7 +655,7 @@ This document registers multiple media types, beginning with Table 1 below.
    Change controller:  Internet Engineering Task Force
       (mailto:iesg@ietf.org).
 
-## application/tlsrpt+gz Media Type
+## application/tlsrpt+gzip Media Type
  
 
     +-------------+----------------+-------------+-------------------+
@@ -653,9 +673,7 @@ This document registers multiple media types, beginning with Table 1 below.
 
    Optional parameters: n/a
 
-   Encoding considerations: Encoding considerations are identical to
-      those specified for the `application/json` media type. See
-      [@!RFC7493].
+   Encoding considerations: Binary
 
    Security considerations: Security considerations relating to SMTP
       TLS Reporting are discussed in Section 7.
@@ -737,14 +755,14 @@ several security risks presented by the existence of this reporting channel:
   delegate processing of reports to a partner organization. However, an attacker
   who controls the Policy Domain DNS could also use this mechanism to direct the
   reports to an unwitting victim, flooding that victim with excessive reports.
-  DMARC [@!RFC7489] defines a solution for verifying delegation to avoid such
+  DMARC [@?RFC7489] defines a solution for verifying delegation to avoid such
   attacks; the need for this is greater with DMARC, however, because DMARC
-  allows an attacker to trigger reports to a target from an innocent third party by sending that
-  third party mail (which triggers a report from the third party to the target).
-  In the case of TLSRPT, the attacker would have to induce the third party to
-  send the attacker mail in order to trigger reports from the third party to the
-  victim; this reduces the risk of such an attack and the need for a
-  verification mechanism.
+  allows an attacker to trigger reports to a target from an innocent third party
+  by sending that third party mail (which triggers a report from the third party
+  to the target).  In the case of TLSRPT, the attacker would have to induce the 
+  third party to send the attacker mail in order to trigger reports from the
+  third party to the victim; this reduces the risk of such an attack and the
+  need for a verification mechanism.
 
 # Appendix 1: Example Reporting Policy
 
@@ -783,7 +801,7 @@ _smtp-tlsrpt.mail.example.com. IN TXT \
   "summary": {
     "total-successful-session-count": 5326,
     "total-failure-session-count": 303
-  }
+  },
   "failure-details": [{
     "result-type": "certificate-expired",
     "sending-mta-ip": "98.136.216.25",
@@ -797,9 +815,9 @@ _smtp-tlsrpt.mail.example.com. IN TXT \
     "additional-information": "hxxps://reports.company-x.com/
       report_info?id=5065427c-23d3#StarttlsNotSupported"
   }, {
-    "result-type: "validation-failure",
+    "result-type": "validation-failure",
     "sending-mta-ip": "47.97.15.2",
-    "receiving-mx-hostname: "mx-backup.mail.company-y.com",
+    "receiving-mx-hostname": "mx-backup.mail.company-y.com",
     "failed-session-count": 3,
     "failure-error-code": "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED"
   }]
