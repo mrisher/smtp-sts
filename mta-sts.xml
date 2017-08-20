@@ -256,10 +256,10 @@ cases where webservers allow untrusted users to host non-text content
 <t><spanx style="verb">mode</spanx>: (plain-text, required). Either &quot;enforce&quot; or &quot;report&quot;, indicating the
 expected behavior of a sending MTA in the case of a policy validation failure.</t>
 <t><spanx style="verb">max_age</spanx>: Max lifetime of the policy (plain-text non-negative integer
-seconds, required).  Well-behaved clients SHOULD cache a policy for up to this value
-from last policy fetch time. To mitigate the risks of attacks at policy
-refresh time, it is expected that this value typically be in the range of
-weeks or greater.</t>
+seconds, maximum value of 31557600, required).  Well-behaved clients SHOULD
+cache a policy for up to this value from last policy fetch time. To mitigate
+the risks of attacks at policy refresh time, it is expected that this value
+typically be in the range of weeks or greater.</t>
 <t><spanx style="verb">mx</spanx>: MX identity patterns (list of plain-text strings, required). One or more
 patterns matching a Common Name (<xref target="RFC6125"/>) or Subject Alternative Name
 (<xref target="RFC5280"/>) DNS-ID present in the X.509 certificate presented by any MX
