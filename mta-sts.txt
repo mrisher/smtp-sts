@@ -257,12 +257,12 @@ sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)       ; chars excluding
    the "mta-sts" host at the Policy Domain.  Thus for "example.com" the
    path is "https://mta-sts.example.com/.well-known/mta-sts.txt".
 
-   The [RFC2616] "Content-Type" media type for this resource MUST be
-   "text/plain"; additional charset parameters are allowed.  When
-   fetching a policy, senders SHOULD validate that the "Content-Type" is
-   as expected, to guard against cases where webservers allow untrusted
-   users to host non-text content (typically, HTML or images) at a user-
-   defined path.
+   The [RFC7231] "Content-Type" media type for this resource MUST be
+   "text/plain".  When fetching a policy, senders SHOULD validate that
+   the media type is "text/plain" to guard against cases where
+   webservers allow untrusted users to host non-text content (typically,
+   HTML or images) at a user-defined path.  Additional "Content-Type"
+   parameters are ignored.
 
    This resource contains the following line-separated key/value pairs:
 
@@ -973,12 +973,6 @@ Internet-Draft                   MTA-STS                     August 2017
               RFC2119, March 1997,
               <http://www.rfc-editor.org/info/rfc2119>.
 
-   [RFC2616]  Fielding, R., Gettys, J., Mogul, J., Frystyk, H.,
-              Masinter, L., Leach, P., and T. Berners-Lee, "Hypertext
-              Transfer Protocol -- HTTP/1.1", RFC 2616, DOI 10.17487/
-              RFC2616, June 1999,
-              <http://www.rfc-editor.org/info/rfc2616>.
-
    [RFC3492]  Costello, A., "Punycode: A Bootstring encoding of Unicode
               for Internationalized Domain Names in Applications
               (IDNA)", RFC 3492, DOI 10.17487/RFC3492, March 2003,
@@ -999,6 +993,12 @@ Internet-Draft                   MTA-STS                     August 2017
               .17487/RFC5785, April 2010,
               <http://www.rfc-editor.org/info/rfc5785>.
 
+   [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
+              Verification of Domain-Based Application Service Identity
+              within Internet Public Key Infrastructure Using X.509
+              (PKIX) Certificates in the Context of Transport Layer
+              Security (TLS)", RFC 6125, DOI 10.17487/RFC6125, March
+              2011, <http://www.rfc-editor.org/info/rfc6125>.
 
 
 
@@ -1010,12 +1010,10 @@ Margolis, et al.        Expires February 16, 2018              [Page 18]
 Internet-Draft                   MTA-STS                     August 2017
 
 
-   [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
-              Verification of Domain-Based Application Service Identity
-              within Internet Public Key Infrastructure Using X.509
-              (PKIX) Certificates in the Context of Transport Layer
-              Security (TLS)", RFC 6125, DOI 10.17487/RFC6125, March
-              2011, <http://www.rfc-editor.org/info/rfc6125>.
+   [RFC7231]  Fielding, R., Ed. and J. Reschke, Ed., "Hypertext Transfer
+              Protocol (HTTP/1.1): Semantics and Content", RFC 7231, DOI
+              10.17487/RFC7231, June 2014, <https://www.rfc-editor.org/
+              info/rfc7231>.
 
    [RFC7405]  Kyzivat, P., "Case-Sensitive String Support in ABNF", RFC
               7405, DOI 10.17487/RFC7405, December 2014,
@@ -1057,6 +1055,8 @@ Internet-Draft                   MTA-STS                     August 2017
               (DANE) Transport Layer Security (TLS)", RFC 7672, DOI 10
               .17487/RFC7672, October 2015,
               <http://www.rfc-editor.org/info/rfc7672>.
+
+
 
 
 

@@ -181,11 +181,11 @@ path of `.well-known/mta-sts.txt` served by the `mta-sts` host at the Policy
 Domain. Thus for `example.com` the path is
 `https://mta-sts.example.com/.well-known/mta-sts.txt`.
 
-The [@!RFC2616] "Content-Type" media type for this resource MUST be
-"text/plain"; additional charset parameters are allowed. When fetching a policy,
-senders SHOULD validate that the "Content-Type" is as expected, to guard against
-cases where webservers allow untrusted users to host non-text content
-(typically, HTML or images) at a user-defined path.
+The [@!RFC7231] "Content-Type" media type for this resource MUST be
+"text/plain". When fetching a policy, senders SHOULD validate that the
+media type is "text/plain" to guard against cases where webservers allow
+untrusted users to host non-text content (typically, HTML or images) at a
+user-defined path. Additional "Content-Type" parameters are ignored.
 
 This resource contains the following line-separated key/value pairs:
 
