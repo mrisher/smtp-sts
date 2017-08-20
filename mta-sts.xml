@@ -237,21 +237,21 @@ MTA-STS and skip the remaining steps of policy discovery.
 </section>
 
 <section anchor="mtasts-policies" title="MTA-STS Policies">
-<t>The policy itself is a set of key/value pairs served via the HTTPS GET method
-from the fixed <xref target="RFC5785"/> &quot;well-known&quot; path of <spanx style="verb">.well-known/mta-sts.txt</spanx>
-served by the <spanx style="verb">mta-sts</spanx> host at the Policy Domain; the <xref target="RFC2616"/>
-&quot;Content-Type&quot; header MUST be &quot;text/plain&quot;. Thus for <spanx style="verb">example.com</spanx> the path is
-<spanx style="verb">https://mta-sts.example.com/.well-known/mta-sts.txt</spanx>.
+<t>The policy itself is a set of key/value pairs (similar to <xref target="RFC2822"/> header
+fields) served via the HTTPS GET method from the fixed <xref target="RFC5785"/> &quot;well-known&quot;
+path of <spanx style="verb">.well-known/mta-sts.txt</spanx> served by the <spanx style="verb">mta-sts</spanx> host at the Policy
+Domain; the <xref target="RFC2616"/> &quot;Content-Type&quot; header MUST be &quot;text/plain&quot;. Thus for
+<spanx style="verb">example.com</spanx> the path is <spanx style="verb">https://mta-sts.example.com/.well-known/mta-sts.txt</spanx>.
 </t>
 <t>This resource contains the following line-separated key/value pairs:
 </t>
 <t>
 <list style="symbols">
-<t><spanx style="verb">version</spanx>: (plain-text, required). Currently only &quot;STSv1&quot; is supported.</t>
-<t><spanx style="verb">mode</spanx>: (plain-text, required). Either &quot;enforce&quot; or &quot;report&quot;, indicating the
+<t><spanx style="verb">version</spanx>: (plain-text). Currently only &quot;STSv1&quot; is supported.</t>
+<t><spanx style="verb">mode</spanx>: (plain-text). Either &quot;enforce&quot; or &quot;report&quot;, indicating the
 expected behavior of a sending MTA in the case of a policy validation failure.</t>
 <t><spanx style="verb">max_age</spanx>: Max lifetime of the policy (plain-text non-negative integer
-seconds, required).  Well-behaved clients SHOULD cache a policy for up to this value
+seconds).  Well-behaved clients SHOULD cache a policy for up to this value
 from last policy fetch time. To mitigate the risks of attacks at policy
 refresh time, it is expected that this value typically be in the range of
 weeks or greater.</t>
@@ -326,10 +326,10 @@ sts-policy-max-age-value = 1*10(DIGIT)
 </artwork></figure>
 <t>Parsers MUST accept TXT records and policy files which are syntactically valid
 (i.e. valid key/value pairs separated by semi-colons for TXT records) and
-implementing a superset of this specification, in which case unknown fields
-SHALL be ignored. If any field other than <spanx style="verb">mx</spanx> is duplicated, the first entry
-will be honored, the rest should be ignored.  For the <spanx style="verb">mx</spanx> field, all valid
-entries will be utilized when enforcing the stated policy.
+but containing additional key/value pairs not specified in this document, in
+which case unknown fields SHALL be ignored. If any non-repeated field--i.e. all
+fields excepting <spanx style="verb">mx</spanx>--is duplicated, all entries except for the first SHALL be
+ignored. If any field is not specified, the policy SHALL be treated as invalid.
 </t>
 </section>
 
@@ -355,7 +355,9 @@ considerations:
 Protocol (OCSP) <xref target="RFC2560"/>, certificate revocation lists (CRLs), or some other
 mechanism.
 </t>
-<t>HTTP 3xx redirects MUST NOT be followed.
+<t>Policies fetched via HTTPS are only valid if the HTTP response code is 200 (OK).
+HTTP 3xx redirects MUST NOT be followed, and HTTP caching (as specified in
+<xref target="RFC7234"/>) MUST NOT be used.
 </t>
 <t>Senders may wish to rate-limit the frequency of attempts to fetch the HTTPS
 endpoint even if a valid TXT record for the recipient domain exists. In the case
@@ -849,6 +851,10 @@ func handleMessage(message) {
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6125.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7405.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7672.xml"?>
+</references>
+<references title="Informative References">
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2822.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7234.xml"?>
 </references>
 
 </back>
