@@ -290,7 +290,7 @@ mechanism.
 
 Policies fetched via HTTPS are only valid if the HTTP response code is 200 (OK).
 HTTP 3xx redirects MUST NOT be followed, and HTTP caching (as specified in
-[@RFC7234]) MUST NOT be used.
+[@?RFC7234]) MUST NOT be used.
 
 Senders may wish to rate-limit the frequency of attempts to fetch the HTTPS
 endpoint even if a valid TXT record for the recipient domain exists. In the case
