@@ -194,7 +194,7 @@ user-defined path. Additional "Content-Type" parameters are ignored.
 This resource contains the following line-separated key/value pairs:
 
 * `version`: (plain-text). Currently only "STSv1" is supported.
-* `mode`: (plain-text). Either "enforce" or "report", indicating the
+* `mode`: (plain-text). One of "enforce", "report", or "none", indicating the
   expected behavior of a sending MTA in the case of a policy validation failure.
 * `max_age`: Max lifetime of the policy (plain-text non-negative integer
   seconds, maximum value of 31557600).  Well-behaved clients SHOULD
@@ -241,8 +241,10 @@ follows:
     sts-policy-field         = sts-policy-version /           ; required once
                                sts-policy-mode    /           ; required once
                                sts-policy-max-age /           ; required once
-                               1*(sts-policy-mx *WSP CRLF) /  ; required at
-                                                              ;   least once
+                               0*(sts-policy-mx *WSP CRLF) /  ; required at
+                                                              ; least once
+                                                              ; except when mode
+                                                              ; is "none"
                                sts-policy-extension           ; other fields
 
     field-delim              = ":" *WSP
@@ -259,7 +261,7 @@ follows:
 
     sts-policy-mode-field    = %s"mode"
 
-    sts-policy-model-value   =  %s"report" / %s"enforce"
+    sts-policy-model-value   =  %s"report" / %s"enforce" / %s"none"
 
     sts-policy-mx            = sts-policy-mx-field field-delim
                                sts-policy-mx-value
@@ -363,8 +365,8 @@ non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST validate:
 
 This section does not dictate the behavior of sending MTAs when policies fail
 to validate; in particular, validation failures of policies which specify
-"report" mode MUST NOT be interpreted as delivery failures, as described in
-(#policy-application), "Policy Application".
+mode values of "report" or "none" MUST NOT be interpreted as delivery failures,
+as described in (#policy-application), "Policy Application".
 
 ## MX Certificate Validation
 
@@ -400,13 +402,17 @@ MTA-STS policy, a sending MTA honoring MTA-STS applies the result of a policy
 validation failure one of two ways, depending on the value of the policy `mode`
 field:
 
-1. `report`: In this mode, sending MTAs which also implement the TLSRPT
+1. `enforce`: In this mode, sending MTAs MUST NOT deliver the message to hosts
+   which fail MX matching or certificate validation.
+
+2. `report`: In this mode, sending MTAs which also implement the TLSRPT
    specification (TODO: add ref) merely send a report indicating policy
    application failures (so long as TLSRPT is also implemented by the recipient
    domain).
 
-2. `enforce`: In this mode, sending MTAs MUST NOT deliver the message to hosts
-   which fail MX matching or certificate validation.
+3. `none`: In this mode, sending MTAs should treat the policy domain as though
+   it does not have any active policy; see (#removing-mtasts), "Removing
+   MTA-STS", for use of this mode value.
 
 When a message fails to deliver due to an `enforce` policy, a compliant MTA MUST
 NOT permanently fail to deliver messages before checking for the presence of an
@@ -443,10 +449,11 @@ following events as reportable failures:
 * HTTPS policy fetch failures when a valid TXT record is present.
 
 * Policy fetch failures of any kind when a valid policy exists in the policy
-  cache.
+  cache, except if that policy's mode is `none`.
 
 * Delivery attempts in which a contacted MX does not support STARTTLS or does
-  not present a certificate which validates according to the applied policy.
+  not present a certificate which validates according to the applied policy,
+  except if that policy's mode is `none`.
 
 # Operational Considerations
 
@@ -467,6 +474,26 @@ during this period of time, or risk message delays.
 Recipients should also prefer to update the HTTPS policy body before updating
 the TXT record; this ordering avoids the risk that senders, seeing a new TXT
 record, mistakenly cache the old policy from HTTPS.
+
+## Removing MTA-STS
+
+In order to facilitate clean opt-out of MTA-STS by implementing policy domains,
+and to distinguish clearly between failures which indicate attacks and those
+which indicate such opt-outs, MTA-STS implements the `none` mode, which allows
+validated policies to indicate authoritatively that the policy domain wishes to
+no longer implement MTA-STS and may, in the future, remove the MTA-STS TXT and
+policy endpoints entirely.
+
+A suggested workflow to implement such an opt out is as follows:
+
+1. Publish a new policy with `mode` equal to `none` and a small `max_age` (e.g.
+   one day).
+2. Publish a new TXT record to trigger fetching of the new policy.
+3. When all previously served policies have expired--normally this is the time
+   the previously published policy was last served plus that policy's `max_age`,
+   but note that older policies may have been served with a greater `max_age`,
+   allowing overlapping policy caches--safely remove the TXT record and HTTPS
+   endpoint.
 
 # IANA Considerations
 
@@ -560,7 +587,9 @@ prevent a successful refresh.
 Additionally, MTAs should alert administrators to repeated policy refresh
 failures long before cached policies expire (through warning logs or similar
 applicable mechanisms), allowing administrators to detect such a persistent
-attack on policy refresh.
+attack on policy refresh. (However, they should not implement such alerts if the
+cached policy has a `none` mode, to allow clean MTA-STS removal, as described in
+(#removing-mtasts).)
 
 Resistance to downgrade attacks of this nature--due to the ability to
 authoritatively determine "lack of a record" even for non-participating

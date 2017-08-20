@@ -258,7 +258,7 @@ user-defined path. Additional &quot;Content-Type&quot; parameters are ignored.
 <t>
 <list style="symbols">
 <t><spanx style="verb">version</spanx>: (plain-text). Currently only &quot;STSv1&quot; is supported.</t>
-<t><spanx style="verb">mode</spanx>: (plain-text). Either &quot;enforce&quot; or &quot;report&quot;, indicating the
+<t><spanx style="verb">mode</spanx>: (plain-text). One of &quot;enforce&quot;, &quot;report&quot;, or &quot;none&quot;, indicating the
 expected behavior of a sending MTA in the case of a policy validation failure.</t>
 <t><spanx style="verb">max_age</spanx>: Max lifetime of the policy (plain-text non-negative integer
 seconds, maximum value of 31557600).  Well-behaved clients SHOULD
@@ -306,8 +306,10 @@ sts-policy-record        = *WSP sts-policy-field *WSP
 sts-policy-field         = sts-policy-version /           ; required once
                            sts-policy-mode    /           ; required once
                            sts-policy-max-age /           ; required once
-                           1*(sts-policy-mx *WSP CRLF) /  ; required at
-                                                          ;   least once
+                           0*(sts-policy-mx *WSP CRLF) /  ; required at
+                                                          ; least once
+                                                          ; except when mode
+                                                          ; is "none"
                            sts-policy-extension           ; other fields
 
 field-delim              = ":" *WSP
@@ -324,7 +326,7 @@ sts-policy-mode          = sts-policy-mode-field field-delim
 
 sts-policy-mode-field    = %s"mode"
 
-sts-policy-model-value   =  %s"report" / %s"enforce"
+sts-policy-model-value   =  %s"report" / %s"enforce" / %s"none"
 
 sts-policy-mx            = sts-policy-mx-field field-delim
                            sts-policy-mx-value
@@ -436,8 +438,8 @@ Certificate Validation&quot;.</t>
 </t>
 <t>This section does not dictate the behavior of sending MTAs when policies fail
 to validate; in particular, validation failures of policies which specify
-&quot;report&quot; mode MUST NOT be interpreted as delivery failures, as described in
-<xref target="policy-application"/>, &quot;Policy Application&quot;.
+mode values of &quot;report&quot; or &quot;none&quot; MUST NOT be interpreted as delivery failures,
+as described in <xref target="policy-application"/>, &quot;Policy Application&quot;.
 </t>
 
 <section anchor="mx-certificate-validation" title="MX Certificate Validation">
@@ -477,12 +479,15 @@ field:
 </t>
 <t>
 <list style="numbers">
+<t><spanx style="verb">enforce</spanx>: In this mode, sending MTAs MUST NOT deliver the message to hosts
+which fail MX matching or certificate validation.</t>
 <t><spanx style="verb">report</spanx>: In this mode, sending MTAs which also implement the TLSRPT
 specification (TODO: add ref) merely send a report indicating policy
 application failures (so long as TLSRPT is also implemented by the recipient
 domain).</t>
-<t><spanx style="verb">enforce</spanx>: In this mode, sending MTAs MUST NOT deliver the message to hosts
-which fail MX matching or certificate validation.</t>
+<t><spanx style="verb">none</spanx>: In this mode, sending MTAs should treat the policy domain as though
+it does not have any active policy; see <xref target="removing-mtasts"/>, &quot;Removing
+MTA-STS&quot;, for use of this mode value.</t>
 </list>
 </t>
 <t>When a message fails to deliver due to an <spanx style="verb">enforce</spanx> policy, a compliant MTA MUST
@@ -526,9 +531,10 @@ following events as reportable failures:
 <list style="symbols">
 <t>HTTPS policy fetch failures when a valid TXT record is present.</t>
 <t>Policy fetch failures of any kind when a valid policy exists in the policy
-cache.</t>
+cache, except if that policy's mode is <spanx style="verb">none</spanx>.</t>
 <t>Delivery attempts in which a contacted MX does not support STARTTLS or does
-not present a certificate which validates according to the applied policy.</t>
+not present a certificate which validates according to the applied policy,
+except if that policy's mode is <spanx style="verb">none</spanx>.</t>
 </list>
 </t>
 </section>
@@ -551,6 +557,30 @@ during this period of time, or risk message delays.
 <t>Recipients should also prefer to update the HTTPS policy body before updating
 the TXT record; this ordering avoids the risk that senders, seeing a new TXT
 record, mistakenly cache the old policy from HTTPS.
+</t>
+</section>
+
+<section anchor="removing-mtasts" title="Removing MTA-STS">
+<t>In order to facilitate clean opt-out of MTA-STS by implementing policy domains,
+and to distinguish clearly between failures which indicate attacks and those
+which indicate such opt-outs, MTA-STS implements the <spanx style="verb">none</spanx> mode, which allows
+validated policies to indicate authoritatively that the policy domain wishes to
+no longer implement MTA-STS and may, in the future, remove the MTA-STS TXT and
+policy endpoints entirely.
+</t>
+<t>A suggested workflow to implement such an opt out is as follows:
+</t>
+<t>
+<list style="numbers">
+<t>Publish a new policy with <spanx style="verb">mode</spanx> equal to <spanx style="verb">none</spanx> and a small <spanx style="verb">max_age</spanx> (e.g.
+one day).</t>
+<t>Publish a new TXT record to trigger fetching of the new policy.</t>
+<t>When all previously served policies have expired--normally this is the time
+the previously published policy was last served plus that policy's <spanx style="verb">max_age</spanx>,
+but note that older policies may have been served with a greater <spanx style="verb">max_age</spanx>,
+allowing overlapping policy caches--safely remove the TXT record and HTTPS
+endpoint.</t>
+</list>
 </t>
 </section>
 </section>
@@ -659,7 +689,9 @@ prevent a successful refresh.
 <t>Additionally, MTAs should alert administrators to repeated policy refresh
 failures long before cached policies expire (through warning logs or similar
 applicable mechanisms), allowing administrators to detect such a persistent
-attack on policy refresh.
+attack on policy refresh. (However, they should not implement such alerts if the
+cached policy has a <spanx style="verb">none</spanx> mode, to allow clean MTA-STS removal, as described in
+<xref target="removing-mtasts"/>.)
 </t>
 <t>Resistance to downgrade attacks of this nature--due to the ability to
 authoritatively determine &quot;lack of a record&quot; even for non-participating
