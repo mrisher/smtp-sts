@@ -96,7 +96,7 @@ Table of Contents
    12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  18
      12.1.  Normative References . . . . . . . . . . . . . . . . . .  18
      12.2.  Informative References . . . . . . . . . . . . . . . . .  19
-     12.3.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  19
+     12.3.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  20
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  20
 
 1.  Introduction
@@ -260,20 +260,20 @@ sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)       ; chars excluding
 
    This resource contains the following line-separated key/value pairs:
 
-   o  "version": (plain-text, required).  Currently only "STSv1" is
-      supported.
+   o  "version": (plain-text).  Currently only "STSv1" is supported.
 
-   o  "mode": (plain-text, required).  Either "enforce" or "report",
-      indicating the expected behavior of a sending MTA in the case of a
-      policy validation failure.
+   o  "mode": (plain-text).  Either "enforce" or "report", indicating
+      the expected behavior of a sending MTA in the case of a policy
+      validation failure.
 
    o  "max_age": Max lifetime of the policy (plain-text non-negative
-      integer seconds, required).  Well-behaved clients SHOULD cache a
-      policy for up to this value from last policy fetch time.  To
-      mitigate the risks of attacks at policy refresh time, it is
-      expected that this value typically be in the range of weeks or
-      greater.
+      integer seconds).  Well-behaved clients SHOULD cache a policy for
+      up to this value from last policy fetch time.  To mitigate the
+      risks of attacks at policy refresh time, it is expected that this
+      value typically be in the range of weeks or greater.
 
+   o  "mx": MX identity patterns (list of plain-text strings, required).
+      One or more patterns matching a Common Name ([RFC6125]) or Subject
 
 
 
@@ -282,8 +282,6 @@ Margolis, et al.        Expires February 16, 2018               [Page 5]
 Internet-Draft                   MTA-STS                     August 2017
 
 
-   o  "mx": MX identity patterns (list of plain-text strings, required).
-      One or more patterns matching a Common Name ([RFC6125]) or Subject
       Alternative Name ([RFC5280]) DNS-ID present in the X.509
       certificate presented by any MX receiving mail for this domain.
       For example: "mx: mail.example.com mx: .example.net" indicates
@@ -311,6 +309,8 @@ Internet-Draft                   MTA-STS                     August 2017
 
    The formal definition of the policy resource, defined using
    [RFC7405], is as follows:
+
+
 
 
 
@@ -375,11 +375,11 @@ Internet-Draft                   MTA-STS                     August 2017
 
    Parsers MUST accept TXT records and policy files which are
    syntactically valid (i.e. valid key/value pairs separated by semi-
-   colons for TXT records) and implementing a superset of this
-   specification, in which case unknown fields SHALL be ignored.  If any
-   field other than "mx" is duplicated, the first entry will be honored,
-   the rest should be ignored.  For the "mx" field, all valid entries
-   will be utilized when enforcing the stated policy.
+   colons for TXT records) and but containing additional key/value pairs
+   not specified in this document, in which case unknown fields SHALL be
+   ignored.  If any non-repeated field--i.e. all fields excepting "mx"--
+   is duplicated, all entries except for the first SHALL be ignored.  If
+   any field is not specified, the policy SHALL be treated as invalid.
 
 3.3.  HTTPS Policy Fetching
 
@@ -413,7 +413,9 @@ Internet-Draft                   MTA-STS                     August 2017
    Certificate Status Protocol (OCSP) [RFC2560], certificate revocation
    lists (CRLs), or some other mechanism.
 
-   HTTP 3xx redirects MUST NOT be followed.
+   Policies fetched via HTTPS are only valid if the HTTP response code
+   is 200 (OK).  HTTP 3xx redirects MUST NOT be followed, and HTTP
+   caching (as specified in [RFC7234]) MUST NOT be used.
 
    Senders may wish to rate-limit the frequency of attempts to fetch the
    HTTPS endpoint even if a valid TXT record for the recipient domain
@@ -439,8 +441,6 @@ Internet-Draft                   MTA-STS                     August 2017
    Conversely, if no "live" policy can be discovered via DNS or fetched
    via HTTPS, but a valid (non-expired) policy exists in the sender's
    cache, the sender MUST apply that cached policy.
-
-
 
 
 
@@ -1047,16 +1047,16 @@ Internet-Draft                   MTA-STS                     August 2017
               RFC5891, August 2010,
               <http://www.rfc-editor.org/info/rfc5891>.
 
+   [RFC7234]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
+              Ed., "Hypertext Transfer Protocol (HTTP/1.1): Caching",
+              RFC 7234, DOI 10.17487/RFC7234, June 2014, <https://www
+              .rfc-editor.org/info/rfc7234>.
+
    [RFC7672]  Dukhovni, V. and W. Hardaker, "SMTP Security via
               Opportunistic DNS-Based Authentication of Named Entities
               (DANE) Transport Layer Security (TLS)", RFC 7672, DOI 10
               .17487/RFC7672, October 2015,
               <http://www.rfc-editor.org/info/rfc7672>.
-
-12.3.  URIs
-
-   [1] https://mta-sts.example.com/.well-known/mta-sts.txt:
-
 
 
 
@@ -1065,6 +1065,10 @@ Margolis, et al.        Expires February 16, 2018              [Page 19]
 
 Internet-Draft                   MTA-STS                     August 2017
 
+
+12.3.  URIs
+
+   [1] https://mta-sts.example.com/.well-known/mta-sts.txt:
 
 Authors' Addresses
 
@@ -1096,10 +1100,6 @@ Authors' Addresses
    Microsoft, Inc
 
    Email: janet.jones (at) microsoft (dot com)
-
-
-
-
 
 
 

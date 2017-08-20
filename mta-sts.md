@@ -183,11 +183,11 @@ Domain; the [@!RFC2616] "Content-Type" header MUST be "text/plain". Thus for
 
 This resource contains the following line-separated key/value pairs:
 
-* `version`: (plain-text, required). Currently only "STSv1" is supported.
-* `mode`: (plain-text, required). Either "enforce" or "report", indicating the
+* `version`: (plain-text). Currently only "STSv1" is supported.
+* `mode`: (plain-text). Either "enforce" or "report", indicating the
   expected behavior of a sending MTA in the case of a policy validation failure.
 * `max_age`: Max lifetime of the policy (plain-text non-negative integer
-  seconds, required).  Well-behaved clients SHOULD cache a policy for up to this value
+  seconds).  Well-behaved clients SHOULD cache a policy for up to this value
   from last policy fetch time. To mitigate the risks of attacks at policy
   refresh time, it is expected that this value typically be in the range of
   weeks or greater.
@@ -262,10 +262,10 @@ follows:
 
 Parsers MUST accept TXT records and policy files which are syntactically valid
 (i.e. valid key/value pairs separated by semi-colons for TXT records) and
-implementing a superset of this specification, in which case unknown fields
-SHALL be ignored. If any field other than `mx` is duplicated, the first entry
-will be honored, the rest should be ignored.  For the `mx` field, all valid
-entries will be utilized when enforcing the stated policy.
+but containing additional key/value pairs not specified in this document, in
+which case unknown fields SHALL be ignored. If any non-repeated field--i.e. all
+fields excepting `mx`--is duplicated, all entries except for the first SHALL be
+ignored. If any field is not specified, the policy SHALL be treated as invalid.
 
 ## HTTPS Policy Fetching
 
@@ -288,7 +288,9 @@ The certificate MAY be checked for revocation via the Online Certificate Status
 Protocol (OCSP) [@?RFC2560], certificate revocation lists (CRLs), or some other
 mechanism.
 
-HTTP 3xx redirects MUST NOT be followed.
+Policies fetched via HTTPS are only valid if the HTTP response code is 200 (OK).
+HTTP 3xx redirects MUST NOT be followed, and HTTP caching (as specified in
+[@RFC7234]) MUST NOT be used.
 
 Senders may wish to rate-limit the frequency of attempts to fetch the HTTPS
 endpoint even if a valid TXT record for the recipient domain exists. In the case
