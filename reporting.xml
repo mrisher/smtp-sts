@@ -239,7 +239,11 @@ This may mean that the reports are delivered in the clear.  Additionally,
 <t>If multiple TXT records for <spanx style="verb">_smtp-tlsrpt</spanx> are returned by the resolver, records
 which do not begin with <spanx style="verb">v=TLSRPTv1;</spanx> are discarded. If the number of resulting
 records is not one, senders MUST assume the recipient domain does not implement
-TLSRPT. Parsers MUST accept TXT records which are syntactically valid (i.e.
+TLSRPT. If the resulting TXT record contains multiple strings, then the record
+MUST be treated as if those strings are concatenated together without adding
+spaces.
+</t>
+<t>Parsers MUST accept TXT records which are syntactically valid (i.e.
 valid key-value pairs separated by semi-colons) and implementing a superset of
 this specification, in which case unknown fields SHALL be ignored.
 </t>

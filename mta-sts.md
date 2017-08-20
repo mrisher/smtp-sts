@@ -173,7 +173,9 @@ is as follows:
 If multiple TXT records for `_mta-sts` are returned by the resolver, records
 which do not begin with `v=STSv1;` are discarded. If the number of resulting
 records is not one, senders MUST assume the recipient domain does not implement
-MTA-STS and skip the remaining steps of policy discovery.
+MTA-STS and skip the remaining steps of policy discovery. If the resulting TXT
+record contains multiple strings, then the record MUST be treated as if those
+strings are concatenated together without adding spaces.
 
 ## MTA-STS Policies
 

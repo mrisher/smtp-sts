@@ -178,7 +178,11 @@ The formal definition of the `_smtp-tlsrpt` TXT record, defined using
 If multiple TXT records for `_smtp-tlsrpt` are returned by the resolver, records
 which do not begin with `v=TLSRPTv1;` are discarded. If the number of resulting
 records is not one, senders MUST assume the recipient domain does not implement
-TLSRPT. Parsers MUST accept TXT records which are syntactically valid (i.e.
+TLSRPT. If the resulting TXT record contains multiple strings, then the record
+MUST be treated as if those strings are concatenated together without adding
+spaces.
+
+Parsers MUST accept TXT records which are syntactically valid (i.e.
 valid key-value pairs separated by semi-colons) and implementing a superset of
 this specification, in which case unknown fields SHALL be ignored.
 

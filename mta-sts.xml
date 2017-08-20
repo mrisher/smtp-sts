@@ -234,7 +234,9 @@ sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)    ; chars excluding "=",
 <t>If multiple TXT records for <spanx style="verb">_mta-sts</spanx> are returned by the resolver, records
 which do not begin with <spanx style="verb">v=STSv1;</spanx> are discarded. If the number of resulting
 records is not one, senders MUST assume the recipient domain does not implement
-MTA-STS and skip the remaining steps of policy discovery.
+MTA-STS and skip the remaining steps of policy discovery. If the resulting TXT
+record contains multiple strings, then the record MUST be treated as if those
+strings are concatenated together without adding spaces.
 </t>
 </section>
 
