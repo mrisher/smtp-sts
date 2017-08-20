@@ -294,10 +294,10 @@ follows:
 </t>
 
 <figure align="center"><artwork align="center">
-sts-policy-record        = sts-policy-version CRLF
-                           sts-policy-mode CRLF
-                           1*(sts-policy-mx CRLF)
-                           sts-policy-max-age
+sts-policy-record        = sts-policy-version *WSP CRLF
+                           sts-policy-mode *WSP CRLF
+                           1*(sts-policy-mx *WSP CRLF)
+                           sts-policy-max-age *WSP [CRLF]
 
 field-delim              = ":" *WSP
 

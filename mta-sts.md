@@ -229,10 +229,10 @@ max_age: 123456
 The formal definition of the policy resource, defined using [@!RFC7405], is as
 follows:
 
-    sts-policy-record        = sts-policy-version CRLF
-                               sts-policy-mode CRLF
-                               1*(sts-policy-mx CRLF)
-                               sts-policy-max-age
+    sts-policy-record        = sts-policy-version *WSP CRLF
+                               sts-policy-mode *WSP CRLF
+                               1*(sts-policy-mx *WSP CRLF)
+                               sts-policy-max-age *WSP [CRLF]
 
     field-delim              = ":" *WSP
 
