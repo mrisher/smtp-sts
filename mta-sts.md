@@ -175,11 +175,16 @@ MTA-STS and skip the remaining steps of policy discovery.
 
 ## MTA-STS Policies
 
-The policy itself is a set of key/value pairs (similar to [@?RFC2822] header
-fields) served via the HTTPS GET method from the fixed [@!RFC5785] "well-known"
-path of `.well-known/mta-sts.txt` served by the `mta-sts` host at the Policy
-Domain; the [@!RFC2616] "Content-Type" header MUST be "text/plain". Thus for
-`example.com` the path is `https://mta-sts.example.com/.well-known/mta-sts.txt`.
+The policy itself is a set of key/value pairs served via the HTTPS GET method
+from the fixed [@!RFC5785] "well-known" path of `.well-known/mta-sts.txt`
+served by the `mta-sts` host at the Policy Domain. Thus for `example.com` the path is
+`https://mta-sts.example.com/.well-known/mta-sts.txt`.
+
+The [@!RFC2616] "Content-Type" media type for this resource MUST be
+"text/plain"; additional charset parameters are allowed. When fetching a policy,
+senders SHOULD validate that the "Content-Type" is as expected, to guard against
+cases where webservers allow untrusted users to host non-text content
+(typically, HTML or images) at a user-defined path.
 
 This resource contains the following line-separated key/value pairs:
 
@@ -187,10 +192,10 @@ This resource contains the following line-separated key/value pairs:
 * `mode`: (plain-text, required). Either "enforce" or "report", indicating the
   expected behavior of a sending MTA in the case of a policy validation failure.
 * `max_age`: Max lifetime of the policy (plain-text non-negative integer
-  seconds, required).  Well-behaved clients SHOULD cache a policy for up to this value
-  from last policy fetch time. To mitigate the risks of attacks at policy
-  refresh time, it is expected that this value typically be in the range of
-  weeks or greater.
+  seconds, maximum value of 31557600, required).  Well-behaved clients SHOULD
+  cache a policy for up to this value from last policy fetch time. To mitigate
+  the risks of attacks at policy refresh time, it is expected that this value
+  typically be in the range of weeks or greater.
 * `mx`: MX identity patterns (list of plain-text strings, required). One or more
   patterns matching a Common Name ([@!RFC6125]) or Subject Alternative Name
   ([@!RFC5280]) DNS-ID present in the X.509 certificate presented by any MX
@@ -224,10 +229,10 @@ max_age: 123456
 The formal definition of the policy resource, defined using [@!RFC7405], is as
 follows:
 
-    sts-policy-record        = sts-policy-version CRLF
-                               sts-policy-mode CRLF
-                               1*(sts-policy-mx CRLF)
-                               sts-policy-max-age
+    sts-policy-record        = sts-policy-version *WSP CRLF
+                               sts-policy-mode *WSP CRLF
+                               1*(sts-policy-mx *WSP CRLF)
+                               sts-policy-max-age *WSP [CRLF]
 
     field-delim              = ":" *WSP
 

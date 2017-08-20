@@ -237,11 +237,24 @@ MTA-STS and skip the remaining steps of policy discovery.
 </section>
 
 <section anchor="mtasts-policies" title="MTA-STS Policies">
+<<<<<<< HEAD
 <t>The policy itself is a set of key/value pairs (similar to <xref target="RFC2822"/> header
 fields) served via the HTTPS GET method from the fixed <xref target="RFC5785"/> &quot;well-known&quot;
 path of <spanx style="verb">.well-known/mta-sts.txt</spanx> served by the <spanx style="verb">mta-sts</spanx> host at the Policy
 Domain; the <xref target="RFC2616"/> &quot;Content-Type&quot; header MUST be &quot;text/plain&quot;. Thus for
 <spanx style="verb">example.com</spanx> the path is <spanx style="verb">https://mta-sts.example.com/.well-known/mta-sts.txt</spanx>.
+=======
+<t>The policy itself is a set of key/value pairs served via the HTTPS GET method
+from the fixed <xref target="RFC5785"/> &quot;well-known&quot; path of <spanx style="verb">.well-known/mta-sts.txt</spanx>
+served by the <spanx style="verb">mta-sts</spanx> host at the Policy Domain. Thus for <spanx style="verb">example.com</spanx> the path is
+<spanx style="verb">https://mta-sts.example.com/.well-known/mta-sts.txt</spanx>.
+>>>>>>> issue174
+</t>
+<t>The <xref target="RFC2616"/> &quot;Content-Type&quot; media type for this resource MUST be
+&quot;text/plain&quot;; additional charset parameters are allowed. When fetching a policy,
+senders SHOULD validate that the &quot;Content-Type&quot; is as expected, to guard against
+cases where webservers allow untrusted users to host non-text content
+(typically, HTML or images) at a user-defined path.
 </t>
 <t>This resource contains the following line-separated key/value pairs:
 </t>
@@ -251,10 +264,10 @@ Domain; the <xref target="RFC2616"/> &quot;Content-Type&quot; header MUST be &qu
 <t><spanx style="verb">mode</spanx>: (plain-text, required). Either &quot;enforce&quot; or &quot;report&quot;, indicating the
 expected behavior of a sending MTA in the case of a policy validation failure.</t>
 <t><spanx style="verb">max_age</spanx>: Max lifetime of the policy (plain-text non-negative integer
-seconds, required).  Well-behaved clients SHOULD cache a policy for up to this value
-from last policy fetch time. To mitigate the risks of attacks at policy
-refresh time, it is expected that this value typically be in the range of
-weeks or greater.</t>
+seconds, maximum value of 31557600, required).  Well-behaved clients SHOULD
+cache a policy for up to this value from last policy fetch time. To mitigate
+the risks of attacks at policy refresh time, it is expected that this value
+typically be in the range of weeks or greater.</t>
 <t><spanx style="verb">mx</spanx>: MX identity patterns (list of plain-text strings, required). One or more
 patterns matching a Common Name (<xref target="RFC6125"/>) or Subject Alternative Name
 (<xref target="RFC5280"/>) DNS-ID present in the X.509 certificate presented by any MX
@@ -289,10 +302,10 @@ follows:
 </t>
 
 <figure align="center"><artwork align="center">
-sts-policy-record        = sts-policy-version CRLF
-                           sts-policy-mode CRLF
-                           1*(sts-policy-mx CRLF)
-                           sts-policy-max-age
+sts-policy-record        = sts-policy-version *WSP CRLF
+                           sts-policy-mode *WSP CRLF
+                           1*(sts-policy-mx *WSP CRLF)
+                           sts-policy-max-age *WSP [CRLF]
 
 field-delim              = ":" *WSP
 
