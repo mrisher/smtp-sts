@@ -252,15 +252,15 @@ cases where webservers allow untrusted users to host non-text content
 </t>
 <t>
 <list style="symbols">
-<t><spanx style="verb">version</spanx>: (plain-text, required). Currently only &quot;STSv1&quot; is supported.</t>
-<t><spanx style="verb">mode</spanx>: (plain-text, required). Either &quot;enforce&quot; or &quot;report&quot;, indicating the
+<t><spanx style="verb">version</spanx>: (plain-text). Currently only &quot;STSv1&quot; is supported.</t>
+<t><spanx style="verb">mode</spanx>: (plain-text). Either &quot;enforce&quot; or &quot;report&quot;, indicating the
 expected behavior of a sending MTA in the case of a policy validation failure.</t>
 <t><spanx style="verb">max_age</spanx>: Max lifetime of the policy (plain-text non-negative integer
-seconds, maximum value of 31557600, required).  Well-behaved clients SHOULD
+seconds, maximum value of 31557600).  Well-behaved clients SHOULD
 cache a policy for up to this value from last policy fetch time. To mitigate
 the risks of attacks at policy refresh time, it is expected that this value
 typically be in the range of weeks or greater.</t>
-<t><spanx style="verb">mx</spanx>: MX identity patterns (list of plain-text strings, required). One or more
+<t><spanx style="verb">mx</spanx>: MX identity patterns (list of plain-text strings). One or more
 patterns matching a Common Name (<xref target="RFC6125"/>) or Subject Alternative Name
 (<xref target="RFC5280"/>) DNS-ID present in the X.509 certificate presented by any MX
 receiving mail for this domain.  For example:
@@ -331,10 +331,10 @@ sts-policy-max-age-value = 1*10(DIGIT)
 </artwork></figure>
 <t>Parsers MUST accept TXT records and policy files which are syntactically valid
 (i.e. valid key/value pairs separated by semi-colons for TXT records) and
-implementing a superset of this specification, in which case unknown fields
-SHALL be ignored. If any field other than <spanx style="verb">mx</spanx> is duplicated, the first entry
-will be honored, the rest should be ignored.  For the <spanx style="verb">mx</spanx> field, all valid
-entries will be utilized when enforcing the stated policy.
+but containing additional key/value pairs not specified in this document, in
+which case unknown fields SHALL be ignored. If any non-repeated field--i.e. all
+fields excepting <spanx style="verb">mx</spanx>--is duplicated, all entries except for the first SHALL be
+ignored. If any field is not specified, the policy SHALL be treated as invalid.
 </t>
 </section>
 
@@ -360,7 +360,9 @@ considerations:
 Protocol (OCSP) <xref target="RFC2560"/>, certificate revocation lists (CRLs), or some other
 mechanism.
 </t>
-<t>HTTP 3xx redirects MUST NOT be followed.
+<t>Policies fetched via HTTPS are only valid if the HTTP response code is 200 (OK).
+HTTP 3xx redirects MUST NOT be followed, and HTTP caching (as specified in
+<xref target="RFC7234"/>) MUST NOT be used.
 </t>
 <t>Senders may wish to rate-limit the frequency of attempts to fetch the HTTPS
 endpoint even if a valid TXT record for the recipient domain exists. In the case
@@ -855,6 +857,7 @@ func handleMessage(message) {
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4033.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5891.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7234.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7672.xml"?>
 </references>
 
