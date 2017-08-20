@@ -148,10 +148,13 @@ Policies consist of the following directives:
 The formal definition of the `_smtp-tlsrpt` TXT record, defined using
 [@!RFC5234], is as follows:
 
-        tlsrpt-record     = tlsrpt-version field-delim tlsrpt-rua
-                            *(field-delim tlsrpt-extension) [field-delim]
+        tlsrpt-record     = tlsrpt-version 1*(field-delim tlsrpt-field)
+                            [field-delim]
 
         field-delim       = *WSP ";" *WSP
+
+        tlsrpt-field      = tlsrpt-rua /        ; Note that the tlsrpt-rua
+                            tlsrpt-extension    ; record is required.
 
         tlsrpt-version    = %s"v=TLSRPTv1"
 

@@ -73,26 +73,26 @@ Table of Contents
    3.  Policy Discovery  . . . . . . . . . . . . . . . . . . . . . .   4
      3.1.  MTA-STS TXT Records . . . . . . . . . . . . . . . . . . .   4
      3.2.  MTA-STS Policies  . . . . . . . . . . . . . . . . . . . .   5
-     3.3.  HTTPS Policy Fetching . . . . . . . . . . . . . . . . . .   7
+     3.3.  HTTPS Policy Fetching . . . . . . . . . . . . . . . . . .   8
      3.4.  Policy Selection for Smart Hosts and Subdomains . . . . .   9
    4.  Policy Validation . . . . . . . . . . . . . . . . . . . . . .   9
      4.1.  MX Certificate Validation . . . . . . . . . . . . . . . .   9
    5.  Policy Application  . . . . . . . . . . . . . . . . . . . . .  10
-     5.1.  Policy Application Control Flow . . . . . . . . . . . . .  10
+     5.1.  Policy Application Control Flow . . . . . . . . . . . . .  11
    6.  Operational Considerations  . . . . . . . . . . . . . . . . .  11
      6.1.  Policy Updates  . . . . . . . . . . . . . . . . . . . . .  11
-   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  11
-     7.1.  Well-Known URIs Registry  . . . . . . . . . . . . . . . .  11
+   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  12
+     7.1.  Well-Known URIs Registry  . . . . . . . . . . . . . . . .  12
      7.2.  MTA-STS TXT Record Fields . . . . . . . . . . . . . . . .  12
      7.3.  MTA-STS Policy Fields . . . . . . . . . . . . . . . . . .  12
    8.  Security Considerations . . . . . . . . . . . . . . . . . . .  12
      8.1.  Obtaining a Signed Certificate  . . . . . . . . . . . . .  13
      8.2.  Preventing Policy Discovery . . . . . . . . . . . . . . .  13
      8.3.  Denial of Service . . . . . . . . . . . . . . . . . . . .  14
-     8.4.  Weak Policy Constraints . . . . . . . . . . . . . . . . .  14
+     8.4.  Weak Policy Constraints . . . . . . . . . . . . . . . . .  15
    9.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  15
    10. Appendix 1: MTA-STS example record & policy . . . . . . . . .  15
-   11. Appendix 2: Message delivery pseudocode . . . . . . . . . . .  15
+   11. Appendix 2: Message delivery pseudocode . . . . . . . . . . .  16
    12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  18
      12.1.  Normative References . . . . . . . . . . . . . . . . . .  18
      12.2.  Informative References . . . . . . . . . . . . . . . . .  19
@@ -226,22 +226,24 @@ Margolis, et al.        Expires February 16, 2018               [Page 4]
 Internet-Draft                   MTA-STS                     August 2017
 
 
-sts-text-record = sts-version field-delim sts-id
-                  *(field-delim sts-extension) [field-delim]
+sts-text-record = sts-version 1*(field-delim sts-field) [field-delim]
+
+sts-field       = sts-id /                        ; Note that sts-id record
+                  sts-extension                   ; is required.
 
 field-delim     = *WSP ";" *WSP
 
 sts-version     = %s"v=STSv1"
 
-sts-id          = %s"id=" 1*32(ALPHA / DIGIT)        ; id=...
+sts-id          = %s"id=" 1*32(ALPHA / DIGIT)     ; id=...
 
-sts-extension   = sts-ext-name "=" sts-ext-value     ; name=value
+sts-extension   = sts-ext-name "=" sts-ext-value  ; name=value
 
 sts-ext-name    = (ALPHA / DIGIT) *31(ALPHA / DIGIT / "_" / "-" / ".")
 
-sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)       ; chars excluding
-                                                     ; "=", ";", SP, and
-                                                     ; control chars
+sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)    ; chars excluding "=",
+                                                  ; ";", SP, and control
+                                                  ; chars
 
    If multiple TXT records for "_mta-sts" are returned by the resolver,
    records which do not begin with "v=STSv1;" are discarded.  If the
@@ -272,8 +274,6 @@ sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)       ; chars excluding
       the expected behavior of a sending MTA in the case of a policy
       validation failure.
 
-   o  "max_age": Max lifetime of the policy (plain-text non-negative
-      integer seconds, maximum value of 31557600).  Well-behaved clients
 
 
 
@@ -282,6 +282,8 @@ Margolis, et al.        Expires February 16, 2018               [Page 5]
 Internet-Draft                   MTA-STS                     August 2017
 
 
+   o  "max_age": Max lifetime of the policy (plain-text non-negative
+      integer seconds, maximum value of 31557600).  Well-behaved clients
       SHOULD cache a policy for up to this value from last policy fetch
       time.  To mitigate the risks of attacks at policy refresh time, it
       is expected that this value typically be in the range of weeks or
@@ -317,18 +319,16 @@ Internet-Draft                   MTA-STS                     August 2017
    The formal definition of the policy resource, defined using
    [RFC7405], is as follows:
 
+sts-policy-record        = *WSP sts-policy-field *WSP
+                           *(CRLF *WSP sts-policy-field *WSP)
+                           [CRLF]
 
-
-
-
-
-
-
-
-
-
-
-
+sts-policy-field         = sts-policy-version /           ; required once
+                           sts-policy-mode    /           ; required once
+                           sts-policy-max-age /           ; required once
+                           1*(sts-policy-mx *WSP CRLF) /  ; required at
+                                                          ;   least once
+                           sts-policy-extension           ; other fields
 
 
 
@@ -338,40 +338,46 @@ Margolis, et al.        Expires February 16, 2018               [Page 6]
 Internet-Draft                   MTA-STS                     August 2017
 
 
-      sts-policy-record        = sts-policy-version *WSP CRLF
-                                 sts-policy-mode *WSP CRLF
-                                 1*(sts-policy-mx *WSP CRLF)
-                                 sts-policy-max-age *WSP [CRLF]
+field-delim              = ":" *WSP
 
-      field-delim              = ":" *WSP
+sts-policy-version       = sts-policy-version-field field-delim
+                           sts-policy-version-value
 
-      sts-policy-version       = sts-policy-version-field field-delim
-                                 sts-policy-version-value
+sts-policy-version-field = %s"version"
 
-      sts-policy-version-field = %s"version"
+sts-policy-version-value = %s"STSv1"
 
-      sts-policy-version-value = %s"STSv1"
+sts-policy-mode          = sts-policy-mode-field field-delim
+                           sts-policy-mode-value
 
-      sts-policy-mode          = sts-policy-mode-field field-delim
-                                 sts-policy-mode-value
+sts-policy-mode-field    = %s"mode"
 
-      sts-policy-mode-field    = %s"mode"
+sts-policy-model-value   =  %s"report" / %s"enforce"
 
-      sts-policy-model-value   =  %s"report" / %s"enforce"
+sts-policy-mx            = sts-policy-mx-field field-delim
+                           sts-policy-mx-value
 
-      sts-policy-mx            = sts-policy-mx-field field-delim
-                                 sts-policy-mx-value
+sts-policy-mx-field      = %s"mx"
 
-      sts-policy-mx-field      = %s"mx"
+sts-policy-mx-value      = 1*(ALPHA / DIGIT / "_" / "-" / ".")
 
-      sts-policy-mx-value      = 1*(ALPHA / DIGIT / "_" / "-" / ".")
+sts-policy-max-age       = sts-policy-max-age-field field-delim
+                           sts-policy-max-age-value
 
-      sts-policy-max-age       = sts-policy-max-age-field field-delim
-                                 sts-policy-max-age-value
+sts-policy-max-age-field = %s"max_age"
 
-      sts-policy-max-age-field = %s"max_age"
+sts-policy-max-age-value = 1*10(DIGIT)
 
-      sts-policy-max-age-value = 1*10(DIGIT)
+sts-policy-extension     = sts-policy-ext-name field-delim ; additional
+                           sts-policy-ext-value            ; extension
+                                                           ; fields
+
+sts-policy-ext-name      = (ALPHA / DIGIT) *31(ALPHA / DIGIT / "_" / "-" / ".")
+
+sts-policy-ext-value     = 1*(%x21-3A / %x3C / %x3E-7E)    ; chars excluding
+                                                           ; "=", ";", SP,
+                                                           ; and control
+                                                           ; chars
 
    Parsers MUST accept TXT records and policy files which are
    syntactically valid (i.e. valid key/value pairs separated by semi-
@@ -381,12 +387,6 @@ Internet-Draft                   MTA-STS                     August 2017
    is duplicated, all entries except for the first SHALL be ignored.  If
    any field is not specified, the policy SHALL be treated as invalid.
 
-3.3.  HTTPS Policy Fetching
-
-   When fetching a new policy or updating a policy, the HTTPS endpoint
-   MUST present a X.509 certificate which is valid for the "mta-sts"
-   host (as described below), chain to a root CA that is trusted by the
-
 
 
 Margolis, et al.        Expires February 16, 2018               [Page 7]
@@ -394,6 +394,11 @@ Margolis, et al.        Expires February 16, 2018               [Page 7]
 Internet-Draft                   MTA-STS                     August 2017
 
 
+3.3.  HTTPS Policy Fetching
+
+   When fetching a new policy or updating a policy, the HTTPS endpoint
+   MUST present a X.509 certificate which is valid for the "mta-sts"
+   host (as described below), chain to a root CA that is trusted by the
    sending MTA, and be non-expired.  It is expected that sending MTAs
    use a set of trusted CAs similar to those in widely deployed Web
    browsers and operating systems.
@@ -438,17 +443,16 @@ Internet-Draft                   MTA-STS                     August 2017
    (TODO: add ref) should, however, report this failure to the recipient
    domain if the domain implements TLSRPT as well.
 
-   Conversely, if no "live" policy can be discovered via DNS or fetched
-   via HTTPS, but a valid (non-expired) policy exists in the sender's
-   cache, the sender MUST apply that cached policy.
-
-
 
 
 Margolis, et al.        Expires February 16, 2018               [Page 8]
 
 Internet-Draft                   MTA-STS                     August 2017
 
+
+   Conversely, if no "live" policy can be discovered via DNS or fetched
+   via HTTPS, but a valid (non-expired) policy exists in the sender's
+   cache, the sender MUST apply that cached policy.
 
 3.4.  Policy Selection for Smart Hosts and Subdomains
 
@@ -494,10 +498,6 @@ Internet-Draft                   MTA-STS                     August 2017
    (as described, for example, in [RFC6125]).  Consider the example
    policy given above, with an "mx" pattern containing ".example.net".
    In this case, if the MX server's X.509 certificate contains a SAN
-   matching "*.example.net", we are required to implement "wildcard-to-
-   wildcard" matching.
-
-
 
 
 
@@ -505,6 +505,9 @@ Margolis, et al.        Expires February 16, 2018               [Page 9]
 
 Internet-Draft                   MTA-STS                     August 2017
 
+
+   matching "*.example.net", we are required to implement "wildcard-to-
+   wildcard" matching.
 
    To simplify this case, we impose the following constraints on
    wildcard certificates, identical to those in [RFC7672] section 3.2.3
@@ -547,13 +550,10 @@ Internet-Draft                   MTA-STS                     August 2017
    policy domain, as described in the TLSRPT specification (TODO: add
    ref).
 
-5.1.  Policy Application Control Flow
 
-   An example control flow for a compliant sender consists of the
-   following steps:
 
-   1.  Check for a cached policy whose time-since-fetch has not exceeded
-       its "max_age".  If none exists, attempt to fetch a new policy
+
+
 
 
 
@@ -562,6 +562,13 @@ Margolis, et al.        Expires February 16, 2018              [Page 10]
 Internet-Draft                   MTA-STS                     August 2017
 
 
+5.1.  Policy Application Control Flow
+
+   An example control flow for a compliant sender consists of the
+   following steps:
+
+   1.  Check for a cached policy whose time-since-fetch has not exceeded
+       its "max_age".  If none exists, attempt to fetch a new policy
        (perhaps asynchronously, so as not to block message delivery).
        Optionally, sending MTAs may unconditionally check for a new
        policy at this step.
@@ -600,14 +607,7 @@ Internet-Draft                   MTA-STS                     August 2017
    updating the TXT record; this ordering avoids the risk that senders,
    seeing a new TXT record, mistakenly cache the old policy from HTTPS.
 
-7.  IANA Considerations
 
-7.1.  Well-Known URIs Registry
-
-   A new .well-known URI will be registered in the Well-Known URIs
-   registry as described below:
-
-   URI Suffix: mta-sts.txt Change Controller: IETF
 
 
 
@@ -617,6 +617,15 @@ Margolis, et al.        Expires February 16, 2018              [Page 11]
 
 Internet-Draft                   MTA-STS                     August 2017
 
+
+7.  IANA Considerations
+
+7.1.  Well-Known URIs Registry
+
+   A new .well-known URI will be registered in the Well-Known URIs
+   registry as described below:
+
+   URI Suffix: mta-sts.txt Change Controller: IETF
 
 7.2.  MTA-STS TXT Record Fields
 
@@ -657,6 +666,14 @@ Internet-Draft                   MTA-STS                     August 2017
    hosts who support STARTTLS.  There are two classes of attacks
    considered:
 
+
+
+
+Margolis, et al.        Expires February 16, 2018              [Page 12]
+
+Internet-Draft                   MTA-STS                     August 2017
+
+
    o  Foiling TLS negotiation, for example by deleting the "250
       STARTTLS" response from a server or altering TLS session
       negotiation.  This would result in the SMTP session occurring over
@@ -666,14 +683,6 @@ Internet-Draft                   MTA-STS                     August 2017
       might deliver the message to an impostor, who could then monitor
       and/or modify messages despite opportunistic TLS.  This
       impersonation could be accomplished by spoofing the DNS MX record
-
-
-
-Margolis, et al.        Expires February 16, 2018              [Page 12]
-
-Internet-Draft                   MTA-STS                     August 2017
-
-
       for the recipient domain, or by redirecting client connections
       intended for the legitimate recipient server (for example, by
       altering BGP routing tables).
@@ -713,15 +722,6 @@ Internet-Draft                   MTA-STS                     August 2017
    Because this attack is also possible upon refresh of a cached policy,
    we suggest implementers do not wait until a cached policy has expired
    before checking for an update; if senders attempt to refresh the
-   cache regularly (for instance, by checking their cached version
-   string against the TXT record on each successful send, or in a
-   background task that runs daily or weekly), an attacker would have to
-   foil policy discovery consistently over the lifetime of a cached
-   policy to prevent a successful refresh.
-
-   Resistance to downgrade attacks of this nature--due to the ability to
-   authoritatively determine "lack of a record" even for non-
-
 
 
 
@@ -730,6 +730,14 @@ Margolis, et al.        Expires February 16, 2018              [Page 13]
 Internet-Draft                   MTA-STS                     August 2017
 
 
+   cache regularly (for instance, by checking their cached version
+   string against the TXT record on each successful send, or in a
+   background task that runs daily or weekly), an attacker would have to
+   foil policy discovery consistently over the lifetime of a cached
+   policy to prevent a successful refresh.
+
+   Resistance to downgrade attacks of this nature--due to the ability to
+   authoritatively determine "lack of a record" even for non-
    participating recipients--is a feature of DANE, due to its use of
    DNSSEC for policy discovery.
 
@@ -768,15 +776,7 @@ Internet-Draft                   MTA-STS                     August 2017
    mitigated by the aforementioned ability for a victim domain to update
    an invalid policy at any future date.
 
-8.4.  Weak Policy Constraints
 
-   Even if an attacker cannot modify a served policy, the potential
-   exists for configurations that allow attackers on the same domain to
-   receive mail for that domain.  For example, an easy configuration
-   option when authoring an MTA-STS Policy for "example.com" is to set
-   the "mx" equal to ".example.com"; recipient domains must consider in
-   this case the risk that any user possessing a valid hostname and CA-
-   signed certificate (for example, "dhcp-123.example.com") will, from
 
 
 
@@ -786,6 +786,15 @@ Margolis, et al.        Expires February 16, 2018              [Page 14]
 Internet-Draft                   MTA-STS                     August 2017
 
 
+8.4.  Weak Policy Constraints
+
+   Even if an attacker cannot modify a served policy, the potential
+   exists for configurations that allow attackers on the same domain to
+   receive mail for that domain.  For example, an easy configuration
+   option when authoring an MTA-STS Policy for "example.com" is to set
+   the "mx" equal to ".example.com"; recipient domains must consider in
+   this case the risk that any user possessing a valid hostname and CA-
+   signed certificate (for example, "dhcp-123.example.com") will, from
    the perspective of MTA-STS Policy validation, be a valid MX host for
    that domain.
 
@@ -820,6 +829,19 @@ Internet-Draft                   MTA-STS                     August 2017
 
    MTA-STS Policy file served as the response body at [1]
 
+
+
+
+
+
+
+
+
+Margolis, et al.        Expires February 16, 2018              [Page 15]
+
+Internet-Draft                   MTA-STS                     August 2017
+
+
                          version: STSv1
                          mode: report
                          mx: mx1.example.com
@@ -834,14 +856,6 @@ Internet-Draft                   MTA-STS                     August 2017
 
    While this pseudocode implementation suggests synchronous policy
    retrieval in the delivery path, in a working implementation that may
-
-
-
-Margolis, et al.        Expires February 16, 2018              [Page 15]
-
-Internet-Draft                   MTA-STS                     August 2017
-
-
    be undesirable, and we expect some implementers to instead prefer a
    background fetch that does not block delivery if no cached policy is
    present.
@@ -876,6 +890,14 @@ func certMatches(connection, policy) {
         return true
       }
       if mx == san {
+
+
+
+Margolis, et al.        Expires February 16, 2018              [Page 16]
+
+Internet-Draft                   MTA-STS                     August 2017
+
+
         return true
       }
     }
@@ -890,14 +912,6 @@ func tryDeliverMail(connection, message) {
 func tryGetNewPolicy(domain) {
   // Check for an MTA-STS TXT record for "domain" in DNS, and return the
   // indicated policy.
-
-
-
-Margolis, et al.        Expires February 16, 2018              [Page 16]
-
-Internet-Draft                   MTA-STS                     August 2017
-
-
 }
 
 func cachePolicy(domain, policy) {
@@ -932,6 +946,14 @@ func tryMxAccordingTo(message, mx, policy) {
 }
 
 func tryWithPolicy(message, domain, policy) {
+
+
+
+Margolis, et al.        Expires February 16, 2018              [Page 17]
+
+Internet-Draft                   MTA-STS                     August 2017
+
+
   mxes := getMxForDomain(domain)
   for mx in mxes {
     if tryMxAccordingTo(message, mx, policy) {
@@ -946,14 +968,6 @@ func handleMessage(message) {
   policy := tryGetNewPolicy(domain)
   if policy {
     cachePolicy(domain, policy)
-
-
-
-Margolis, et al.        Expires February 16, 2018              [Page 17]
-
-Internet-Draft                   MTA-STS                     August 2017
-
-
   } else {
     policy = tryGetCachedPolicy(domain)
   }
@@ -988,6 +1002,14 @@ Internet-Draft                   MTA-STS                     August 2017
               DOI 10.17487/RFC5321, October 2008,
               <http://www.rfc-editor.org/info/rfc5321>.
 
+
+
+
+Margolis, et al.        Expires February 16, 2018              [Page 18]
+
+Internet-Draft                   MTA-STS                     August 2017
+
+
    [RFC5785]  Nottingham, M. and E. Hammer-Lahav, "Defining Well-Known
               Uniform Resource Identifiers (URIs)", RFC 5785, DOI 10
               .17487/RFC5785, April 2010,
@@ -999,16 +1021,6 @@ Internet-Draft                   MTA-STS                     August 2017
               (PKIX) Certificates in the Context of Transport Layer
               Security (TLS)", RFC 6125, DOI 10.17487/RFC6125, March
               2011, <http://www.rfc-editor.org/info/rfc6125>.
-
-
-
-
-
-
-Margolis, et al.        Expires February 16, 2018              [Page 18]
-
-Internet-Draft                   MTA-STS                     August 2017
-
 
    [RFC7231]  Fielding, R., Ed. and J. Reschke, Ed., "Hypertext Transfer
               Protocol (HTTP/1.1): Semantics and Content", RFC 7231, DOI
@@ -1045,6 +1057,15 @@ Internet-Draft                   MTA-STS                     August 2017
               RFC5891, August 2010,
               <http://www.rfc-editor.org/info/rfc5891>.
 
+
+
+
+
+Margolis, et al.        Expires February 16, 2018              [Page 19]
+
+Internet-Draft                   MTA-STS                     August 2017
+
+
    [RFC7234]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
               Ed., "Hypertext Transfer Protocol (HTTP/1.1): Caching",
               RFC 7234, DOI 10.17487/RFC7234, June 2014, <https://www
@@ -1055,16 +1076,6 @@ Internet-Draft                   MTA-STS                     August 2017
               (DANE) Transport Layer Security (TLS)", RFC 7672, DOI 10
               .17487/RFC7672, October 2015,
               <http://www.rfc-editor.org/info/rfc7672>.
-
-
-
-
-
-
-Margolis, et al.        Expires February 16, 2018              [Page 19]
-
-Internet-Draft                   MTA-STS                     August 2017
-
 
 12.3.  URIs
 
@@ -1100,17 +1111,6 @@ Authors' Addresses
    Microsoft, Inc
 
    Email: janet.jones (at) microsoft (dot com)
-
-
-
-
-
-
-
-
-
-
-
 
 
 

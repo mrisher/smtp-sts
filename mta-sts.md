@@ -151,22 +151,24 @@ An example TXT record is as below:
 The formal definition of the `_mta-sts` TXT record, defined using [@!RFC7405],
 is as follows:
 
-    sts-text-record = sts-version field-delim sts-id
-                      *(field-delim sts-extension) [field-delim]
+    sts-text-record = sts-version 1*(field-delim sts-field) [field-delim]
+
+    sts-field       = sts-id /                        ; Note that sts-id record
+                      sts-extension                   ; is required.
 
     field-delim     = *WSP ";" *WSP
 
     sts-version     = %s"v=STSv1"
 
-    sts-id          = %s"id=" 1*32(ALPHA / DIGIT)        ; id=...
+    sts-id          = %s"id=" 1*32(ALPHA / DIGIT)     ; id=...
 
-    sts-extension   = sts-ext-name "=" sts-ext-value     ; name=value
+    sts-extension   = sts-ext-name "=" sts-ext-value  ; name=value
 
     sts-ext-name    = (ALPHA / DIGIT) *31(ALPHA / DIGIT / "_" / "-" / ".")
 
-    sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)       ; chars excluding
-                                                         ; "=", ";", SP, and
-                                                         ; control chars
+    sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)    ; chars excluding "=",
+                                                      ; ";", SP, and control
+                                                      ; chars
 
 If multiple TXT records for `_mta-sts` are returned by the resolver, records
 which do not begin with `v=STSv1;` are discarded. If the number of resulting
@@ -230,10 +232,16 @@ max_age: 123456
 The formal definition of the policy resource, defined using [@!RFC7405], is as
 follows:
 
-    sts-policy-record        = sts-policy-version *WSP CRLF
-                               sts-policy-mode *WSP CRLF
-                               1*(sts-policy-mx *WSP CRLF)
-                               sts-policy-max-age *WSP [CRLF]
+    sts-policy-record        = *WSP sts-policy-field *WSP
+                               *(CRLF *WSP sts-policy-field *WSP)
+                               [CRLF]
+
+    sts-policy-field         = sts-policy-version /           ; required once
+                               sts-policy-mode    /           ; required once
+                               sts-policy-max-age /           ; required once
+                               1*(sts-policy-mx *WSP CRLF) /  ; required at
+                                                              ;   least once
+                               sts-policy-extension           ; other fields
 
     field-delim              = ":" *WSP
 
@@ -265,6 +273,16 @@ follows:
 
     sts-policy-max-age-value = 1*10(DIGIT)
 
+    sts-policy-extension     = sts-policy-ext-name field-delim ; additional
+                               sts-policy-ext-value            ; extension
+                                                               ; fields
+
+    sts-policy-ext-name      = (ALPHA / DIGIT) *31(ALPHA / DIGIT / "_" / "-" / ".")
+
+    sts-policy-ext-value     = 1*(%x21-3A / %x3C / %x3E-7E)    ; chars excluding
+                                                               ; "=", ";", SP,
+                                                               ; and control
+                                                               ; chars
 
 Parsers MUST accept TXT records and policy files which are syntactically valid
 (i.e. valid key/value pairs separated by semi-colons for TXT records) and

@@ -241,10 +241,13 @@ Internet-Draft                 SMTP-TLSRPT                   August 2017
    The formal definition of the "_smtp-tlsrpt" TXT record, defined using
    [RFC5234], is as follows:
 
-    tlsrpt-record     = tlsrpt-version field-delim tlsrpt-rua
-                        *(field-delim tlsrpt-extension) [field-delim]
+    tlsrpt-record     = tlsrpt-version 1*(field-delim tlsrpt-field)
+                        [field-delim]
 
     field-delim       = *WSP ";" *WSP
+
+    tlsrpt-field      = tlsrpt-rua /        ; Note that the tlsrpt-rua
+                        tlsrpt-extension    ; record is required.
 
     tlsrpt-version    = %s"v=TLSRPTv1"
 
@@ -271,9 +274,6 @@ Internet-Draft                 SMTP-TLSRPT                   August 2017
    MUST accept TXT records which are syntactically valid (i.e.  valid
    key-value pairs separated by semi-colons) and implementing a superset
    of this specification, in which case unknown fields SHALL be ignored.
-
-
-
 
 
 
