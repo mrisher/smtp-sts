@@ -211,7 +211,7 @@ This may mean that the reports are delivered in the clear.  Additionally,
 
 <figure align="center"><artwork align="center">
     tlsrpt-record     = tlsrpt-version field-delim tlsrpt-rua
-                        [field-delim [tlsrpt-extensions]]
+                        *(field-delim tlsrpt-extension) [field-delim]
 
     field-delim       = *WSP ";" *WSP
 
@@ -224,10 +224,6 @@ This may mean that the reports are delivered in the clear.  Additionally,
                       ; "URI" is imported from [@!RFC3986]; commas (ASCII
                       ; 0x2C) and exclamation points (ASCII 0x21)
                       ; MUST be encoded
-
-    tlsrpt-extensions = tlsrpt-extension *(field-delim tlsrpt-extension)
-                        [field-delim]                      
-                      ; extension fields
 
     tlsrpt-extension  = tlsrpt-ext-name "=" tlsrpt-ext-value
 

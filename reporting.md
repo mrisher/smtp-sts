@@ -149,7 +149,7 @@ The formal definition of the `_smtp-tlsrpt` TXT record, defined using
 [@!RFC5234], is as follows:
 
         tlsrpt-record     = tlsrpt-version field-delim tlsrpt-rua
-                            [field-delim [tlsrpt-extensions]]
+                            *(field-delim tlsrpt-extension) [field-delim]
 
         field-delim       = *WSP ";" *WSP
 
@@ -162,10 +162,6 @@ The formal definition of the `_smtp-tlsrpt` TXT record, defined using
                           ; "URI" is imported from [@!RFC3986]; commas (ASCII
                           ; 0x2C) and exclamation points (ASCII 0x21)
                           ; MUST be encoded
-
-        tlsrpt-extensions = tlsrpt-extension *(field-delim tlsrpt-extension)
-                            [field-delim]                      
-                          ; extension fields
 
         tlsrpt-extension  = tlsrpt-ext-name "=" tlsrpt-ext-value
 

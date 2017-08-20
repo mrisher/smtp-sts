@@ -242,7 +242,7 @@ Internet-Draft                 SMTP-TLSRPT                   August 2017
    [RFC5234], is as follows:
 
     tlsrpt-record     = tlsrpt-version field-delim tlsrpt-rua
-                        [field-delim [tlsrpt-extensions]]
+                        *(field-delim tlsrpt-extension) [field-delim]
 
     field-delim       = *WSP ";" *WSP
 
@@ -255,10 +255,6 @@ Internet-Draft                 SMTP-TLSRPT                   August 2017
                       ; "URI" is imported from [@!RFC3986]; commas (ASCII
                       ; 0x2C) and exclamation points (ASCII 0x21)
                       ; MUST be encoded
-
-    tlsrpt-extensions = tlsrpt-extension *(field-delim tlsrpt-extension)
-                        [field-delim]
-                      ; extension fields
 
     tlsrpt-extension  = tlsrpt-ext-name "=" tlsrpt-ext-value
 
@@ -273,6 +269,10 @@ Internet-Draft                 SMTP-TLSRPT                   August 2017
    discarded.  If the number of resulting records is not one, senders
    MUST assume the recipient domain does not implement TLSRPT.  Parsers
    MUST accept TXT records which are syntactically valid (i.e.  valid
+   key-value pairs separated by semi-colons) and implementing a superset
+   of this specification, in which case unknown fields SHALL be ignored.
+
+
 
 
 
@@ -281,9 +281,6 @@ Margolis, et al.        Expires February 16, 2018               [Page 5]
 
 Internet-Draft                 SMTP-TLSRPT                   August 2017
 
-
-   key-value pairs separated by semi-colons) and implementing a superset
-   of this specification, in which case unknown fields SHALL be ignored.
 
 3.1.  Example Reporting Policy
 
@@ -330,6 +327,9 @@ Internet-Draft                 SMTP-TLSRPT                   August 2017
 
       *  An identifier for the policy (where applicable)
 
+   o  Aggregate counts, comprising result type, sending MTA IP,
+      receiving MTA hostname, session count, and an optional additional
+
 
 
 
@@ -338,8 +338,6 @@ Margolis, et al.        Expires February 16, 2018               [Page 6]
 Internet-Draft                 SMTP-TLSRPT                   August 2017
 
 
-   o  Aggregate counts, comprising result type, sending MTA IP,
-      receiving MTA hostname, session count, and an optional additional
       information field containing a URI for recipients to review
       further information on a failure type.
 
@@ -386,6 +384,8 @@ Internet-Draft                 SMTP-TLSRPT                   August 2017
 
    o  "certificate-host-mismatch": This indicates that the certificate
       presented did not adhere to the constraints specified in the MTA-
+      STS or DANE policy, e.g.  if the MX does not match any identities
+      listed in the Subject Alternate Name (SAN) [RFC5280].
 
 
 
@@ -393,9 +393,6 @@ Margolis, et al.        Expires February 16, 2018               [Page 7]
 
 Internet-Draft                 SMTP-TLSRPT                   August 2017
 
-
-      STS or DANE policy, e.g.  if the MX does not match any identities
-      listed in the Subject Alternate Name (SAN) [RFC5280].
 
    o  "certificate-expired": This indicates that the certificate has
       expired.
@@ -442,6 +439,9 @@ Internet-Draft                 SMTP-TLSRPT                   August 2017
    "Negotiation Failures" stated above, the reporter SHOULD use the
    "validation-failure" category.  As TLS grows and becomes more
    complex, new mechanisms may not be easily categorized.  This allows
+   for a generic feedback category.  When this category is used, the
+   reporter SHOULD also use the "failure-reason-code" to give some
+   feedback to the receiving entity.  This is intended to be a short
 
 
 
@@ -450,9 +450,6 @@ Margolis, et al.        Expires February 16, 2018               [Page 8]
 Internet-Draft                 SMTP-TLSRPT                   August 2017
 
 
-   for a generic feedback category.  When this category is used, the
-   reporter SHOULD also use the "failure-reason-code" to give some
-   feedback to the receiving entity.  This is intended to be a short
    text field, and the contents of the field should be an error code or
    error text, such as "X509_V_ERR_UNHANDLED_CRITICAL_CRL_EXTENSION".
 
@@ -499,15 +496,15 @@ Internet-Draft                 SMTP-TLSRPT                   August 2017
 
                             JSON Report Format
 
+   o  "organization-name": The name of the organization responsible for
+      the report.  It is provided as a string.
+
 
 
 Margolis, et al.        Expires February 16, 2018               [Page 9]
 
 Internet-Draft                 SMTP-TLSRPT                   August 2017
 
-
-   o  "organization-name": The name of the organization responsible for
-      the report.  It is provided as a string.
 
    o  "date-time": The date-time indicates the start- and end-times for
       the report range.  It is provided as a string formatted according
@@ -554,6 +551,9 @@ Internet-Draft                 SMTP-TLSRPT                   August 2017
       record with which the sending MTA attempted to negotiate a
       STARTTLS connection.
 
+   o  "receiving-mx-helo": (optional) The HELO or EHLO string from the
+      banner announced during the reported session.
+
 
 
 
@@ -561,9 +561,6 @@ Margolis, et al.        Expires February 16, 2018              [Page 10]
 
 Internet-Draft                 SMTP-TLSRPT                   August 2017
 
-
-   o  "receiving-mx-helo": (optional) The HELO or EHLO string from the
-      banner announced during the reported session.
 
    o  "total-successful-session-count": The aggregate number (integer)
       of successfully negotiated TLS-enabled connections to the
@@ -598,6 +595,9 @@ Internet-Draft                 SMTP-TLSRPT                   August 2017
 
    The filename is RECOMMENDED to be constructed using the following
    ABNF:
+
+
+
 
 
 
