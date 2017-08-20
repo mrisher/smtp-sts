@@ -97,7 +97,7 @@ Table of Contents
      12.1.  Normative References . . . . . . . . . . . . . . . . . .  18
      12.2.  Informative References . . . . . . . . . . . . . . . . .  19
      12.3.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  19
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  20
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  19
 
 1.  Introduction
 
@@ -251,14 +251,6 @@ sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)       ; chars excluding
 
 3.2.  MTA-STS Policies
 
-<<<<<<< HEAD
-   The policy itself is a set of key/value pairs (similar to [RFC2822]
-   header fields) served via the HTTPS GET method from the fixed
-   [RFC5785] "well-known" path of ".well-known/mta-sts.txt" served by
-   the "mta-sts" host at the Policy Domain; the [RFC2616] "Content-Type"
-   header MUST be "text/plain".  Thus for "example.com" the path is
-   "https://mta-sts.example.com/.well-known/mta-sts.txt".
-=======
    The policy itself is a set of key/value pairs served via the HTTPS
    GET method from the fixed [RFC5785] "well-known" path of ".well-
    known/mta-sts.txt" served by the "mta-sts" host at the Policy Domain.
@@ -271,7 +263,6 @@ sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)       ; chars excluding
    as expected, to guard against cases where webservers allow untrusted
    users to host non-text content (typically, HTML or images) at a user-
    defined path.
->>>>>>> issue174
 
    This resource contains the following line-separated key/value pairs:
 
@@ -1038,10 +1029,6 @@ Internet-Draft                   MTA-STS                     August 2017
               .17487/RFC2560, June 1999,
               <http://www.rfc-editor.org/info/rfc2560>.
 
-   [RFC2822]  Resnick, P., Ed., "Internet Message Format", RFC 2822, DOI
-              10.17487/RFC2822, April 2001, <https://www.rfc-editor.org/
-              info/rfc2822>.
-
    [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
               Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
               February 2002, <http://www.rfc-editor.org/info/rfc3207>.
@@ -1066,6 +1053,10 @@ Internet-Draft                   MTA-STS                     August 2017
 
    [1] https://mta-sts.example.com/.well-known/mta-sts.txt:
 
+Authors' Addresses
+
+
+
 
 
 
@@ -1074,8 +1065,6 @@ Margolis, et al.        Expires February 16, 2018              [Page 19]
 
 Internet-Draft                   MTA-STS                     August 2017
 
-
-Authors' Addresses
 
    Daniel Margolis
    Google, Inc
@@ -1105,6 +1094,8 @@ Authors' Addresses
    Microsoft, Inc
 
    Email: janet.jones (at) microsoft (dot com)
+
+
 
 
 
