@@ -401,8 +401,6 @@ complete policy body within that timeout and size limit.
 <t>If a valid TXT record is found but no policy can be fetched via HTTPS (for any
 reason), and there is no valid (non-expired) previously-cached policy, senders
 MUST continue with delivery as though the domain has not implemented MTA-STS.
-Senders who implement TLSRPT (TODO: add ref) should, however, report this
-failure to the recipient domain if the domain implements TLSRPT as well.
 </t>
 <t>Conversely, if no &quot;live&quot; policy can be discovered via DNS or fetched via HTTPS,
 but a valid (non-expired) policy exists in the sender's cache, the sender MUST
@@ -493,10 +491,6 @@ updated policy at the Policy Domain. (In all cases, MTAs SHOULD treat such
 failures as transient errors and retry delivery later.) This allows implementing
 domains to update long-lived policies on the fly.
 </t>
-<t>Finally, in both <spanx style="verb">enforce</spanx> and <spanx style="verb">report</spanx> modes, failures to deliver in compliance
-with the applied policy result in failure reports to the policy domain, as
-described in the TLSRPT specification (TODO: add ref).
-</t>
 
 <section anchor="policy-application-control-flow" title="Policy Application Control Flow">
 <t>An example control flow for a compliant sender consists of the following steps:
@@ -519,6 +513,24 @@ the case of temporary message delivery failures apply (as discussed in
 </list>
 </t>
 </section>
+</section>
+
+<section anchor="reporting-failures" title="Reporting Failures">
+<t>MTA-STS is intended to be used along with TLSRPT (TODO: add ref) in order to
+ensure implementing domains can detect cases of both benign and malicious
+failures, and to ensure that failures that indicate an active attack are
+discoverable. As such, senders who also implement TLSRPT SHOULD treat the
+following events as reportable failures:
+</t>
+<t>
+<list style="symbols">
+<t>HTTPS policy fetch failures when a valid TXT record is present.</t>
+<t>Policy fetch failures of any kind when a valid policy exists in the policy
+cache.</t>
+<t>Delivery attempts in which a contacted MX does not support STARTTLS or does
+not present a certificate which validates according to the applied policy.</t>
+</list>
+</t>
 </section>
 
 <section anchor="operational-considerations" title="Operational Considerations">
@@ -643,6 +655,11 @@ checking their cached version string against the TXT record on each successful
 send, or in a background task that runs daily or weekly), an attacker would have
 to foil policy discovery consistently over the lifetime of a cached policy to
 prevent a successful refresh.
+</t>
+<t>Additionally, MTAs should alert administrators to repeated policy refresh
+failures long before cached policies expire (through warning logs or similar
+applicable mechanisms), allowing administrators to detect such a persistent
+attack on policy refresh.
 </t>
 <t>Resistance to downgrade attacks of this nature--due to the ability to
 authoritatively determine &quot;lack of a record&quot; even for non-participating
