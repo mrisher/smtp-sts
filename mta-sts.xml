@@ -445,16 +445,16 @@ to validate; in particular, validation failures of policies which specify
 <section anchor="mx-certificate-validation" title="MX Certificate Validation">
 <t>The certificate presented by the receiving MX MUST chain to a root CA that is
 trusted by the sending MTA and be non-expired. The certificate MUST have a CN-ID
-(<xref target="RFC6125"/>) or SAN (<xref target="RFC5280"/>) with a DNS-ID matching the <spanx style="verb">mx</spanx> pattern. The
-MX's certificate MAY also be checked for revocation via OCSP <xref target="RFC2560"/>,
-certificate revocation lists (CRLs), or some other mechanism.
+(<xref target="RFC6125"/>) or subject alternative name (<xref target="RFC5280"/>) with a DNS-ID matching
+the <spanx style="verb">mx</spanx> pattern. The MX's certificate MAY also be checked for revocation via
+OCSP <xref target="RFC2560"/>, certificate revocation lists (CRLs), or some other mechanism.
 </t>
 <t>Because the <spanx style="verb">mx</spanx> patterns are not hostnames, however, matching is not identical
 to other common cases of X.509 certificate authentication (as described, for
 example, in <xref target="RFC6125"/>). Consider the example policy given above, with an <spanx style="verb">mx</spanx>
 pattern containing <spanx style="verb">.example.net</spanx>. In this case, if the MX server's X.509
-certificate contains a SAN matching <spanx style="verb">*.example.net</spanx>, we are required to
-implement &quot;wildcard-to-wildcard&quot; matching.
+certificate contains a subject alternative name matching <spanx style="verb">*.example.net</spanx>, we are
+required to implement &quot;wildcard-to-wildcard&quot; matching.
 </t>
 <t>To simplify this case, we impose the following constraints on wildcard
 certificates, identical to those in <xref target="RFC7672"/> section 3.2.3 and [@?RFC6125
