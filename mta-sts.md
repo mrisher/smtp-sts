@@ -177,9 +177,14 @@ MTA-STS and skip the remaining steps of policy discovery.
 
 The policy itself is a set of key/value pairs served via the HTTPS GET method
 from the fixed [@!RFC5785] "well-known" path of `.well-known/mta-sts.txt`
-served by the `mta-sts` host at the Policy Domain; the [@!RFC2616]
-"Content-Type" header MUST be "text/plain". Thus for `example.com` the path is
+served by the `mta-sts` host at the Policy Domain. Thus for `example.com` the path is
 `https://mta-sts.example.com/.well-known/mta-sts.txt`.
+
+The [@!RFC2616] "Content-Type" media type for this resource MUST be
+"text/plain"; additional charset parameters are allowed. When fetching a policy,
+senders SHOULD validate that the "Content-Type" is as expected, to guard against
+cases where webservers allow untrusted users to host non-text content
+(typically, HTML or images) at a user-defined path.
 
 This resource contains the following line-separated key/value pairs:
 

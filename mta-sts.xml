@@ -239,9 +239,14 @@ MTA-STS and skip the remaining steps of policy discovery.
 <section anchor="mtasts-policies" title="MTA-STS Policies">
 <t>The policy itself is a set of key/value pairs served via the HTTPS GET method
 from the fixed <xref target="RFC5785"/> &quot;well-known&quot; path of <spanx style="verb">.well-known/mta-sts.txt</spanx>
-served by the <spanx style="verb">mta-sts</spanx> host at the Policy Domain; the <xref target="RFC2616"/>
-&quot;Content-Type&quot; header MUST be &quot;text/plain&quot;. Thus for <spanx style="verb">example.com</spanx> the path is
+served by the <spanx style="verb">mta-sts</spanx> host at the Policy Domain. Thus for <spanx style="verb">example.com</spanx> the path is
 <spanx style="verb">https://mta-sts.example.com/.well-known/mta-sts.txt</spanx>.
+</t>
+<t>The <xref target="RFC2616"/> &quot;Content-Type&quot; media type for this resource MUST be
+&quot;text/plain&quot;; additional charset parameters are allowed. When fetching a policy,
+senders SHOULD validate that the &quot;Content-Type&quot; is as expected, to guard against
+cases where webservers allow untrusted users to host non-text content
+(typically, HTML or images) at a user-defined path.
 </t>
 <t>This resource contains the following line-separated key/value pairs:
 </t>
