@@ -90,16 +90,16 @@ We also define the following terms for further use in this document:
 * MTA-STS Policy: A commitment by the Policy Domain to support PKIX authenticated
   TLS for the specified MX hosts.
 * Policy Domain: The domain for which an MTA-STS Policy is defined. This is the
-  next-hop domain; when sending mail to "alice@example.com" this would ordinarly
-  be "example.com", but this may be overriden by explicit routing rules (as
-  described in (#policy-selection-for-smart-hosts-and-subdomains),
+  next-hop domain; when sending mail to "alice@example.com" this would
+  ordinarily be "example.com", but this may be overridden by explicit routing
+  rules (as described in (#policy-selection-for-smart-hosts-and-subdomains),
   "Policy Selection for Smart Hosts and Subdomains").
 
 # Related Technologies
 
 The DANE TLSA record [@!RFC7672] is similar, in that DANE is also designed to
 upgrade unauthenticated encryption or plaintext transmission into authenticated,
-downgrade-resistent encrypted tarnsmission. DANE requires DNSSEC [@!RFC4033] for
+downgrade-resistant encrypted transmission. DANE requires DNSSEC [@!RFC4033] for
 authentication; the mechanism described here instead relies on certificate
 authorities (CAs) and does not require DNSSEC, at a cost of risking malicious
 downgrades.  For a thorough discussion of this trade-off, see
@@ -509,18 +509,18 @@ recipient while carrying out a man-in-the-middle attack--may be able to foil
 policy discovery and effectively downgrade the security of the message delivery.
 
 Since this attack depends upon intercepting initial policy discovery, we
-strongly recommend implementors to prefer policy `max_age` values to be as long
+strongly recommend implementers to prefer policy `max_age` values to be as long
 as is practical.
 
 Because this attack is also possible upon refresh of a cached policy, we suggest
-implementors do not wait until a cached policy has expired before checking for
+implementers do not wait until a cached policy has expired before checking for
 an update; if senders attempt to refresh the cache regularly (for instance, by
 checking their cached version string against the TXT record on each successful
 send, or in a background task that runs daily or weekly), an attacker would have
 to foil policy discovery consistently over the lifetime of a cached policy to
 prevent a successful refresh.
 
-Resistence to downgrade attacks of this nature--due to the ability to
+Resistance to downgrade attacks of this nature--due to the ability to
 authoritatively determine "lack of a record" even for non-participating
 recipients--is a feature of DANE, due to its use of DNSSEC for policy discovery.
 
@@ -621,7 +621,7 @@ Below is pseudocode demonstrating the logic of a compliant sending MTA.
 
 While this pseudocode implementation suggests synchronous policy retrieval in
 the delivery path, in a working implementation that may be undesirable, and we
-expect some implementors to instead prefer a background fetch that does not
+expect some implementers to instead prefer a background fetch that does not
 block delivery if no cached policy is present.
 
 ~~~~~~~~~

@@ -141,16 +141,16 @@ Internet-Draft                   MTA-STS                     August 2017
 
    o  Policy Domain: The domain for which an MTA-STS Policy is defined.
       This is the next-hop domain; when sending mail to
-      "alice@example.com" this would ordinarly be "example.com", but
-      this may be overriden by explicit routing rules (as described in
+      "alice@example.com" this would ordinarily be "example.com", but
+      this may be overridden by explicit routing rules (as described in
       Section 3.4, "Policy Selection for Smart Hosts and Subdomains").
 
 2.  Related Technologies
 
    The DANE TLSA record [RFC7672] is similar, in that DANE is also
    designed to upgrade unauthenticated encryption or plaintext
-   transmission into authenticated, downgrade-resistent encrypted
-   tarnsmission.  DANE requires DNSSEC [RFC4033] for authentication; the
+   transmission into authenticated, downgrade-resistant encrypted
+   transmission.  DANE requires DNSSEC [RFC4033] for authentication; the
    mechanism described here instead relies on certificate authorities
    (CAs) and does not require DNSSEC, at a cost of risking malicious
    downgrades.  For a thorough discussion of this trade-off, see
@@ -707,11 +707,11 @@ Internet-Draft                   MTA-STS                     August 2017
    security of the message delivery.
 
    Since this attack depends upon intercepting initial policy discovery,
-   we strongly recommend implementors to prefer policy "max_age" values
+   we strongly recommend implementers to prefer policy "max_age" values
    to be as long as is practical.
 
    Because this attack is also possible upon refresh of a cached policy,
-   we suggest implementors do not wait until a cached policy has expired
+   we suggest implementers do not wait until a cached policy has expired
    before checking for an update; if senders attempt to refresh the
    cache regularly (for instance, by checking their cached version
    string against the TXT record on each successful send, or in a
@@ -719,7 +719,7 @@ Internet-Draft                   MTA-STS                     August 2017
    foil policy discovery consistently over the lifetime of a cached
    policy to prevent a successful refresh.
 
-   Resistence to downgrade attacks of this nature--due to the ability to
+   Resistance to downgrade attacks of this nature--due to the ability to
    authoritatively determine "lack of a record" even for non-
 
 
@@ -842,7 +842,7 @@ Margolis, et al.        Expires February 16, 2018              [Page 15]
 Internet-Draft                   MTA-STS                     August 2017
 
 
-   be undesirable, and we expect some implementors to instead prefer a
+   be undesirable, and we expect some implementers to instead prefer a
    background fetch that does not block delivery if no cached policy is
    present.
 

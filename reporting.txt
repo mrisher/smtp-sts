@@ -283,7 +283,7 @@ Internet-Draft                 SMTP-TLSRPT                   August 2017
 
 
    MUST accept TXT records which are syntactically valid (i.e.  valid
-   key-value pairs seprated by semi-colons) and implementing a superset
+   key-value pairs separated by semi-colons) and implementing a superset
    of this specification, in which case unknown fields SHALL be ignored.
 
 3.1.  Example Reporting Policy
