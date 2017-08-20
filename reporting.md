@@ -148,28 +148,26 @@ Policies consist of the following directives:
 The formal definition of the `_smtp-tlsrpt` TXT record, defined using
 [@!RFC5234], is as follows:
 
-        tlsrpt-record     = tlsrpt-version *WSP field-delim *WSP tlsrpt-rua
+        tlsrpt-record     = tlsrpt-version field-delim tlsrpt-rua
                             [field-delim [tlsrpt-extensions]]
 
-        field-delim       = %x3B                                    ; ";"
+        field-delim       = *WSP ";" *WSP
 
-        tlsrpt-version    = %x76 *WSP "=" *WSP %x54 %x4C %x53 %x52
-                            %x50 %x54 %x76 %x31                ; "v=TLSRPTv1"
+        tlsrpt-version    = %s"v=TLSRPTv1"
 
-        tlsrpt-rua        = %x72 %x75 %x61 *WSP "=" *WSP 
-	                    tlsrpt-uri *(*WSP "," *WSP tlsrpt-uri)  ; "rua=..."
+        tlsrpt-rua        = %s"rua="
+	                    tlsrpt-uri *(*WSP "," *WSP tlsrpt-uri)
 
         tlsrpt-uri        = URI
                           ; "URI" is imported from [@!RFC3986]; commas (ASCII
                           ; 0x2C) and exclamation points (ASCII 0x21)
-                          ; MUST be encoded; the numeric portion MUST fit
-                          ; within an unsigned 64-bit integer
+                          ; MUST be encoded
 
         tlsrpt-extensions = tlsrpt-extension *(field-delim tlsrpt-extension)
                             [field-delim]                      
                           ; extension fields
 
-        tlsrpt-extension  = tlsrpt-ext-name *WSP "=" *WSP tlsrpt-ext-value
+        tlsrpt-extension  = tlsrpt-ext-name "=" tlsrpt-ext-value
 
         tlsrpt-ext-name   = (ALPHA / DIGIT) *31(ALPHA / DIGIT / "_" / "-" / ".")
 
