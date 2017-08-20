@@ -251,11 +251,11 @@ sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)       ; chars excluding
 
 3.2.  MTA-STS Policies
 
-   The policy itself is a set of key/value pairs served via the HTTPS
-   GET method from the fixed [RFC5785] "well-known" path of ".well-
-   known/mta-sts.txt" served by the "mta-sts" host at the Policy Domain.
-   Thus for "example.com" the path is "https://mta-sts.example.com
-   /.well-known/mta-sts.txt".
+   The policy itself is a set of key/value pairs (similar to [RFC5322]
+   header fields) served via the HTTPS GET method from the fixed
+   [RFC5785] "well-known" path of ".well-known/mta-sts.txt" served by
+   the "mta-sts" host at the Policy Domain.  Thus for "example.com" the
+   path is "https://mta-sts.example.com/.well-known/mta-sts.txt".
 
    The [RFC2616] "Content-Type" media type for this resource MUST be
    "text/plain"; additional charset parameters are allowed.  When
@@ -1038,6 +1038,10 @@ Internet-Draft                   MTA-STS                     August 2017
               4033, DOI 10.17487/RFC4033, March 2005,
               <http://www.rfc-editor.org/info/rfc4033>.
 
+   [RFC5322]  Resnick, P., Ed., "Internet Message Format", RFC 5322, DOI
+              10.17487/RFC5322, October 2008,
+              <http://www.rfc-editor.org/info/rfc5322>.
+
    [RFC5891]  Klensin, J., "Internationalized Domain Names in
               Applications (IDNA): Protocol", RFC 5891, DOI 10.17487/
               RFC5891, August 2010,
@@ -1053,10 +1057,6 @@ Internet-Draft                   MTA-STS                     August 2017
               (DANE) Transport Layer Security (TLS)", RFC 7672, DOI 10
               .17487/RFC7672, October 2015,
               <http://www.rfc-editor.org/info/rfc7672>.
-
-
-
-
 
 
 

@@ -175,9 +175,10 @@ MTA-STS and skip the remaining steps of policy discovery.
 
 ## MTA-STS Policies
 
-The policy itself is a set of key/value pairs served via the HTTPS GET method
-from the fixed [@!RFC5785] "well-known" path of `.well-known/mta-sts.txt`
-served by the `mta-sts` host at the Policy Domain. Thus for `example.com` the path is
+The policy itself is a set of key/value pairs (similar to [@?RFC5322] header
+fields) served via the HTTPS GET method from the fixed [@!RFC5785] "well-known"
+path of `.well-known/mta-sts.txt` served by the `mta-sts` host at the Policy
+Domain. Thus for `example.com` the path is
 `https://mta-sts.example.com/.well-known/mta-sts.txt`.
 
 The [@!RFC2616] "Content-Type" media type for this resource MUST be
