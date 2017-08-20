@@ -62,7 +62,7 @@ trusted server certificate.
 
 # Introduction
 
-The STARTTLS extension to SMTP [@!RFC3207] allows SMTP clients and hosts to
+The STARTTLS extension to SMTP [@?RFC3207] allows SMTP clients and hosts to
 negotiate the use of a TLS channel for encrypted mail transmission.
 
 While this opportunistic encryption protocol by itself provides a high barrier
@@ -97,9 +97,9 @@ We also define the following terms for further use in this document:
 
 # Related Technologies
 
-The DANE TLSA record [@!RFC7672] is similar, in that DANE is also designed to
+The DANE TLSA record [@?RFC7672] is similar, in that DANE is also designed to
 upgrade unauthenticated encryption or plaintext transmission into authenticated,
-downgrade-resistant encrypted transmission. DANE requires DNSSEC [@!RFC4033] for
+downgrade-resistant encrypted transmission. DANE requires DNSSEC [@?RFC4033] for
 authentication; the mechanism described here instead relies on certificate
 authorities (CAs) and does not require DNSSEC, at a cost of risking malicious
 downgrades.  For a thorough discussion of this trade-off, see
@@ -175,11 +175,11 @@ MTA-STS and skip the remaining steps of policy discovery.
 
 ## MTA-STS Policies
 
-The policy itself is a set of key/value pairs served via the HTTPS GET method
-from the fixed [@!RFC5785] "well-known" path of `.well-known/mta-sts.txt`
-served by the `mta-sts` host at the Policy Domain; the [@!RFC2616]
-"Content-Type" header MUST be "text/plain". Thus for `example.com` the path is
-`https://mta-sts.example.com/.well-known/mta-sts.txt`.
+The policy itself is a set of key/value pairs (similar to [@?RFC2822] header
+fields) served via the HTTPS GET method from the fixed [@!RFC5785] "well-known"
+path of `.well-known/mta-sts.txt` served by the `mta-sts` host at the Policy
+Domain; the [@!RFC2616] "Content-Type" header MUST be "text/plain". Thus for
+`example.com` the path is `https://mta-sts.example.com/.well-known/mta-sts.txt`.
 
 This resource contains the following line-separated key/value pairs:
 
@@ -205,7 +205,7 @@ This resource contains the following line-separated key/value pairs:
   (`.example.net`) matching the right-hand parts of a server's identity; the
   latter case are distinguished by a leading period.  If there are more than
   one MX specified by the policy, they MUST be on separate lines within the
-  policy file.  In the case of Internationalized Domain Names ([@!RFC5891]), 
+  policy file.  In the case of Internationalized Domain Names ([@?RFC5891]),
   the MX MUST specify the Punycode-encoded A-label [@!RFC3492] and not the 
   Unicode-encoded U-label. The full semantics of certificate validation are 
   described in (#mx-certificate-validation), "MX Certificate Validation."
@@ -285,7 +285,7 @@ considerations:
   '\*' as the complete left-most label within the identifier.
 
 The certificate MAY be checked for revocation via the Online Certificate Status
-Protocol (OCSP) [@!RFC2560], certificate revocation lists (CRLs), or some other
+Protocol (OCSP) [@?RFC2560], certificate revocation lists (CRLs), or some other
 mechanism.
 
 HTTP 3xx redirects MUST NOT be followed.
@@ -345,18 +345,18 @@ to validate; in particular, validation failures of policies which specify
 The certificate presented by the receiving MX MUST chain to a root CA that is
 trusted by the sending MTA and be non-expired. The certificate MUST have a CN-ID
 ([@!RFC6125]) or SAN ([@!RFC5280]) with a DNS-ID matching the `mx` pattern. The
-MX's certificate MAY also be checked for revocation via OCSP [@!RFC2560],
+MX's certificate MAY also be checked for revocation via OCSP [@?RFC2560],
 certificate revocation lists (CRLs), or some other mechanism.
 
 Because the `mx` patterns are not hostnames, however, matching is not identical
 to other common cases of X.509 certificate authentication (as described, for
-example, in [@!RFC6125]). Consider the example policy given above, with an `mx`
+example, in [@?RFC6125]). Consider the example policy given above, with an `mx`
 pattern containing `.example.net`. In this case, if the MX server's X.509
 certificate contains a SAN matching `*.example.net`, we are required to
 implement "wildcard-to-wildcard" matching.
 
 To simplify this case, we impose the following constraints on wildcard
-certificates, identical to those in [@!RFC7672] section 3.2.3 and [@!RFC6125
+certificates, identical to those in [@?RFC7672] section 3.2.3 and [@?RFC6125
 section 6.4.3: wildcards are valid in DNS-IDs or CN-IDs, but must be the entire
 first label of the identifier (that is, `*.example.com`, not
 `mail*.example.com`). Senders who are comparing a "suffix" MX pattern with a
@@ -492,7 +492,7 @@ specific attacks on this model.
 ## Obtaining a Signed Certificate
 
 SMTP MTA-STS relies on certificate validation via PKIX based TLS identity
-checking [@!RFC6125]. Attackers who are able to obtain a valid certificate for
+checking [@?RFC6125]. Attackers who are able to obtain a valid certificate for
 the targeted recipient mail service (e.g. by compromising a certificate
 authority) are thus able to circumvent STS authentication.
 

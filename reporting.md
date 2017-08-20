@@ -373,7 +373,7 @@ Figure: JSON Report Format
    policy, whether TLSA record ([@!RFC6698] section 2.3) or MTA-STS policy.
 * `domain`: The Policy Domain is the domain against which the MTA-STS or DANE
     policy is defined. In the case of Internationalized Domain Names
-   ([@!RFC5891]), the domain is the Punycode-encoded A-label
+   ([@?RFC5891]), the domain is the Punycode-encoded A-label
    ([@!RFC3492]) and not the U-label.
 * `mx-host-pattern`: The pattern of MX hostnames from the applied policy. It
     is provided as a string, and is interpreted in the same manner as the

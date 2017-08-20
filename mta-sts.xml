@@ -237,11 +237,11 @@ MTA-STS and skip the remaining steps of policy discovery.
 </section>
 
 <section anchor="mtasts-policies" title="MTA-STS Policies">
-<t>The policy itself is a set of key/value pairs served via the HTTPS GET method
-from the fixed <xref target="RFC5785"/> &quot;well-known&quot; path of <spanx style="verb">.well-known/mta-sts.txt</spanx>
-served by the <spanx style="verb">mta-sts</spanx> host at the Policy Domain; the <xref target="RFC2616"/>
-&quot;Content-Type&quot; header MUST be &quot;text/plain&quot;. Thus for <spanx style="verb">example.com</spanx> the path is
-<spanx style="verb">https://mta-sts.example.com/.well-known/mta-sts.txt</spanx>.
+<t>The policy itself is a set of key/value pairs (similar to <xref target="RFC2822"/> header
+fields) served via the HTTPS GET method from the fixed <xref target="RFC5785"/> &quot;well-known&quot;
+path of <spanx style="verb">.well-known/mta-sts.txt</spanx> served by the <spanx style="verb">mta-sts</spanx> host at the Policy
+Domain; the <xref target="RFC2616"/> &quot;Content-Type&quot; header MUST be &quot;text/plain&quot;. Thus for
+<spanx style="verb">example.com</spanx> the path is <spanx style="verb">https://mta-sts.example.com/.well-known/mta-sts.txt</spanx>.
 </t>
 <t>This resource contains the following line-separated key/value pairs:
 </t>
@@ -428,7 +428,7 @@ certificate contains a SAN matching <spanx style="verb">*.example.net</spanx>, w
 implement &quot;wildcard-to-wildcard&quot; matching.
 </t>
 <t>To simplify this case, we impose the following constraints on wildcard
-certificates, identical to those in <xref target="RFC7672"/> section 3.2.3 and [@!RFC6125
+certificates, identical to those in <xref target="RFC7672"/> section 3.2.3 and [@?RFC6125
 section 6.4.3: wildcards are valid in DNS-IDs or CN-IDs, but must be the entire
 first label of the identifier (that is, <spanx style="verb">*.example.com</spanx>, not
 <spanx style="verb">mail*.example.com</spanx>). Senders who are comparing a &quot;suffix&quot; MX pattern with a
@@ -837,17 +837,20 @@ func handleMessage(message) {
 <back>
 <references title="Normative References">
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2560.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2616.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3492.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4033.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5280.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5321.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5785.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5891.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6125.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7405.xml"?>
+</references>
+<references title="Informative References">
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2560.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2822.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4033.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5891.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7672.xml"?>
 </references>
 
