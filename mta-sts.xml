@@ -452,8 +452,8 @@ OCSP <xref target="RFC2560"/>, certificate revocation lists (CRLs), or some othe
 <t>Because the <spanx style="verb">mx</spanx> patterns are not hostnames, however, matching is not identical
 to other common cases of X.509 certificate authentication (as described, for
 example, in <xref target="RFC6125"/>). Consider the example policy given above, with an <spanx style="verb">mx</spanx>
-pattern containing <spanx style="verb">.example.net</spanx>. In this case, if the MX server's X.509
-certificate contains a subject alternative name matching <spanx style="verb">*.example.net</spanx>, we are
+pattern containing <spanx style="verb">.example.com</spanx>. In this case, if the MX server's X.509
+certificate contains a subject alternative name matching <spanx style="verb">*.example.com</spanx>, we are
 required to implement &quot;wildcard-to-wildcard&quot; matching.
 </t>
 <t>To simplify this case, we impose the following constraints on wildcard
@@ -464,6 +464,10 @@ first label of the identifier (that is, <spanx style="verb">*.example.com</spanx
 wildcard identifier should thus strip the wildcard and ensure that the two sides
 match label-by-label, until all labels of the shorter side (if unequal length)
 are consumed.
+</t>
+<t>Note that a wildcard <spanx style="emph">must</spanx> match a label; an <spanx style="verb">mx</spanx> pattern of <spanx style="verb">.example.com</spanx>
+thus does not match a SAN of <spanx style="verb">example.com</spanx>, nor does a SAN of <spanx style="verb">*.example.com</spanx>
+match an <spanx style="verb">mx</spanx> of <spanx style="verb">example.com</spanx>.
 </t>
 <t>A simple pseudocode implementation of this algorithm is presented in the
 Appendix.
@@ -771,6 +775,22 @@ func tryStartTls(connection) {
   // Attempt to open an SMTP connection with STARTTLS with the MX.
 }
 
+func isWildcardMatch(pat, host) {
+  // Literal matches are true.
+  if pat == host {
+    return true
+  }
+  // Leading '.' matches a wildcard against the first part, i.e.
+  // .example.com matches x.example.com but not x.y.example.com.
+  if pat[0] == '.' {
+    parts = SplitN(host, '.', 2)  // Split on the first '.'.
+    if len(parts) &gt; 1 &amp;&amp; parts[1] == pat[1:] {
+      return true
+    }
+  }
+  return false
+}
+
 func certMatches(connection, policy) {
   // Assume a handy function to return CN and DNS-ID SANs.
   for san in getDnsIdSansAndCnFromCert(connection) {
@@ -781,13 +801,7 @@ func certMatches(connection, policy) {
         if san[1] != '.' continue
         san = san[1:]
       }
-      if san[0] == '.' &amp;&amp; HasSuffix(mx, san) {
-        return true
-      }
-      if mx[0] == '.' &amp;&amp; HasSuffix(san, mx) {
-        return true
-      }
-      if mx == san {
+      if isWildcardMatch(san, mx) || isWildcardMatch(mx, san) {
         return true
       }
     }

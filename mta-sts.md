@@ -379,8 +379,8 @@ OCSP [@?RFC2560], certificate revocation lists (CRLs), or some other mechanism.
 Because the `mx` patterns are not hostnames, however, matching is not identical
 to other common cases of X.509 certificate authentication (as described, for
 example, in [@?RFC6125]). Consider the example policy given above, with an `mx`
-pattern containing `.example.net`. In this case, if the MX server's X.509
-certificate contains a subject alternative name matching `*.example.net`, we are
+pattern containing `.example.com`. In this case, if the MX server's X.509
+certificate contains a subject alternative name matching `*.example.com`, we are
 required to implement "wildcard-to-wildcard" matching.
 
 To simplify this case, we impose the following constraints on wildcard
@@ -391,6 +391,10 @@ first label of the identifier (that is, `*.example.com`, not
 wildcard identifier should thus strip the wildcard and ensure that the two sides
 match label-by-label, until all labels of the shorter side (if unequal length)
 are consumed.
+
+Note that a wildcard *must* match a label; an `mx` pattern of `.example.com`
+thus does not match a SAN of `example.com`, nor does a SAN of `*.example.com`
+match an `mx` of `example.com`.
 
 A simple pseudocode implementation of this algorithm is presented in the
 Appendix.
@@ -666,6 +670,22 @@ func tryStartTls(connection) {
   // Attempt to open an SMTP connection with STARTTLS with the MX.
 }
 
+func isWildcardMatch(pat, host) {
+  // Literal matches are true.
+  if pat == host {
+    return true
+  }
+  // Leading '.' matches a wildcard against the first part, i.e.
+  // .example.com matches x.example.com but not x.y.example.com.
+  if pat[0] == '.' {
+    parts = SplitN(host, '.', 2)  // Split on the first '.'.
+    if len(parts) > 1 && parts[1] == pat[1:] {
+      return true
+    }
+  }
+  return false
+}
+
 func certMatches(connection, policy) {
   // Assume a handy function to return CN and DNS-ID SANs.
   for san in getDnsIdSansAndCnFromCert(connection) {
@@ -676,13 +696,7 @@ func certMatches(connection, policy) {
         if san[1] != '.' continue
         san = san[1:]
       }
-      if san[0] == '.' && HasSuffix(mx, san) {
-        return true
-      }
-      if mx[0] == '.' && HasSuffix(san, mx) {
-        return true
-      }
-      if mx == san {
+      if isWildcardMatch(san, mx) || isWildcardMatch(mx, san) {
         return true
       }
     }
