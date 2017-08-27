@@ -90,21 +90,21 @@ Table of Contents
      8.2.  Preventing Policy Discovery . . . . . . . . . . . . . . .  13
      8.3.  Denial of Service . . . . . . . . . . . . . . . . . . . .  14
      8.4.  Weak Policy Constraints . . . . . . . . . . . . . . . . .  15
+     8.5.  Compromise of the Web PKI System  . . . . . . . . . . . .  15
    9.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  15
-   10. Appendix 1: MTA-STS example record & policy . . . . . . . . .  15
+   10. Appendix 1: MTA-STS example record & policy . . . . . . . . .  16
    11. Appendix 2: Message delivery pseudocode . . . . . . . . . . .  16
-   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  18
-     12.1.  Normative References . . . . . . . . . . . . . . . . . .  18
-     12.2.  Informative References . . . . . . . . . . . . . . . . .  19
+   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  19
+     12.1.  Normative References . . . . . . . . . . . . . . . . . .  19
+     12.2.  Informative References . . . . . . . . . . . . . . . . .  20
      12.3.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  20
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  20
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  21
 
 1.  Introduction
 
    The STARTTLS extension to SMTP [RFC3207] allows SMTP clients and
    hosts to negotiate the use of a TLS channel for encrypted mail
    transmission.
-
 
 
 
@@ -507,7 +507,7 @@ Internet-Draft                   MTA-STS                     August 2017
 
 
    certificate MAY also be checked for revocation via OCSP [RFC2560],
-   certificate revocation lists (CRLs), or some other mechanism.
+   CRLs [RFC6818], or some other mechanism.
 
    Because the "mx" patterns are not hostnames, however, matching is not
    identical to other common cases of X.509 certificate authentication
@@ -803,6 +803,29 @@ Internet-Draft                   MTA-STS                     August 2017
    the perspective of MTA-STS Policy validation, be a valid MX host for
    that domain.
 
+8.5.  Compromise of the Web PKI System
+
+   A host of risks apply to the PKI system used for certificate
+   authentication, both of the "mta-sts" HTTPS host's certificate and
+   the SMTP servers' certificates.  These risks are broadly applicable
+   within the Web PKI ecosystem and are not specific to MTA-STS;
+   nonetheless, they deserve some consideration in this context.
+
+   Broadly speaking, attackers may compromise the system by obtaining
+   certificates under fraudulent circumstances (i.e. by impersonating
+   the legitimate owner of the victim domain), by compromising a
+   Certificate Authority or Delegate Authority's private keys, by
+   obtaining a legitimate certificate issued to the victim domain, and
+   similar.
+
+   One approach commonly employed by Web browsers to help mitigate
+   against some of these attacks is to allow for revocation of
+   compromised or fraudulent certificates via OCSP [RFC2560] or CRLs
+   [RFC6818].  Such mechanisms themselves represent tradeoffs and are
+   not universally implemented; we nonetheless recommend implementors of
+   MTA-STS to implement revocation mechanisms which are most applicable
+   to their implementations.
+
 9.  Contributors
 
    Nicolas Lidzborski Google, Inc nlidz (at) google (dot com)
@@ -810,6 +833,14 @@ Internet-Draft                   MTA-STS                     August 2017
    Wei Chuang Google, Inc weihaw (at) google (dot com)
 
    Brandon Long Google, Inc blong (at) google (dot com)
+
+
+
+
+Margolis, et al.        Expires February 16, 2018              [Page 15]
+
+Internet-Draft                   MTA-STS                     August 2017
+
 
    Franck Martin LinkedIn, Inc fmartin (at) linkedin (dot com)
 
@@ -833,14 +864,6 @@ Internet-Draft                   MTA-STS                     August 2017
        _mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
 
    MTA-STS Policy file served as the response body at [1]
-
-
-
-
-Margolis, et al.        Expires February 16, 2018              [Page 15]
-
-Internet-Draft                   MTA-STS                     August 2017
-
 
                          version: STSv1
                          mode: report
@@ -867,6 +890,14 @@ func isEnforce(policy) {
 
 func isNonExpired(policy) {
   // Return true if the policy is not expired.
+
+
+
+Margolis, et al.        Expires February 16, 2018              [Page 16]
+
+Internet-Draft                   MTA-STS                     August 2017
+
+
 }
 
 func tryStartTls(connection) {
@@ -890,14 +921,6 @@ func certMatches(connection, policy) {
         return true
       }
       if mx == san {
-
-
-
-Margolis, et al.        Expires February 16, 2018              [Page 16]
-
-Internet-Draft                   MTA-STS                     August 2017
-
-
         return true
       }
     }
@@ -923,6 +946,14 @@ func tryGetCachedPolicy(domain) {
 }
 
 func reportError(error) {
+
+
+
+Margolis, et al.        Expires February 16, 2018              [Page 17]
+
+Internet-Draft                   MTA-STS                     August 2017
+
+
   // Report an error via TLSRPT.
 }
 
@@ -946,14 +977,6 @@ func tryMxAccordingTo(message, mx, policy) {
 }
 
 func tryWithPolicy(message, domain, policy) {
-
-
-
-Margolis, et al.        Expires February 16, 2018              [Page 17]
-
-Internet-Draft                   MTA-STS                     August 2017
-
-
   mxes := getMxForDomain(domain)
   for mx in mxes {
     if tryMxAccordingTo(message, mx, policy) {
@@ -976,6 +999,15 @@ func handleMessage(message) {
   }
   // Try to deliver the message normally (i.e. without MTA-STS).
 }
+
+
+
+
+
+
+Margolis, et al.        Expires February 16, 2018              [Page 18]
+
+Internet-Draft                   MTA-STS                     August 2017
 
 
 12.  References
@@ -1002,14 +1034,6 @@ func handleMessage(message) {
               DOI 10.17487/RFC5321, October 2008,
               <http://www.rfc-editor.org/info/rfc5321>.
 
-
-
-
-Margolis, et al.        Expires February 16, 2018              [Page 18]
-
-Internet-Draft                   MTA-STS                     August 2017
-
-
    [RFC5785]  Nottingham, M. and E. Hammer-Lahav, "Defining Well-Known
               Uniform Resource Identifiers (URIs)", RFC 5785, DOI 10
               .17487/RFC5785, April 2010,
@@ -1030,6 +1054,17 @@ Internet-Draft                   MTA-STS                     August 2017
    [RFC7405]  Kyzivat, P., "Case-Sensitive String Support in ABNF", RFC
               7405, DOI 10.17487/RFC7405, December 2014,
               <http://www.rfc-editor.org/info/rfc7405>.
+
+
+
+
+
+
+
+Margolis, et al.        Expires February 16, 2018              [Page 19]
+
+Internet-Draft                   MTA-STS                     August 2017
+
 
 12.2.  Informative References
 
@@ -1057,14 +1092,10 @@ Internet-Draft                   MTA-STS                     August 2017
               RFC5891, August 2010,
               <http://www.rfc-editor.org/info/rfc5891>.
 
-
-
-
-
-Margolis, et al.        Expires February 16, 2018              [Page 19]
-
-Internet-Draft                   MTA-STS                     August 2017
-
+   [RFC6818]  Yee, P., "Updates to the Internet X.509 Public Key
+              Infrastructure Certificate and Certificate Revocation List
+              (CRL) Profile", RFC 6818, DOI 10.17487/RFC6818, January
+              2013, <https://www.rfc-editor.org/info/rfc6818>.
 
    [RFC7234]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
               Ed., "Hypertext Transfer Protocol (HTTP/1.1): Caching",
@@ -1080,6 +1111,16 @@ Internet-Draft                   MTA-STS                     August 2017
 12.3.  URIs
 
    [1] https://mta-sts.example.com/.well-known/mta-sts.txt:
+
+
+
+
+
+
+Margolis, et al.        Expires February 16, 2018              [Page 20]
+
+Internet-Draft                   MTA-STS                     August 2017
+
 
 Authors' Addresses
 
@@ -1117,4 +1158,19 @@ Authors' Addresses
 
 
 
-Margolis, et al.        Expires February 16, 2018              [Page 20]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Margolis, et al.        Expires February 16, 2018              [Page 21]

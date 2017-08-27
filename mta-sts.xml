@@ -448,7 +448,7 @@ to validate; in particular, validation failures of policies which specify
 trusted by the sending MTA and be non-expired. The certificate MUST have a CN-ID
 (<xref target="RFC6125"/>) or subject alternative name (<xref target="RFC5280"/>) with a DNS-ID matching
 the <spanx style="verb">mx</spanx> pattern. The MX's certificate MAY also be checked for revocation via
-OCSP <xref target="RFC2560"/>, certificate revocation lists (CRLs), or some other mechanism.
+OCSP <xref target="RFC2560"/>, CRLs <xref target="RFC6818"/>, or some other mechanism.
 </t>
 <t>Because the <spanx style="verb">mx</spanx> patterns are not hostnames, however, matching is not identical
 to other common cases of X.509 certificate authentication (as described, for
@@ -693,6 +693,28 @@ and CA-signed certificate (for example, <spanx style="verb">dhcp-123.example.com
 perspective of MTA-STS Policy validation, be a valid MX host for that domain.
 </t>
 </section>
+
+<section anchor="compromise-of-the-web-pki-system" title="Compromise of the Web PKI System">
+<t>A host of risks apply to the PKI system used for certificate authentication,
+both of the <spanx style="verb">mta-sts</spanx> HTTPS host's certificate and the SMTP servers'
+certificates. These risks are broadly applicable within the Web PKI ecosystem
+and are not specific to MTA-STS; nonetheless, they deserve some consideration in
+this context.
+</t>
+<t>Broadly speaking, attackers may compromise the system by obtaining certificates
+under fraudulent circumstances (i.e. by impersonating the legitimate owner of
+the victim domain), by compromising a Certificate Authority or Delegate
+Authority's private keys, by obtaining a legitimate certificate issued to the
+victim domain, and similar.
+</t>
+<t>One approach commonly employed by Web browsers to help mitigate against some of
+these attacks is to allow for revocation of compromised or fraudulent
+certificates via OCSP <xref target="RFC2560"/> or CRLs <xref target="RFC6818"/>. Such mechanisms
+themselves represent tradeoffs and are not universally implemented; we
+nonetheless recommend implementors of MTA-STS to implement revocation mechanisms
+which are most applicable to their implementations.
+</t>
+</section>
 </section>
 
 <section anchor="contributors" title="Contributors">
@@ -881,6 +903,7 @@ func handleMessage(message) {
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4033.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5322.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5891.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6818.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7234.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7672.xml"?>
 </references>
