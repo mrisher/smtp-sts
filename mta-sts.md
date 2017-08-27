@@ -296,10 +296,11 @@ ignored. If any field is not specified, the policy SHALL be treated as invalid.
 ## HTTPS Policy Fetching
 
 When fetching a new policy or updating a policy, the HTTPS endpoint MUST present
-a X.509 certificate which is valid for the `mta-sts` host (as described below),
-chain to a root CA that is trusted by the sending MTA, and be non-expired. It is
-expected that sending MTAs use a set of trusted CAs similar to those in widely
-deployed Web browsers and operating systems.
+a X.509 certificate which is valid for the `mta-sts` host (e.g.
+`mta-sts.example.com`) as described below, chain to a root CA that is trusted by
+the sending MTA, and be non-expired. It is expected that sending MTAs use a set
+of trusted CAs similar to those in widely deployed Web browsers and operating
+systems.
 
 The certificate is valid for the `mta-sts` host with respect to the rules
 described in [@!RFC6125], with the following application-specific
