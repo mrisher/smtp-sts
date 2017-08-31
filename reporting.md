@@ -557,6 +557,12 @@ The report MAY be delivered by POST to HTTPS. If compressed, the report SHOULD
 use the media type `application/tlsrpt+gzip`, and `application/tlsrpt+json`
 otherwise (see section (#iana-considerations), "IANA Considerations").
 
+A reporting entity SHOULD expect a "successful" response from the accepting
+HTTPS server, typically a 200 or 201 HTTP code [@?RFC7231].  Other codes could indicate
+a delivery failure, and may be retried as per local policy.  The receiving system
+is not expected to process reports at receipt time, and MAY store them for processing
+at a later time.
+
 ## Delivery Retry
 
 In the event of a delivery failure, regardless of the delivery method, a 
