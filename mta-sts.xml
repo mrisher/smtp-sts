@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE rfc SYSTEM 'rfc2629.dtd' []>
-<rfc ipr="trust200902" category="std" docName="draft-ietf-uta-mta-sts-08">
+<rfc ipr="trust200902" category="std" docName="draft-ietf-uta-mta-sts-09">
 <?rfc toc="yes"?>
 <?rfc symrefs="yes"?>
 <?rfc sortrefs="yes"?>
@@ -87,7 +87,7 @@
 <uri></uri>
 </address>
 </author>
-<date year="2017" month="August" day="15"/>
+<date year="2017" month="September" day="1"/>
 
 <area>Applications</area>
 <workgroup>Using TLS in Applications</workgroup>
@@ -421,10 +421,8 @@ attempt to fetch a policy from the parent zone. Thus for mail sent to
 &quot;user@mail.example.com&quot;, the policy can be fetched only from &quot;mail.example.com&quot;,
 not &quot;example.com&quot;.
 </t>
-</section>
-</section>
-
-<section anchor="policy-validation" title="Policy Validation">
+<t>#Policy Validation
+</t>
 <t>When sending to an MX at a domain for which the sender has a valid and
 non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST validate:
 </t>
@@ -442,20 +440,21 @@ to validate; in particular, validation failures of policies which specify
 &quot;report&quot; mode MUST NOT be interpreted as delivery failures, as described in
 <xref target="policy-application"/>, &quot;Policy Application&quot;.
 </t>
+</section>
 
 <section anchor="mx-certificate-validation" title="MX Certificate Validation">
 <t>The certificate presented by the receiving MX MUST chain to a root CA that is
 trusted by the sending MTA and be non-expired. The certificate MUST have a CN-ID
-(<xref target="RFC6125"/>) or subject alternative name (<xref target="RFC5280"/>) with a DNS-ID matching
+(<xref target="RFC6125"/>) or subject alternative name (SAN, <xref target="RFC5280"/>) with a DNS-ID matching
 the <spanx style="verb">mx</spanx> pattern. The MX's certificate MAY also be checked for revocation via
 OCSP <xref target="RFC2560"/>, CRLs <xref target="RFC6818"/>, or some other mechanism.
 </t>
 <t>Because the <spanx style="verb">mx</spanx> patterns are not hostnames, however, matching is not identical
 to other common cases of X.509 certificate authentication (as described, for
 example, in <xref target="RFC6125"/>). Consider the example policy given above, with an <spanx style="verb">mx</spanx>
-pattern containing <spanx style="verb">.example.net</spanx>. In this case, if the MX server's X.509
-certificate contains a subject alternative name matching <spanx style="verb">*.example.net</spanx>, we are
-required to implement &quot;wildcard-to-wildcard&quot; matching.
+pattern containing <spanx style="verb">.example.com</spanx>. In this case, if the MX server's X.509
+certificate contains a SAN matching <spanx style="verb">*.example.com</spanx>, we are required to
+implement &quot;wildcard-to-wildcard&quot; matching.
 </t>
 <t>To simplify this case, we impose the following constraints on wildcard
 certificates, identical to those in <xref target="RFC7672"/> section 3.2.3 and [@?RFC6125
@@ -465,6 +464,10 @@ first label of the identifier (that is, <spanx style="verb">*.example.com</spanx
 wildcard identifier should thus strip the wildcard and ensure that the two sides
 match label-by-label, until all labels of the shorter side (if unequal length)
 are consumed.
+</t>
+<t>Note that a wildcard <spanx style="emph">must</spanx> match a label; an <spanx style="verb">mx</spanx> pattern of <spanx style="verb">.example.com</spanx>
+thus does not match a SAN of <spanx style="verb">example.com</spanx>, nor does a SAN of <spanx style="verb">*.example.com</spanx>
+match an <spanx style="verb">mx</spanx> of <spanx style="verb">example.com</spanx>.
 </t>
 <t>A simple pseudocode implementation of this algorithm is presented in the
 Appendix.
@@ -794,6 +797,22 @@ func tryStartTls(connection) {
   // Attempt to open an SMTP connection with STARTTLS with the MX.
 }
 
+func isWildcardMatch(pat, host) {
+  // Literal matches are true.
+  if pat == host {
+    return true
+  }
+  // Leading '.' matches a wildcard against the first part, i.e.
+  // .example.com matches x.example.com but not x.y.example.com.
+  if pat[0] == '.' {
+    parts = SplitN(host, '.', 2)  // Split on the first '.'.
+    if len(parts) &gt; 1 &amp;&amp; parts[1] == pat[1:] {
+      return true
+    }
+  }
+  return false
+}
+
 func certMatches(connection, policy) {
   // Assume a handy function to return CN and DNS-ID SANs.
   for san in getDnsIdSansAndCnFromCert(connection) {
@@ -804,13 +823,7 @@ func certMatches(connection, policy) {
         if san[1] != '.' continue
         san = san[1:]
       }
-      if san[0] == '.' &amp;&amp; HasSuffix(mx, san) {
-        return true
-      }
-      if mx[0] == '.' &amp;&amp; HasSuffix(san, mx) {
-        return true
-      }
-      if mx == san {
+      if isWildcardMatch(san, mx) || isWildcardMatch(mx, san) {
         return true
       }
     }

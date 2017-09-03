@@ -352,7 +352,7 @@ attempt to fetch a policy from the parent zone. Thus for mail sent to
 "user@mail.example.com", the policy can be fetched only from "mail.example.com",
 not "example.com".
 
-#  Policy Validation
+#Policy Validation
 
 When sending to an MX at a domain for which the sender has a valid and
 non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST validate:
@@ -373,16 +373,16 @@ to validate; in particular, validation failures of policies which specify
 
 The certificate presented by the receiving MX MUST chain to a root CA that is
 trusted by the sending MTA and be non-expired. The certificate MUST have a CN-ID
-([@!RFC6125]) or subject alternative name ([@!RFC5280]) with a DNS-ID matching
+([@!RFC6125]) or subject alternative name (SAN, [@!RFC5280]) with a DNS-ID matching
 the `mx` pattern. The MX's certificate MAY also be checked for revocation via
 OCSP [@?RFC2560], CRLs [@?RFC6818], or some other mechanism.
 
 Because the `mx` patterns are not hostnames, however, matching is not identical
 to other common cases of X.509 certificate authentication (as described, for
 example, in [@?RFC6125]). Consider the example policy given above, with an `mx`
-pattern containing `.example.net`. In this case, if the MX server's X.509
-certificate contains a subject alternative name matching `*.example.net`, we are
-required to implement "wildcard-to-wildcard" matching.
+pattern containing `.example.com`. In this case, if the MX server's X.509
+certificate contains a SAN matching `*.example.com`, we are required to
+implement "wildcard-to-wildcard" matching.
 
 To simplify this case, we impose the following constraints on wildcard
 certificates, identical to those in [@?RFC7672] section 3.2.3 and [@?RFC6125
@@ -392,6 +392,10 @@ first label of the identifier (that is, `*.example.com`, not
 wildcard identifier should thus strip the wildcard and ensure that the two sides
 match label-by-label, until all labels of the shorter side (if unequal length)
 are consumed.
+
+Note that a wildcard *must* match a label; an `mx` pattern of `.example.com`
+thus does not match a SAN of `example.com`, nor does a SAN of `*.example.com`
+match an `mx` of `example.com`.
 
 A simple pseudocode implementation of this algorithm is presented in the
 Appendix.
@@ -688,6 +692,22 @@ func tryStartTls(connection) {
   // Attempt to open an SMTP connection with STARTTLS with the MX.
 }
 
+func isWildcardMatch(pat, host) {
+  // Literal matches are true.
+  if pat == host {
+    return true
+  }
+  // Leading '.' matches a wildcard against the first part, i.e.
+  // .example.com matches x.example.com but not x.y.example.com.
+  if pat[0] == '.' {
+    parts = SplitN(host, '.', 2)  // Split on the first '.'.
+    if len(parts) > 1 && parts[1] == pat[1:] {
+      return true
+    }
+  }
+  return false
+}
+
 func certMatches(connection, policy) {
   // Assume a handy function to return CN and DNS-ID SANs.
   for san in getDnsIdSansAndCnFromCert(connection) {
@@ -698,13 +718,7 @@ func certMatches(connection, policy) {
         if san[1] != '.' continue
         san = san[1:]
       }
-      if san[0] == '.' && HasSuffix(mx, san) {
-        return true
-      }
-      if mx[0] == '.' && HasSuffix(san, mx) {
-        return true
-      }
-      if mx == san {
+      if isWildcardMatch(san, mx) || isWildcardMatch(mx, san) {
         return true
       }
     }
