@@ -352,7 +352,7 @@ attempt to fetch a policy from the parent zone. Thus for mail sent to
 "user@mail.example.com", the policy can be fetched only from "mail.example.com",
 not "example.com".
 
-#  Policy Validation
+#Policy Validation
 
 When sending to an MX at a domain for which the sender has a valid and
 non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST validate:
@@ -373,7 +373,7 @@ to validate; in particular, validation failures of policies which specify
 
 The certificate presented by the receiving MX MUST chain to a root CA that is
 trusted by the sending MTA and be non-expired. The certificate MUST have a CN-ID
-([@!RFC6125]) or subject alternative name ([@!RFC5280]) with a DNS-ID matching
+([@!RFC6125]) or subject alternative name (SAN, [@!RFC5280]) with a DNS-ID matching
 the `mx` pattern. The MX's certificate MAY also be checked for revocation via
 OCSP [@?RFC2560], CRLs [@?RFC6818], or some other mechanism.
 
@@ -381,8 +381,8 @@ Because the `mx` patterns are not hostnames, however, matching is not identical
 to other common cases of X.509 certificate authentication (as described, for
 example, in [@?RFC6125]). Consider the example policy given above, with an `mx`
 pattern containing `.example.com`. In this case, if the MX server's X.509
-certificate contains a subject alternative name matching `*.example.com`, we are
-required to implement "wildcard-to-wildcard" matching.
+certificate contains a SAN matching `*.example.com`, we are required to
+implement "wildcard-to-wildcard" matching.
 
 To simplify this case, we impose the following constraints on wildcard
 certificates, identical to those in [@?RFC7672] section 3.2.3 and [@?RFC6125
