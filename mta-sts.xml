@@ -420,10 +420,8 @@ attempt to fetch a policy from the parent zone. Thus for mail sent to
 &quot;user@mail.example.com&quot;, the policy can be fetched only from &quot;mail.example.com&quot;,
 not &quot;example.com&quot;.
 </t>
-</section>
-</section>
-
-<section anchor="policy-validation" title="Policy Validation">
+<t>#Policy Validation
+</t>
 <t>When sending to an MX at a domain for which the sender has a valid and
 non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST validate:
 </t>
@@ -441,11 +439,12 @@ to validate; in particular, validation failures of policies which specify
 &quot;report&quot; mode MUST NOT be interpreted as delivery failures, as described in
 <xref target="policy-application"/>, &quot;Policy Application&quot;.
 </t>
+</section>
 
 <section anchor="mx-certificate-validation" title="MX Certificate Validation">
 <t>The certificate presented by the receiving MX MUST chain to a root CA that is
 trusted by the sending MTA and be non-expired. The certificate MUST have a CN-ID
-(<xref target="RFC6125"/>) or subject alternative name (<xref target="RFC5280"/>) with a DNS-ID matching
+(<xref target="RFC6125"/>) or subject alternative name (SAN, <xref target="RFC5280"/>) with a DNS-ID matching
 the <spanx style="verb">mx</spanx> pattern. The MX's certificate MAY also be checked for revocation via
 OCSP <xref target="RFC2560"/>, certificate revocation lists (CRLs), or some other mechanism.
 </t>
@@ -453,8 +452,8 @@ OCSP <xref target="RFC2560"/>, certificate revocation lists (CRLs), or some othe
 to other common cases of X.509 certificate authentication (as described, for
 example, in <xref target="RFC6125"/>). Consider the example policy given above, with an <spanx style="verb">mx</spanx>
 pattern containing <spanx style="verb">.example.com</spanx>. In this case, if the MX server's X.509
-certificate contains a subject alternative name matching <spanx style="verb">*.example.com</spanx>, we are
-required to implement &quot;wildcard-to-wildcard&quot; matching.
+certificate contains a SAN matching <spanx style="verb">*.example.com</spanx>, we are required to
+implement &quot;wildcard-to-wildcard&quot; matching.
 </t>
 <t>To simplify this case, we impose the following constraints on wildcard
 certificates, identical to those in <xref target="RFC7672"/> section 3.2.3 and [@?RFC6125
