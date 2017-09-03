@@ -3,13 +3,13 @@
    Title = "SMTP MTA Strict Transport Security (MTA-STS)"
    abbrev = "MTA-STS"
    category = "std"
-   docName = "draft-ietf-uta-mta-sts-08"
+   docName = "draft-ietf-uta-mta-sts-09"
    ipr = "trust200902"
    area = "Applications"
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2017-08-15T00:00:00Z
+   date = 2017-09-01T00:00:00Z
 
    [[author]]
    initials="D."
@@ -298,10 +298,11 @@ ignored. If any field is not specified, the policy SHALL be treated as invalid.
 ## HTTPS Policy Fetching
 
 When fetching a new policy or updating a policy, the HTTPS endpoint MUST present
-a X.509 certificate which is valid for the `mta-sts` host (as described below),
-chain to a root CA that is trusted by the sending MTA, and be non-expired. It is
-expected that sending MTAs use a set of trusted CAs similar to those in widely
-deployed Web browsers and operating systems.
+a X.509 certificate which is valid for the `mta-sts` host (e.g.
+`mta-sts.example.com`) as described below, chain to a root CA that is trusted by
+the sending MTA, and be non-expired. It is expected that sending MTAs use a set
+of trusted CAs similar to those in widely deployed Web browsers and operating
+systems.
 
 The certificate is valid for the `mta-sts` host with respect to the rules
 described in [@!RFC6125], with the following application-specific
@@ -374,7 +375,7 @@ The certificate presented by the receiving MX MUST chain to a root CA that is
 trusted by the sending MTA and be non-expired. The certificate MUST have a CN-ID
 ([@!RFC6125]) or subject alternative name ([@!RFC5280]) with a DNS-ID matching
 the `mx` pattern. The MX's certificate MAY also be checked for revocation via
-OCSP [@?RFC2560], certificate revocation lists (CRLs), or some other mechanism.
+OCSP [@?RFC2560], CRLs [@?RFC6818], or some other mechanism.
 
 Because the `mx` patterns are not hostnames, however, matching is not identical
 to other common cases of X.509 certificate authentication (as described, for
@@ -635,6 +636,27 @@ for `example.com` is to set the `mx` equal to `.example.com`; recipient domains
 must consider in this case the risk that any user possessing a valid hostname
 and CA-signed certificate (for example, `dhcp-123.example.com`) will, from the
 perspective of MTA-STS Policy validation, be a valid MX host for that domain.
+
+## Compromise of the Web PKI System
+
+A host of risks apply to the PKI system used for certificate authentication,
+both of the `mta-sts` HTTPS host's certificate and the SMTP servers'
+certificates. These risks are broadly applicable within the Web PKI ecosystem
+and are not specific to MTA-STS; nonetheless, they deserve some consideration in
+this context.
+
+Broadly speaking, attackers may compromise the system by obtaining certificates
+under fraudulent circumstances (i.e. by impersonating the legitimate owner of
+the victim domain), by compromising a Certificate Authority or Delegate
+Authority's private keys, by obtaining a legitimate certificate issued to the
+victim domain, and similar.
+
+One approach commonly employed by Web browsers to help mitigate against some of
+these attacks is to allow for revocation of compromised or fraudulent
+certificates via OCSP [@?RFC2560] or CRLs [@?RFC6818]. Such mechanisms
+themselves represent tradeoffs and are not universally implemented; we
+nonetheless recommend implementors of MTA-STS to implement revocation mechanisms
+which are most applicable to their implementations.
 
 # Contributors
 

@@ -5,17 +5,17 @@
 Using TLS in Applications                                    D. Margolis
 Internet-Draft                                                 M. Risher
 Intended status: Standards Track                             Google, Inc
-Expires: February 16, 2018                               B. Ramakrishnan
+Expires: March 5, 2018                                   B. Ramakrishnan
                                                              Yahoo!, Inc
                                                               A. Brotman
                                                             Comcast, Inc
                                                                 J. Jones
                                                           Microsoft, Inc
-                                                         August 15, 2017
+                                                       September 1, 2017
 
 
               SMTP MTA Strict Transport Security (MTA-STS)
-                       draft-ietf-uta-mta-sts-08
+                       draft-ietf-uta-mta-sts-09
 
 Abstract
 
@@ -40,7 +40,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on February 16, 2018.
+   This Internet-Draft will expire on March 5, 2018.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Margolis, et al.        Expires February 16, 2018               [Page 1]
+Margolis, et al.          Expires March 5, 2018                 [Page 1]
 
-Internet-Draft                   MTA-STS                     August 2017
+Internet-Draft                   MTA-STS                  September 2017
 
 
    publication of this document.  Please review these documents
@@ -67,7 +67,7 @@ Internet-Draft                   MTA-STS                     August 2017
 
 Table of Contents
 
-   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
      1.1.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   3
    2.  Related Technologies  . . . . . . . . . . . . . . . . . . . .   3
    3.  Policy Discovery  . . . . . . . . . . . . . . . . . . . . . .   4
@@ -92,27 +92,33 @@ Table of Contents
      9.2.  Preventing Policy Discovery . . . . . . . . . . . . . . .  14
      9.3.  Denial of Service . . . . . . . . . . . . . . . . . . . .  15
      9.4.  Weak Policy Constraints . . . . . . . . . . . . . . . . .  16
+     9.5.  Compromise of the Web PKI System  . . . . . . . . . . . .  16
    10. Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  16
-   11. Appendix 1: MTA-STS example record & policy . . . . . . . . .  16
+   11. Appendix 1: MTA-STS example record & policy . . . . . . . . .  17
    12. Appendix 2: Message delivery pseudocode . . . . . . . . . . .  17
-   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  19
-     13.1.  Normative References . . . . . . . . . . . . . . . . . .  19
-     13.2.  Informative References . . . . . . . . . . . . . . . . .  20
+   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .  20
+     13.1.  Normative References . . . . . . . . . . . . . . . . . .  20
+     13.2.  Informative References . . . . . . . . . . . . . . . . .  21
      13.3.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  21
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  21
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  22
+
+
+
+
+
+
+
+
+Margolis, et al.          Expires March 5, 2018                 [Page 2]
+
+Internet-Draft                   MTA-STS                  September 2017
+
 
 1.  Introduction
 
    The STARTTLS extension to SMTP [RFC3207] allows SMTP clients and
    hosts to negotiate the use of a TLS channel for encrypted mail
    transmission.
-
-
-
-Margolis, et al.        Expires February 16, 2018               [Page 2]
-
-Internet-Draft                   MTA-STS                     August 2017
-
 
    While this opportunistic encryption protocol by itself provides a
    high barrier against passive man-in-the-middle traffic interception,
@@ -155,21 +161,21 @@ Internet-Draft                   MTA-STS                     August 2017
    transmission.  DANE requires DNSSEC [RFC4033] for authentication; the
    mechanism described here instead relies on certificate authorities
    (CAs) and does not require DNSSEC, at a cost of risking malicious
+
+
+
+
+Margolis, et al.          Expires March 5, 2018                 [Page 3]
+
+Internet-Draft                   MTA-STS                  September 2017
+
+
    downgrades.  For a thorough discussion of this trade-off, see
    Section 9, "Security Considerations".
 
    In addition, MTA-STS provides an optional report-only mode, enabling
    soft deployments to detect policy failures; partial deployments can
    be achieved in DANE by deploying TLSA records only for some of a
-
-
-
-
-Margolis, et al.        Expires February 16, 2018               [Page 3]
-
-Internet-Draft                   MTA-STS                     August 2017
-
-
    domain's MXs, but such a mechanism is not possible for the per-domain
    policies used by MTA-STS.
 
@@ -213,18 +219,17 @@ Internet-Draft                   MTA-STS                     August 2017
 
    An example TXT record is as below:
 
+
+
+Margolis, et al.          Expires March 5, 2018                 [Page 4]
+
+Internet-Draft                   MTA-STS                  September 2017
+
+
    "_mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;""
 
    The formal definition of the "_mta-sts" TXT record, defined using
    [RFC7405], is as follows:
-
-
-
-
-Margolis, et al.        Expires February 16, 2018               [Page 4]
-
-Internet-Draft                   MTA-STS                     August 2017
-
 
 sts-text-record = sts-version 1*(field-delim sts-field) [field-delim]
 
@@ -270,17 +275,14 @@ sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)    ; chars excluding "=",
 
    This resource contains the following line-separated key/value pairs:
 
-   o  "version": (plain-text).  Currently only "STSv1" is supported.
 
 
-
-
-
-
-Margolis, et al.        Expires February 16, 2018               [Page 5]
+Margolis, et al.          Expires March 5, 2018                 [Page 5]
 
-Internet-Draft                   MTA-STS                     August 2017
+Internet-Draft                   MTA-STS                  September 2017
 
+
+   o  "version": (plain-text).  Currently only "STSv1" is supported.
 
    o  "mode": (plain-text).  One of "enforce", "report", or "none",
       indicating the expected behavior of a sending MTA in the case of a
@@ -328,16 +330,16 @@ sts-policy-record        = *WSP sts-policy-field *WSP
                            [CRLF]
 
 sts-policy-field         = sts-policy-version /           ; required once
+
+
+
+Margolis, et al.          Expires March 5, 2018                 [Page 6]
+
+Internet-Draft                   MTA-STS                  September 2017
+
+
                            sts-policy-mode    /           ; required once
                            sts-policy-max-age /           ; required once
-
-
-
-Margolis, et al.        Expires February 16, 2018               [Page 6]
-
-Internet-Draft                   MTA-STS                     August 2017
-
-
                            0*(sts-policy-mx *WSP CRLF) /  ; required at
                                                           ; least once
                                                           ; except when mode
@@ -387,11 +389,9 @@ sts-policy-ext-value     = 1*(%x21-3A / %x3C / %x3E-7E)    ; chars excluding
 
 
 
-
-
-Margolis, et al.        Expires February 16, 2018               [Page 7]
+Margolis, et al.          Expires March 5, 2018                 [Page 7]
 
-Internet-Draft                   MTA-STS                     August 2017
+Internet-Draft                   MTA-STS                  September 2017
 
 
    Parsers MUST accept TXT records and policy files which are
@@ -406,10 +406,10 @@ Internet-Draft                   MTA-STS                     August 2017
 
    When fetching a new policy or updating a policy, the HTTPS endpoint
    MUST present a X.509 certificate which is valid for the "mta-sts"
-   host (as described below), chain to a root CA that is trusted by the
-   sending MTA, and be non-expired.  It is expected that sending MTAs
-   use a set of trusted CAs similar to those in widely deployed Web
-   browsers and operating systems.
+   host (e.g.  "mta-sts.example.com") as described below, chain to a
+   root CA that is trusted by the sending MTA, and be non-expired.  It
+   is expected that sending MTAs use a set of trusted CAs similar to
+   those in widely deployed Web browsers and operating systems.
 
    The certificate is valid for the "mta-sts" host with respect to the
    rules described in [RFC6125], with the following application-specific
@@ -445,9 +445,9 @@ Internet-Draft                   MTA-STS                     August 2017
 
 
 
-Margolis, et al.        Expires February 16, 2018               [Page 8]
+Margolis, et al.          Expires March 5, 2018                 [Page 8]
 
-Internet-Draft                   MTA-STS                     August 2017
+Internet-Draft                   MTA-STS                  September 2017
 
 
    hosts SHOULD respond to requests with a complete policy body within
@@ -501,14 +501,14 @@ Internet-Draft                   MTA-STS                     August 2017
 
 
 
-Margolis, et al.        Expires February 16, 2018               [Page 9]
+Margolis, et al.          Expires March 5, 2018                 [Page 9]
 
-Internet-Draft                   MTA-STS                     August 2017
+Internet-Draft                   MTA-STS                  September 2017
 
 
    ([RFC5280]) with a DNS-ID matching the "mx" pattern.  The MX's
    certificate MAY also be checked for revocation via OCSP [RFC2560],
-   certificate revocation lists (CRLs), or some other mechanism.
+   CRLs [RFC6818], or some other mechanism.
 
    Because the "mx" patterns are not hostnames, however, matching is not
    identical to other common cases of X.509 certificate authentication
@@ -557,9 +557,9 @@ Internet-Draft                   MTA-STS                     August 2017
 
 
 
-Margolis, et al.        Expires February 16, 2018              [Page 10]
+Margolis, et al.          Expires March 5, 2018                [Page 10]
 
-Internet-Draft                   MTA-STS                     August 2017
+Internet-Draft                   MTA-STS                  September 2017
 
 
    (In all cases, MTAs SHOULD treat such failures as transient errors
@@ -613,9 +613,9 @@ Internet-Draft                   MTA-STS                     August 2017
 
 
 
-Margolis, et al.        Expires February 16, 2018              [Page 11]
+Margolis, et al.          Expires March 5, 2018                [Page 11]
 
-Internet-Draft                   MTA-STS                     August 2017
+Internet-Draft                   MTA-STS                  September 2017
 
 
 7.  Operational Considerations
@@ -669,9 +669,9 @@ Internet-Draft                   MTA-STS                     August 2017
 
 
 
-Margolis, et al.        Expires February 16, 2018              [Page 12]
+Margolis, et al.          Expires March 5, 2018                [Page 12]
 
-Internet-Draft                   MTA-STS                     August 2017
+Internet-Draft                   MTA-STS                  September 2017
 
 
 8.  IANA Considerations
@@ -725,9 +725,9 @@ Internet-Draft                   MTA-STS                     August 2017
 
 
 
-Margolis, et al.        Expires February 16, 2018              [Page 13]
+Margolis, et al.          Expires March 5, 2018                [Page 13]
 
-Internet-Draft                   MTA-STS                     August 2017
+Internet-Draft                   MTA-STS                  September 2017
 
 
    o  Foiling TLS negotiation, for example by deleting the "250
@@ -781,9 +781,9 @@ Internet-Draft                   MTA-STS                     August 2017
 
 
 
-Margolis, et al.        Expires February 16, 2018              [Page 14]
+Margolis, et al.          Expires March 5, 2018                [Page 14]
 
-Internet-Draft                   MTA-STS                     August 2017
+Internet-Draft                   MTA-STS                  September 2017
 
 
    cache regularly (for instance, by checking their cached version
@@ -837,9 +837,9 @@ Internet-Draft                   MTA-STS                     August 2017
 
 
 
-Margolis, et al.        Expires February 16, 2018              [Page 15]
+Margolis, et al.          Expires March 5, 2018                [Page 15]
 
-Internet-Draft                   MTA-STS                     August 2017
+Internet-Draft                   MTA-STS                  September 2017
 
 
    TXT record on the same domain--something not, to our knowledge,
@@ -859,6 +859,29 @@ Internet-Draft                   MTA-STS                     August 2017
    the perspective of MTA-STS Policy validation, be a valid MX host for
    that domain.
 
+9.5.  Compromise of the Web PKI System
+
+   A host of risks apply to the PKI system used for certificate
+   authentication, both of the "mta-sts" HTTPS host's certificate and
+   the SMTP servers' certificates.  These risks are broadly applicable
+   within the Web PKI ecosystem and are not specific to MTA-STS;
+   nonetheless, they deserve some consideration in this context.
+
+   Broadly speaking, attackers may compromise the system by obtaining
+   certificates under fraudulent circumstances (i.e. by impersonating
+   the legitimate owner of the victim domain), by compromising a
+   Certificate Authority or Delegate Authority's private keys, by
+   obtaining a legitimate certificate issued to the victim domain, and
+   similar.
+
+   One approach commonly employed by Web browsers to help mitigate
+   against some of these attacks is to allow for revocation of
+   compromised or fraudulent certificates via OCSP [RFC2560] or CRLs
+   [RFC6818].  Such mechanisms themselves represent tradeoffs and are
+   not universally implemented; we nonetheless recommend implementors of
+   MTA-STS to implement revocation mechanisms which are most applicable
+   to their implementations.
+
 10.  Contributors
 
    Nicolas Lidzborski Google, Inc nlidz (at) google (dot com)
@@ -866,6 +889,14 @@ Internet-Draft                   MTA-STS                     August 2017
    Wei Chuang Google, Inc weihaw (at) google (dot com)
 
    Brandon Long Google, Inc blong (at) google (dot com)
+
+
+
+
+Margolis, et al.          Expires March 5, 2018                [Page 16]
+
+Internet-Draft                   MTA-STS                  September 2017
+
 
    Franck Martin LinkedIn, Inc fmartin (at) linkedin (dot com)
 
@@ -889,14 +920,6 @@ Internet-Draft                   MTA-STS                     August 2017
        _mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
 
    MTA-STS Policy file served as the response body at [1]
-
-
-
-
-Margolis, et al.        Expires February 16, 2018              [Page 16]
-
-Internet-Draft                   MTA-STS                     August 2017
-
 
                          version: STSv1
                          mode: report
@@ -923,6 +946,14 @@ func isEnforce(policy) {
 
 func isNonExpired(policy) {
   // Return true if the policy is not expired.
+
+
+
+Margolis, et al.          Expires March 5, 2018                [Page 17]
+
+Internet-Draft                   MTA-STS                  September 2017
+
+
 }
 
 func tryStartTls(connection) {
@@ -946,14 +977,6 @@ func certMatches(connection, policy) {
         return true
       }
       if mx == san {
-
-
-
-Margolis, et al.        Expires February 16, 2018              [Page 17]
-
-Internet-Draft                   MTA-STS                     August 2017
-
-
         return true
       }
     }
@@ -979,6 +1002,14 @@ func tryGetCachedPolicy(domain) {
 }
 
 func reportError(error) {
+
+
+
+Margolis, et al.          Expires March 5, 2018                [Page 18]
+
+Internet-Draft                   MTA-STS                  September 2017
+
+
   // Report an error via TLSRPT.
 }
 
@@ -1002,14 +1033,6 @@ func tryMxAccordingTo(message, mx, policy) {
 }
 
 func tryWithPolicy(message, domain, policy) {
-
-
-
-Margolis, et al.        Expires February 16, 2018              [Page 18]
-
-Internet-Draft                   MTA-STS                     August 2017
-
-
   mxes := getMxForDomain(domain)
   for mx in mxes {
     if tryMxAccordingTo(message, mx, policy) {
@@ -1032,6 +1055,15 @@ func handleMessage(message) {
   }
   // Try to deliver the message normally (i.e. without MTA-STS).
 }
+
+
+
+
+
+
+Margolis, et al.          Expires March 5, 2018                [Page 19]
+
+Internet-Draft                   MTA-STS                  September 2017
 
 
 13.  References
@@ -1058,14 +1090,6 @@ func handleMessage(message) {
               DOI 10.17487/RFC5321, October 2008,
               <http://www.rfc-editor.org/info/rfc5321>.
 
-
-
-
-Margolis, et al.        Expires February 16, 2018              [Page 19]
-
-Internet-Draft                   MTA-STS                     August 2017
-
-
    [RFC5785]  Nottingham, M. and E. Hammer-Lahav, "Defining Well-Known
               Uniform Resource Identifiers (URIs)", RFC 5785, DOI 10
               .17487/RFC5785, April 2010,
@@ -1086,6 +1110,17 @@ Internet-Draft                   MTA-STS                     August 2017
    [RFC7405]  Kyzivat, P., "Case-Sensitive String Support in ABNF", RFC
               7405, DOI 10.17487/RFC7405, December 2014,
               <http://www.rfc-editor.org/info/rfc7405>.
+
+
+
+
+
+
+
+Margolis, et al.          Expires March 5, 2018                [Page 20]
+
+Internet-Draft                   MTA-STS                  September 2017
+
 
 13.2.  Informative References
 
@@ -1113,14 +1148,10 @@ Internet-Draft                   MTA-STS                     August 2017
               RFC5891, August 2010,
               <http://www.rfc-editor.org/info/rfc5891>.
 
-
-
-
-
-Margolis, et al.        Expires February 16, 2018              [Page 20]
-
-Internet-Draft                   MTA-STS                     August 2017
-
+   [RFC6818]  Yee, P., "Updates to the Internet X.509 Public Key
+              Infrastructure Certificate and Certificate Revocation List
+              (CRL) Profile", RFC 6818, DOI 10.17487/RFC6818, January
+              2013, <https://www.rfc-editor.org/info/rfc6818>.
 
    [RFC7234]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
               Ed., "Hypertext Transfer Protocol (HTTP/1.1): Caching",
@@ -1136,6 +1167,16 @@ Internet-Draft                   MTA-STS                     August 2017
 13.3.  URIs
 
    [1] https://mta-sts.example.com/.well-known/mta-sts.txt:
+
+
+
+
+
+
+Margolis, et al.          Expires March 5, 2018                [Page 21]
+
+Internet-Draft                   MTA-STS                  September 2017
+
 
 Authors' Addresses
 
@@ -1173,4 +1214,19 @@ Authors' Addresses
 
 
 
-Margolis, et al.        Expires February 16, 2018              [Page 21]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Margolis, et al.          Expires March 5, 2018                [Page 22]
