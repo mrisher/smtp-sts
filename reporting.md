@@ -146,7 +146,7 @@ Policies consist of the following directives:
 	 by the recipient.
 
 The formal definition of the `_smtp-tlsrpt` TXT record, defined using
-[@!RFC5234], is as follows:
+[@!RFC5234] & [@!RFC7405], is as follows:
 
         tlsrpt-record     = tlsrpt-version 1*(field-delim tlsrpt-field)
                             [field-delim]
