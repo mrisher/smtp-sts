@@ -317,19 +317,9 @@ The certificate MAY be checked for revocation via the Online Certificate Status
 Protocol (OCSP) [@?RFC2560], certificate revocation lists (CRLs), or some other
 mechanism.
 
-Policies fetched via HTTPS are only valid if the HTTP response code is 200 (OK),
-or if an HTTP redirect (codes 302, 303, or 307) leads to a different endpoint
-resulting in an HTTP 200.  Note that when following an HTTP 30x redirect, the
-aforementioned certificate authentication MUST nonetheless be applied to the
-initial HTTPS response that serves the 30x code; subsequent redirect URIs MUST
-also be HTTPS with a server certificate that is trusted by the sending MTA,
-non-expired, and valid for the host identity, though this identity may differ
-from that the initial `mta-sts` host. (Thus, for example,
-`https://mta-sts.user.com` may redirect requests to
-`https://mta-sts.provider.com`, but the `provider.com` endpoint must also be
-authenticated.)
-
-HTTP caching (as specified in [@?RFC7234]) MUST NOT be used.
+Policies fetched via HTTPS are only valid if the HTTP response code is 200 (OK).
+HTTP 3xx redirects MUST NOT be followed, and HTTP caching (as specified in
+[@?RFC7234]) MUST NOT be used.
 
 Senders may wish to rate-limit the frequency of attempts to fetch the HTTPS
 endpoint even if a valid TXT record for the recipient domain exists. In the case
@@ -502,11 +492,11 @@ the `_mta-sts` record maintained by the hosting organization. This allows the
 hosting organization to control update signaling.
 
 Second, the Policy Domain must point the "well-known" policy location to the
-hosting organization. This can be done by redirecting the `mta-sts` host to a
+hosting organization. This can be done either by redirecting the `mta-sts` host to a
 host or CNAME specified by the hosting organization and by giving the hosting
-organization a TLS certificate which is valid for that host, or by serving an
-HTTP 302 redirect from the "well-known" policy to the policy of the hosting
-organization.
+organization a TLS certificate which is valid for that host, or by setting up a
+"reverse proxy" (also known as a "gateway") server that serves as the Policy
+Domain's policy the policy currently served by the hosting organization.
 
 For example, given a user domain `user.com` hosted by a mail provider
 `provider.com`, the following configuration would allow policy delegation:
@@ -520,9 +510,9 @@ Policy:
 ~~~
 > GET /.well-known/mta-sts.txt
 > Host: mta-sts.user.com
-< HTTP/1.1 302 Found
-< Location: https://mta-sts.host.com/.well-known/mta-sts.txt
+< HTTP/1.1 200 OK  # Response proxies content from https://mta-sts.host.com
 ~~~
+
 
 ## Removing MTA-STS
 
