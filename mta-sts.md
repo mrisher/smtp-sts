@@ -492,8 +492,8 @@ the `_mta-sts` record maintained by the hosting organization. This allows the
 hosting organization to control update signaling.
 
 Second, the Policy Domain must point the "well-known" policy location to the
-hosting organization. This can be done either by redirecting the `mta-sts` host to a
-host or CNAME specified by the hosting organization and by giving the hosting
+hosting organization. This can be done either by setting the `mta-sts` record to
+a host or CNAME specified by the hosting organization and by giving the hosting
 organization a TLS certificate which is valid for that host, or by setting up a
 "reverse proxy" (also known as a "gateway") server that serves as the Policy
 Domain's policy the policy currently served by the hosting organization.
@@ -503,14 +503,14 @@ For example, given a user domain `user.com` hosted by a mail provider
 
 DNS:
 ~~~
-_mta-sts.user.com.  IN CNAME _mta-sts.host.com.
+_mta-sts.user.com.  IN CNAME _mta-sts.provider.com.
 ~~~
 
 Policy:
 ~~~
 > GET /.well-known/mta-sts.txt
 > Host: mta-sts.user.com
-< HTTP/1.1 200 OK  # Response proxies content from https://mta-sts.host.com
+< HTTP/1.1 200 OK  # Response proxies content from https://mta-sts.provider.com
 ~~~
 
 
