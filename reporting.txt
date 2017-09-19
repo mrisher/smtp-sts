@@ -5,18 +5,18 @@
 Using TLS in Applications                                    D. Margolis
 Internet-Draft                                               Google, Inc
 Intended status: Standards Track                              A. Brotman
-Expires: March 5, 2018                                      Comcast, Inc
+Expires: March 9, 2018                                      Comcast, Inc
                                                          B. Ramakrishnan
                                                              Yahoo!, Inc
                                                                 J. Jones
                                                           Microsoft, Inc
                                                                M. Risher
                                                              Google, Inc
-                                                       September 1, 2017
+                                                       September 5, 2017
 
 
                            SMTP TLS Reporting
-                     draft-ietf-uta-smtp-tlsrpt-09
+                     draft-ietf-uta-smtp-tlsrpt-10
 
 Abstract
 
@@ -46,14 +46,14 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on March 5, 2018.
+   This Internet-Draft will expire on March 9, 2018.
 
 
 
 
 
 
-Margolis, et al.          Expires March 5, 2018                 [Page 1]
+Margolis, et al.          Expires March 9, 2018                 [Page 1]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Margolis, et al.          Expires March 5, 2018                 [Page 2]
+Margolis, et al.          Expires March 9, 2018                 [Page 2]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
@@ -165,7 +165,7 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
 
 
 
-Margolis, et al.          Expires March 5, 2018                 [Page 3]
+Margolis, et al.          Expires March 9, 2018                 [Page 3]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
@@ -221,7 +221,7 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
 
 
 
-Margolis, et al.          Expires March 5, 2018                 [Page 4]
+Margolis, et al.          Expires March 9, 2018                 [Page 4]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
@@ -239,7 +239,7 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
       lacking such a signature MUST be ignored by the recipient.
 
    The formal definition of the "_smtp-tlsrpt" TXT record, defined using
-   [RFC5234], is as follows:
+   [RFC5234] & [RFC7405], is as follows:
 
     tlsrpt-record     = tlsrpt-version 1*(field-delim tlsrpt-field)
                         [field-delim]
@@ -277,7 +277,7 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
 
 
 
-Margolis, et al.          Expires March 5, 2018                 [Page 5]
+Margolis, et al.          Expires March 9, 2018                 [Page 5]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
@@ -333,7 +333,7 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
 
 
 
-Margolis, et al.          Expires March 5, 2018                 [Page 6]
+Margolis, et al.          Expires March 9, 2018                 [Page 6]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
@@ -389,7 +389,7 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
 
 
 
-Margolis, et al.          Expires March 5, 2018                 [Page 7]
+Margolis, et al.          Expires March 9, 2018                 [Page 7]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
@@ -445,7 +445,7 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
 
 
 
-Margolis, et al.          Expires March 5, 2018                 [Page 8]
+Margolis, et al.          Expires March 9, 2018                 [Page 8]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
@@ -501,7 +501,7 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
 
 
 
-Margolis, et al.          Expires March 5, 2018                 [Page 9]
+Margolis, et al.          Expires March 9, 2018                 [Page 9]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
@@ -557,7 +557,7 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
 
 
 
-Margolis, et al.          Expires March 5, 2018                [Page 10]
+Margolis, et al.          Expires March 9, 2018                [Page 10]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
@@ -613,7 +613,7 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
 
 
 
-Margolis, et al.          Expires March 5, 2018                [Page 11]
+Margolis, et al.          Expires March 9, 2018                [Page 11]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
@@ -669,7 +669,7 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
 
 
 
-Margolis, et al.          Expires March 5, 2018                [Page 12]
+Margolis, et al.          Expires March 9, 2018                [Page 12]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
@@ -725,7 +725,7 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
 
 
 
-Margolis, et al.          Expires March 5, 2018                [Page 13]
+Margolis, et al.          Expires March 9, 2018                [Page 13]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
@@ -781,7 +781,7 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
 
 
 
-Margolis, et al.          Expires March 5, 2018                [Page 14]
+Margolis, et al.          Expires March 9, 2018                [Page 14]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
@@ -837,7 +837,7 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
 
 
 
-Margolis, et al.          Expires March 5, 2018                [Page 15]
+Margolis, et al.          Expires March 9, 2018                [Page 15]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
@@ -893,7 +893,7 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
 
 
 
-Margolis, et al.          Expires March 5, 2018                [Page 16]
+Margolis, et al.          Expires March 9, 2018                [Page 16]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
@@ -949,7 +949,7 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
 
 
 
-Margolis, et al.          Expires March 5, 2018                [Page 17]
+Margolis, et al.          Expires March 9, 2018                [Page 17]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
@@ -1005,7 +1005,7 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
 
 
 
-Margolis, et al.          Expires March 5, 2018                [Page 18]
+Margolis, et al.          Expires March 9, 2018                [Page 18]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
@@ -1061,7 +1061,7 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
 
 
 
-Margolis, et al.          Expires March 5, 2018                [Page 19]
+Margolis, et al.          Expires March 9, 2018                [Page 19]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
@@ -1117,7 +1117,7 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
 
 
 
-Margolis, et al.          Expires March 5, 2018                [Page 20]
+Margolis, et al.          Expires March 9, 2018                [Page 20]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
@@ -1173,7 +1173,7 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
 
 
 
-Margolis, et al.          Expires March 5, 2018                [Page 21]
+Margolis, et al.          Expires March 9, 2018                [Page 21]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
@@ -1229,7 +1229,7 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
 
 
 
-Margolis, et al.          Expires March 5, 2018                [Page 22]
+Margolis, et al.          Expires March 9, 2018                [Page 22]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
@@ -1269,6 +1269,10 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
               Interchange Format", RFC 7159, DOI 10.17487/RFC7159, March
               2014, <http://www.rfc-editor.org/info/rfc7159>.
 
+   [RFC7405]  Kyzivat, P., "Case-Sensitive String Support in ABNF", RFC
+              7405, DOI 10.17487/RFC7405, December 2014,
+              <http://www.rfc-editor.org/info/rfc7405>.
+
    [RFC7493]  Bray, T., Ed., "The I-JSON Message Format", RFC 7493, DOI
               10.17487/RFC7493, March 2015,
               <http://www.rfc-editor.org/info/rfc7493>.
@@ -1279,16 +1283,16 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
               Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
               February 2002, <http://www.rfc-editor.org/info/rfc3207>.
 
-   [RFC3501]  Crispin, M., "INTERNET MESSAGE ACCESS PROTOCOL - VERSION
-              4rev1", RFC 3501, DOI 10.17487/RFC3501, March 2003,
-              <http://www.rfc-editor.org/info/rfc3501>.
 
 
-
-Margolis, et al.          Expires March 5, 2018                [Page 23]
+Margolis, et al.          Expires March 9, 2018                [Page 23]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
+
+   [RFC3501]  Crispin, M., "INTERNET MESSAGE ACCESS PROTOCOL - VERSION
+              4rev1", RFC 3501, DOI 10.17487/RFC3501, March 2003,
+              <http://www.rfc-editor.org/info/rfc3501>.
 
    [RFC3864]  Klyne, G., Nottingham, M., and J. Mogul, "Registration
               Procedures for Message Header Fields", BCP 90, RFC 3864,
@@ -1333,17 +1337,19 @@ Authors' Addresses
    Email: rbinu (at) yahoo-inc (dot com)
 
 
+
+
+
+
+Margolis, et al.          Expires March 9, 2018                [Page 24]
+
+Internet-Draft                 SMTP-TLSRPT                September 2017
+
+
    Janet Jones
    Microsoft, Inc
 
    Email: janet.jones (at) microsoft (dot com)
-
-
-
-
-Margolis, et al.          Expires March 5, 2018                [Page 24]
-
-Internet-Draft                 SMTP-TLSRPT                September 2017
 
 
    Mark Risher
@@ -1391,10 +1397,4 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
 
 
 
-
-
-
-
-
-
-Margolis, et al.          Expires March 5, 2018                [Page 25]
+Margolis, et al.          Expires March 9, 2018                [Page 25]
