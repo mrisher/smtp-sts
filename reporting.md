@@ -371,17 +371,21 @@ Figure: JSON Report Format
 * `policy-type`: The type of policy that was applied by the sending domain.
     Presently, the only three valid choices are `tlsa`, `sts`, and the literal
     string `no-policy-found`. It is provided as a string.
-* `policy-string`: The JSON string serialization ([@!RFC7159] section 7) of the
-   policy, whether TLSA record ([@!RFC6698] section 2.3) or MTA-STS policy.
+* `policy-string`: A string representation of the policy, whether TLSA 
+    record ([@!RFC6698] section 2.3) or MTA-STS policy. Examples:
+    TLSA: `"_25._tcp.mx.example.com. IN TLSA ( 3 0 1 \
+    1F850A337E6DB9C609C522D136A475638CC43E1ED424F8EEC8513D7 47D1D085D )"`
+    MTA-STS: `"version: STSv1\nmode: report\nmx: mx1.example.com\nmx: \
+    mx2.example.com\nmx: mx.backup-example.com\nmax_age: 12345678"`
 * `domain`: The Policy Domain is the domain against which the MTA-STS or DANE
     policy is defined. In the case of Internationalized Domain Names
-   ([@?RFC5891]), the domain is the Punycode-encoded A-label
-   ([@!RFC3492]) and not the U-label.
+    ([@?RFC5891]), the domain is the Punycode-encoded A-label
+    ([@!RFC3492]) and not the U-label.
 * `mx-host-pattern`: The pattern of MX hostnames from the applied policy. It
     is provided as a string, and is interpreted in the same manner as the
     "Checking of Wildcard Certificates" rules in Section 6.4.3 of [@!RFC6125].
-     In the case of Internationalized Domain Names ([@!RFC5891]), the domain is 
-     the Punycode-encoded A-label ([@!RFC3492]) and not the U-label.
+    In the case of Internationalized Domain Names ([@!RFC5891]), the domain is 
+    the Punycode-encoded A-label ([@!RFC3492]) and not the U-label.
 * `result-type`: A value from (#result-types), "Result Types",  above.
 * `ip-address`: The IP address of the sending MTA that attempted the STARTTLS
     connection. It is provided as a string representation of an IPv4 (see below) 
