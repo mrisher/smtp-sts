@@ -9,7 +9,7 @@
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2017-09-15T00:00:00Z
+   date = 2017-09-28T00:00:00Z
    
    [[author]]
    initials="D."
@@ -143,7 +143,8 @@ Policies consist of the following directives:
 	This may mean that the reports are delivered in the clear.  Additionally,
 	 reports sent via SMTP MUST contain a valid DKIM [@!RFC6376] signature by
 	 the reporting domain.  Reports lacking such a signature MUST be ignored
-	 by the recipient.
+	 by the recipient.  DKIM signatures must not use the "l=" attribute to
+	 limit the body length used in the signature.
 
 The formal definition of the `_smtp-tlsrpt` TXT record, defined using
 [@!RFC5234] & [@!RFC7405], is as follows:
@@ -424,7 +425,9 @@ The filename is RECOMMENDED to be constructed using the following ABNF:
 
      unique-id = 1*(ALPHA / DIGIT)
 
-     sender = domain        ; imported from [@!RFC5321]
+     sender = domain        ; From the [@!RFC5321] that is used 
+     			    ; as the domain for the `contact-info`
+			    ; address in the report body
 
      policy-domain   = domain
 
@@ -474,8 +477,10 @@ In addition, the following two new top level message header fields are defined:
 TLS-Report-Domain: Receiver-Domain
 TLS-Report-Submitter: Sender-Domain
 ```
-These message headers MUST be included and should allow for easy searching for 
-all reports submitted by a report domain or a particular submitter, for example
+The `TLS-Report-Submitter` value MUST match the value found in the filename
+and the [@!5321] domain from the `contact-info` from the report body.  These 
+message headers MUST be included and should allow for easy searching for all
+reports submitted by a report domain or a particular submitter, for example 
 in IMAP [@?RFC3501]:
 
 `s SEARCH HEADER "TLS-Report-Domain" "example.com"`
