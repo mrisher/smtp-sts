@@ -5,17 +5,17 @@
 Using TLS in Applications                                    D. Margolis
 Internet-Draft                                                 M. Risher
 Intended status: Standards Track                             Google, Inc
-Expires: March 9, 2018                                   B. Ramakrishnan
+Expires: April 1, 2018                                   B. Ramakrishnan
                                                              Yahoo!, Inc
                                                               A. Brotman
                                                             Comcast, Inc
                                                                 J. Jones
                                                           Microsoft, Inc
-                                                       September 5, 2017
+                                                      September 28, 2017
 
 
               SMTP MTA Strict Transport Security (MTA-STS)
-                       draft-ietf-uta-mta-sts-09
+                       draft-ietf-uta-mta-sts-10
 
 Abstract
 
@@ -40,7 +40,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on March 9, 2018.
+   This Internet-Draft will expire on April 1, 2018.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Margolis, et al.          Expires March 9, 2018                 [Page 1]
+Margolis, et al.          Expires April 1, 2018                 [Page 1]
 
 Internet-Draft                   MTA-STS                  September 2017
 
@@ -67,7 +67,7 @@ Internet-Draft                   MTA-STS                  September 2017
 
 Table of Contents
 
-   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
      1.1.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   3
    2.  Related Technologies  . . . . . . . . . . . . . . . . . . . .   3
    3.  Policy Discovery  . . . . . . . . . . . . . . . . . . . . . .   4
@@ -99,26 +99,20 @@ Table of Contents
    12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  21
      12.1.  Normative References . . . . . . . . . . . . . . . . . .  21
      12.2.  Informative References . . . . . . . . . . . . . . . . .  22
-     12.3.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  22
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  23
-
-
-
-
-
-
-
-
-Margolis, et al.          Expires March 9, 2018                 [Page 2]
-
-Internet-Draft                   MTA-STS                  September 2017
-
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  22
 
 1.  Introduction
 
    The STARTTLS extension to SMTP [RFC3207] allows SMTP clients and
    hosts to negotiate the use of a TLS channel for encrypted mail
    transmission.
+
+
+
+Margolis, et al.          Expires April 1, 2018                 [Page 2]
+
+Internet-Draft                   MTA-STS                  September 2017
+
 
    While this opportunistic encryption protocol by itself provides a
    high barrier against passive man-in-the-middle traffic interception,
@@ -161,21 +155,21 @@ Internet-Draft                   MTA-STS                  September 2017
    transmission.  DANE requires DNSSEC [RFC4033] for authentication; the
    mechanism described here instead relies on certificate authorities
    (CAs) and does not require DNSSEC, at a cost of risking malicious
-
-
-
-
-Margolis, et al.          Expires March 9, 2018                 [Page 3]
-
-Internet-Draft                   MTA-STS                  September 2017
-
-
    downgrades.  For a thorough discussion of this trade-off, see
    Section 8, "Security Considerations".
 
    In addition, MTA-STS provides an optional report-only mode, enabling
    soft deployments to detect policy failures; partial deployments can
    be achieved in DANE by deploying TLSA records only for some of a
+
+
+
+
+Margolis, et al.          Expires April 1, 2018                 [Page 3]
+
+Internet-Draft                   MTA-STS                  September 2017
+
+
    domain's MXs, but such a mechanism is not possible for the per-domain
    policies used by MTA-STS.
 
@@ -219,17 +213,18 @@ Internet-Draft                   MTA-STS                  September 2017
 
    An example TXT record is as below:
 
-
-
-Margolis, et al.          Expires March 9, 2018                 [Page 4]
-
-Internet-Draft                   MTA-STS                  September 2017
-
-
    "_mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;""
 
    The formal definition of the "_mta-sts" TXT record, defined using
    [RFC7405], is as follows:
+
+
+
+
+Margolis, et al.          Expires April 1, 2018                 [Page 4]
+
+Internet-Draft                   MTA-STS                  September 2017
+
 
 sts-text-record = sts-version 1*(field-delim sts-field) [field-delim]
 
@@ -275,14 +270,17 @@ sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)    ; chars excluding "=",
 
    This resource contains the following line-separated key/value pairs:
 
+   o  "version": (plain-text).  Currently only "STSv1" is supported.
 
 
-Margolis, et al.          Expires March 9, 2018                 [Page 5]
+
+
+
+
+Margolis, et al.          Expires April 1, 2018                 [Page 5]
 
 Internet-Draft                   MTA-STS                  September 2017
 
-
-   o  "version": (plain-text).  Currently only "STSv1" is supported.
 
    o  "mode": (plain-text).  One of "enforce", "report", or "none",
       indicating the expected behavior of a sending MTA in the case of a
@@ -330,16 +328,16 @@ sts-policy-record        = *WSP sts-policy-field *WSP
                            [CRLF]
 
 sts-policy-field         = sts-policy-version /           ; required once
+                           sts-policy-mode    /           ; required once
+                           sts-policy-max-age /           ; required once
 
 
 
-Margolis, et al.          Expires March 9, 2018                 [Page 6]
+Margolis, et al.          Expires April 1, 2018                 [Page 6]
 
 Internet-Draft                   MTA-STS                  September 2017
 
 
-                           sts-policy-mode    /           ; required once
-                           sts-policy-max-age /           ; required once
                            0*(sts-policy-mx *WSP CRLF) /  ; required at
                                                           ; least once
                                                           ; except when mode
@@ -389,7 +387,9 @@ sts-policy-ext-value     = 1*(%x21-3A / %x3C / %x3E-7E)    ; chars excluding
 
 
 
-Margolis, et al.          Expires March 9, 2018                 [Page 7]
+
+
+Margolis, et al.          Expires April 1, 2018                 [Page 7]
 
 Internet-Draft                   MTA-STS                  September 2017
 
@@ -445,7 +445,7 @@ Internet-Draft                   MTA-STS                  September 2017
 
 
 
-Margolis, et al.          Expires March 9, 2018                 [Page 8]
+Margolis, et al.          Expires April 1, 2018                 [Page 8]
 
 Internet-Draft                   MTA-STS                  September 2017
 
@@ -501,7 +501,7 @@ Internet-Draft                   MTA-STS                  September 2017
 
 
 
-Margolis, et al.          Expires March 9, 2018                 [Page 9]
+Margolis, et al.          Expires April 1, 2018                 [Page 9]
 
 Internet-Draft                   MTA-STS                  September 2017
 
@@ -557,7 +557,7 @@ Internet-Draft                   MTA-STS                  September 2017
 
 
 
-Margolis, et al.          Expires March 9, 2018                [Page 10]
+Margolis, et al.          Expires April 1, 2018                [Page 10]
 
 Internet-Draft                   MTA-STS                  September 2017
 
@@ -613,7 +613,7 @@ Internet-Draft                   MTA-STS                  September 2017
 
 
 
-Margolis, et al.          Expires March 9, 2018                [Page 11]
+Margolis, et al.          Expires April 1, 2018                [Page 11]
 
 Internet-Draft                   MTA-STS                  September 2017
 
@@ -669,7 +669,7 @@ Internet-Draft                   MTA-STS                  September 2017
 
 
 
-Margolis, et al.          Expires March 9, 2018                [Page 12]
+Margolis, et al.          Expires April 1, 2018                [Page 12]
 
 Internet-Draft                   MTA-STS                  September 2017
 
@@ -725,7 +725,7 @@ Internet-Draft                   MTA-STS                  September 2017
 
 
 
-Margolis, et al.          Expires March 9, 2018                [Page 13]
+Margolis, et al.          Expires April 1, 2018                [Page 13]
 
 Internet-Draft                   MTA-STS                  September 2017
 
@@ -781,7 +781,7 @@ Internet-Draft                   MTA-STS                  September 2017
 
 
 
-Margolis, et al.          Expires March 9, 2018                [Page 14]
+Margolis, et al.          Expires April 1, 2018                [Page 14]
 
 Internet-Draft                   MTA-STS                  September 2017
 
@@ -837,7 +837,7 @@ Internet-Draft                   MTA-STS                  September 2017
 
 
 
-Margolis, et al.          Expires March 9, 2018                [Page 15]
+Margolis, et al.          Expires April 1, 2018                [Page 15]
 
 Internet-Draft                   MTA-STS                  September 2017
 
@@ -893,7 +893,7 @@ Internet-Draft                   MTA-STS                  September 2017
 
 
 
-Margolis, et al.          Expires March 9, 2018                [Page 16]
+Margolis, et al.          Expires April 1, 2018                [Page 16]
 
 Internet-Draft                   MTA-STS                  September 2017
 
@@ -949,7 +949,7 @@ Internet-Draft                   MTA-STS                  September 2017
 
 
 
-Margolis, et al.          Expires March 9, 2018                [Page 17]
+Margolis, et al.          Expires April 1, 2018                [Page 17]
 
 Internet-Draft                   MTA-STS                  September 2017
 
@@ -962,7 +962,8 @@ Internet-Draft                   MTA-STS                  September 2017
 
        _mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
 
-   MTA-STS Policy file served as the response body at [1]
+   MTA-STS Policy file served as the response body at <https://mta-
+   sts.example.com/.well-known/mta-sts.txt:>
 
                          version: STSv1
                          mode: report
@@ -1001,15 +1002,15 @@ func isWildcardMatch(pat, host) {
     return true
   }
   // Leading '.' matches a wildcard against the first part, i.e.
-  // .example.com matches x.example.com but not x.y.example.com.
 
 
 
-Margolis, et al.          Expires March 9, 2018                [Page 18]
+Margolis, et al.          Expires April 1, 2018                [Page 18]
 
 Internet-Draft                   MTA-STS                  September 2017
 
 
+  // .example.com matches x.example.com but not x.y.example.com.
   if pat[0] == '.' {
     parts = SplitN(host, '.', 2)  // Split on the first '.'.
     if len(parts) > 1 && parts[1] == pat[1:] {
@@ -1060,8 +1061,7 @@ func reportError(error) {
 
 
 
-
-Margolis, et al.          Expires March 9, 2018                [Page 19]
+Margolis, et al.          Expires April 1, 2018                [Page 19]
 
 Internet-Draft                   MTA-STS                  September 2017
 
@@ -1117,7 +1117,7 @@ func handleMessage(message) {
 
 
 
-Margolis, et al.          Expires March 9, 2018                [Page 20]
+Margolis, et al.          Expires April 1, 2018                [Page 20]
 
 Internet-Draft                   MTA-STS                  September 2017
 
@@ -1127,53 +1127,53 @@ Internet-Draft                   MTA-STS                  September 2017
 12.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
-              Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
-              RFC2119, March 1997,
-              <http://www.rfc-editor.org/info/rfc2119>.
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997, <https://www.rfc-
+              editor.org/info/rfc2119>.
 
    [RFC3492]  Costello, A., "Punycode: A Bootstring encoding of Unicode
               for Internationalized Domain Names in Applications
               (IDNA)", RFC 3492, DOI 10.17487/RFC3492, March 2003,
-              <http://www.rfc-editor.org/info/rfc3492>.
+              <https://www.rfc-editor.org/info/rfc3492>.
 
    [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
               Housley, R., and W. Polk, "Internet X.509 Public Key
               Infrastructure Certificate and Certificate Revocation List
               (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
-              <http://www.rfc-editor.org/info/rfc5280>.
+              <https://www.rfc-editor.org/info/rfc5280>.
 
    [RFC5321]  Klensin, J., "Simple Mail Transfer Protocol", RFC 5321,
-              DOI 10.17487/RFC5321, October 2008,
-              <http://www.rfc-editor.org/info/rfc5321>.
+              DOI 10.17487/RFC5321, October 2008, <https://www.rfc-
+              editor.org/info/rfc5321>.
 
    [RFC5785]  Nottingham, M. and E. Hammer-Lahav, "Defining Well-Known
-              Uniform Resource Identifiers (URIs)", RFC 5785, DOI 10
-              .17487/RFC5785, April 2010,
-              <http://www.rfc-editor.org/info/rfc5785>.
+              Uniform Resource Identifiers (URIs)", RFC 5785,
+              DOI 10.17487/RFC5785, April 2010, <https://www.rfc-
+              editor.org/info/rfc5785>.
 
    [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
               Verification of Domain-Based Application Service Identity
               within Internet Public Key Infrastructure Using X.509
               (PKIX) Certificates in the Context of Transport Layer
               Security (TLS)", RFC 6125, DOI 10.17487/RFC6125, March
-              2011, <http://www.rfc-editor.org/info/rfc6125>.
+              2011, <https://www.rfc-editor.org/info/rfc6125>.
 
    [RFC7231]  Fielding, R., Ed. and J. Reschke, Ed., "Hypertext Transfer
-              Protocol (HTTP/1.1): Semantics and Content", RFC 7231, DOI
-              10.17487/RFC7231, June 2014, <https://www.rfc-editor.org/
-              info/rfc7231>.
+              Protocol (HTTP/1.1): Semantics and Content", RFC 7231,
+              DOI 10.17487/RFC7231, June 2014, <https://www.rfc-
+              editor.org/info/rfc7231>.
 
-   [RFC7405]  Kyzivat, P., "Case-Sensitive String Support in ABNF", RFC
-              7405, DOI 10.17487/RFC7405, December 2014,
-              <http://www.rfc-editor.org/info/rfc7405>.
-
-
+   [RFC7405]  Kyzivat, P., "Case-Sensitive String Support in ABNF",
+              RFC 7405, DOI 10.17487/RFC7405, December 2014,
+              <https://www.rfc-editor.org/info/rfc7405>.
 
 
 
 
 
-Margolis, et al.          Expires March 9, 2018                [Page 21]
+
+
+Margolis, et al.          Expires April 1, 2018                [Page 21]
 
 Internet-Draft                   MTA-STS                  September 2017
 
@@ -1182,27 +1182,27 @@ Internet-Draft                   MTA-STS                  September 2017
 
    [RFC2560]  Myers, M., Ankney, R., Malpani, A., Galperin, S., and C.
               Adams, "X.509 Internet Public Key Infrastructure Online
-              Certificate Status Protocol - OCSP", RFC 2560, DOI 10
-              .17487/RFC2560, June 1999,
-              <http://www.rfc-editor.org/info/rfc2560>.
+              Certificate Status Protocol - OCSP", RFC 2560,
+              DOI 10.17487/RFC2560, June 1999, <https://www.rfc-
+              editor.org/info/rfc2560>.
 
    [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
               Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
-              February 2002, <http://www.rfc-editor.org/info/rfc3207>.
+              February 2002, <https://www.rfc-editor.org/info/rfc3207>.
 
    [RFC4033]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
-              Rose, "DNS Security Introduction and Requirements", RFC
-              4033, DOI 10.17487/RFC4033, March 2005,
-              <http://www.rfc-editor.org/info/rfc4033>.
+              Rose, "DNS Security Introduction and Requirements",
+              RFC 4033, DOI 10.17487/RFC4033, March 2005,
+              <https://www.rfc-editor.org/info/rfc4033>.
 
-   [RFC5322]  Resnick, P., Ed., "Internet Message Format", RFC 5322, DOI
-              10.17487/RFC5322, October 2008,
-              <http://www.rfc-editor.org/info/rfc5322>.
+   [RFC5322]  Resnick, P., Ed., "Internet Message Format", RFC 5322,
+              DOI 10.17487/RFC5322, October 2008, <https://www.rfc-
+              editor.org/info/rfc5322>.
 
    [RFC5891]  Klensin, J., "Internationalized Domain Names in
-              Applications (IDNA): Protocol", RFC 5891, DOI 10.17487/
-              RFC5891, August 2010,
-              <http://www.rfc-editor.org/info/rfc5891>.
+              Applications (IDNA): Protocol", RFC 5891,
+              DOI 10.17487/RFC5891, August 2010, <https://www.rfc-
+              editor.org/info/rfc5891>.
 
    [RFC6818]  Yee, P., "Updates to the Internet X.509 Public Key
               Infrastructure Certificate and Certificate Revocation List
@@ -1211,28 +1211,14 @@ Internet-Draft                   MTA-STS                  September 2017
 
    [RFC7234]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
               Ed., "Hypertext Transfer Protocol (HTTP/1.1): Caching",
-              RFC 7234, DOI 10.17487/RFC7234, June 2014, <https://www
-              .rfc-editor.org/info/rfc7234>.
+              RFC 7234, DOI 10.17487/RFC7234, June 2014,
+              <https://www.rfc-editor.org/info/rfc7234>.
 
    [RFC7672]  Dukhovni, V. and W. Hardaker, "SMTP Security via
               Opportunistic DNS-Based Authentication of Named Entities
-              (DANE) Transport Layer Security (TLS)", RFC 7672, DOI 10
-              .17487/RFC7672, October 2015,
-              <http://www.rfc-editor.org/info/rfc7672>.
-
-12.3.  URIs
-
-   [1] https://mta-sts.example.com/.well-known/mta-sts.txt:
-
-
-
-
-
-
-Margolis, et al.          Expires March 9, 2018                [Page 22]
-
-Internet-Draft                   MTA-STS                  September 2017
-
+              (DANE) Transport Layer Security (TLS)", RFC 7672,
+              DOI 10.17487/RFC7672, October 2015, <https://www.rfc-
+              editor.org/info/rfc7672>.
 
 Authors' Addresses
 
@@ -1240,6 +1226,12 @@ Authors' Addresses
    Google, Inc
 
    Email: dmargolis (at) google.com
+
+
+
+Margolis, et al.          Expires April 1, 2018                [Page 22]
+
+Internet-Draft                   MTA-STS                  September 2017
 
 
    Mark Risher
@@ -1285,4 +1277,12 @@ Authors' Addresses
 
 
 
-Margolis, et al.          Expires March 9, 2018                [Page 23]
+
+
+
+
+
+
+
+
+Margolis, et al.          Expires April 1, 2018                [Page 23]
