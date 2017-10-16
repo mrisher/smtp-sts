@@ -501,13 +501,13 @@ announced during the reported session.</t>
 <t><spanx style="verb">total-successful-session-count</spanx>: The aggregate number (integer) of successfully
 negotiated TLS-enabled connections to the receiving site.</t>
 <t><spanx style="verb">total-failure-session-count</spanx>: The aggregate number (integer) of failures to
-negotiate an TLS-enabled connection to the receiving site.</t>
+negotiate a TLS-enabled connection to the receiving site.</t>
 <t><spanx style="verb">failed-session-count</spanx>: The number of (attempted) sessions that match the relevant
 <spanx style="verb">result-type</spanx> for this section.</t>
 <t><spanx style="verb">additional-info-uri</spanx>: An optional URI <xref target="RFC3986"/> pointing to additional information
 around the relevant <spanx style="verb">result-type</spanx>. For example, this URI might host the
 complete certificate chain presented during an attempted STARTTLS session.</t>
-<t><spanx style="verb">failure-reason-code</spanx>: A text field to include an TLS-related error
+<t><spanx style="verb">failure-reason-code</spanx>: A text field to include a TLS-related error
 code or error message.
 
 <vspace/></t>

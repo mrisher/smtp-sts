@@ -606,7 +606,7 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
       receiving site.
 
    o  "total-failure-session-count": The aggregate number (integer) of
-      failures to negotiate an TLS-enabled connection to the receiving
+      failures to negotiate a TLS-enabled connection to the receiving
       site.
 
 
@@ -626,7 +626,7 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
       example, this URI might host the complete certificate chain
       presented during an attempted STARTTLS session.
 
-   o  "failure-reason-code": A text field to include an TLS-related
+   o  "failure-reason-code": A text field to include a TLS-related
       error code or error message.
 
    For report purposes, an IPv4 Address is defined as: IPv4address =
