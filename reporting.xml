@@ -87,7 +87,7 @@
 <uri></uri>
 </address>
 </author>
-<date year="2017" month="September" day="5"/>
+<date year="2017" month="September" day="28"/>
 
 <area>Applications</area>
 <workgroup>Using TLS in Applications</workgroup>
@@ -202,7 +202,8 @@ sending MTAs MUST deliver reports despite any TLS-related failures.
 This may mean that the reports are delivered in the clear.  Additionally,
  reports sent via SMTP MUST contain a valid DKIM <xref target="RFC6376"/> signature by
  the reporting domain.  Reports lacking such a signature MUST be ignored
- by the recipient.</t>
+ by the recipient.  DKIM signatures must not use the &quot;l=&quot; attribute to
+ limit the body length used in the signature.</t>
 </list>
 </t>
 <t>The formal definition of the <spanx style="verb">_smtp-tlsrpt</spanx> TXT record, defined using
@@ -474,8 +475,12 @@ as a string.</t>
 <t><spanx style="verb">policy-type</spanx>: The type of policy that was applied by the sending domain.
 Presently, the only three valid choices are <spanx style="verb">tlsa</spanx>, <spanx style="verb">sts</spanx>, and the literal
 string <spanx style="verb">no-policy-found</spanx>. It is provided as a string.</t>
-<t><spanx style="verb">policy-string</spanx>: The JSON string serialization (<xref target="RFC7159"/> section 7) of the
-policy, whether TLSA record (<xref target="RFC6698"/> section 2.3) or MTA-STS policy.</t>
+<t><spanx style="verb">policy-string</spanx>: A string representation of the policy, whether TLSA
+record (<xref target="RFC6698"/> section 2.3) or MTA-STS policy. Examples:
+TLSA: <spanx style="verb">"_25._tcp.mx.example.com. IN TLSA ( 3 0 1 \
+1F850A337E6DB9C609C522D136A475638CC43E1ED424F8EEC8513D7 47D1D085D )"</spanx>
+MTA-STS: <spanx style="verb">"version: STSv1\nmode: report\nmx: mx1.example.com\nmx: \
+mx2.example.com\nmx: mx.backup-example.com\nmax_age: 12345678"</spanx></t>
 <t><spanx style="verb">domain</spanx>: The Policy Domain is the domain against which the MTA-STS or DANE
 policy is defined. In the case of Internationalized Domain Names
 (<xref target="RFC5891"/>), the domain is the Punycode-encoded A-label
@@ -483,8 +488,8 @@ policy is defined. In the case of Internationalized Domain Names
 <t><spanx style="verb">mx-host-pattern</spanx>: The pattern of MX hostnames from the applied policy. It
 is provided as a string, and is interpreted in the same manner as the
 &quot;Checking of Wildcard Certificates&quot; rules in Section 6.4.3 of <xref target="RFC6125"/>.
- In the case of Internationalized Domain Names (<xref target="RFC5891"/>), the domain is
- the Punycode-encoded A-label (<xref target="RFC3492"/>) and not the U-label.</t>
+In the case of Internationalized Domain Names (<xref target="RFC5891"/>), the domain is
+the Punycode-encoded A-label (<xref target="RFC3492"/>) and not the U-label.</t>
 <t><spanx style="verb">result-type</spanx>: A value from <xref target="result-types"/>, &quot;Result Types&quot;,  above.</t>
 <t><spanx style="verb">ip-address</spanx>: The IP address of the sending MTA that attempted the STARTTLS
 connection. It is provided as a string representation of an IPv4 (see below)
@@ -535,7 +540,9 @@ POST.
 
  unique-id = 1*(ALPHA / DIGIT)
 
- sender = domain        ; imported from [@!RFC5321]
+ sender = domain        ; From the [@!RFC5321] that is used 
+                ; as the domain for the `contact-info`
+            ; address in the report body
 
  policy-domain   = domain
 
@@ -590,8 +597,10 @@ If compressed, the report should use the media type <spanx style="verb">applicat
 TLS-Report-Domain: Receiver-Domain
 TLS-Report-Submitter: Sender-Domain
 </artwork></figure>
-<t>These message headers MUST be included and should allow for easy searching for
-all reports submitted by a report domain or a particular submitter, for example
+<t>The <spanx style="verb">TLS-Report-Submitter</spanx> value MUST match the value found in the filename
+and the <xref target="RFC5321"/> domain from the <spanx style="verb">contact-info</spanx> from the report body.  These
+message headers MUST be included and should allow for easy searching for all
+reports submitted by a report domain or a particular submitter, for example
 in IMAP <xref target="RFC3501"/>:
 </t>
 <t><spanx style="verb">s SEARCH HEADER "TLS-Report-Domain" "example.com"</spanx>
@@ -1005,7 +1014,6 @@ respond to the <spanx style="verb">STARTTLS</spanx> command.  Additionally 3 ses
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6376.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6522.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6698.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7159.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7405.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7493.xml"?>
 </references>

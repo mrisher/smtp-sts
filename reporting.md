@@ -9,7 +9,7 @@
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2017-09-05T00:00:00Z
+   date = 2017-09-28T00:00:00Z
    
    [[author]]
    initials="D."
@@ -143,7 +143,8 @@ Policies consist of the following directives:
 	This may mean that the reports are delivered in the clear.  Additionally,
 	 reports sent via SMTP MUST contain a valid DKIM [@!RFC6376] signature by
 	 the reporting domain.  Reports lacking such a signature MUST be ignored
-	 by the recipient.
+	 by the recipient.  DKIM signatures must not use the "l=" attribute to
+	 limit the body length used in the signature.
 
 The formal definition of the `_smtp-tlsrpt` TXT record, defined using
 [@!RFC5234] & [@!RFC7405], is as follows:
@@ -370,17 +371,21 @@ Figure: JSON Report Format
 * `policy-type`: The type of policy that was applied by the sending domain.
     Presently, the only three valid choices are `tlsa`, `sts`, and the literal
     string `no-policy-found`. It is provided as a string.
-* `policy-string`: The JSON string serialization ([@!RFC7159] section 7) of the
-   policy, whether TLSA record ([@!RFC6698] section 2.3) or MTA-STS policy.
+* `policy-string`: A string representation of the policy, whether TLSA 
+    record ([@!RFC6698] section 2.3) or MTA-STS policy. Examples:
+    TLSA: `"_25._tcp.mx.example.com. IN TLSA ( 3 0 1 \
+    1F850A337E6DB9C609C522D136A475638CC43E1ED424F8EEC8513D7 47D1D085D )"`
+    MTA-STS: `"version: STSv1\nmode: report\nmx: mx1.example.com\nmx: \
+    mx2.example.com\nmx: mx.backup-example.com\nmax_age: 12345678"`
 * `domain`: The Policy Domain is the domain against which the MTA-STS or DANE
     policy is defined. In the case of Internationalized Domain Names
-   ([@?RFC5891]), the domain is the Punycode-encoded A-label
-   ([@!RFC3492]) and not the U-label.
+    ([@?RFC5891]), the domain is the Punycode-encoded A-label
+    ([@!RFC3492]) and not the U-label.
 * `mx-host-pattern`: The pattern of MX hostnames from the applied policy. It
     is provided as a string, and is interpreted in the same manner as the
     "Checking of Wildcard Certificates" rules in Section 6.4.3 of [@!RFC6125].
-     In the case of Internationalized Domain Names ([@!RFC5891]), the domain is 
-     the Punycode-encoded A-label ([@!RFC3492]) and not the U-label.
+    In the case of Internationalized Domain Names ([@!RFC5891]), the domain is 
+    the Punycode-encoded A-label ([@!RFC3492]) and not the U-label.
 * `result-type`: A value from (#result-types), "Result Types",  above.
 * `ip-address`: The IP address of the sending MTA that attempted the STARTTLS
     connection. It is provided as a string representation of an IPv4 (see below) 
@@ -424,7 +429,9 @@ The filename is RECOMMENDED to be constructed using the following ABNF:
 
      unique-id = 1*(ALPHA / DIGIT)
 
-     sender = domain        ; imported from [@!RFC5321]
+     sender = domain        ; From the [@!RFC5321] that is used 
+     			    ; as the domain for the `contact-info`
+			    ; address in the report body
 
      policy-domain   = domain
 
@@ -474,8 +481,10 @@ In addition, the following two new top level message header fields are defined:
 TLS-Report-Domain: Receiver-Domain
 TLS-Report-Submitter: Sender-Domain
 ```
-These message headers MUST be included and should allow for easy searching for 
-all reports submitted by a report domain or a particular submitter, for example
+The `TLS-Report-Submitter` value MUST match the value found in the filename
+and the [@!RFC5321] domain from the `contact-info` from the report body.  These 
+message headers MUST be included and should allow for easy searching for all
+reports submitted by a report domain or a particular submitter, for example 
 in IMAP [@?RFC3501]:
 
 `s SEARCH HEADER "TLS-Report-Domain" "example.com"`

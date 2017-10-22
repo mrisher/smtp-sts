@@ -3,13 +3,13 @@
    Title = "SMTP MTA Strict Transport Security (MTA-STS)"
    abbrev = "MTA-STS"
    category = "std"
-   docName = "draft-ietf-uta-mta-sts-09"
+   docName = "draft-ietf-uta-mta-sts-10"
    ipr = "trust200902"
    area = "Applications"
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2017-09-05T00:00:00Z
+   date = 2017-09-28T00:00:00Z
 
    [[author]]
    initials="D."
@@ -479,6 +479,40 @@ during this period of time, or risk message delays.
 Recipients should also prefer to update the HTTPS policy body before updating
 the TXT record; this ordering avoids the risk that senders, seeing a new TXT
 record, mistakenly cache the old policy from HTTPS.
+
+## Policy Delegation
+
+Domain owners commonly delegate SMTP hosting to a different organization, such
+as an ISP or a Web host. In such a case, they may wish to also delegate the
+MTA-STS policy to the same organization which can be accomplished with two
+changes.
+
+First, the Policy Domain must point the `_mta-sts` record, via CNAME, to
+the `_mta-sts` record maintained by the hosting organization. This allows the
+hosting organization to control update signaling.
+
+Second, the Policy Domain must point the "well-known" policy location to the
+hosting organization. This can be done either by setting the `mta-sts` record to
+a host or CNAME specified by the hosting organization and by giving the hosting
+organization a TLS certificate which is valid for that host, or by setting up a
+"reverse proxy" (also known as a "gateway") server that serves as the Policy
+Domain's policy the policy currently served by the hosting organization.
+
+For example, given a user domain `user.com` hosted by a mail provider
+`provider.com`, the following configuration would allow policy delegation:
+
+DNS:
+~~~
+_mta-sts.user.com.  IN CNAME _mta-sts.provider.com.
+~~~
+
+Policy:
+~~~
+> GET /.well-known/mta-sts.txt
+> Host: mta-sts.user.com
+< HTTP/1.1 200 OK  # Response proxies content from https://mta-sts.provider.com
+~~~
+
 
 ## Removing MTA-STS
 
