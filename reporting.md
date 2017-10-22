@@ -397,13 +397,13 @@ Figure: JSON Report Format
 * `total-successful-session-count`: The aggregate number (integer) of successfully 
     negotiated TLS-enabled connections to the receiving site.
 * `total-failure-session-count`: The aggregate number (integer) of failures to 
-    negotiate an TLS-enabled connection to the receiving site.
+    negotiate a TLS-enabled connection to the receiving site.
 * `failed-session-count`: The number of (attempted) sessions that match the relevant
     `result-type` for this section.
 * `additional-info-uri`: An optional URI [@!RFC3986] pointing to additional information
     around the relevant `result-type`. For example, this URI might host the
     complete certificate chain presented during an attempted STARTTLS session.
-* `failure-reason-code`: A text field to include an TLS-related error
+* `failure-reason-code`: A text field to include a TLS-related error
     code or error message.
     
 For report purposes, an IPv4 Address is defined as:
