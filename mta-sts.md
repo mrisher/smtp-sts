@@ -485,6 +485,11 @@ only send one name in the SNI extension. The server's fallback certificate may
 match a different name that is acceptable to the client, e.g., the original
 next-hop domain.
 
+## Minimum TLS Version Support
+
+MTAs supporting MTA-STS MUST have support for TLS version 1.2 [@!RFC5246] or
+higher. The general TLS usage guidance in [@!RFC7525] SHOULD be followed.
+
 # Operational Considerations
 
 ## Policy Updates
