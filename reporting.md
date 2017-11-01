@@ -780,6 +780,17 @@ several security risks presented by the existence of this reporting channel:
   third party to the victim; this reduces the risk of such an attack and the
   need for a verification mechanism.
 
+Finally, because TLSRPT is intended to help administrators discover
+man-in-the-middle attacks against transport-layer encryption, including attacks
+designed to thwart negotiation of encrypted connections (by downgrading
+opportunistic encryption or, in the case of MTA-STS, preventing discovery of a
+new MTA-STS policy), we must also consider the risk that an adversary who can
+induce such a downgrade attack can also prevent discovery of the TLSRPT TXT
+record (and thus prevent discovery of the successful downgrade attack).
+Administrators are thus encouraged to deploy TLSRPT TXT records with a large TTL
+(reducing the window for successful attacks against DNS resolution of the
+record) or to deploy DNSSEC on the deploying zone.
+
 # Appendix 1: Example Reporting Policy
 
 ## Report using MAILTO
