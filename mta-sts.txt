@@ -67,7 +67,7 @@ Internet-Draft                   MTA-STS                  September 2017
 
 Table of Contents
 
-   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
      1.1.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   3
    2.  Related Technologies  . . . . . . . . . . . . . . . . . . . .   3
    3.  Policy Discovery  . . . . . . . . . . . . . . . . . . . . . .   4
@@ -85,27 +85,27 @@ Table of Contents
      6.3.  Removing MTA-STS  . . . . . . . . . . . . . . . . . . . .  13
    7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  13
      7.1.  Well-Known URIs Registry  . . . . . . . . . . . . . . . .  13
-     7.2.  MTA-STS TXT Record Fields . . . . . . . . . . . . . . . .  13
+     7.2.  MTA-STS TXT Record Fields . . . . . . . . . . . . . . . .  14
      7.3.  MTA-STS Policy Fields . . . . . . . . . . . . . . . . . .  14
    8.  Security Considerations . . . . . . . . . . . . . . . . . . .  14
      8.1.  Obtaining a Signed Certificate  . . . . . . . . . . . . .  15
      8.2.  Preventing Policy Discovery . . . . . . . . . . . . . . .  15
      8.3.  Denial of Service . . . . . . . . . . . . . . . . . . . .  16
-     8.4.  Weak Policy Constraints . . . . . . . . . . . . . . . . .  16
+     8.4.  Weak Policy Constraints . . . . . . . . . . . . . . . . .  17
      8.5.  Compromise of the Web PKI System  . . . . . . . . . . . .  17
    9.  Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  17
-   10. Appendix 1: MTA-STS example record & policy . . . . . . . . .  17
+   10. Appendix 1: MTA-STS example record & policy . . . . . . . . .  18
    11. Appendix 2: Message delivery pseudocode . . . . . . . . . . .  18
    12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  21
      12.1.  Normative References . . . . . . . . . . . . . . . . . .  21
      12.2.  Informative References . . . . . . . . . . . . . . . . .  22
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  22
+     12.3.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  22
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  23
 
-1.  Introduction
 
-   The STARTTLS extension to SMTP [RFC3207] allows SMTP clients and
-   hosts to negotiate the use of a TLS channel for encrypted mail
-   transmission.
+
+
+
 
 
 
@@ -113,6 +113,12 @@ Margolis, et al.          Expires April 1, 2018                 [Page 2]
 
 Internet-Draft                   MTA-STS                  September 2017
 
+
+1.  Introduction
+
+   The STARTTLS extension to SMTP [RFC3207] allows SMTP clients and
+   hosts to negotiate the use of a TLS channel for encrypted mail
+   transmission.
 
    While this opportunistic encryption protocol by itself provides a
    high barrier against passive man-in-the-middle traffic interception,
@@ -155,12 +161,6 @@ Internet-Draft                   MTA-STS                  September 2017
    transmission.  DANE requires DNSSEC [RFC4033] for authentication; the
    mechanism described here instead relies on certificate authorities
    (CAs) and does not require DNSSEC, at a cost of risking malicious
-   downgrades.  For a thorough discussion of this trade-off, see
-   Section 8, "Security Considerations".
-
-   In addition, MTA-STS provides an optional report-only mode, enabling
-   soft deployments to detect policy failures; partial deployments can
-   be achieved in DANE by deploying TLSA records only for some of a
 
 
 
@@ -170,6 +170,12 @@ Margolis, et al.          Expires April 1, 2018                 [Page 3]
 Internet-Draft                   MTA-STS                  September 2017
 
 
+   downgrades.  For a thorough discussion of this trade-off, see
+   Section 8, "Security Considerations".
+
+   In addition, MTA-STS provides an optional report-only mode, enabling
+   soft deployments to detect policy failures; partial deployments can
+   be achieved in DANE by deploying TLSA records only for some of a
    domain's MXs, but such a mechanism is not possible for the per-domain
    policies used by MTA-STS.
 
@@ -213,18 +219,17 @@ Internet-Draft                   MTA-STS                  September 2017
 
    An example TXT record is as below:
 
-   "_mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;""
-
-   The formal definition of the "_mta-sts" TXT record, defined using
-   [RFC7405], is as follows:
-
-
 
 
 Margolis, et al.          Expires April 1, 2018                 [Page 4]
 
 Internet-Draft                   MTA-STS                  September 2017
 
+
+   "_mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;""
+
+   The formal definition of the "_mta-sts" TXT record, defined using
+   [RFC7405], is as follows:
 
 sts-text-record = sts-version 1*(field-delim sts-field) [field-delim]
 
@@ -270,17 +275,14 @@ sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)    ; chars excluding "=",
 
    This resource contains the following line-separated key/value pairs:
 
-   o  "version": (plain-text).  Currently only "STSv1" is supported.
-
-
-
-
 
 
 Margolis, et al.          Expires April 1, 2018                 [Page 5]
 
 Internet-Draft                   MTA-STS                  September 2017
 
+
+   o  "version": (plain-text).  Currently only "STSv1" is supported.
 
    o  "mode": (plain-text).  One of "enforce", "report", or "none",
       indicating the expected behavior of a sending MTA in the case of a
@@ -328,8 +330,6 @@ sts-policy-record        = *WSP sts-policy-field *WSP
                            [CRLF]
 
 sts-policy-field         = sts-policy-version /           ; required once
-                           sts-policy-mode    /           ; required once
-                           sts-policy-max-age /           ; required once
 
 
 
@@ -338,6 +338,8 @@ Margolis, et al.          Expires April 1, 2018                 [Page 6]
 Internet-Draft                   MTA-STS                  September 2017
 
 
+                           sts-policy-mode    /           ; required once
+                           sts-policy-max-age /           ; required once
                            0*(sts-policy-mx *WSP CRLF) /  ; required at
                                                           ; least once
                                                           ; except when mode
@@ -384,8 +386,6 @@ sts-policy-ext-value     = 1*(%x21-3A / %x3C / %x3E-7E)    ; chars excluding
                                                            ; "=", ";", SP,
                                                            ; and control
                                                            ; chars
-
-
 
 
 
@@ -680,6 +680,16 @@ Internet-Draft                   MTA-STS                  September 2017
 > Host: mta-sts.user.com
 < HTTP/1.1 200 OK  # Response proxies content from https://mta-sts.provider.com
 
+   Note that while sending MTAs MUST NOT use HTTP caching when fetching
+   policies via HTTPS, such caching may nonetheless be useful to a
+   reverse proxy configured as described in this section.  An HTTPS
+   policy endpoint expecting to be proxied for multiple hosted domains--
+   as with a large mail hosting provider or similar--may wish to
+   indicate an HTTP Cache-Control "max-age" response directive (as
+   specified in [RFC7234]) of 60 seconds as a reasonable value to save
+   reverse proxies an unnecessarily high-rate of proxied policy
+   fetching.
+
 6.3.  Removing MTA-STS
 
    In order to facilitate clean opt-out of MTA-STS by implementing
@@ -712,16 +722,6 @@ Internet-Draft                   MTA-STS                  September 2017
 
    URI Suffix: mta-sts.txt Change Controller: IETF
 
-7.2.  MTA-STS TXT Record Fields
-
-   IANA is requested to create a new registry titled "MTA-STS TXT Record
-   Fields".  The initial entries in the registry are:
-
-
-
-
-
-
 
 
 
@@ -729,6 +729,11 @@ Margolis, et al.          Expires April 1, 2018                [Page 13]
 
 Internet-Draft                   MTA-STS                  September 2017
 
+
+7.2.  MTA-STS TXT Record Fields
+
+   IANA is requested to create a new registry titled "MTA-STS TXT Record
+   Fields".  The initial entries in the registry are:
 
        +------------+--------------------+------------------------+
        | Field Name |    Description     |       Reference        |
@@ -773,11 +778,6 @@ Internet-Draft                   MTA-STS                  September 2017
       might deliver the message to an impostor, who could then monitor
       and/or modify messages despite opportunistic TLS.  This
       impersonation could be accomplished by spoofing the DNS MX record
-      for the recipient domain, or by redirecting client connections
-      intended for the legitimate recipient server (for example, by
-      altering BGP routing tables).
-
-
 
 
 
@@ -785,6 +785,10 @@ Margolis, et al.          Expires April 1, 2018                [Page 14]
 
 Internet-Draft                   MTA-STS                  September 2017
 
+
+      for the recipient domain, or by redirecting client connections
+      intended for the legitimate recipient server (for example, by
+      altering BGP routing tables).
 
    MTA-STS can thwart such attacks only if the sender is able to
    previously obtain and cache a policy for the recipient domain, and
@@ -830,10 +834,6 @@ Internet-Draft                   MTA-STS                  September 2017
    Additionally, MTAs should alert administrators to repeated policy
    refresh failures long before cached policies expire (through warning
    logs or similar applicable mechanisms), allowing administrators to
-   detect such a persistent attack on policy refresh.  (However, they
-   should not implement such alerts if the cached policy has a "none"
-   mode, to allow clean MTA-STS removal, as described in Section 6.3.)
-
 
 
 
@@ -841,6 +841,10 @@ Margolis, et al.          Expires April 1, 2018                [Page 15]
 
 Internet-Draft                   MTA-STS                  September 2017
 
+
+   detect such a persistent attack on policy refresh.  (However, they
+   should not implement such alerts if the cached policy has a "none"
+   mode, to allow clean MTA-STS removal, as described in Section 6.3.)
 
    Resistance to downgrade attacks of this nature--due to the ability to
    authoritatively determine "lack of a record" even for non-
@@ -882,14 +886,10 @@ Internet-Draft                   MTA-STS                  September 2017
    mitigated by the aforementioned ability for a victim domain to update
    an invalid policy at any future date.
 
-8.4.  Weak Policy Constraints
 
-   Even if an attacker cannot modify a served policy, the potential
-   exists for configurations that allow attackers on the same domain to
-   receive mail for that domain.  For example, an easy configuration
-   option when authoring an MTA-STS Policy for "example.com" is to set
-   the "mx" equal to ".example.com"; recipient domains must consider in
-   this case the risk that any user possessing a valid hostname and CA-
+
+
+
 
 
 
@@ -898,6 +898,14 @@ Margolis, et al.          Expires April 1, 2018                [Page 16]
 Internet-Draft                   MTA-STS                  September 2017
 
 
+8.4.  Weak Policy Constraints
+
+   Even if an attacker cannot modify a served policy, the potential
+   exists for configurations that allow attackers on the same domain to
+   receive mail for that domain.  For example, an easy configuration
+   option when authoring an MTA-STS Policy for "example.com" is to set
+   the "mx" equal to ".example.com"; recipient domains must consider in
+   this case the risk that any user possessing a valid hostname and CA-
    signed certificate (for example, "dhcp-123.example.com") will, from
    the perspective of MTA-STS Policy validation, be a valid MX host for
    that domain.
@@ -938,14 +946,6 @@ Internet-Draft                   MTA-STS                  September 2017
    Klaus Umbach 1&1 Mail & Media Development & Technology GmbH
    klaus.umbach (at) 1und1 (dot de)
 
-   Markus Laber 1&1 Mail & Media Development & Technology GmbH
-   markus.laber (at) 1und1 (dot de)
-
-10.  Appendix 1: MTA-STS example record & policy
-
-   The owner of "example.com" wishes to begin using MTA-STS with a
-   policy that will solicit reports from senders without affecting how
-   the messages are processed, in order to verify the identity of MXs
 
 
 
@@ -954,6 +954,14 @@ Margolis, et al.          Expires April 1, 2018                [Page 17]
 Internet-Draft                   MTA-STS                  September 2017
 
 
+   Markus Laber 1&1 Mail & Media Development & Technology GmbH
+   markus.laber (at) 1und1 (dot de)
+
+10.  Appendix 1: MTA-STS example record & policy
+
+   The owner of "example.com" wishes to begin using MTA-STS with a
+   policy that will solicit reports from senders without affecting how
+   the messages are processed, in order to verify the identity of MXs
    that handle mail for "example.com", confirm that TLS is correctly
    used, and ensure that certificates presented by the recipient MX
    validate.
@@ -962,8 +970,7 @@ Internet-Draft                   MTA-STS                  September 2017
 
        _mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
 
-   MTA-STS Policy file served as the response body at <https://mta-
-   sts.example.com/.well-known/mta-sts.txt:>
+   MTA-STS Policy file served as the response body at [1]
 
                          version: STSv1
                          mode: report
@@ -996,13 +1003,6 @@ func tryStartTls(connection) {
   // Attempt to open an SMTP connection with STARTTLS with the MX.
 }
 
-func isWildcardMatch(pat, host) {
-  // Literal matches are true.
-  if pat == host {
-    return true
-  }
-  // Leading '.' matches a wildcard against the first part, i.e.
-
 
 
 Margolis, et al.          Expires April 1, 2018                [Page 18]
@@ -1010,6 +1010,12 @@ Margolis, et al.          Expires April 1, 2018                [Page 18]
 Internet-Draft                   MTA-STS                  September 2017
 
 
+func isWildcardMatch(pat, host) {
+  // Literal matches are true.
+  if pat == host {
+    return true
+  }
+  // Leading '.' matches a wildcard against the first part, i.e.
   // .example.com matches x.example.com but not x.y.example.com.
   if pat[0] == '.' {
     parts = SplitN(host, '.', 2)  // Split on the first '.'.
@@ -1052,12 +1058,6 @@ func cachePolicy(domain, policy) {
 }
 
 func tryGetCachedPolicy(domain) {
-  // Return a cached policy for "domain".
-}
-
-func reportError(error) {
-  // Report an error via TLSRPT.
-}
 
 
 
@@ -1065,6 +1065,13 @@ Margolis, et al.          Expires April 1, 2018                [Page 19]
 
 Internet-Draft                   MTA-STS                  September 2017
 
+
+  // Return a cached policy for "domain".
+}
+
+func reportError(error) {
+  // Report an error via TLSRPT.
+}
 
 func tryMxAccordingTo(message, mx, policy) {
   connection := connect(mx)
@@ -1107,13 +1114,6 @@ func handleMessage(message) {
     return tryWithPolicy(message, domain, policy)
   }
   // Try to deliver the message normally (i.e. without MTA-STS).
-}
-
-
-
-
-
-
 
 
 
@@ -1122,53 +1122,53 @@ Margolis, et al.          Expires April 1, 2018                [Page 20]
 Internet-Draft                   MTA-STS                  September 2017
 
 
+}
+
+
 12.  References
 
 12.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
-              Requirement Levels", BCP 14, RFC 2119,
-              DOI 10.17487/RFC2119, March 1997, <https://www.rfc-
-              editor.org/info/rfc2119>.
+              Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
+              RFC2119, March 1997,
+              <http://www.rfc-editor.org/info/rfc2119>.
 
    [RFC3492]  Costello, A., "Punycode: A Bootstring encoding of Unicode
               for Internationalized Domain Names in Applications
               (IDNA)", RFC 3492, DOI 10.17487/RFC3492, March 2003,
-              <https://www.rfc-editor.org/info/rfc3492>.
+              <http://www.rfc-editor.org/info/rfc3492>.
 
    [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
               Housley, R., and W. Polk, "Internet X.509 Public Key
               Infrastructure Certificate and Certificate Revocation List
               (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
-              <https://www.rfc-editor.org/info/rfc5280>.
+              <http://www.rfc-editor.org/info/rfc5280>.
 
    [RFC5321]  Klensin, J., "Simple Mail Transfer Protocol", RFC 5321,
-              DOI 10.17487/RFC5321, October 2008, <https://www.rfc-
-              editor.org/info/rfc5321>.
+              DOI 10.17487/RFC5321, October 2008,
+              <http://www.rfc-editor.org/info/rfc5321>.
 
    [RFC5785]  Nottingham, M. and E. Hammer-Lahav, "Defining Well-Known
-              Uniform Resource Identifiers (URIs)", RFC 5785,
-              DOI 10.17487/RFC5785, April 2010, <https://www.rfc-
-              editor.org/info/rfc5785>.
+              Uniform Resource Identifiers (URIs)", RFC 5785, DOI 10
+              .17487/RFC5785, April 2010,
+              <http://www.rfc-editor.org/info/rfc5785>.
 
    [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
               Verification of Domain-Based Application Service Identity
               within Internet Public Key Infrastructure Using X.509
               (PKIX) Certificates in the Context of Transport Layer
               Security (TLS)", RFC 6125, DOI 10.17487/RFC6125, March
-              2011, <https://www.rfc-editor.org/info/rfc6125>.
+              2011, <http://www.rfc-editor.org/info/rfc6125>.
 
    [RFC7231]  Fielding, R., Ed. and J. Reschke, Ed., "Hypertext Transfer
-              Protocol (HTTP/1.1): Semantics and Content", RFC 7231,
-              DOI 10.17487/RFC7231, June 2014, <https://www.rfc-
-              editor.org/info/rfc7231>.
+              Protocol (HTTP/1.1): Semantics and Content", RFC 7231, DOI
+              10.17487/RFC7231, June 2014, <https://www.rfc-editor.org/
+              info/rfc7231>.
 
-   [RFC7405]  Kyzivat, P., "Case-Sensitive String Support in ABNF",
-              RFC 7405, DOI 10.17487/RFC7405, December 2014,
-              <https://www.rfc-editor.org/info/rfc7405>.
-
-
-
+   [RFC7405]  Kyzivat, P., "Case-Sensitive String Support in ABNF", RFC
+              7405, DOI 10.17487/RFC7405, December 2014,
+              <http://www.rfc-editor.org/info/rfc7405>.
 
 
 
@@ -1182,27 +1182,27 @@ Internet-Draft                   MTA-STS                  September 2017
 
    [RFC2560]  Myers, M., Ankney, R., Malpani, A., Galperin, S., and C.
               Adams, "X.509 Internet Public Key Infrastructure Online
-              Certificate Status Protocol - OCSP", RFC 2560,
-              DOI 10.17487/RFC2560, June 1999, <https://www.rfc-
-              editor.org/info/rfc2560>.
+              Certificate Status Protocol - OCSP", RFC 2560, DOI 10
+              .17487/RFC2560, June 1999,
+              <http://www.rfc-editor.org/info/rfc2560>.
 
    [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
               Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
-              February 2002, <https://www.rfc-editor.org/info/rfc3207>.
+              February 2002, <http://www.rfc-editor.org/info/rfc3207>.
 
    [RFC4033]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
-              Rose, "DNS Security Introduction and Requirements",
-              RFC 4033, DOI 10.17487/RFC4033, March 2005,
-              <https://www.rfc-editor.org/info/rfc4033>.
+              Rose, "DNS Security Introduction and Requirements", RFC
+              4033, DOI 10.17487/RFC4033, March 2005,
+              <http://www.rfc-editor.org/info/rfc4033>.
 
-   [RFC5322]  Resnick, P., Ed., "Internet Message Format", RFC 5322,
-              DOI 10.17487/RFC5322, October 2008, <https://www.rfc-
-              editor.org/info/rfc5322>.
+   [RFC5322]  Resnick, P., Ed., "Internet Message Format", RFC 5322, DOI
+              10.17487/RFC5322, October 2008,
+              <http://www.rfc-editor.org/info/rfc5322>.
 
    [RFC5891]  Klensin, J., "Internationalized Domain Names in
-              Applications (IDNA): Protocol", RFC 5891,
-              DOI 10.17487/RFC5891, August 2010, <https://www.rfc-
-              editor.org/info/rfc5891>.
+              Applications (IDNA): Protocol", RFC 5891, DOI 10.17487/
+              RFC5891, August 2010,
+              <http://www.rfc-editor.org/info/rfc5891>.
 
    [RFC6818]  Yee, P., "Updates to the Internet X.509 Public Key
               Infrastructure Certificate and Certificate Revocation List
@@ -1211,14 +1211,28 @@ Internet-Draft                   MTA-STS                  September 2017
 
    [RFC7234]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
               Ed., "Hypertext Transfer Protocol (HTTP/1.1): Caching",
-              RFC 7234, DOI 10.17487/RFC7234, June 2014,
-              <https://www.rfc-editor.org/info/rfc7234>.
+              RFC 7234, DOI 10.17487/RFC7234, June 2014, <https://www
+              .rfc-editor.org/info/rfc7234>.
 
    [RFC7672]  Dukhovni, V. and W. Hardaker, "SMTP Security via
               Opportunistic DNS-Based Authentication of Named Entities
-              (DANE) Transport Layer Security (TLS)", RFC 7672,
-              DOI 10.17487/RFC7672, October 2015, <https://www.rfc-
-              editor.org/info/rfc7672>.
+              (DANE) Transport Layer Security (TLS)", RFC 7672, DOI 10
+              .17487/RFC7672, October 2015,
+              <http://www.rfc-editor.org/info/rfc7672>.
+
+12.3.  URIs
+
+   [1] https://mta-sts.example.com/.well-known/mta-sts.txt:
+
+
+
+
+
+
+Margolis, et al.          Expires April 1, 2018                [Page 22]
+
+Internet-Draft                   MTA-STS                  September 2017
+
 
 Authors' Addresses
 
@@ -1226,12 +1240,6 @@ Authors' Addresses
    Google, Inc
 
    Email: dmargolis (at) google.com
-
-
-
-Margolis, et al.          Expires April 1, 2018                [Page 22]
-
-Internet-Draft                   MTA-STS                  September 2017
 
 
    Mark Risher
@@ -1256,14 +1264,6 @@ Internet-Draft                   MTA-STS                  September 2017
    Microsoft, Inc
 
    Email: janet.jones (at) microsoft (dot com)
-
-
-
-
-
-
-
-
 
 
 
