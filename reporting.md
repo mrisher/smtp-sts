@@ -840,7 +840,7 @@ _smtp-tlsrpt.mail.example.com. IN TXT \
     "sending-mta-ip": "98.22.33.99",
     "receiving-mx-hostname": "mx2.mail.company-y.com",
     "failed-session-count": 200,
-    "additional-information": "hxxps://reports.company-x.com/
+    "additional-information": "https://reports.company-x.com/
       report_info?id=5065427c-23d3#StarttlsNotSupported"
   }, {
     "result-type": "validation-failure",
