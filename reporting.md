@@ -328,32 +328,32 @@ The JSON schema is derived from the HPKP JSON schema [@?RFC7469] (cf. Section 3)
 
 ```
 {
-  "organization-name": organization - name,
+  "organization-name": organization-name,
   "date-range": {
-    "start-datetime": date - time,
-    "end-datetime": date - time
+    "start-datetime": date-time,
+    "end-datetime": date-time
   },
-  "contact-info": email - address,
-  "report-id": report - id,
+  "contact-info": email-address,
+  "report-id": report-id,
   "policies": [{
     "policy": {
-      "policy-type": policy - type,
-      "policy-string": policy - string,
+      "policy-type": policy-type,
+      "policy-string": policy-string,
       "policy-domain": domain,
-      "mx-host": mx - host - pattern
+      "mx-host": mx-host-pattern
     },
     "summary": {
-      "total-successful-session-count": total - successful - session - count,
-      "total-failure-session-count": total - failure - session - count
+      "total-successful-session-count": total-successful-session-count,
+      "total-failure-session-count": total-failure-session-count
     },
     "failure-details": [
       {
-        "result-type": result - type,
-        "sending-mta-ip": ip - address,
-        "receiving-mx-hostname": receiving - mx - hostname,
-        "receiving-mx-helo": receiving - mx - helo,
-        "failed-session-count": failed - session - count,
-        "additional-information": additional - info - uri,
+        "result-type": result-type,
+        "sending-mta-ip": ip-address,
+        "receiving-mx-hostname": receiving-mx-hostname,
+        "receiving-mx-helo": receiving-mx-helo,
+        "failed-session-count": failed-session-count,
+        "additional-information": additional-info-uri,
         "failure-reason-code": failure-reason-code
         }
       ]
