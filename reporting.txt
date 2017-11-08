@@ -118,11 +118,11 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
    7.  Security Considerations . . . . . . . . . . . . . . . . . . .  19
    8.  Appendix 1: Example Reporting Policy  . . . . . . . . . . . .  20
      8.1.  Report using MAILTO . . . . . . . . . . . . . . . . . . .  20
-     8.2.  Report using HTTPS  . . . . . . . . . . . . . . . . . . .  20
-   9.  Appendix 2: Example JSON Report . . . . . . . . . . . . . . .  20
+     8.2.  Report using HTTPS  . . . . . . . . . . . . . . . . . . .  21
+   9.  Appendix 2: Example JSON Report . . . . . . . . . . . . . . .  21
    10. References  . . . . . . . . . . . . . . . . . . . . . . . . .  22
      10.1.  Normative References . . . . . . . . . . . . . . . . . .  22
-     10.2.  Informative References . . . . . . . . . . . . . . . . .  23
+     10.2.  Informative References . . . . . . . . . . . . . . . . .  24
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  24
 
 1.  Introduction
@@ -233,10 +233,11 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
    o  In the case of "mailto", reports should be submitted to the
       specified email address ([RFC6068]).  When sending failure reports
       via SMTP, sending MTAs MUST deliver reports despite any TLS-
-      related failures.  This may mean that the reports are delivered in
-      the clear.  Additionally, reports sent via SMTP MUST contain a
-      valid DKIM [RFC6376] signature by the reporting domain.  Reports
-      lacking such a signature MUST be ignored by the recipient.  DKIM
+      related failuresand SHOULD NOT include this SMTP session in the
+      next report.  This may mean that the reports are delivered in the
+      clear.  Additionally, reports sent via SMTP MUST contain a valid
+      DKIM [RFC6376] signature by the reporting domain.  Reports lacking
+      such a signature MUST be ignored by the recipient.  DKIM
       signatures must not use the "l=" attribute to limit the body
       length used in the signature.
 
@@ -273,7 +274,6 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
    resolver, records which do not begin with "v=TLSRPTv1;" are
    discarded.  If the number of resulting records is not one, senders
    MUST assume the recipient domain does not implement TLSRPT.  If the
-   resulting TXT record contains multiple strings, then the record MUST
 
 
 
@@ -282,6 +282,7 @@ Margolis, et al.          Expires April 1, 2018                 [Page 5]
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
 
+   resulting TXT record contains multiple strings, then the record MUST
    be treated as if those strings are concatenated together without
    adding spaces.
 
@@ -329,7 +330,6 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
          a semicolon) (3) The literal string "no-policy-found", if
          neither a DANE nor MTA-STS policy could be found.
 
-      *  The domain for which the policy is applied
 
 
 
@@ -337,6 +337,8 @@ Margolis, et al.          Expires April 1, 2018                 [Page 6]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
+
+      *  The domain for which the policy is applied
 
       *  The MX host
 
@@ -382,8 +384,6 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
    The list of result types will start with the minimal set below, and
    is expected to grow over time based on real-world experience.  The
    initial set is:
-
-
 
 
 
@@ -626,8 +626,8 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
       example, this URI might host the complete certificate chain
       presented during an attempted STARTTLS session.
 
-   o  "failure-reason-code": A text field to include a TLS-related
-      error code or error message.
+   o  "failure-reason-code": A text field to include a TLS-related error
+      code or error message.
 
    For report purposes, an IPv4 Address is defined as: IPv4address =
    dec-octet "." dec-octet "." dec-octet "." dec-octet
@@ -1094,24 +1094,24 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
       the third party to the victim; this reduces the risk of such an
       attack and the need for a verification mechanism.
 
+   Finally, because TLSRPT is intended to help administrators discover
+   man-in-the-middle attacks against transport-layer encryption,
+   including attacks designed to thwart negotiation of encrypted
+   connections (by downgrading opportunistic encryption or, in the case
+   of MTA-STS, preventing discovery of a new MTA-STS policy), we must
+   also consider the risk that an adversary who can induce such a
+   downgrade attack can also prevent discovery of the TLSRPT TXT record
+   (and thus prevent discovery of the successful downgrade attack).
+   Administrators are thus encouraged to deploy TLSRPT TXT records with
+   a large TTL (reducing the window for successful attacks against DNS
+   resolution of the record) or to deploy DNSSEC on the deploying zone.
+
 8.  Appendix 1: Example Reporting Policy
 
 8.1.  Report using MAILTO
 
             _smtp-tlsrpt.mail.example.com. IN TXT \
                     "v=TLSRPTv1;rua=mailto:reports@example.com"
-
-8.2.  Report using HTTPS
-
-           _smtp-tlsrpt.mail.example.com. IN TXT \
-                   "v=TLSRPTv1; \
-                   rua=https://reporting.example.com/v1/tlsrpt"
-
-9.  Appendix 2: Example JSON Report
-
-
-
-
 
 
 
@@ -1121,6 +1121,14 @@ Margolis, et al.          Expires April 1, 2018                [Page 20]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
+
+8.2.  Report using HTTPS
+
+           _smtp-tlsrpt.mail.example.com. IN TXT \
+                   "v=TLSRPTv1; \
+                   rua=https://reporting.example.com/v1/tlsrpt"
+
+9.  Appendix 2: Example JSON Report
 
 {
   "organization-name": "Company-X",
@@ -1161,14 +1169,6 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
   }]
 }
 
-   Figure: Example JSON report for a messages from Company-X to
-   Company-Y, where 100 sessions were attempted to Company Y servers
-   with an expired certificate and 200 sessions were attempted to
-   Company Y servers that did not successfully respond to the "STARTTLS"
-   command.  Additionally 3 sessions failed due to
-   "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED".
-
-
 
 
 
@@ -1177,6 +1177,13 @@ Margolis, et al.          Expires April 1, 2018                [Page 21]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
+
+   Figure: Example JSON report for a messages from Company-X to
+   Company-Y, where 100 sessions were attempted to Company Y servers
+   with an expired certificate and 200 sessions were attempted to
+   Company Y servers that did not successfully respond to the "STARTTLS"
+   command.  Additionally 3 sessions failed due to
+   "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED".
 
 10.  References
 
@@ -1218,13 +1225,6 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
               10.17487/RFC5322, October 2008,
               <http://www.rfc-editor.org/info/rfc5322>.
 
-   [RFC5891]  Klensin, J., "Internationalized Domain Names in
-              Applications (IDNA): Protocol", RFC 5891, DOI 10.17487/
-              RFC5891, August 2010,
-              <http://www.rfc-editor.org/info/rfc5891>.
-
-
-
 
 
 
@@ -1233,6 +1233,11 @@ Margolis, et al.          Expires April 1, 2018                [Page 22]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
+
+   [RFC5891]  Klensin, J., "Internationalized Domain Names in
+              Applications (IDNA): Protocol", RFC 5891, DOI 10.17487/
+              RFC5891, August 2010,
+              <http://www.rfc-editor.org/info/rfc5891>.
 
    [RFC5952]  Kawamura, S. and M. Kawashima, "A Recommendation for IPv6
               Address Text Representation", RFC 5952, DOI 10.17487/
@@ -1273,6 +1278,18 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
               10.17487/RFC7493, March 2015,
               <http://www.rfc-editor.org/info/rfc7493>.
 
+
+
+
+
+
+
+
+Margolis, et al.          Expires April 1, 2018                [Page 23]
+
+Internet-Draft                 SMTP-TLSRPT                September 2017
+
+
 10.2.  Informative References
 
    [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
@@ -1282,13 +1299,6 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
    [RFC3501]  Crispin, M., "INTERNET MESSAGE ACCESS PROTOCOL - VERSION
               4rev1", RFC 3501, DOI 10.17487/RFC3501, March 2003,
               <http://www.rfc-editor.org/info/rfc3501>.
-
-
-
-Margolis, et al.          Expires April 1, 2018                [Page 23]
-
-Internet-Draft                 SMTP-TLSRPT                September 2017
-
 
    [RFC3864]  Klyne, G., Nottingham, M., and J. Mogul, "Registration
               Procedures for Message Header Fields", BCP 90, RFC 3864,
@@ -1327,6 +1337,15 @@ Authors' Addresses
    Email: alex_brotman (at) comcast.com
 
 
+
+
+
+
+Margolis, et al.          Expires April 1, 2018                [Page 24]
+
+Internet-Draft                 SMTP-TLSRPT                September 2017
+
+
    Binu Ramakrishnan
    Yahoo!, Inc
 
@@ -1339,29 +1358,10 @@ Authors' Addresses
    Email: janet.jones (at) microsoft (dot com)
 
 
-
-
-Margolis, et al.          Expires April 1, 2018                [Page 24]
-
-Internet-Draft                 SMTP-TLSRPT                September 2017
-
-
    Mark Risher
    Google, Inc
 
    Email: risher (at) google (dot com)
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

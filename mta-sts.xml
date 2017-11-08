@@ -625,6 +625,14 @@ _mta-sts.user.com.  IN CNAME _mta-sts.provider.com.
 &gt; Host: mta-sts.user.com
 &lt; HTTP/1.1 200 OK  # Response proxies content from https://mta-sts.provider.com
 </artwork></figure>
+<t>Note that while sending MTAs MUST NOT use HTTP caching when fetching policies
+via HTTPS, such caching may nonetheless be useful to a reverse proxy configured
+as described in this section. An HTTPS policy endpoint expecting to be proxied
+for multiple hosted domains--as with a large mail hosting provider or
+similar--may wish to indicate an HTTP Cache-Control <spanx style="verb">max-age</spanx> response directive
+(as specified in <xref target="RFC7234"/>) of 60 seconds as a reasonable value to save
+reverse proxies an unnecessarily high-rate of proxied policy fetching.
+</t>
 </section>
 
 <section anchor="removing-mtasts" title="Removing MTA-STS">
