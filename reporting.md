@@ -342,7 +342,7 @@ The JSON schema is derived from the HPKP JSON schema [@?RFC7469] (cf. Section 3)
   },
   "summary": {
     "total-successful-session-count": total-successful-session-count,
-    "total-failure-session-count:" total-failure-session-count
+    "total-failure-session-count": total-failure-session-count
   }
   "failure-details": [
     {
