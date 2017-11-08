@@ -87,8 +87,8 @@ they appear in this document, are to be interpreted as described in [@!RFC2119].
 
 We also define the following terms for further use in this document:
 
-* MTA-STS Policy: A commitment by the Policy Domain to support PKIX authenticated
-  TLS for the specified MX hosts.
+* MTA-STS Policy: A commitment by the Policy Domain to support PKIX
+  authenticated TLS for the specified MX hosts.
 * Policy Domain: The domain for which an MTA-STS Policy is defined. This is the
   next-hop domain; when sending mail to "alice@example.com" this would
   ordinarily be "example.com", but this may be overridden by explicit routing
@@ -119,11 +119,11 @@ failing DANE validation.
 
 # Policy Discovery
 
-MTA-STS policies are distributed via HTTPS from a "well-known" [@!RFC5785] path served
-within the Policy Domain, and their presence and current version are indicated
-by a TXT record at the Policy Domain. These TXT records additionally contain a
-policy `id` field, allowing sending MTAs to check the currency of a cached
-policy without performing an HTTPS request.
+MTA-STS policies are distributed via HTTPS from a "well-known" [@!RFC5785] path
+served within the Policy Domain, and their presence and current version are
+indicated by a TXT record at the Policy Domain. These TXT records additionally
+contain a policy `id` field, allowing sending MTAs to check the currency of a
+cached policy without performing an HTTPS request.
 
 To discover if a recipient domain implements MTA-STS, a sender need only resolve
 a single TXT record. To see if an updated policy is available for a domain for
@@ -140,8 +140,8 @@ semicolon-separated key/value pairs containing the following fields:
 * `v`: (plain-text, required). Currently only "STSv1" is supported.
 * `id`: (plain-text, required). A short string used to track policy updates.
   This string MUST uniquely identify a given instance of a policy, such that 
-  senders can determine when the policy has been updated by comparing to the `id`
-  of a previously seen policy. There is no implied ordering of `id` fields
+  senders can determine when the policy has been updated by comparing to the
+  `id` of a previously seen policy. There is no implied ordering of `id` fields
   between revisions.
 
 An example TXT record is as below:
@@ -281,7 +281,8 @@ follows:
                                sts-policy-ext-value            ; extension
                                                                ; fields
 
-    sts-policy-ext-name      = (ALPHA / DIGIT) *31(ALPHA / DIGIT / "_" / "-" / ".")
+    sts-policy-ext-name      = (ALPHA / DIGIT)
+                               *31(ALPHA / DIGIT / "_" / "-" / ".")
 
     sts-policy-ext-value     = 1*(%x21-3A / %x3C / %x3E-7E)    ; chars excluding
                                                                ; "=", ";", SP,
@@ -373,9 +374,9 @@ as described in (#policy-application), "Policy Application".
 
 The certificate presented by the receiving MX MUST chain to a root CA that is
 trusted by the sending MTA and be non-expired. The certificate MUST have a CN-ID
-([@!RFC6125]) or subject alternative name (SAN, [@!RFC5280]) with a DNS-ID matching
-the `mx` pattern. The MX's certificate MAY also be checked for revocation via
-OCSP [@?RFC2560], CRLs [@?RFC6818], or some other mechanism.
+([@!RFC6125]) or subject alternative name (SAN, [@!RFC5280]) with a DNS-ID
+matching the `mx` pattern. The MX's certificate MAY also be checked for
+revocation via OCSP [@?RFC2560], CRLs [@?RFC6818], or some other mechanism.
 
 Because the `mx` patterns are not hostnames, however, matching is not identical
 to other common cases of X.509 certificate authentication (as described, for
@@ -706,11 +707,12 @@ update an invalid policy at any future date.
 
 Even if an attacker cannot modify a served policy, the potential exists for
 configurations that allow attackers on the same domain to receive mail for that
-domain. For example, an easy configuration option when authoring an MTA-STS Policy
-for `example.com` is to set the `mx` equal to `.example.com`; recipient domains
-must consider in this case the risk that any user possessing a valid hostname
-and CA-signed certificate (for example, `dhcp-123.example.com`) will, from the
-perspective of MTA-STS Policy validation, be a valid MX host for that domain.
+domain. For example, an easy configuration option when authoring an MTA-STS
+Policy for `example.com` is to set the `mx` equal to `.example.com`; recipient
+domains must consider in this case the risk that any user possessing a valid
+hostname and CA-signed certificate (for example, `dhcp-123.example.com`) will,
+from the perspective of MTA-STS Policy validation, be a valid MX host for that
+domain.
 
 ## Compromise of the Web PKI System
 
@@ -826,7 +828,8 @@ func certMatches(connection, policy) {
   // Assume a handy function to return CN and DNS-ID SANs.
   for san in getDnsIdSansAndCnFromCert(connection) {
     for mx in policy.mx {
-      // Return if the server certificate from "connection" matches the "mx" host.
+      // Return if the server certificate from "connection" matches the "mx"
+      // host.
       if san[0] == '*' {
         // Invalid wildcard!
         if san[1] != '.' continue

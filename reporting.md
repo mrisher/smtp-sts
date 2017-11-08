@@ -115,8 +115,9 @@ We also define the following terms for further use in this document:
 * This document is intended as a companion to the specification for SMTP MTA
     Strict Transport Security (MTA-STS, TODO: Add RFC ref).
 * SMTP-TLSRPT defines a mechanism for sending domains that are compatible with
-  MTA-STS or DANE to share success and failure statistics with recipient domains.
-  DANE is defined in [@!RFC6698] and MTA-STS is defined in [TODO : Add RFC ref]
+  MTA-STS or DANE to share success and failure statistics with recipient
+  domains.  DANE is defined in [@!RFC6698] and MTA-STS is defined in [TODO : Add
+  RFC ref]
 
 # Reporting Policy
 
@@ -138,14 +139,13 @@ Policies consist of the following directives:
   to the specified URI.  Report submitters MAY ignore certificate validation
   errors when submitting reports via https.
 * In the case of `mailto`, reports should be submitted to the specified
-  email address ([@!RFC6068]). When sending failure reports via SMTP,
-	sending MTAs MUST deliver reports despite any TLS-related failuresand 
-	SHOULD NOT include this SMTP session in the next report. This may mean 
-	that the reports are delivered in the clear. Additionally, reports sent
-	via SMTP MUST contain a valid DKIM [@!RFC6376] signature by the reporting
-	domain.  Reports lacking such a signature MUST be ignored by the recipient.
-	DKIM signatures must not use the "l=" attribute to limit the body length
-	used in the signature.
+  email address ([@!RFC6068]). When sending failure reports via SMTP, sending
+  MTAs MUST deliver reports despite any TLS-related failuresand SHOULD NOT
+  include this SMTP session in the next report. This may mean that the reports
+  are delivered in the clear. Additionally, reports sent via SMTP MUST contain a
+  valid DKIM [@!RFC6376] signature by the reporting domain.  Reports lacking
+  such a signature MUST be ignored by the recipient.  DKIM signatures must not
+  use the "l=" attribute to limit the body length used in the signature.
 
 The formal definition of the `_smtp-tlsrpt` TXT record, defined using
 [@!RFC5234] & [@!RFC7405], is as follows:
@@ -268,56 +268,59 @@ to grow over time based on real-world experience. The initial set is:
 
 ### Negotiation Failures
 
-* `starttls-not-supported`: This indicates that the recipient MX did not
-    support STARTTLS.
-* `certificate-host-mismatch`: This indicates that the certificate presented
-    did not adhere to the constraints specified in the MTA-STS or DANE policy, e.g.
-    if the MX does not match any identities listed in the Subject Alternate 
-    Name (SAN) [RFC5280].
+* `starttls-not-supported`: This indicates that the recipient MX did not support
+  STARTTLS.
+* `certificate-host-mismatch`: This indicates that the certificate presented did
+  not adhere to the constraints specified in the MTA-STS or DANE policy, e.g.
+  if the MX does not match any identities listed in the Subject Alternate Name
+  (SAN) [RFC5280].
 * `certificate-expired`: This indicates that the certificate has expired.
 * `certificate-not-trusted`: This a label that covers multiple certificate
-    related failures that include, but not limited to errors such as
-    untrusted/unknown CAs, certificate name constraints, certificate chain
-    errors etc. When using this declaration, the reporting MTA SHOULD utilize
-    the `failure-reason` to provide more information to the receiving entity.
-* `validation-failure`: This indicates a general failure for a reason not matching 
-    a category above.  When using this declaration, the reporting MTA SHOULD utilize 
-    the `failure-reason` to provide more information to the receiving entity.
+  related failures that include, but not limited to errors such as
+  untrusted/unknown CAs, certificate name constraints, certificate chain errors
+  etc. When using this declaration, the reporting MTA SHOULD utilize the
+  `failure-reason` to provide more information to the receiving entity.
+* `validation-failure`: This indicates a general failure for a reason not
+  matching a category above.  When using this declaration, the reporting MTA
+  SHOULD utilize the `failure-reason` to provide more information to the
+  receiving entity.
 
 ### Policy Failures
 
 #### DANE-specific Policy Failures
 
 * `tlsa-invalid`: This indicates a validation error in the TLSA record
-    associated with a DANE policy.  None of the records in the RRset were found
-    to be valid.
-* `dnssec-invalid`: This would indicate that no valid records were returned from 
-    the recursive resolver.  The request returned with SERVFAIL for the requested
-    TLSA record.  It should be noted that if the reporter's systems are having problems
-    resolving destination DNS records due to DNSSEC failures, it's possible they will 
-    also be unable to resolve the TLSRPT record, therefore these types of reports may
-    be rare.
+  associated with a DANE policy.  None of the records in the RRset were found to
+  be valid.
+* `dnssec-invalid`: This would indicate that no valid records were returned from
+  the recursive resolver.  The request returned with SERVFAIL for the requested
+  TLSA record.  It should be noted that if the reporter's systems are having
+  problems resolving destination DNS records due to DNSSEC failures, it's
+  possible they will also be unable to resolve the TLSRPT record, therefore
+  these types of reports may be rare.
 
 #### MTA-STS-specific Policy Failures
 
-* `sts-policy-invalid`: This indicates a validation error for the overall MTA-STS
-    policy.
+* `sts-policy-invalid`: This indicates a validation error for the overall
+  MTA-STS policy.
 * `sts-webpki-invalid`: This indicates that the MTA-STS policy could not be
-    authenticated using PKIX validation.
+  authenticated using PKIX validation.
     
 ### General Failures
 
-When a negotiation failure can not be categorized into one of the "Negotiation Failures" 
-stated above, the reporter SHOULD use the `validation-failure` category.  As TLS grows
-and becomes more complex, new mechanisms may not be easily categorized.  This allows for
-a generic feedback category.  When this category is used, the reporter SHOULD also use the
-`failure-reason-code` to give some feedback to the receiving entity.  This is intended
-to be a short text field, and the contents of the field should be an error code or error
-text, such as "X509_V_ERR_UNHANDLED_CRITICAL_CRL_EXTENSION".
+When a negotiation failure can not be categorized into one of the "Negotiation
+Failures" stated above, the reporter SHOULD use the `validation-failure`
+category.  As TLS grows and becomes more complex, new mechanisms may not be
+easily categorized.  This allows for a generic feedback category.  When this
+category is used, the reporter SHOULD also use the `failure-reason-code` to give
+some feedback to the receiving entity.  This is intended to be a short text
+field, and the contents of the field should be an error code or error text, such
+as "X509_V_ERR_UNHANDLED_CRITICAL_CRL_EXTENSION".
 
 ### Transient Failures
 
-Transient errors due to too-busy network, TCP timeouts, etc. are not required to be reported. 
+Transient errors due to too-busy network, TCP timeouts, etc. are not required to
+be reported. 
 
 ## JSON Report Schema
 
@@ -357,55 +360,56 @@ The JSON schema is derived from the HPKP JSON schema [@?RFC7469] (cf. Section 3)
 ```
 Figure: JSON Report Format
 
-* `organization-name`: The name of the organization responsible for the
-    report. It is provided as a string.
+* `organization-name`: The name of the organization responsible for the report.
+  It is provided as a string.
 * `date-time`: The date-time indicates the start- and end-times for the report
-    range. It is provided as a string formatted according to Section 5.6,
-    "Internet Date/Time Format", of [@!RFC3339].  The report should be for a
-    full UTC day, 0000-2400.
+  range. It is provided as a string formatted according to Section 5.6,
+  "Internet Date/Time Format", of [@!RFC3339].  The report should be for a full
+  UTC day, 0000-2400.
 * `email-address`: The contact information for a responsible party of the
-    report. It is provided as a string formatted according to Section 3.4.1,
-    "Addr-Spec", of [@!RFC5321].
+  report. It is provided as a string formatted according to Section 3.4.1,
+  "Addr-Spec", of [@!RFC5321].
 * `report-id`: A unique identifier for the report. Report authors may use
-    whatever scheme they prefer to generate a unique identifier. It is provided
-    as a string.
+  whatever scheme they prefer to generate a unique identifier. It is provided as
+  a string.
 * `policy-type`: The type of policy that was applied by the sending domain.
-    Presently, the only three valid choices are `tlsa`, `sts`, and the literal
-    string `no-policy-found`. It is provided as a string.
-* `policy-string`: A string representation of the policy, whether TLSA 
-    record ([@!RFC6698] section 2.3) or MTA-STS policy. Examples:
-    TLSA: `"_25._tcp.mx.example.com. IN TLSA ( 3 0 1 \
-    1F850A337E6DB9C609C522D136A475638CC43E1ED424F8EEC8513D7 47D1D085D )"`
-    MTA-STS: `"version: STSv1\nmode: report\nmx: mx1.example.com\nmx: \
-    mx2.example.com\nmx: mx.backup-example.com\nmax_age: 12345678"`
+  Presently, the only three valid choices are `tlsa`, `sts`, and the literal
+  string `no-policy-found`. It is provided as a string.
+* `policy-string`: A string representation of the policy, whether TLSA record
+  ([@!RFC6698] section 2.3) or MTA-STS policy. Examples: TLSA:
+  `"_25._tcp.mx.example.com. IN TLSA ( 3 0 1 \
+  1F850A337E6DB9C609C522D136A475638CC43E1ED424F8EEC8513D7 47D1D085D )"` MTA-STS:
+  `"version: STSv1\nmode: report\nmx: mx1.example.com\nmx: \
+  mx2.example.com\nmx: mx.backup-example.com\nmax_age: 12345678"`
 * `domain`: The Policy Domain is the domain against which the MTA-STS or DANE
-    policy is defined. In the case of Internationalized Domain Names
-    ([@?RFC5891]), the domain is the Punycode-encoded A-label
-    ([@!RFC3492]) and not the U-label.
-* `mx-host-pattern`: The pattern of MX hostnames from the applied policy. It
-    is provided as a string, and is interpreted in the same manner as the
-    "Checking of Wildcard Certificates" rules in Section 6.4.3 of [@!RFC6125].
-    In the case of Internationalized Domain Names ([@!RFC5891]), the domain is 
-    the Punycode-encoded A-label ([@!RFC3492]) and not the U-label.
+  policy is defined. In the case of Internationalized Domain Names
+  ([@?RFC5891]), the domain is the Punycode-encoded A-label ([@!RFC3492]) and
+  not the U-label.
+* `mx-host-pattern`: The pattern of MX hostnames from the applied policy. It is
+  provided as a string, and is interpreted in the same manner as the "Checking
+  of Wildcard Certificates" rules in Section 6.4.3 of [@!RFC6125].  In the case
+  of Internationalized Domain Names ([@!RFC5891]), the domain is the
+  Punycode-encoded A-label ([@!RFC3492]) and not the U-label.
 * `result-type`: A value from (#result-types), "Result Types",  above.
 * `ip-address`: The IP address of the sending MTA that attempted the STARTTLS
-    connection. It is provided as a string representation of an IPv4 (see below) 
-    or IPv6 ([@!RFC5952]) address in dot-decimal or colon-hexadecimal notation.
+  connection. It is provided as a string representation of an IPv4 (see below)
+  or IPv6 ([@!RFC5952]) address in dot-decimal or colon-hexadecimal notation.
 * `receiving-mx-hostname`: The hostname of the receiving MTA MX record with
-    which the sending MTA attempted to negotiate a STARTTLS connection.
+  which the sending MTA attempted to negotiate a STARTTLS connection.
 * `receiving-mx-helo`: (optional) The HELO or EHLO string from the banner
-    announced during the reported session.
-* `total-successful-session-count`: The aggregate number (integer) of successfully 
-    negotiated TLS-enabled connections to the receiving site.
-* `total-failure-session-count`: The aggregate number (integer) of failures to 
-    negotiate a TLS-enabled connection to the receiving site.
-* `failed-session-count`: The number of (attempted) sessions that match the relevant
-    `result-type` for this section.
-* `additional-info-uri`: An optional URI [@!RFC3986] pointing to additional information
-    around the relevant `result-type`. For example, this URI might host the
-    complete certificate chain presented during an attempted STARTTLS session.
-* `failure-reason-code`: A text field to include a TLS-related error
-    code or error message.
+  announced during the reported session.
+* `total-successful-session-count`: The aggregate number (integer) of
+  successfully negotiated TLS-enabled connections to the receiving site.
+* `total-failure-session-count`: The aggregate number (integer) of failures to
+  negotiate a TLS-enabled connection to the receiving site.
+* `failed-session-count`: The number of (attempted) sessions that match the
+  relevant `result-type` for this section.
+* `additional-info-uri`: An optional URI [@!RFC3986] pointing to additional
+  information around the relevant `result-type`. For example, this URI might
+  host the complete certificate chain presented during an attempted STARTTLS
+  session.
+* `failure-reason-code`: A text field to include a TLS-related error code or
+  error message.
     
 For report purposes, an IPv4 Address is defined as:
      IPv4address = dec-octet "." dec-octet "." dec-octet "." dec-octet     
@@ -568,24 +572,24 @@ use the media type `application/tlsrpt+gzip`, and `application/tlsrpt+json`
 otherwise (see section (#iana-considerations), "IANA Considerations").
 
 A reporting entity SHOULD expect a "successful" response from the accepting
-HTTPS server, typically a 200 or 201 HTTP code [@?RFC7231].  Other codes could indicate
-a delivery failure, and may be retried as per local policy.  The receiving system
-is not expected to process reports at receipt time, and MAY store them for processing
-at a later time.
+HTTPS server, typically a 200 or 201 HTTP code [@?RFC7231].  Other codes could
+indicate a delivery failure, and may be retried as per local policy.  The
+receiving system is not expected to process reports at receipt time, and MAY
+store them for processing at a later time.
 
 ## Delivery Retry
 
 In the event of a delivery failure, regardless of the delivery method, a 
 sender SHOULD attempt redelivery for up to 24hrs after the initial attempt.  As
 previously stated the reports are optional, so while it is ideal to attempt
-redelivery, it is not required.  If multiple retries are attempted, ideally they 
+redelivery, it is not required.  If multiple retries are attempted, ideally they
 would be on a logarithmic scale.
 
 ## Metadata Variances
 
 As stated above, there are a variable number of ways to declare information
 about the data therein.  If it should be the case that these objects were to
-disagree, then the report data contained within the JSON body MUST be considered 
+disagree, then the report data contained within the JSON body MUST be considered
 the authoritative source for those data elements.
 
 # IANA Considerations
