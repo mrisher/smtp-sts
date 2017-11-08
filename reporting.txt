@@ -21,15 +21,15 @@ Expires: May 12, 2018                                       Comcast, Inc
 Abstract
 
    A number of protocols exist for establishing encrypted channels
-   between SMTP Mail Transfer Agents, including STARTTLS [RFC3207], DANE
-   [RFC6698], and MTA-STS (TODO: Add ref).  These protocols can fail due
-   to misconfiguration or active attack, leading to undelivered messages
-   or delivery over unencrypted or unauthenticated channels.  This
-   document describes a reporting mechanism and format by which sending
-   systems can share statistics and specific information about potential
-   failures with recipient domains.  Recipient domains can then use this
-   information to both detect potential attackers and diagnose
-   unintentional misconfigurations.
+   between SMTP Mail Transfer Agents, including STARTTLS, DANE TLSA, and
+   MTA-STS.  These protocols can fail due to misconfiguration or active
+   attack, leading to undelivered messages or delivery over unencrypted
+   or unauthenticated channels.  This document describes a reporting
+   mechanism and format by which sending systems can share statistics
+   and specific information about potential failures with recipient
+   domains.  Recipient domains can then use this information to both
+   detect potential attackers and diagnose unintentional
+   misconfigurations.
 
 Status of This Memo
 
@@ -227,7 +227,7 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
    o  In the case of "https", reports should be submitted via POST
-      ([RFC2818]) to the specified URI.  Report submitters MAY ignore
+      ([RFC7231]) to the specified URI.  Report submitters MAY ignore
       certificate validation errors when submitting reports via https.
 
    o  In the case of "mailto", reports should be submitted to the
@@ -1194,10 +1194,6 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
               RFC2119, March 1997,
               <http://www.rfc-editor.org/info/rfc2119>.
 
-   [RFC2818]  Rescorla, E., "HTTP Over TLS", RFC 2818, DOI 10.17487/
-              RFC2818, May 2000,
-              <http://www.rfc-editor.org/info/rfc2818>.
-
    [RFC3339]  Klyne, G. and C. Newman, "Date and Time on the Internet:
               Timestamps", RFC 3339, DOI 10.17487/RFC3339, July 2002,
               <http://www.rfc-editor.org/info/rfc3339>.
@@ -1217,6 +1213,12 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
               RFC5234, January 2008,
               <http://www.rfc-editor.org/info/rfc5234>.
 
+   [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
+              Housley, R., and W. Polk, "Internet X.509 Public Key
+              Infrastructure Certificate and Certificate Revocation List
+              (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
+              <http://www.rfc-editor.org/info/rfc5280>.
+
    [RFC5321]  Klensin, J., "Simple Mail Transfer Protocol", RFC 5321,
               DOI 10.17487/RFC5321, October 2008,
               <http://www.rfc-editor.org/info/rfc5321>.
@@ -1224,8 +1226,6 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
    [RFC5322]  Resnick, P., Ed., "Internet Message Format", RFC 5322, DOI
               10.17487/RFC5322, October 2008,
               <http://www.rfc-editor.org/info/rfc5322>.
-
-
 
 
 
@@ -1270,6 +1270,11 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
               Protocol: TLSA", RFC 6698, DOI 10.17487/RFC6698, August
               2012, <http://www.rfc-editor.org/info/rfc6698>.
 
+   [RFC7231]  Fielding, R., Ed. and J. Reschke, Ed., "Hypertext Transfer
+              Protocol (HTTP/1.1): Semantics and Content", RFC 7231, DOI
+              10.17487/RFC7231, June 2014, <https://www.rfc-editor.org/
+              info/rfc7231>.
+
    [RFC7405]  Kyzivat, P., "Case-Sensitive String Support in ABNF", RFC
               7405, DOI 10.17487/RFC7405, December 2014,
               <http://www.rfc-editor.org/info/rfc7405>.
@@ -1277,11 +1282,6 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
    [RFC7493]  Bray, T., Ed., "The I-JSON Message Format", RFC 7493, DOI
               10.17487/RFC7493, March 2015,
               <http://www.rfc-editor.org/info/rfc7493>.
-
-
-
-
-
 
 
 
@@ -1304,11 +1304,6 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
               Procedures for Message Header Fields", BCP 90, RFC 3864,
               DOI 10.17487/RFC3864, September 2004,
               <http://www.rfc-editor.org/info/rfc3864>.
-
-   [RFC7231]  Fielding, R., Ed. and J. Reschke, Ed., "Hypertext Transfer
-              Protocol (HTTP/1.1): Semantics and Content", RFC 7231, DOI
-              10.17487/RFC7231, June 2014, <https://www.rfc-editor.org/
-              info/rfc7231>.
 
    [RFC7435]  Dukhovni, V., "Opportunistic Security: Some Protection
               Most of the Time", RFC 7435, DOI 10.17487/RFC7435,
@@ -1337,6 +1332,11 @@ Authors' Addresses
    Email: alex_brotman (at) comcast.com
 
 
+   Binu Ramakrishnan
+   Yahoo!, Inc
+
+   Email: rbinu (at) yahoo-inc (dot com)
+
 
 
 
@@ -1344,12 +1344,6 @@ Authors' Addresses
 Margolis, et al.          Expires May 12, 2018                 [Page 24]
 
 Internet-Draft                 SMTP-TLSRPT                 November 2017
-
-
-   Binu Ramakrishnan
-   Yahoo!, Inc
-
-   Email: rbinu (at) yahoo-inc (dot com)
 
 
    Janet Jones
@@ -1362,6 +1356,12 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
    Google, Inc
 
    Email: risher (at) google (dot com)
+
+
+
+
+
+
 
 
 

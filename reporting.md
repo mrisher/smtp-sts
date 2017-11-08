@@ -52,14 +52,13 @@
 .# Abstract
 
 A number of protocols exist for establishing encrypted channels between SMTP
-Mail Transfer Agents, including STARTTLS [@?RFC3207], DANE [@!RFC6698], and
-MTA-STS (TODO: Add ref). These protocols can fail due to misconfiguration or
-active attack, leading to undelivered messages or delivery over unencrypted or
-unauthenticated channels. This document describes a reporting mechanism and
-format by which sending systems can share statistics and specific information
-about potential failures with recipient domains. Recipient domains can then use
-this information to both detect potential attackers and diagnose unintentional
-misconfigurations.
+Mail Transfer Agents, including STARTTLS, DANE TLSA, and MTA-STS. These
+protocols can fail due to misconfiguration or active attack, leading to
+undelivered messages or delivery over unencrypted or unauthenticated channels.
+This document describes a reporting mechanism and format by which sending
+systems can share statistics and specific information about potential failures
+with recipient domains. Recipient domains can then use this information to both
+detect potential attackers and diagnose unintentional misconfigurations.
 
 {mainmatter}
 
@@ -135,8 +134,8 @@ Policies consist of the following directives:
   Schema",  for more information). Two URI schemes are supported: `mailto` 
   and `https`.  As with DMARC [@?RFC7489], the policy domain can specify a 
   comma-separated list of URIs.
-* In the case of `https`, reports should be submitted via POST ([@!RFC2818]) 
-  to the specified URI.  Report submitters MAY ignore certificate validation
+* In the case of `https`, reports should be submitted via POST ([@!RFC7231]) to
+  the specified URI.  Report submitters MAY ignore certificate validation
   errors when submitting reports via https.
 * In the case of `mailto`, reports should be submitted to the specified
   email address ([@!RFC6068]). When sending failure reports via SMTP, sending
@@ -273,7 +272,7 @@ to grow over time based on real-world experience. The initial set is:
 * `certificate-host-mismatch`: This indicates that the certificate presented did
   not adhere to the constraints specified in the MTA-STS or DANE policy, e.g.
   if the MX does not match any identities listed in the Subject Alternate Name
-  (SAN) [RFC5280].
+  (SAN) [@!RFC5280].
 * `certificate-expired`: This indicates that the certificate has expired.
 * `certificate-not-trusted`: This a label that covers multiple certificate
   related failures that include, but not limited to errors such as
