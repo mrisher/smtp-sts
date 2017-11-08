@@ -460,6 +460,31 @@ following events as reportable failures:
   not present a certificate which validates according to the applied policy,
   except if that policy's mode is `none`.
 
+# Interoperability Considerations
+
+## SNI Support
+
+To ensure that the server sends the right certificate chain, the SMTP client
+MUST have support for the TLS SNI extension [@!RFC6066]. When connecting to a
+HTTP server to retrieve the MTA-STS policy, the SNI extension MUST contain the
+name of the policy host (e.g. `mta-sts.example.com`). When connecting to an SMTP
+server, the SNI extension MUST contain the MX hostname.
+
+HTTP servers used to deliver MTA-STS policies MUST have support for the TLS SNI
+extension and MAY rely on SNI to determine which certificate chain to present to
+the client. In either case, HTTP servers MUST respond with a certificate chain
+that matches the policy hostname or abort the TLS handshake if unable to do so.
+
+SMTP servers MUST have support for the TLS SNI extension and MAY rely on SNI to
+determine which certificate chain to present to the client. If the client sends
+no SNI extension or sends an SNI extension for an unsupported server name, the
+server MUST simply send a fallback certificate chain of its choice. The reason
+for not enforcing strict matching of the requested SNI hostname is that MTA-STS
+TLS clients may be typically willing to accept multiple server names but can
+only send one name in the SNI extension. The server's fallback certificate may
+match a different name that is acceptable to the client, e.g., the original
+next-hop domain.
+
 # Operational Considerations
 
 ## Policy Updates

@@ -233,10 +233,11 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
    o  In the case of "mailto", reports should be submitted to the
       specified email address ([RFC6068]).  When sending failure reports
       via SMTP, sending MTAs MUST deliver reports despite any TLS-
-      related failures.  This may mean that the reports are delivered in
-      the clear.  Additionally, reports sent via SMTP MUST contain a
-      valid DKIM [RFC6376] signature by the reporting domain.  Reports
-      lacking such a signature MUST be ignored by the recipient.  DKIM
+      related failuresand SHOULD NOT include this SMTP session in the
+      next report.  This may mean that the reports are delivered in the
+      clear.  Additionally, reports sent via SMTP MUST contain a valid
+      DKIM [RFC6376] signature by the reporting domain.  Reports lacking
+      such a signature MUST be ignored by the recipient.  DKIM
       signatures must not use the "l=" attribute to limit the body
       length used in the signature.
 
@@ -273,7 +274,6 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
    resolver, records which do not begin with "v=TLSRPTv1;" are
    discarded.  If the number of resulting records is not one, senders
    MUST assume the recipient domain does not implement TLSRPT.  If the
-   resulting TXT record contains multiple strings, then the record MUST
 
 
 
@@ -282,6 +282,7 @@ Margolis, et al.          Expires April 1, 2018                 [Page 5]
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
 
+   resulting TXT record contains multiple strings, then the record MUST
    be treated as if those strings are concatenated together without
    adding spaces.
 
@@ -329,7 +330,6 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
          a semicolon) (3) The literal string "no-policy-found", if
          neither a DANE nor MTA-STS policy could be found.
 
-      *  The domain for which the policy is applied
 
 
 
@@ -337,6 +337,8 @@ Margolis, et al.          Expires April 1, 2018                 [Page 6]
 
 Internet-Draft                 SMTP-TLSRPT                September 2017
 
+
+      *  The domain for which the policy is applied
 
       *  The MX host
 
@@ -382,8 +384,6 @@ Internet-Draft                 SMTP-TLSRPT                September 2017
    The list of result types will start with the minimal set below, and
    is expected to grow over time based on real-world experience.  The
    initial set is:
-
-
 
 
 
