@@ -234,8 +234,10 @@ Aggregate reports contain the following fields:
 
 Note that the failure types are non-exclusive; an aggregate report may contain
 overlapping `counts` of failure types when a single send attempt encountered
-multiple errors.  Additionally, in the event that only one policy is being 
-reported, the report SHOULD utilize "policies" array in the report body.
+multiple errors. Reporters may report multiple applied policies (for example, an
+MTA-STS policy and a DANE TLSA record for the same domain and MX); even in the
+case where only a single policy was applied, the "policies" field of the report
+body must be an array and not a singular value.
 
 ## Report Time-frame
 

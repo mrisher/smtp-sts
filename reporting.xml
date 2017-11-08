@@ -306,7 +306,10 @@ type.</t>
 </t>
 <t>Note that the failure types are non-exclusive; an aggregate report may contain
 overlapping <spanx style="verb">counts</spanx> of failure types when a single send attempt encountered
-multiple errors.
+multiple errors. Reporters may report multiple applied policies (for example, an
+MTA-STS policy and a DANE TLSA record for the same domain and MX); even in the
+case where only a single policy was applied, the &quot;policies&quot; field of the report
+body must be an array and not a singular value.
 </t>
 
 <section anchor="report-timeframe" title="Report Time-frame">
@@ -438,28 +441,32 @@ be reported.
   },
   "contact-info": email-address,
   "report-id": report-id,
-  "policy": {
-    "policy-type": policy-type,
-    "policy-string": policy-string,
-    "policy-domain": domain,
-    "mx-host": mx-host-pattern
-  },
-  "summary": {
-    "total-successful-session-count": total-successful-session-count,
-    "total-failure-session-count:" total-failure-session-count
-  }
-  "failure-details": [
-    {
-      "result-type": result-type,
-      "sending-mta-ip": ip-address,
-      "receiving-mx-hostname": receiving-mx-hostname,
-      "receiving-mx-helo": receiving-mx-helo,
-      "failed-session-count": failed-session-count,
-      "additional-information": additional-info-uri,
-      "failure-reason-code": "failure-reason-code"
+  "policies": [{
+    "policy": {
+      "policy-type": policy-type,
+      "policy-string": policy-string,
+      "policy-domain": domain,
+      "mx-host": mx-host-pattern
+    },
+    "summary": {
+      "total-successful-session-count": total-successful-session-count,
+      "total-failure-session-count": total-failure-session-count
+    },
+    "failure-details": [
+      {
+        "result-type": result-type,
+        "sending-mta-ip": ip-address,
+        "receiving-mx-hostname": receiving-mx-hostname,
+        "receiving-mx-helo": receiving-mx-helo,
+        "failed-session-count": failed-session-count,
+        "additional-information": additional-info-uri,
+        "failure-reason-code": failure-reason-code
+        }
+      ]
     }
   ]
 }
+
 </artwork></figure>
 <t>
 <list style="symbols">
@@ -972,36 +979,39 @@ _smtp-tlsrpt.mail.example.com. IN TXT \
   },
   "contact-info": "sts-reporting@company-x.com",
   "report-id": "5065427c-23d3-47ca-b6e0-946ea0e8c4be",
-  "policy": {
-    "policy-type": "sts",
-    "policy-string": "version: STSv1\r\nmode: report\r\nmx: .mail.company-y.com\r\nmax_age: 86400",
-    "policy-domain": "company-y.com",
-    "mx-host": ".mail.company-y.com"
-  },
-  "summary": {
-    "total-successful-session-count": 5326,
-    "total-failure-session-count": 303
-  },
-  "failure-details": [{
-    "result-type": "certificate-expired",
-    "sending-mta-ip": "98.136.216.25",
-    "receiving-mx-hostname": "mx1.mail.company-y.com",
-    "failed-session-count": 100
-  }, {
-    "result-type": "starttls-not-supported",
-    "sending-mta-ip": "98.22.33.99",
-    "receiving-mx-hostname": "mx2.mail.company-y.com",
-    "failed-session-count": 200,
-    "additional-information": "https://reports.company-x.com/
-      report_info?id=5065427c-23d3#StarttlsNotSupported"
-  }, {
-    "result-type": "validation-failure",
-    "sending-mta-ip": "47.97.15.2",
-    "receiving-mx-hostname": "mx-backup.mail.company-y.com",
-    "failed-session-count": 3,
-    "failure-error-code": "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED"
+  "policies": [{
+    "policy": {
+      "policy-type": "sts",
+      "policy-string": "version: STSv1\r\nmode: report\r\nmx: .mail.company-y.com\r\nmax_age: 86400",
+      "policy-domain": "company-y.com",
+      "mx-host": ".mail.company-y.com"
+    },
+    "summary": {
+      "total-successful-session-count": 5326,
+      "total-failure-session-count": 303
+    },
+    "failure-details": [{
+      "result-type": "certificate-expired",
+      "sending-mta-ip": "98.136.216.25",
+      "receiving-mx-hostname": "mx1.mail.company-y.com",
+      "failed-session-count": 100
+    }, {
+      "result-type": "starttls-not-supported",
+      "sending-mta-ip": "98.22.33.99",
+      "receiving-mx-hostname": "mx2.mail.company-y.com",
+      "failed-session-count": 200,
+      "additional-information": "https://reports.company-x.com/ 
+        report_info ? id = 5065427 c - 23 d3# StarttlsNotSupported "
+    }, {
+      "result-type": "validation-failure",
+      "sending-mta-ip": "47.97.15.2",
+      "receiving-mx-hostname": "mx-backup.mail.company-y.com",
+      "failed-session-count": 3,
+      "failure-error-code": "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED"
+    }]
   }]
 }
+
 </artwork></figure>
 <t>Figure: Example JSON report for a messages from Company-X to Company-Y, where
 100 sessions were attempted to Company Y servers with an expired certificate and
