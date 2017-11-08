@@ -383,7 +383,7 @@ considerations:
 </list>
 </t>
 <t>The certificate MAY be checked for revocation via the Online Certificate Status
-Protocol (OCSP) <xref target="RFC2560"/>, certificate revocation lists (CRLs), or some other
+Protocol (OCSP) <xref target="RFC6960"/>, certificate revocation lists (CRLs), or some other
 mechanism.
 </t>
 <t>Policies fetched via HTTPS are only valid if the HTTP response code is 200 (OK).
@@ -448,7 +448,7 @@ as described in <xref target="policy-application"/>, &quot;Policy Application&qu
 trusted by the sending MTA and be non-expired. The certificate MUST have a CN-ID
 (<xref target="RFC6125"/>) or subject alternative name (SAN, <xref target="RFC5280"/>) with a DNS-ID
 matching the <spanx style="verb">mx</spanx> pattern. The MX's certificate MAY also be checked for
-revocation via OCSP <xref target="RFC2560"/>, CRLs <xref target="RFC6818"/>, or some other mechanism.
+revocation via OCSP <xref target="RFC6960"/>, CRLs <xref target="RFC6818"/>, or some other mechanism.
 </t>
 <t>Because the <spanx style="verb">mx</spanx> patterns are not hostnames, however, matching is not identical
 to other common cases of X.509 certificate authentication (as described, for
@@ -840,7 +840,7 @@ victim domain, and similar.
 </t>
 <t>One approach commonly employed by Web browsers to help mitigate against some of
 these attacks is to allow for revocation of compromised or fraudulent
-certificates via OCSP <xref target="RFC2560"/> or CRLs <xref target="RFC6818"/>. Such mechanisms
+certificates via OCSP <xref target="RFC6960"/> or CRLs <xref target="RFC6818"/>. Such mechanisms
 themselves represent tradeoffs and are not universally implemented; we
 nonetheless recommend implementors of MTA-STS to implement revocation mechanisms
 which are most applicable to their implementations.
@@ -1043,12 +1043,12 @@ func handleMessage(message) {
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7525.xml"?>
 </references>
 <references title="Informative References">
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2560.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4033.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5322.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5891.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6818.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6960.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7234.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7672.xml"?>
 </references>

@@ -315,7 +315,7 @@ considerations:
   '\*' as the complete left-most label within the identifier.
 
 The certificate MAY be checked for revocation via the Online Certificate Status
-Protocol (OCSP) [@?RFC2560], certificate revocation lists (CRLs), or some other
+Protocol (OCSP) [@?RFC6960], certificate revocation lists (CRLs), or some other
 mechanism.
 
 Policies fetched via HTTPS are only valid if the HTTP response code is 200 (OK).
@@ -376,7 +376,7 @@ The certificate presented by the receiving MX MUST chain to a root CA that is
 trusted by the sending MTA and be non-expired. The certificate MUST have a CN-ID
 ([@!RFC6125]) or subject alternative name (SAN, [@!RFC5280]) with a DNS-ID
 matching the `mx` pattern. The MX's certificate MAY also be checked for
-revocation via OCSP [@?RFC2560], CRLs [@?RFC6818], or some other mechanism.
+revocation via OCSP [@?RFC6960], CRLs [@?RFC6818], or some other mechanism.
 
 Because the `mx` patterns are not hostnames, however, matching is not identical
 to other common cases of X.509 certificate authentication (as described, for
@@ -730,7 +730,7 @@ victim domain, and similar.
 
 One approach commonly employed by Web browsers to help mitigate against some of
 these attacks is to allow for revocation of compromised or fraudulent
-certificates via OCSP [@?RFC2560] or CRLs [@?RFC6818]. Such mechanisms
+certificates via OCSP [@?RFC6960] or CRLs [@?RFC6818]. Such mechanisms
 themselves represent tradeoffs and are not universally implemented; we
 nonetheless recommend implementors of MTA-STS to implement revocation mechanisms
 which are most applicable to their implementations.

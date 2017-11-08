@@ -425,7 +425,7 @@ Internet-Draft                   MTA-STS                   November 2017
       identifier.
 
    The certificate MAY be checked for revocation via the Online
-   Certificate Status Protocol (OCSP) [RFC2560], certificate revocation
+   Certificate Status Protocol (OCSP) [RFC6960], certificate revocation
    lists (CRLs), or some other mechanism.
 
    Policies fetched via HTTPS are only valid if the HTTP response code
@@ -512,7 +512,7 @@ Internet-Draft                   MTA-STS                   November 2017
    that is trusted by the sending MTA and be non-expired.  The
    certificate MUST have a CN-ID ([RFC6125]) or subject alternative name
    (SAN, [RFC5280]) with a DNS-ID matching the "mx" pattern.  The MX's
-   certificate MAY also be checked for revocation via OCSP [RFC2560],
+   certificate MAY also be checked for revocation via OCSP [RFC6960],
    CRLs [RFC6818], or some other mechanism.
 
    Because the "mx" patterns are not hostnames, however, matching is not
@@ -983,7 +983,7 @@ Internet-Draft                   MTA-STS                   November 2017
 
    One approach commonly employed by Web browsers to help mitigate
    against some of these attacks is to allow for revocation of
-   compromised or fraudulent certificates via OCSP [RFC2560] or CRLs
+   compromised or fraudulent certificates via OCSP [RFC6960] or CRLs
    [RFC6818].  Such mechanisms themselves represent tradeoffs and are
    not universally implemented; we nonetheless recommend implementors of
    MTA-STS to implement revocation mechanisms which are most applicable
@@ -1258,12 +1258,6 @@ Internet-Draft                   MTA-STS                   November 2017
 
 13.2.  Informative References
 
-   [RFC2560]  Myers, M., Ankney, R., Malpani, A., Galperin, S., and C.
-              Adams, "X.509 Internet Public Key Infrastructure Online
-              Certificate Status Protocol - OCSP", RFC 2560, DOI 10
-              .17487/RFC2560, June 1999,
-              <http://www.rfc-editor.org/info/rfc2560>.
-
    [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
               Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
               February 2002, <http://www.rfc-editor.org/info/rfc3207>.
@@ -1282,6 +1276,12 @@ Internet-Draft                   MTA-STS                   November 2017
               RFC5891, August 2010,
               <http://www.rfc-editor.org/info/rfc5891>.
 
+   [RFC6818]  Yee, P., "Updates to the Internet X.509 Public Key
+              Infrastructure Certificate and Certificate Revocation List
+              (CRL) Profile", RFC 6818, DOI 10.17487/RFC6818, January
+              2013, <https://www.rfc-editor.org/info/rfc6818>.
+
+
 
 
 
@@ -1290,10 +1290,11 @@ Margolis, et al.          Expires May 12, 2018                 [Page 23]
 Internet-Draft                   MTA-STS                   November 2017
 
 
-   [RFC6818]  Yee, P., "Updates to the Internet X.509 Public Key
-              Infrastructure Certificate and Certificate Revocation List
-              (CRL) Profile", RFC 6818, DOI 10.17487/RFC6818, January
-              2013, <https://www.rfc-editor.org/info/rfc6818>.
+   [RFC6960]  Santesson, S., Myers, M., Ankney, R., Malpani, A.,
+              Galperin, S., and C. Adams, "X.509 Internet Public Key
+              Infrastructure Online Certificate Status Protocol - OCSP",
+              RFC 6960, DOI 10.17487/RFC6960, June 2013, <https://www
+              .rfc-editor.org/info/rfc6960>.
 
    [RFC7234]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
               Ed., "Hypertext Transfer Protocol (HTTP/1.1): Caching",
@@ -1334,7 +1335,6 @@ Authors' Addresses
    Comcast, Inc
 
    Email: alex_brotman (at) comcast.com
-
 
 
 
