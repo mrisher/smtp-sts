@@ -198,12 +198,13 @@ to the specified URI.  Report submitters MAY ignore certificate validation
 errors when submitting reports via https.</t>
 <t>In the case of <spanx style="verb">mailto</spanx>, reports should be submitted to the specified
 email address (<xref target="RFC6068"/>). When sending failure reports via SMTP,
-sending MTAs MUST deliver reports despite any TLS-related failures.
-This may mean that the reports are delivered in the clear.  Additionally,
- reports sent via SMTP MUST contain a valid DKIM <xref target="RFC6376"/> signature by
- the reporting domain.  Reports lacking such a signature MUST be ignored
- by the recipient.  DKIM signatures must not use the &quot;l=&quot; attribute to
- limit the body length used in the signature.</t>
+sending MTAs MUST deliver reports despite any TLS-related failuresand
+SHOULD NOT include this SMTP session in the next report. This may mean
+that the reports are delivered in the clear. Additionally, reports sent
+via SMTP MUST contain a valid DKIM <xref target="RFC6376"/> signature by the reporting
+domain.  Reports lacking such a signature MUST be ignored by the recipient.
+DKIM signatures must not use the &quot;l=&quot; attribute to limit the body length
+used in the signature.</t>
 </list>
 </t>
 <t>The formal definition of the <spanx style="verb">_smtp-tlsrpt</spanx> TXT record, defined using
@@ -923,6 +924,17 @@ third party to send the attacker mail in order to trigger reports from the
 third party to the victim; this reduces the risk of such an attack and the
 need for a verification mechanism.</t>
 </list>
+</t>
+<t>Finally, because TLSRPT is intended to help administrators discover
+man-in-the-middle attacks against transport-layer encryption, including attacks
+designed to thwart negotiation of encrypted connections (by downgrading
+opportunistic encryption or, in the case of MTA-STS, preventing discovery of a
+new MTA-STS policy), we must also consider the risk that an adversary who can
+induce such a downgrade attack can also prevent discovery of the TLSRPT TXT
+record (and thus prevent discovery of the successful downgrade attack).
+Administrators are thus encouraged to deploy TLSRPT TXT records with a large TTL
+(reducing the window for successful attacks against DNS resolution of the
+record) or to deploy DNSSEC on the deploying zone.
 </t>
 </section>
 

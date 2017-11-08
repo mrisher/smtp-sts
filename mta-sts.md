@@ -543,6 +543,13 @@ Policy:
 < HTTP/1.1 200 OK  # Response proxies content from https://mta-sts.provider.com
 ~~~
 
+Note that while sending MTAs MUST NOT use HTTP caching when fetching policies
+via HTTPS, such caching may nonetheless be useful to a reverse proxy configured
+as described in this section. An HTTPS policy endpoint expecting to be proxied
+for multiple hosted domains--as with a large mail hosting provider or
+similar--may wish to indicate an HTTP Cache-Control `max-age` response directive
+(as specified in [@?RFC7234]) of 60 seconds as a reasonable value to save
+reverse proxies an unnecessarily high-rate of proxied policy fetching.
 
 ## Removing MTA-STS
 
