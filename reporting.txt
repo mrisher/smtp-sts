@@ -355,7 +355,7 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
    applied policies (for example, an MTA-STS policy and a DANE TLSA
    record for the same domain and MX); even in the case where only a
    single policy was applied, the "policies" field of the report body
-   must be an array and not a singular value.
+   MUST be an array and not a singular value.
 
 4.1.  Report Time-frame
 

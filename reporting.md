@@ -237,7 +237,7 @@ overlapping `counts` of failure types when a single send attempt encountered
 multiple errors. Reporters may report multiple applied policies (for example, an
 MTA-STS policy and a DANE TLSA record for the same domain and MX); even in the
 case where only a single policy was applied, the "policies" field of the report
-body must be an array and not a singular value.
+body MUST be an array and not a singular value.
 
 ## Report Time-frame
 
