@@ -163,15 +163,16 @@ The formal definition of the `_smtp-tlsrpt` TXT record, defined using
 	                    tlsrpt-uri *(*WSP "," *WSP tlsrpt-uri)
 
         tlsrpt-uri        = URI
-                          ; "URI" is imported from [@!RFC3986]; commas (ASCII
-                          ; 0x2C) and exclamation points (ASCII 0x21)
-                          ; MUST be encoded
+                          ; "URI" is imported from [@!RFC3986]; 
+			  ; commas (ASCII 0x2C) and exclamation 
+			  ; points (ASCII 0x21) MUST be encoded
 
         tlsrpt-extension  = tlsrpt-ext-name "=" tlsrpt-ext-value
 
-        tlsrpt-ext-name   = (ALPHA / DIGIT) *31(ALPHA / DIGIT / "_" / "-" / ".")
+        tlsrpt-ext-name   = (ALPHA / DIGIT) *31(ALPHA / 
+	                    DIGIT / "_" / "-" / ".")
 
-        tlsrpt-ext-value  = 1*(%x21-3A / %x3C / %x3E-7E)       ; chars excluding
+        tlsrpt-ext-value  = 1*(%x21-3A / %x3C / %x3E-7E) ; chars excluding
                                                          ; "=", ";", SP, and
                                                          ; control chars
 
@@ -833,7 +834,8 @@ _smtp-tlsrpt.mail.example.com. IN TXT \
   "policies": [{
     "policy": {
       "policy-type": "sts",
-      "policy-string": "version: STSv1\r\nmode: report\r\nmx: .mail.company-y.com\r\nmax_age: 86400",
+      "policy-string": "version: STSv1\r\nmode: report\r\n
+                mx: .mail.company-y.com\r\nmax_age: 86400",
       "policy-domain": "company-y.com",
       "mx-host": ".mail.company-y.com"
     },
