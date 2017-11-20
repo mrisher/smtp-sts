@@ -139,7 +139,7 @@ Policies consist of the following directives:
   errors when submitting reports via https.
 * In the case of `mailto`, reports should be submitted to the specified
   email address ([@!RFC6068]). When sending failure reports via SMTP, sending
-  MTAs MUST deliver reports despite any TLS-related failuresand SHOULD NOT
+  MTAs MUST deliver reports despite any TLS-related failures and SHOULD NOT
   include this SMTP session in the next report. This may mean that the reports
   are delivered in the clear. Additionally, reports sent via SMTP MUST contain a
   valid DKIM [@!RFC6376] signature by the reporting domain.  Reports lacking
