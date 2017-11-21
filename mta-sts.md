@@ -529,19 +529,20 @@ organization a TLS certificate which is valid for that host, or by setting up a
 "reverse proxy" (also known as a "gateway") server that serves as the Policy
 Domain's policy the policy currently served by the hosting organization.
 
-For example, given a user domain `user.com` hosted by a mail provider
-`provider.com`, the following configuration would allow policy delegation:
+For example, given a user domain `user.example` hosted by a mail provider
+`provider.example`, the following configuration would allow policy delegation:
 
 DNS:
 ~~~
-_mta-sts.user.com.  IN CNAME _mta-sts.provider.com.
+_mta-sts.user.example.  IN CNAME _mta-sts.provider.example.
 ~~~
 
 Policy:
 ~~~
 > GET /.well-known/mta-sts.txt
-> Host: mta-sts.user.com
-< HTTP/1.1 200 OK  # Response proxies content from https://mta-sts.provider.com
+> Host: mta-sts.user.example
+< HTTP/1.1 200 OK  # Response proxies content from
+                   # https://mta-sts.provider.example
 ~~~
 
 Note that while sending MTAs MUST NOT use HTTP caching when fetching policies

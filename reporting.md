@@ -829,15 +829,15 @@ _smtp-tlsrpt.mail.example.com. IN TXT \
     "start-datetime": "2016-04-01T00:00:00Z",
     "end-datetime": "2016-04-01T23:59:59Z"
   },
-  "contact-info": "sts-reporting@company-x.com",
+  "contact-info": "sts-reporting@company-x.example",
   "report-id": "5065427c-23d3-47ca-b6e0-946ea0e8c4be",
   "policies": [{
     "policy": {
       "policy-type": "sts",
       "policy-string": "version: STSv1\r\nmode: report\r\n
-                mx: .mail.company-y.com\r\nmax_age: 86400",
-      "policy-domain": "company-y.com",
-      "mx-host": ".mail.company-y.com"
+                mx: .mail.company-y.example\r\nmax_age: 86400",
+      "policy-domain": "company-y.example",
+      "mx-host": ".mail.company-y.example"
     },
     "summary": {
       "total-successful-session-count": 5326,
@@ -846,19 +846,19 @@ _smtp-tlsrpt.mail.example.com. IN TXT \
     "failure-details": [{
       "result-type": "certificate-expired",
       "sending-mta-ip": "98.136.216.25",
-      "receiving-mx-hostname": "mx1.mail.company-y.com",
+      "receiving-mx-hostname": "mx1.mail.company-y.example",
       "failed-session-count": 100
     }, {
       "result-type": "starttls-not-supported",
       "sending-mta-ip": "98.22.33.99",
-      "receiving-mx-hostname": "mx2.mail.company-y.com",
+      "receiving-mx-hostname": "mx2.mail.company-y.example",
       "failed-session-count": 200,
-      "additional-information": "https://reports.company-x.com/ 
+      "additional-information": "https://reports.company-x.example/ 
         report_info ? id = 5065427 c - 23 d3# StarttlsNotSupported "
     }, {
       "result-type": "validation-failure",
       "sending-mta-ip": "47.97.15.2",
-      "receiving-mx-hostname": "mx-backup.mail.company-y.com",
+      "receiving-mx-hostname": "mx-backup.mail.company-y.example",
       "failed-session-count": 3,
       "failure-error-code": "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED"
     }]

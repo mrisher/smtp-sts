@@ -233,7 +233,7 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
    o  In the case of "mailto", reports should be submitted to the
       specified email address ([RFC6068]).  When sending failure reports
       via SMTP, sending MTAs MUST deliver reports despite any TLS-
-      related failuresand SHOULD NOT include this SMTP session in the
+      related failures and SHOULD NOT include this SMTP session in the
       next report.  This may mean that the reports are delivered in the
       clear.  Additionally, reports sent via SMTP MUST contain a valid
       DKIM [RFC6376] signature by the reporting domain.  Reports lacking
@@ -258,22 +258,22 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
                     tlsrpt-uri *(*WSP "," *WSP tlsrpt-uri)
 
     tlsrpt-uri        = URI
-                      ; "URI" is imported from [@!RFC3986]; commas (ASCII
-                      ; 0x2C) and exclamation points (ASCII 0x21)
-                      ; MUST be encoded
+                      ; "URI" is imported from [@!RFC3986];
+          ; commas (ASCII 0x2C) and exclamation
+          ; points (ASCII 0x21) MUST be encoded
 
     tlsrpt-extension  = tlsrpt-ext-name "=" tlsrpt-ext-value
 
-    tlsrpt-ext-name   = (ALPHA / DIGIT) *31(ALPHA / DIGIT / "_" / "-" / ".")
+    tlsrpt-ext-name   = (ALPHA / DIGIT) *31(ALPHA /
+                    DIGIT / "_" / "-" / ".")
 
-    tlsrpt-ext-value  = 1*(%x21-3A / %x3C / %x3E-7E)       ; chars excluding
+    tlsrpt-ext-value  = 1*(%x21-3A / %x3C / %x3E-7E) ; chars excluding
                                                      ; "=", ";", SP, and
                                                      ; control chars
 
    If multiple TXT records for "_smtp-tlsrpt" are returned by the
    resolver, records which do not begin with "v=TLSRPTv1;" are
    discarded.  If the number of resulting records is not one, senders
-   MUST assume the recipient domain does not implement TLSRPT.  If the
 
 
 
@@ -282,6 +282,7 @@ Margolis, et al.          Expires May 12, 2018                  [Page 5]
 Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
+   MUST assume the recipient domain does not implement TLSRPT.  If the
    resulting TXT record contains multiple strings, then the record MUST
    be treated as if those strings are concatenated together without
    adding spaces.
@@ -329,7 +330,6 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
          string, with each RR entry of the RRset listed and separated by
          a semicolon) (3) The literal string "no-policy-found", if
          neither a DANE nor MTA-STS policy could be found.
-
 
 
 
@@ -1178,54 +1178,54 @@ Margolis, et al.          Expires May 12, 2018                 [Page 21]
 Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
-{
-  "organization-name": "Company-X",
-  "date-range": {
-    "start-datetime": "2016-04-01T00:00:00Z",
-    "end-datetime": "2016-04-01T23:59:59Z"
-  },
-  "contact-info": "sts-reporting@company-x.com",
-  "report-id": "5065427c-23d3-47ca-b6e0-946ea0e8c4be",
-  "policies": [{
-    "policy": {
-      "policy-type": "sts",
-      "policy-string": "version: STSv1\r\nmode: report\r\nmx: .mail.company-y.com\r\nmax_age: 86400",
-      "policy-domain": "company-y.com",
-      "mx-host": ".mail.company-y.com"
-    },
-    "summary": {
-      "total-successful-session-count": 5326,
-      "total-failure-session-count": 303
-    },
-    "failure-details": [{
-      "result-type": "certificate-expired",
-      "sending-mta-ip": "98.136.216.25",
-      "receiving-mx-hostname": "mx1.mail.company-y.com",
-      "failed-session-count": 100
-    }, {
-      "result-type": "starttls-not-supported",
-      "sending-mta-ip": "98.22.33.99",
-      "receiving-mx-hostname": "mx2.mail.company-y.com",
-      "failed-session-count": 200,
-      "additional-information": "https://reports.company-x.com/
-        report_info ? id = 5065427 c - 23 d3# StarttlsNotSupported "
-    }, {
-      "result-type": "validation-failure",
-      "sending-mta-ip": "47.97.15.2",
-      "receiving-mx-hostname": "mx-backup.mail.company-y.com",
-      "failed-session-count": 3,
-      "failure-error-code": "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED"
-    }]
-  }]
-}
+   {
+     "organization-name": "Company-X",
+     "date-range": {
+       "start-datetime": "2016-04-01T00:00:00Z",
+       "end-datetime": "2016-04-01T23:59:59Z"
+     },
+     "contact-info": "sts-reporting@company-x.example",
+     "report-id": "5065427c-23d3-47ca-b6e0-946ea0e8c4be",
+     "policies": [{
+       "policy": {
+         "policy-type": "sts",
+         "policy-string": "version: STSv1\r\nmode: report\r\n
+                   mx: .mail.company-y.example\r\nmax_age: 86400",
+         "policy-domain": "company-y.example",
+         "mx-host": ".mail.company-y.example"
+       },
+       "summary": {
+         "total-successful-session-count": 5326,
+         "total-failure-session-count": 303
+       },
+       "failure-details": [{
+         "result-type": "certificate-expired",
+         "sending-mta-ip": "98.136.216.25",
+         "receiving-mx-hostname": "mx1.mail.company-y.example",
+         "failed-session-count": 100
+       }, {
+         "result-type": "starttls-not-supported",
+         "sending-mta-ip": "98.22.33.99",
+         "receiving-mx-hostname": "mx2.mail.company-y.example",
+         "failed-session-count": 200,
+         "additional-information": "https://reports.company-x.example/
+           report_info ? id = 5065427 c - 23 d3# StarttlsNotSupported "
+       }, {
+         "result-type": "validation-failure",
+         "sending-mta-ip": "47.97.15.2",
+         "receiving-mx-hostname": "mx-backup.mail.company-y.example",
+         "failed-session-count": 3,
+         "failure-error-code": "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED"
+       }]
+     }]
+   }
 
 
    Figure: Example JSON report for a messages from Company-X to
    Company-Y, where 100 sessions were attempted to Company Y servers
    with an expired certificate and 200 sessions were attempted to
    Company Y servers that did not successfully respond to the "STARTTLS"
-   command.  Additionally 3 sessions failed due to
-   "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED".
+
 
 
 
@@ -1233,6 +1233,9 @@ Margolis, et al.          Expires May 12, 2018                 [Page 22]
 
 Internet-Draft                 SMTP-TLSRPT                 November 2017
 
+
+   command.  Additionally 3 sessions failed due to
+   "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED".
 
 10.  References
 
@@ -1276,10 +1279,7 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
               10.17487/RFC5322, October 2008,
               <http://www.rfc-editor.org/info/rfc5322>.
 
-   [RFC5891]  Klensin, J., "Internationalized Domain Names in
-              Applications (IDNA): Protocol", RFC 5891, DOI 10.17487/
-              RFC5891, August 2010,
-              <http://www.rfc-editor.org/info/rfc5891>.
+
 
 
 
@@ -1289,6 +1289,11 @@ Margolis, et al.          Expires May 12, 2018                 [Page 23]
 
 Internet-Draft                 SMTP-TLSRPT                 November 2017
 
+
+   [RFC5891]  Klensin, J., "Internationalized Domain Names in
+              Applications (IDNA): Protocol", RFC 5891, DOI 10.17487/
+              RFC5891, August 2010,
+              <http://www.rfc-editor.org/info/rfc5891>.
 
    [RFC5952]  Kawamura, S. and M. Kawashima, "A Recommendation for IPv6
               Address Text Representation", RFC 5952, DOI 10.17487/
@@ -1333,11 +1338,6 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
    [RFC7493]  Bray, T., Ed., "The I-JSON Message Format", RFC 7493, DOI
               10.17487/RFC7493, March 2015,
               <http://www.rfc-editor.org/info/rfc7493>.
-
-
-
-
-
 
 
 

@@ -615,22 +615,23 @@ organization a TLS certificate which is valid for that host, or by setting up a
 &quot;reverse proxy&quot; (also known as a &quot;gateway&quot;) server that serves as the Policy
 Domain's policy the policy currently served by the hosting organization.
 </t>
-<t>For example, given a user domain <spanx style="verb">user.com</spanx> hosted by a mail provider
-<spanx style="verb">provider.com</spanx>, the following configuration would allow policy delegation:
+<t>For example, given a user domain <spanx style="verb">user.example</spanx> hosted by a mail provider
+<spanx style="verb">provider.example</spanx>, the following configuration would allow policy delegation:
 </t>
 <t>DNS:
 </t>
 
 <figure align="center"><artwork align="center">
-_mta-sts.user.com.  IN CNAME _mta-sts.provider.com.
+_mta-sts.user.example.  IN CNAME _mta-sts.provider.example.
 </artwork></figure>
 <t>Policy:
 </t>
 
 <figure align="center"><artwork align="center">
 &gt; GET /.well-known/mta-sts.txt
-&gt; Host: mta-sts.user.com
-&lt; HTTP/1.1 200 OK  # Response proxies content from https://mta-sts.provider.com
+&gt; Host: mta-sts.user.example
+&lt; HTTP/1.1 200 OK  # Response proxies content from
+                   # https://mta-sts.provider.example
 </artwork></figure>
 <t>Note that while sending MTAs MUST NOT use HTTP caching when fetching policies
 via HTTPS, such caching may nonetheless be useful to a reverse proxy configured

@@ -713,13 +713,13 @@ Internet-Draft                   MTA-STS                   November 2017
    (also known as a "gateway") server that serves as the Policy Domain's
    policy the policy currently served by the hosting organization.
 
-   For example, given a user domain "user.com" hosted by a mail provider
-   "provider.com", the following configuration would allow policy
-   delegation:
+   For example, given a user domain "user.example" hosted by a mail
+   provider "provider.example", the following configuration would allow
+   policy delegation:
 
    DNS:
 
-            _mta-sts.user.com.  IN CNAME _mta-sts.provider.com.
+        _mta-sts.user.example.  IN CNAME _mta-sts.provider.example.
 
    Policy:
 
@@ -730,9 +730,10 @@ Margolis, et al.          Expires May 12, 2018                 [Page 13]
 Internet-Draft                   MTA-STS                   November 2017
 
 
-> GET /.well-known/mta-sts.txt
-> Host: mta-sts.user.com
-< HTTP/1.1 200 OK  # Response proxies content from https://mta-sts.provider.com
+           > GET /.well-known/mta-sts.txt
+           > Host: mta-sts.user.example
+           < HTTP/1.1 200 OK  # Response proxies content from
+                              # https://mta-sts.provider.example
 
    Note that while sending MTAs MUST NOT use HTTP caching when fetching
    policies via HTTPS, such caching may nonetheless be useful to a
@@ -775,7 +776,6 @@ Internet-Draft                   MTA-STS                   November 2017
    registry as described below:
 
    URI Suffix: mta-sts.txt Change Controller: IETF
-
 
 
 

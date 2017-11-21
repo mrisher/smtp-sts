@@ -198,7 +198,7 @@ the specified URI.  Report submitters MAY ignore certificate validation
 errors when submitting reports via https.</t>
 <t>In the case of <spanx style="verb">mailto</spanx>, reports should be submitted to the specified
 email address (<xref target="RFC6068"/>). When sending failure reports via SMTP, sending
-MTAs MUST deliver reports despite any TLS-related failuresand SHOULD NOT
+MTAs MUST deliver reports despite any TLS-related failures and SHOULD NOT
 include this SMTP session in the next report. This may mean that the reports
 are delivered in the clear. Additionally, reports sent via SMTP MUST contain a
 valid DKIM <xref target="RFC6376"/> signature by the reporting domain.  Reports lacking
@@ -225,15 +225,16 @@ use the &quot;l=&quot; attribute to limit the body length used in the signature.
                     tlsrpt-uri *(*WSP "," *WSP tlsrpt-uri)
 
     tlsrpt-uri        = URI
-                      ; "URI" is imported from [@!RFC3986]; commas (ASCII
-                      ; 0x2C) and exclamation points (ASCII 0x21)
-                      ; MUST be encoded
+                      ; "URI" is imported from [@!RFC3986]; 
+          ; commas (ASCII 0x2C) and exclamation 
+          ; points (ASCII 0x21) MUST be encoded
 
     tlsrpt-extension  = tlsrpt-ext-name "=" tlsrpt-ext-value
 
-    tlsrpt-ext-name   = (ALPHA / DIGIT) *31(ALPHA / DIGIT / "_" / "-" / ".")
+    tlsrpt-ext-name   = (ALPHA / DIGIT) *31(ALPHA / 
+                    DIGIT / "_" / "-" / ".")
 
-    tlsrpt-ext-value  = 1*(%x21-3A / %x3C / %x3E-7E)       ; chars excluding
+    tlsrpt-ext-value  = 1*(%x21-3A / %x3C / %x3E-7E) ; chars excluding
                                                      ; "=", ";", SP, and
                                                      ; control chars
 </artwork></figure>
@@ -977,14 +978,15 @@ _smtp-tlsrpt.mail.example.com. IN TXT \
     "start-datetime": "2016-04-01T00:00:00Z",
     "end-datetime": "2016-04-01T23:59:59Z"
   },
-  "contact-info": "sts-reporting@company-x.com",
+  "contact-info": "sts-reporting@company-x.example",
   "report-id": "5065427c-23d3-47ca-b6e0-946ea0e8c4be",
   "policies": [{
     "policy": {
       "policy-type": "sts",
-      "policy-string": "version: STSv1\r\nmode: report\r\nmx: .mail.company-y.com\r\nmax_age: 86400",
-      "policy-domain": "company-y.com",
-      "mx-host": ".mail.company-y.com"
+      "policy-string": "version: STSv1\r\nmode: report\r\n
+                mx: .mail.company-y.example\r\nmax_age: 86400",
+      "policy-domain": "company-y.example",
+      "mx-host": ".mail.company-y.example"
     },
     "summary": {
       "total-successful-session-count": 5326,
@@ -993,19 +995,19 @@ _smtp-tlsrpt.mail.example.com. IN TXT \
     "failure-details": [{
       "result-type": "certificate-expired",
       "sending-mta-ip": "98.136.216.25",
-      "receiving-mx-hostname": "mx1.mail.company-y.com",
+      "receiving-mx-hostname": "mx1.mail.company-y.example",
       "failed-session-count": 100
     }, {
       "result-type": "starttls-not-supported",
       "sending-mta-ip": "98.22.33.99",
-      "receiving-mx-hostname": "mx2.mail.company-y.com",
+      "receiving-mx-hostname": "mx2.mail.company-y.example",
       "failed-session-count": 200,
-      "additional-information": "https://reports.company-x.com/ 
+      "additional-information": "https://reports.company-x.example/ 
         report_info ? id = 5065427 c - 23 d3# StarttlsNotSupported "
     }, {
       "result-type": "validation-failure",
       "sending-mta-ip": "47.97.15.2",
-      "receiving-mx-hostname": "mx-backup.mail.company-y.com",
+      "receiving-mx-hostname": "mx-backup.mail.company-y.example",
       "failed-session-count": 3,
       "failure-error-code": "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED"
     }]
