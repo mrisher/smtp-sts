@@ -231,24 +231,24 @@ Internet-Draft                   MTA-STS                   November 2017
    The formal definition of the "_mta-sts" TXT record, defined using
    [RFC7405], is as follows:
 
-sts-text-record = sts-version 1*(field-delim sts-field) [field-delim]
+   sts-text-record = sts-version 1*(field-delim sts-field) [field-delim]
 
-sts-field       = sts-id /                        ; Note that sts-id record
-                  sts-extension                   ; is required.
+   sts-field       = sts-id /                 ; Note that sts-id record
+                     sts-extension            ; is required.
 
-field-delim     = *WSP ";" *WSP
+   field-delim     = *WSP ";" *WSP
 
-sts-version     = %s"v=STSv1"
+   sts-version     = %s"v=STSv1"
 
-sts-id          = %s"id=" 1*32(ALPHA / DIGIT)     ; id=...
+   sts-id          = %s"id=" 1*32(ALPHA / DIGIT)     ; id=...
 
-sts-extension   = sts-ext-name "=" sts-ext-value  ; name=value
+   sts-extension   = sts-ext-name "=" sts-ext-value  ; name=value
 
-sts-ext-name    = (ALPHA / DIGIT) *31(ALPHA / DIGIT / "_" / "-" / ".")
+   sts-ext-name    = (ALPHA / DIGIT)
+                     *31(ALPHA / DIGIT / "_" / "-" / ".")
 
-sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)    ; chars excluding "=",
-                                                  ; ";", SP, and control
-                                                  ; chars
+   sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)
+                     ; chars excluding "=", ";", SP, and control chars
 
    If multiple TXT records for "_mta-sts" are returned by the resolver,
    records which do not begin with "v=STSv1;" are discarded.  If the
@@ -325,11 +325,11 @@ Internet-Draft                   MTA-STS                   November 2017
    The formal definition of the policy resource, defined using
    [RFC7405], is as follows:
 
-sts-policy-record        = *WSP sts-policy-field *WSP
-                           *(CRLF *WSP sts-policy-field *WSP)
-                           [CRLF]
+   sts-policy-record        = *WSP sts-policy-field *WSP
+                              *(CRLF *WSP sts-policy-field *WSP)
+                              [CRLF]
 
-sts-policy-field         = sts-policy-version /           ; required once
+   sts-policy-field         = sts-policy-version /      ; required once
 
 
 
@@ -338,54 +338,54 @@ Margolis, et al.          Expires May 12, 2018                  [Page 6]
 Internet-Draft                   MTA-STS                   November 2017
 
 
-                           sts-policy-mode    /           ; required once
-                           sts-policy-max-age /           ; required once
-                           0*(sts-policy-mx *WSP CRLF) /  ; required at
-                                                          ; least once
-                                                          ; except when mode
-                                                          ; is "none"
-                           sts-policy-extension           ; other fields
+                              sts-policy-mode    /      ; required once
+                              sts-policy-max-age /      ; required once
 
-field-delim              = ":" *WSP
+                              0*(sts-policy-mx *WSP CRLF) /
+                              ; required at least once, except when
+                              ; mode is "none"
 
-sts-policy-version       = sts-policy-version-field field-delim
-                           sts-policy-version-value
+                              sts-policy-extension      ; other fields
 
-sts-policy-version-field = %s"version"
+   field-delim              = ":" *WSP
 
-sts-policy-version-value = %s"STSv1"
+   sts-policy-version       = sts-policy-version-field field-delim
+                              sts-policy-version-value
 
-sts-policy-mode          = sts-policy-mode-field field-delim
-                           sts-policy-mode-value
+   sts-policy-version-field = %s"version"
 
-sts-policy-mode-field    = %s"mode"
+   sts-policy-version-value = %s"STSv1"
 
-sts-policy-model-value   =  %s"report" / %s"enforce" / %s"none"
+   sts-policy-mode          = sts-policy-mode-field field-delim
+                              sts-policy-mode-value
 
-sts-policy-mx            = sts-policy-mx-field field-delim
-                           sts-policy-mx-value
+   sts-policy-mode-field    = %s"mode"
 
-sts-policy-mx-field      = %s"mx"
+   sts-policy-model-value   =  %s"report" / %s"enforce" / %s"none"
 
-sts-policy-mx-value      = 1*(ALPHA / DIGIT / "_" / "-" / ".")
+   sts-policy-mx            = sts-policy-mx-field field-delim
+                              sts-policy-mx-value
 
-sts-policy-max-age       = sts-policy-max-age-field field-delim
-                           sts-policy-max-age-value
+   sts-policy-mx-field      = %s"mx"
 
-sts-policy-max-age-field = %s"max_age"
+   sts-policy-mx-value      = 1*(ALPHA / DIGIT / "_" / "-" / ".")
 
-sts-policy-max-age-value = 1*10(DIGIT)
+   sts-policy-max-age       = sts-policy-max-age-field field-delim
+                              sts-policy-max-age-value
 
-sts-policy-extension     = sts-policy-ext-name field-delim ; additional
-                           sts-policy-ext-value            ; extension
-                                                           ; fields
+   sts-policy-max-age-field = %s"max_age"
 
-sts-policy-ext-name      = (ALPHA / DIGIT)
-                           *31(ALPHA / DIGIT / "_" / "-" / ".")
+   sts-policy-max-age-value = 1*10(DIGIT)
 
-sts-policy-ext-value     = 1*(%x21-3A / %x3C / %x3E-7E)    ; chars excluding
-                                                           ; "=", ";", SP,
-                                                           ; and control
+   sts-policy-extension     = sts-policy-ext-name   ; additional
+                              field-delim           ; extension
+                              sts-policy-ext-value  ; fields
+
+   sts-policy-ext-name      = (ALPHA / DIGIT)
+                              *31(ALPHA / DIGIT / "_" / "-" / ".")
+
+   sts-policy-ext-value     = 1*(%x21-3A / %x3C / %x3E-7E)
+                            ; chars, excluding "=", ";", SP, and
 
 
 
@@ -394,7 +394,7 @@ Margolis, et al.          Expires May 12, 2018                  [Page 7]
 Internet-Draft                   MTA-STS                   November 2017
 
 
-                                                           ; chars
+                            ; control chars
 
    Parsers MUST accept TXT records and policy files which are
    syntactically valid (i.e. valid key/value pairs separated by semi-
@@ -633,7 +633,7 @@ Internet-Draft                   MTA-STS                   November 2017
    To ensure that the server sends the right certificate chain, the SMTP
    client MUST have support for the TLS SNI extension [RFC6066].  When
    connecting to a HTTP server to retrieve the MTA-STS policy, the SNI
-   extension MUST contain the name of the policy host (e.g. "mta-
+   extension MUST contain the name of the policy host (e.g.  "mta-
    sts.example.com").  When connecting to an SMTP server, the SNI
    extension MUST contain the MX hostname.
 
@@ -1086,8 +1086,8 @@ func certMatches(connection, policy) {
   // Assume a handy function to return CN and DNS-ID SANs.
   for san in getDnsIdSansAndCnFromCert(connection) {
     for mx in policy.mx {
-      // Return if the server certificate from "connection" matches the "mx"
-      // host.
+      // Return if the server certificate from "connection" matches the
+      // "mx" host.
       if san[0] == '*' {
         // Invalid wildcard!
         if san[1] != '.' continue
@@ -1133,7 +1133,8 @@ func reportError(error) {
 func tryMxAccordingTo(message, mx, policy) {
   connection := connect(mx)
   if !connection {
-    return false  // Can't connect to the MX so it's not an MTA-STS error.
+    return false  // Can't connect to the MX so it's not an MTA-STS
+                  // error.
   }
   secure := true
   if !tryStartTls(connection) {
@@ -1169,7 +1170,6 @@ func handleMessage(message) {
   }
   if policy {
     return tryWithPolicy(message, domain, policy)
-  }
 
 
 
@@ -1178,6 +1178,7 @@ Margolis, et al.          Expires May 12, 2018                 [Page 21]
 Internet-Draft                   MTA-STS                   November 2017
 
 
+  }
   // Try to deliver the message normally (i.e. without MTA-STS).
 }
 
@@ -1220,7 +1221,6 @@ Internet-Draft                   MTA-STS                   November 2017
               Extensions: Extension Definitions", RFC 6066, DOI 10
               .17487/RFC6066, January 2011, <https://www.rfc-editor.org/
               info/rfc6066>.
-
 
 
 

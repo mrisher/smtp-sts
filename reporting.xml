@@ -95,14 +95,15 @@
 
 
 <abstract>
-<t>A number of protocols exist for establishing encrypted channels between SMTP
-Mail Transfer Agents, including STARTTLS, DANE TLSA, and MTA-STS. These
-protocols can fail due to misconfiguration or active attack, leading to
-undelivered messages or delivery over unencrypted or unauthenticated channels.
-This document describes a reporting mechanism and format by which sending
-systems can share statistics and specific information about potential failures
-with recipient domains. Recipient domains can then use this information to both
-detect potential attackers and diagnose unintentional misconfigurations.
+<t>A number of protocols exist for establishing encrypted channels between
+SMTP Mail Transfer Agents, including STARTTLS, DANE TLSA, and MTA-STS.
+These protocols can fail due to misconfiguration or active attack,
+leading to undelivered messages or delivery over unencrypted or
+unauthenticated channels.  This document describes a reporting mechanism
+and format by which sending systems can share statistics and specific
+information about potential failures with recipient domains. Recipient
+domains can then use this information to both detect potential attackers
+and diagnose unintentional misconfigurations.
 </t>
 </abstract>
 
@@ -112,51 +113,55 @@ detect potential attackers and diagnose unintentional misconfigurations.
 <middle>
 
 <section anchor="introduction" title="Introduction">
-<t>The STARTTLS extension to SMTP <xref target="RFC3207"/> allows SMTP clients and hosts to
-establish secure SMTP sessions over TLS. The protocol design is based on
-&quot;Opportunistic Security&quot; (OS) <xref target="RFC7435"/>, which maintains interoperability with
-clients that do not support STARTTLS but means that any attacker who can delete
-parts of the SMTP session (such as the &quot;250 STARTTLS&quot; response) or redirect the
-entire SMTP session (perhaps by overwriting the resolved MX record of the
-delivery domain) can perform a downgrade or interception attack.
+<t>The STARTTLS extension to SMTP <xref target="RFC3207"/> allows SMTP clients and hosts
+to establish secure SMTP sessions over TLS. The protocol design is based
+on &quot;Opportunistic Security&quot; (OS) <xref target="RFC7435"/>, which maintains
+interoperability with clients that do not support STARTTLS but means
+that any attacker who can delete parts of the SMTP session (such as the
+&quot;250 STARTTLS&quot; response) or redirect the entire SMTP session (perhaps by
+overwriting the resolved MX record of the delivery domain) can perform a
+downgrade or interception attack.
 </t>
-<t>Because such &quot;downgrade attacks&quot; are not necessarily apparent to the receiving
-MTA, this document defines a mechanism for sending domains to report on failures
-at multiple stages of the MTA-to-MTA conversation.
+<t>Because such &quot;downgrade attacks&quot; are not necessarily apparent to the
+receiving MTA, this document defines a mechanism for sending domains to
+report on failures at multiple stages of the MTA-to-MTA conversation.
 </t>
-<t>Recipient domains may also use the mechanisms defined by MTA-STS (TODO: Add ref)
-or DANE <xref target="RFC6698"/> to publish additional encryption and authentication
-requirements; this document defines a mechanism for sending domains that are
-compatible with MTA-STS or DANE to share success and failure statistics with
-recipient domains.
+<t>Recipient domains may also use the mechanisms defined by MTA-STS (TODO:
+Add ref) or DANE <xref target="RFC6698"/> to publish additional encryption and
+authentication requirements; this document defines a mechanism for
+sending domains that are compatible with MTA-STS or DANE to share
+success and failure statistics with recipient domains.
 </t>
-<t>Specifically, this document defines a reporting schema that covers failures in
-routing, STARTTLS negotiation, and both DANE <xref target="RFC6698"/> and MTA-STS (TODO: Add
-ref) policy validation errors, and a standard TXT record that recipient domains
-can use to indicate where reports in this format should be sent.
+<t>Specifically, this document defines a reporting schema that covers
+failures in routing, STARTTLS negotiation, and both DANE <xref target="RFC6698"/> and
+MTA-STS (TODO: Add ref) policy validation errors, and a standard TXT
+record that recipient domains can use to indicate where reports in this
+format should be sent.
 </t>
-<t>This document is intended as a companion to the specification for SMTP MTA
-Strict Transport Security (MTA-STS, TODO: Add ref).
+<t>This document is intended as a companion to the specification for SMTP
+MTA Strict Transport Security (MTA-STS, TODO: Add ref).
 </t>
 
 <section anchor="terminology" title="Terminology">
-<t>The key words &quot;MUST&quot;, &quot;MUST NOT&quot;, &quot;REQUIRED&quot;, &quot;SHALL&quot;, &quot;SHALL NOT&quot;, &quot;SHOULD&quot;,
-&quot;SHOULD NOT&quot;, &quot;RECOMMENDED&quot;,  &quot;MAY&quot;, and &quot;OPTIONAL&quot; in this document are to be
-interpreted as described in <xref target="RFC2119"/>.
+<t>The key words &quot;MUST&quot;, &quot;MUST NOT&quot;, &quot;REQUIRED&quot;, &quot;SHALL&quot;, &quot;SHALL NOT&quot;,
+&quot;SHOULD&quot;, &quot;SHOULD NOT&quot;, &quot;RECOMMENDED&quot;,  &quot;MAY&quot;, and &quot;OPTIONAL&quot; in this
+document are to be interpreted as described in <xref target="RFC2119"/>.
 </t>
 <t>We also define the following terms for further use in this document:
 </t>
 <t>
 <list style="symbols">
-<t>MTA-STS Policy: A definition of the expected TLS availability, behavior, and
-desired actions for a given domain when a sending MTA encounters
-problems in negotiating a secure channel. MTA-STS is defined in [TODO]</t>
-<t>DANE Policy: A mechanism by which administrators can supply a record that can
-be used to validate the certificate presented by an MTA. DANE is defined
-in <xref target="RFC6698"/>.</t>
-<t>TLSRPT Policy: A policy specifying the endpoint to which sending MTAs should
-deliver reports.</t>
-<t>Policy Domain: The domain against which an MTA-STS or DANE Policy is defined.</t>
+<t>MTA-STS Policy: A definition of the expected TLS availability,
+behavior, and desired actions for a given domain when a sending MTA
+encounters problems in negotiating a secure channel. MTA-STS is
+defined in [TODO]</t>
+<t>DANE Policy: A mechanism by which administrators can supply a record
+that can be used to validate the certificate presented by an MTA. DANE
+is defined in <xref target="RFC6698"/>.</t>
+<t>TLSRPT Policy: A policy specifying the endpoint to which sending MTAs
+should deliver reports.</t>
+<t>Policy Domain: The domain against which an MTA-STS or DANE Policy is
+defined.</t>
 <t>Sending MTA: The MTA initiating the delivery of an email message.</t>
 </list>
 </t>
@@ -166,44 +171,47 @@ deliver reports.</t>
 <section anchor="related-technologies" title="Related Technologies">
 <t>
 <list style="symbols">
-<t>This document is intended as a companion to the specification for SMTP MTA
-Strict Transport Security (MTA-STS, TODO: Add RFC ref).</t>
-<t>SMTP-TLSRPT defines a mechanism for sending domains that are compatible with
-MTA-STS or DANE to share success and failure statistics with recipient
-domains.  DANE is defined in <xref target="RFC6698"/> and MTA-STS is defined in [TODO : Add
-RFC ref]</t>
+<t>This document is intended as a companion to the specification for SMTP
+MTA Strict Transport Security (MTA-STS, TODO: Add RFC ref).</t>
+<t>SMTP-TLSRPT defines a mechanism for sending domains that are
+compatible with MTA-STS or DANE to share success and failure
+statistics with recipient domains.  DANE is defined in <xref target="RFC6698"/> and
+MTA-STS is defined in [TODO : Add RFC ref]</t>
 </list>
 </t>
 </section>
 
 <section anchor="reporting-policy" title="Reporting Policy">
 <t>A domain publishes a record to its DNS indicating that it wishes to
-receive reports. These SMTP TLSRPT policies are distributed via DNS from the
-Policy Domain's zone, as TXT records (similar to DMARC policies) under the name
-<spanx style="verb">_smtp-tlsrpt</spanx>. For example, for the Policy Domain <spanx style="verb">example.com</spanx>, the
-recipient's TLSRPT policy can be retrieved from <spanx style="verb">_smtp-tlsrpt.example.com</spanx>.
+receive reports. These SMTP TLSRPT policies are distributed via DNS from
+the Policy Domain's zone, as TXT records (similar to DMARC policies)
+under the name <spanx style="verb">_smtp-tlsrpt</spanx>. For example, for the Policy Domain
+<spanx style="verb">example.com</spanx>, the recipient's TLSRPT policy can be retrieved from
+<spanx style="verb">_smtp-tlsrpt.example.com</spanx>.
 </t>
 <t>Policies consist of the following directives:
 </t>
 <t>
 <list style="symbols">
 <t><spanx style="verb">v</spanx>: This value MUST be equal to <spanx style="verb">TLSRPTv1</spanx>.</t>
-<t><spanx style="verb">rua</spanx>: A URI specifying the endpoint to which aggregate information about
-policy validation results should be sent (see <xref target="reporting-schema"/>, &quot;Reporting
-Schema&quot;,  for more information). Two URI schemes are supported: <spanx style="verb">mailto</spanx>
-and <spanx style="verb">https</spanx>.  As with DMARC <xref target="RFC7489"/>, the policy domain can specify a
-comma-separated list of URIs.</t>
-<t>In the case of <spanx style="verb">https</spanx>, reports should be submitted via POST (<xref target="RFC7231"/>) to
-the specified URI.  Report submitters MAY ignore certificate validation
-errors when submitting reports via https.</t>
+<t><spanx style="verb">rua</spanx>: A URI specifying the endpoint to which aggregate information
+about policy validation results should be sent (see
+<xref target="reporting-schema"/>, &quot;Reporting Schema&quot;,  for more information). Two
+URI schemes are supported: <spanx style="verb">mailto</spanx> and <spanx style="verb">https</spanx>.  As with DMARC
+<xref target="RFC7489"/>, the policy domain can specify a comma-separated list of
+URIs.</t>
+<t>In the case of <spanx style="verb">https</spanx>, reports should be submitted via POST
+(<xref target="RFC7231"/>) to the specified URI.  Report submitters MAY ignore
+certificate validation errors when submitting reports via https.</t>
 <t>In the case of <spanx style="verb">mailto</spanx>, reports should be submitted to the specified
-email address (<xref target="RFC6068"/>). When sending failure reports via SMTP, sending
-MTAs MUST deliver reports despite any TLS-related failures and SHOULD NOT
-include this SMTP session in the next report. This may mean that the reports
-are delivered in the clear. Additionally, reports sent via SMTP MUST contain a
-valid DKIM <xref target="RFC6376"/> signature by the reporting domain.  Reports lacking
-such a signature MUST be ignored by the recipient.  DKIM signatures must not
-use the &quot;l=&quot; attribute to limit the body length used in the signature.</t>
+email address (<xref target="RFC6068"/>). When sending failure reports via SMTP,
+sending MTAs MUST deliver reports despite any TLS-related failures and
+SHOULD NOT include this SMTP session in the next report. This may mean
+that the reports are delivered in the clear. Additionally, reports
+sent via SMTP MUST contain a valid DKIM <xref target="RFC6376"/> signature by the
+reporting domain.  Reports lacking such a signature MUST be ignored by
+the recipient.  DKIM signatures must not use the &quot;l=&quot; attribute to
+limit the body length used in the signature.</t>
 </list>
 </t>
 <t>The formal definition of the <spanx style="verb">_smtp-tlsrpt</spanx> TXT record, defined using
@@ -216,8 +224,9 @@ use the &quot;l=&quot; attribute to limit the body length used in the signature.
 
     field-delim       = *WSP ";" *WSP
 
-    tlsrpt-field      = tlsrpt-rua /        ; Note that the tlsrpt-rua
-                        tlsrpt-extension    ; record is required.
+    tlsrpt-field      = tlsrpt-rua /        ; Note that the
+                        tlsrpt-extension    ; tlsrpt-rua record is
+                                            ; required.
 
     tlsrpt-version    = %s"v=TLSRPTv1"
 
@@ -234,20 +243,21 @@ use the &quot;l=&quot; attribute to limit the body length used in the signature.
     tlsrpt-ext-name   = (ALPHA / DIGIT) *31(ALPHA / 
                     DIGIT / "_" / "-" / ".")
 
-    tlsrpt-ext-value  = 1*(%x21-3A / %x3C / %x3E-7E) ; chars excluding
-                                                     ; "=", ";", SP, and
-                                                     ; control chars
+    tlsrpt-ext-value  = 1*(%x21-3A / %x3C / %x3E-7E)
+                        ; chars excluding "=", ";", SP, and control
+                        ; chars
 </artwork></figure>
-<t>If multiple TXT records for <spanx style="verb">_smtp-tlsrpt</spanx> are returned by the resolver, records
-which do not begin with <spanx style="verb">v=TLSRPTv1;</spanx> are discarded. If the number of resulting
-records is not one, senders MUST assume the recipient domain does not implement
-TLSRPT. If the resulting TXT record contains multiple strings, then the record
-MUST be treated as if those strings are concatenated together without adding
-spaces.
+<t>If multiple TXT records for <spanx style="verb">_smtp-tlsrpt</spanx> are returned by the resolver,
+records which do not begin with <spanx style="verb">v=TLSRPTv1;</spanx> are discarded. If the
+number of resulting records is not one, senders MUST assume the
+recipient domain does not implement TLSRPT. If the resulting TXT record
+contains multiple strings, then the record MUST be treated as if those
+strings are concatenated together without adding spaces.
 </t>
 <t>Parsers MUST accept TXT records which are syntactically valid (i.e.
-valid key-value pairs separated by semi-colons) and implementing a superset of
-this specification, in which case unknown fields SHALL be ignored.
+valid key-value pairs separated by semi-colons) and implementing a
+superset of this specification, in which case unknown fields SHALL be
+ignored.
 </t>
 
 <section anchor="example-reporting-policy" title="Example Reporting Policy">
@@ -289,35 +299,35 @@ contents of the report</t>
 </list></t>
 <t>Policy, consisting of:
 <list style="symbols">
-<t>One of the following policy types:
-(1) The MTA-STS policy applied (as a string)
-(2) The DANE TLSA record applied (as a string, with each RR entry of the
-RRset listed and separated by a semicolon)
-(3) The literal string <spanx style="verb">no-policy-found</spanx>, if neither a DANE nor
-MTA-STS policy could be found.</t>
+<t>One of the following policy types: (1) The MTA-STS policy applied
+(as a string) (2) The DANE TLSA record applied (as a string, with
+each RR entry of the RRset listed and separated by a semicolon) (3)
+The literal string <spanx style="verb">no-policy-found</spanx>, if neither a DANE nor MTA-STS
+policy could be found.</t>
 <t>The domain for which the policy is applied</t>
 <t>The MX host</t>
 <t>An identifier for the policy (where applicable)</t>
 </list></t>
-<t>Aggregate counts, comprising result type, sending MTA IP, receiving MTA
-hostname, session count, and an optional additional information field
-containing a URI for recipients to review further information on a failure
-type.</t>
+<t>Aggregate counts, comprising result type, sending MTA IP, receiving
+MTA hostname, session count, and an optional additional information
+field containing a URI for recipients to review further information on
+a failure type.</t>
 </list>
 </t>
-<t>Note that the failure types are non-exclusive; an aggregate report may contain
-overlapping <spanx style="verb">counts</spanx> of failure types when a single send attempt encountered
-multiple errors. Reporters may report multiple applied policies (for example, an
-MTA-STS policy and a DANE TLSA record for the same domain and MX); even in the
-case where only a single policy was applied, the &quot;policies&quot; field of the report
-body MUST be an array and not a singular value.
+<t>Note that the failure types are non-exclusive; an aggregate report may
+contain overlapping <spanx style="verb">counts</spanx> of failure types when a single send attempt
+encountered multiple errors. Reporters may report multiple applied
+policies (for example, an MTA-STS policy and a DANE TLSA record for the
+same domain and MX); even in the case where only a single policy was
+applied, the &quot;policies&quot; field of the report body MUST be an array and
+not a singular value.
 </t>
 
 <section anchor="report-timeframe" title="Report Time-frame">
-<t>The report SHOULD cover a full day, from 0000-2400 UTC.  This should allow for
-easier correlation of failure events.  To avoid a Denial of Service against the
-system processing the reports, the reports should be delivered after some
-delay, perhaps several hours.
+<t>The report SHOULD cover a full day, from 0000-2400 UTC.  This should
+allow for easier correlation of failure events.  To avoid a Denial of
+Service against the system processing the reports, the reports should be
+delivered after some delay, perhaps several hours.
 </t>
 </section>
 
@@ -326,11 +336,11 @@ delay, perhaps several hours.
 <section anchor="success-count" title="Success Count">
 <t>
 <list style="symbols">
-<t><spanx style="verb">success-count</spanx>: This indicates that the sending MTA was able to successfully
-negotiate a policy-compliant TLS connection, and serves to provide a
-&quot;heartbeat&quot; to receiving domains that reporting is functional and tabulating
-correctly.  This field contains an aggregate count of successful connections
-for the reporting system.
+<t><spanx style="verb">success-count</spanx>: This indicates that the sending MTA was able to
+successfully negotiate a policy-compliant TLS connection, and serves
+to provide a &quot;heartbeat&quot; to receiving domains that reporting is
+functional and tabulating correctly.  This field contains an aggregate
+count of successful connections for the reporting system.
 
 <vspace/></t>
 </list>
@@ -342,37 +352,41 @@ for the reporting system.
 <list style="symbols">
 <t><spanx style="verb">failure-count</spanx>: This indicates that the sending MTA was unable to
 successfully establish a connection with the receiving platform.
-<xref target="result-types"/>, &quot;Result Types&quot;, will elaborate on the failed negotiation
-attempts.  This field contains an aggregate count of failed connections.</t>
+<xref target="result-types"/>, &quot;Result Types&quot;, will elaborate on the failed
+negotiation attempts.  This field contains an aggregate count of
+failed connections.</t>
 </list>
 </t>
 </section>
 </section>
 
 <section anchor="result-types" title="Result Types">
-<t>The list of result types will start with the minimal set below, and is expected
-to grow over time based on real-world experience. The initial set is:
+<t>The list of result types will start with the minimal set below, and is
+expected to grow over time based on real-world experience. The initial
+set is:
 </t>
 
 <section anchor="negotiation-failures" title="Negotiation Failures">
 <t>
 <list style="symbols">
-<t><spanx style="verb">starttls-not-supported</spanx>: This indicates that the recipient MX did not support
-STARTTLS.</t>
-<t><spanx style="verb">certificate-host-mismatch</spanx>: This indicates that the certificate presented did
-not adhere to the constraints specified in the MTA-STS or DANE policy, e.g.
-if the MX does not match any identities listed in the Subject Alternate Name
-(SAN) <xref target="RFC5280"/>.</t>
-<t><spanx style="verb">certificate-expired</spanx>: This indicates that the certificate has expired.</t>
-<t><spanx style="verb">certificate-not-trusted</spanx>: This a label that covers multiple certificate
-related failures that include, but not limited to errors such as
-untrusted/unknown CAs, certificate name constraints, certificate chain errors
-etc. When using this declaration, the reporting MTA SHOULD utilize the
-<spanx style="verb">failure-reason</spanx> to provide more information to the receiving entity.</t>
-<t><spanx style="verb">validation-failure</spanx>: This indicates a general failure for a reason not
-matching a category above.  When using this declaration, the reporting MTA
-SHOULD utilize the <spanx style="verb">failure-reason</spanx> to provide more information to the
-receiving entity.</t>
+<t><spanx style="verb">starttls-not-supported</spanx>: This indicates that the recipient MX did not
+support STARTTLS.</t>
+<t><spanx style="verb">certificate-host-mismatch</spanx>: This indicates that the certificate
+presented did not adhere to the constraints specified in the MTA-STS
+or DANE policy, e.g.  if the MX does not match any identities listed
+in the Subject Alternate Name (SAN) <xref target="RFC5280"/>.</t>
+<t><spanx style="verb">certificate-expired</spanx>: This indicates that the certificate has
+expired.</t>
+<t><spanx style="verb">certificate-not-trusted</spanx>: This a label that covers multiple
+certificate related failures that include, but not limited to errors
+such as untrusted/unknown CAs, certificate name constraints,
+certificate chain errors etc. When using this declaration, the
+reporting MTA SHOULD utilize the <spanx style="verb">failure-reason</spanx> to provide more
+information to the receiving entity.</t>
+<t><spanx style="verb">validation-failure</spanx>: This indicates a general failure for a reason
+not matching a category above.  When using this declaration, the
+reporting MTA SHOULD utilize the <spanx style="verb">failure-reason</spanx> to provide more
+information to the receiving entity.</t>
 </list>
 </t>
 </section>
@@ -383,14 +397,15 @@ receiving entity.</t>
 <t>
 <list style="symbols">
 <t><spanx style="verb">tlsa-invalid</spanx>: This indicates a validation error in the TLSA record
-associated with a DANE policy.  None of the records in the RRset were found to
-be valid.</t>
-<t><spanx style="verb">dnssec-invalid</spanx>: This would indicate that no valid records were returned from
-the recursive resolver.  The request returned with SERVFAIL for the requested
-TLSA record.  It should be noted that if the reporter's systems are having
-problems resolving destination DNS records due to DNSSEC failures, it's
-possible they will also be unable to resolve the TLSRPT record, therefore
-these types of reports may be rare.</t>
+associated with a DANE policy.  None of the records in the RRset were
+found to be valid.</t>
+<t><spanx style="verb">dnssec-invalid</spanx>: This would indicate that no valid records were
+returned from the recursive resolver.  The request returned with
+SERVFAIL for the requested TLSA record.  It should be noted that if
+the reporter's systems are having problems resolving destination DNS
+records due to DNSSEC failures, it's possible they will also be unable
+to resolve the TLSRPT record, therefore these types of reports may be
+rare.</t>
 </list>
 </t>
 </section>
@@ -398,10 +413,10 @@ these types of reports may be rare.</t>
 <section anchor="mtastsspecific-policy-failures" title="MTA-STS-specific Policy Failures">
 <t>
 <list style="symbols">
-<t><spanx style="verb">sts-policy-invalid</spanx>: This indicates a validation error for the overall
-MTA-STS policy.</t>
-<t><spanx style="verb">sts-webpki-invalid</spanx>: This indicates that the MTA-STS policy could not be
-authenticated using PKIX validation.
+<t><spanx style="verb">sts-policy-invalid</spanx>: This indicates a validation error for the
+overall MTA-STS policy.</t>
+<t><spanx style="verb">sts-webpki-invalid</spanx>: This indicates that the MTA-STS policy could not
+be authenticated using PKIX validation.
 
 <vspace/></t>
 </list>
@@ -410,26 +425,28 @@ authenticated using PKIX validation.
 </section>
 
 <section anchor="general-failures" title="General Failures">
-<t>When a negotiation failure can not be categorized into one of the &quot;Negotiation
-Failures&quot; stated above, the reporter SHOULD use the <spanx style="verb">validation-failure</spanx>
-category.  As TLS grows and becomes more complex, new mechanisms may not be
-easily categorized.  This allows for a generic feedback category.  When this
-category is used, the reporter SHOULD also use the <spanx style="verb">failure-reason-code</spanx> to give
-some feedback to the receiving entity.  This is intended to be a short text
-field, and the contents of the field should be an error code or error text, such
-as &quot;X509_V_ERR_UNHANDLED_CRITICAL_CRL_EXTENSION&quot;.
+<t>When a negotiation failure can not be categorized into one of the
+&quot;Negotiation Failures&quot; stated above, the reporter SHOULD use the
+<spanx style="verb">validation-failure</spanx> category.  As TLS grows and becomes more complex,
+new mechanisms may not be easily categorized.  This allows for a generic
+feedback category.  When this category is used, the reporter SHOULD also
+use the <spanx style="verb">failure-reason-code</spanx> to give some feedback to the receiving
+entity.  This is intended to be a short text field, and the contents of
+the field should be an error code or error text, such as
+&quot;X509_V_ERR_UNHANDLED_CRITICAL_CRL_EXTENSION&quot;.
 </t>
 </section>
 
 <section anchor="transient-failures" title="Transient Failures">
-<t>Transient errors due to too-busy network, TCP timeouts, etc. are not required to
-be reported.
+<t>Transient errors due to too-busy network, TCP timeouts, etc. are not
+required to be reported.
 </t>
 </section>
 </section>
 
 <section anchor="json-report-schema" title="JSON Report Schema">
-<t>The JSON schema is derived from the HPKP JSON schema <xref target="RFC7469"/> (cf. Section 3)
+<t>The JSON schema is derived from the HPKP JSON schema <xref target="RFC7469"/> (cf.
+Section 3)
 </t>
 
 <figure align="center" title="JSON Report Format
@@ -471,56 +488,59 @@ be reported.
 </artwork></figure>
 <t>
 <list style="symbols">
-<t><spanx style="verb">organization-name</spanx>: The name of the organization responsible for the report.
-It is provided as a string.</t>
-<t><spanx style="verb">date-time</spanx>: The date-time indicates the start- and end-times for the report
-range. It is provided as a string formatted according to Section 5.6,
-&quot;Internet Date/Time Format&quot;, of <xref target="RFC3339"/>.  The report should be for a full
-UTC day, 0000-2400.</t>
-<t><spanx style="verb">email-address</spanx>: The contact information for a responsible party of the
-report. It is provided as a string formatted according to Section 3.4.1,
-&quot;Addr-Spec&quot;, of <xref target="RFC5321"/>.</t>
-<t><spanx style="verb">report-id</spanx>: A unique identifier for the report. Report authors may use
-whatever scheme they prefer to generate a unique identifier. It is provided as
-a string.</t>
-<t><spanx style="verb">policy-type</spanx>: The type of policy that was applied by the sending domain.
-Presently, the only three valid choices are <spanx style="verb">tlsa</spanx>, <spanx style="verb">sts</spanx>, and the literal
-string <spanx style="verb">no-policy-found</spanx>. It is provided as a string.</t>
-<t><spanx style="verb">policy-string</spanx>: A string representation of the policy, whether TLSA record
-(<xref target="RFC6698"/> section 2.3) or MTA-STS policy. Examples: TLSA:
+<t><spanx style="verb">organization-name</spanx>: The name of the organization responsible for the
+report.  It is provided as a string.</t>
+<t><spanx style="verb">date-time</spanx>: The date-time indicates the start- and end-times for the
+report range. It is provided as a string formatted according to
+Section 5.6, &quot;Internet Date/Time Format&quot;, of <xref target="RFC3339"/>.  The report
+should be for a full UTC day, 0000-2400.</t>
+<t><spanx style="verb">email-address</spanx>: The contact information for a responsible party of
+the report. It is provided as a string formatted according to Section
+3.4.1, &quot;Addr-Spec&quot;, of <xref target="RFC5321"/>.</t>
+<t><spanx style="verb">report-id</spanx>: A unique identifier for the report. Report authors may
+use whatever scheme they prefer to generate a unique identifier. It is
+provided as a string.</t>
+<t><spanx style="verb">policy-type</spanx>: The type of policy that was applied by the sending
+domain.  Presently, the only three valid choices are <spanx style="verb">tlsa</spanx>, <spanx style="verb">sts</spanx>,
+and the literal string <spanx style="verb">no-policy-found</spanx>. It is provided as a string.</t>
+<t><spanx style="verb">policy-string</spanx>: A string representation of the policy, whether TLSA
+record (<xref target="RFC6698"/> section 2.3) or MTA-STS policy. Examples: TLSA:
 <spanx style="verb">"_25._tcp.mx.example.com. IN TLSA ( 3 0 1 \
-1F850A337E6DB9C609C522D136A475638CC43E1ED424F8EEC8513D7 47D1D085D )"</spanx> MTA-STS:
-<spanx style="verb">"version: STSv1\nmode: report\nmx: mx1.example.com\nmx: \
+1F850A337E6DB9C609C522D136A475638CC43E1ED424F8EEC8513D7 47D1D085D )"</spanx>
+MTA-STS: <spanx style="verb">"version: STSv1\nmode: report\nmx: mx1.example.com\nmx: \
 mx2.example.com\nmx: mx.backup-example.com\nmax_age: 12345678"</spanx></t>
-<t><spanx style="verb">domain</spanx>: The Policy Domain is the domain against which the MTA-STS or DANE
-policy is defined. In the case of Internationalized Domain Names
-(<xref target="RFC5891"/>), the domain is the Punycode-encoded A-label (<xref target="RFC3492"/>) and
-not the U-label.</t>
-<t><spanx style="verb">mx-host-pattern</spanx>: The pattern of MX hostnames from the applied policy. It is
-provided as a string, and is interpreted in the same manner as the &quot;Checking
-of Wildcard Certificates&quot; rules in Section 6.4.3 of <xref target="RFC6125"/>.  In the case
-of Internationalized Domain Names (<xref target="RFC5891"/>), the domain is the
-Punycode-encoded A-label (<xref target="RFC3492"/>) and not the U-label.</t>
+<t><spanx style="verb">domain</spanx>: The Policy Domain is the domain against which the MTA-STS or
+DANE policy is defined. In the case of Internationalized Domain Names
+(<xref target="RFC5891"/>), the domain is the Punycode-encoded A-label
+(<xref target="RFC3492"/>) and not the U-label.</t>
+<t><spanx style="verb">mx-host-pattern</spanx>: The pattern of MX hostnames from the applied
+policy. It is provided as a string, and is interpreted in the same
+manner as the &quot;Checking of Wildcard Certificates&quot; rules in Section
+6.4.3 of <xref target="RFC6125"/>.  In the case of Internationalized Domain Names
+(<xref target="RFC5891"/>), the domain is the Punycode-encoded A-label
+(<xref target="RFC3492"/>) and not the U-label.</t>
 <t><spanx style="verb">result-type</spanx>: A value from <xref target="result-types"/>, &quot;Result Types&quot;,  above.</t>
-<t><spanx style="verb">ip-address</spanx>: The IP address of the sending MTA that attempted the STARTTLS
-connection. It is provided as a string representation of an IPv4 (see below)
-or IPv6 (<xref target="RFC5952"/>) address in dot-decimal or colon-hexadecimal notation.</t>
-<t><spanx style="verb">receiving-mx-hostname</spanx>: The hostname of the receiving MTA MX record with
-which the sending MTA attempted to negotiate a STARTTLS connection.</t>
-<t><spanx style="verb">receiving-mx-helo</spanx>: (optional) The HELO or EHLO string from the banner
-announced during the reported session.</t>
+<t><spanx style="verb">ip-address</spanx>: The IP address of the sending MTA that attempted the
+STARTTLS connection. It is provided as a string representation of an
+IPv4 (see below) or IPv6 (<xref target="RFC5952"/>) address in dot-decimal or
+colon-hexadecimal notation.</t>
+<t><spanx style="verb">receiving-mx-hostname</spanx>: The hostname of the receiving MTA MX record
+with which the sending MTA attempted to negotiate a STARTTLS
+connection.</t>
+<t><spanx style="verb">receiving-mx-helo</spanx>: (optional) The HELO or EHLO string from the
+banner announced during the reported session.</t>
 <t><spanx style="verb">total-successful-session-count</spanx>: The aggregate number (integer) of
 successfully negotiated TLS-enabled connections to the receiving site.</t>
-<t><spanx style="verb">total-failure-session-count</spanx>: The aggregate number (integer) of failures to
-negotiate a TLS-enabled connection to the receiving site.</t>
-<t><spanx style="verb">failed-session-count</spanx>: The number of (attempted) sessions that match the
-relevant <spanx style="verb">result-type</spanx> for this section.</t>
-<t><spanx style="verb">additional-info-uri</spanx>: An optional URI <xref target="RFC3986"/> pointing to additional
-information around the relevant <spanx style="verb">result-type</spanx>. For example, this URI might
-host the complete certificate chain presented during an attempted STARTTLS
-session.</t>
-<t><spanx style="verb">failure-reason-code</spanx>: A text field to include a TLS-related error code or
-error message.
+<t><spanx style="verb">total-failure-session-count</spanx>: The aggregate number (integer) of
+failures to negotiate a TLS-enabled connection to the receiving site.</t>
+<t><spanx style="verb">failed-session-count</spanx>: The number of (attempted) sessions that match
+the relevant <spanx style="verb">result-type</spanx> for this section.</t>
+<t><spanx style="verb">additional-info-uri</spanx>: An optional URI <xref target="RFC3986"/> pointing to
+additional information around the relevant <spanx style="verb">result-type</spanx>. For example,
+this URI might host the complete certificate chain presented during an
+attempted STARTTLS session.</t>
+<t><spanx style="verb">failure-reason-code</spanx>: A text field to include a TLS-related error
+code or error message.
 
 <vspace/></t>
 </list>
@@ -571,59 +591,56 @@ POST.
  extension = "json" / "json.gz"
 </artwork></figure>
 <t>The extension MUST be &quot;json&quot; for a plain JSON file, or &quot;json.gz&quot; for a
-   JSON file compressed using GZIP.
+JSON file compressed using GZIP.
 </t>
 <t>&quot;unique-id&quot; allows an optional unique ID generated by the Sending MTA to
-   distinguish among multiple reports generated simultaneously by different
-   sources within the same Policy Domain. For example, this is a possible
-   filename for the gzip file of a report to the Policy Domain &quot;example.net&quot;
-   from the Sending MTA &quot;mail.sender.example.com&quot;:
+distinguish among multiple reports generated simultaneously by different
+sources within the same Policy Domain. For example, this is a possible
+filename for the gzip file of a report to the Policy Domain
+&quot;example.net&quot; from the Sending MTA &quot;mail.sender.example.com&quot;:
 </t>
-
-<figure align="center"><artwork align="center">
- `mail.sender.example.com!example.net!1470013207!1470186007!001.json.gz`
-</artwork></figure>
+<t><spanx style="verb">mail.sender.example.com!example.net!1470013207!1470186007!001.json.gz</spanx>
+</t>
 </section>
 
 <section anchor="compression" title="Compression">
-<t>The report SHOULD be subjected to GZIP compression for both email and HTTPS
-transport. Declining to apply compression can cause the report to be too large
-for a receiver to process (a commonly observed receiver limit is ten megabytes);
-compressing the file increases the chances of acceptance of the report at some
-compute cost.
+<t>The report SHOULD be subjected to GZIP compression for both email and
+HTTPS transport. Declining to apply compression can cause the report to
+be too large for a receiver to process (a commonly observed receiver
+limit is ten megabytes); compressing the file increases the chances of
+acceptance of the report at some compute cost.
 </t>
 </section>
 
 <section anchor="email-transport" title="Email Transport">
-<t>The report MAY be delivered by email. To make the reports machine-parsable
-for the receivers, we define a top-level media type <spanx style="verb">multipart/report</spanx> with
-a new parameter <spanx style="verb">report-type="tlsrpt"</spanx>. Inside it, there are two parts: The
-first part is human readable, typically <spanx style="verb">text/plain</spanx>, and the second part is
-machine readable with a new media type defined called <spanx style="verb">application/tlsrpt+json</spanx>.
-If compressed, the report should use the media type <spanx style="verb">application/tlsrpt+gzip</spanx>.
+<t>The report MAY be delivered by email. To make the reports
+machine-parsable for the receivers, we define a top-level media type
+<spanx style="verb">multipart/report</spanx> with a new parameter <spanx style="verb">report-type="tlsrpt"</spanx>. Inside
+it, there are two parts: The first part is human readable, typically
+<spanx style="verb">text/plain</spanx>, and the second part is machine readable with a new media
+type defined called <spanx style="verb">application/tlsrpt+json</spanx>.  If compressed, the
+report should use the media type <spanx style="verb">application/tlsrpt+gzip</spanx>.
 </t>
-<t>In addition, the following two new top level message header fields are defined:
+<t>In addition, the following two new top level message header fields are
+defined:
 </t>
-
-<figure align="center"><artwork align="center">
-TLS-Report-Domain: Receiver-Domain
-TLS-Report-Submitter: Sender-Domain
-</artwork></figure>
-<t>The <spanx style="verb">TLS-Report-Submitter</spanx> value MUST match the value found in the filename
-and the <xref target="RFC5321"/> domain from the <spanx style="verb">contact-info</spanx> from the report body.  These
-message headers MUST be included and should allow for easy searching for all
-reports submitted by a report domain or a particular submitter, for example
-in IMAP <xref target="RFC3501"/>:
+<t><spanx style="verb">TLS-Report-Domain: Receiver-Domain TLS-Report-Submitter:
+Sender-Domain</spanx> The <spanx style="verb">TLS-Report-Submitter</spanx> value MUST match the value
+found in the filename and the <xref target="RFC5321"/> domain from the <spanx style="verb">contact-info</spanx>
+from the report body.  These message headers MUST be included and should
+allow for easy searching for all reports submitted by a report domain or
+a particular submitter, for example in IMAP <xref target="RFC3501"/>:
 </t>
 <t><spanx style="verb">s SEARCH HEADER "TLS-Report-Domain" "example.com"</spanx>
 </t>
-<t>It is presumed that the aggregate reporting address will be equipped to process
-new message header fields and extract MIME parts with the prescribed media type
-and filename, and ignore the rest.  These additional headers SHOULD be included
-in the DKIM <xref target="RFC6376"/> signature for the message.
+<t>It is presumed that the aggregate reporting address will be equipped to
+process new message header fields and extract MIME parts with the
+prescribed media type and filename, and ignore the rest.  These
+additional headers SHOULD be included in the DKIM <xref target="RFC6376"/> signature
+for the message.
 </t>
-<t>The <xref target="RFC5322"/>.Subject field for report submissions SHOULD conform to the
-   following ABNF:
+<t>The <xref target="RFC5322"/>.Subject field for report submissions SHOULD conform to
+the following ABNF:
 </t>
 
 <figure align="center"><artwork align="center">
@@ -634,24 +651,25 @@ tlsrpt-subject = %s"Report" FWS               ; "Report"
          domain-name FWS              ; per RFC6376
          %s"Report-ID:" FWS           ; "Report-ID:
          "&lt;" id-left "@" id-right "&gt;" ; per RFC5322
-         [CFWS]                       ; per RFC5322 (as with FWS)
+         [CFWS]                       ; per RFC5322
+                                              ; (as with FWS)
 </artwork></figure>
 <t>The first domain-name indicates the DNS domain name about which the
-   report was generated.  The second domain-name indicates the DNS
-   domain name representing the Sending MTA generating the report.
-   The purpose of the Report-ID: portion of the field is to enable the
-   Policy Domain to identify and ignore duplicate reports that might be
-   sent by a Sending MTA.
+ report was generated. The second domain-name indicates the DNS domain
+ name representing the Sending MTA generating the report.  The purpose
+ of the Report-ID: portion of the field is to enable the Policy Domain
+ to identify and ignore duplicate reports that might be sent by a
+ Sending MTA.
 </t>
 <t>For instance, this is a possible Subject field for a report to the
-   Policy Domain &quot;example.net&quot; from the Sending MTA
-   &quot;mail.sender.example.com&quot;.  It is line-wrapped as allowed by <xref target="RFC5322"/>:
+ Policy Domain &quot;example.net&quot; from the Sending MTA
+ &quot;mail.sender.example.com&quot;.  It is line-wrapped as allowed by
 </t>
 
 <figure align="center"><artwork align="center">
- Subject: Report Domain: example.net
-     Submitter: mail.sender.example.com
-     Report-ID: &lt;735ff.e317+bf22029@mailexample.net&gt;
+     Subject: Report Domain: example.net
+         Submitter: mail.sender.example.com
+         Report-ID: &lt;735ff.e317+bf22029@mailexample.net&gt;
 </artwork></figure>
 
 <section anchor="example-report" title="Example Report">
@@ -690,39 +708,41 @@ tlsrpt-subject = %s"Report" FWS               ; "Report"
 ------=_NextPart_000_024E_01CC9B0A.AFE54C00--
 ...
 </artwork></figure>
-<t>Note that, when sending failure reports via SMTP, sending MTAs MUST NOT honor
-MTA-STS or DANE TLSA failures.
+<t>Note that, when sending failure reports via SMTP, sending MTAs MUST NOT
+honor MTA-STS or DANE TLSA failures.
 </t>
 </section>
 </section>
 
 <section anchor="https-transport" title="HTTPS Transport">
-<t>The report MAY be delivered by POST to HTTPS. If compressed, the report SHOULD
-use the media type <spanx style="verb">application/tlsrpt+gzip</spanx>, and <spanx style="verb">application/tlsrpt+json</spanx>
-otherwise (see section <xref target="iana-considerations"/>, &quot;IANA Considerations&quot;).
+<t>The report MAY be delivered by POST to HTTPS. If compressed, the report
+SHOULD use the media type <spanx style="verb">application/tlsrpt+gzip</spanx>, and
+<spanx style="verb">application/tlsrpt+json</spanx> otherwise (see section <xref target="iana-considerations"/>,
+&quot;IANA Considerations&quot;).
 </t>
-<t>A reporting entity SHOULD expect a &quot;successful&quot; response from the accepting
-HTTPS server, typically a 200 or 201 HTTP code <xref target="RFC7231"/>.  Other codes could
-indicate a delivery failure, and may be retried as per local policy.  The
-receiving system is not expected to process reports at receipt time, and MAY
-store them for processing at a later time.
+<t>A reporting entity SHOULD expect a &quot;successful&quot; response from the
+accepting HTTPS server, typically a 200 or 201 HTTP code <xref target="RFC7231"/>.
+Other codes could indicate a delivery failure, and may be retried as per
+local policy.  The receiving system is not expected to process reports
+at receipt time, and MAY store them for processing at a later time.
 </t>
 </section>
 
 <section anchor="delivery-retry" title="Delivery Retry">
 <t>In the event of a delivery failure, regardless of the delivery method, a
-sender SHOULD attempt redelivery for up to 24hrs after the initial attempt.  As
-previously stated the reports are optional, so while it is ideal to attempt
-redelivery, it is not required.  If multiple retries are attempted, ideally they
-would be on a logarithmic scale.
+sender SHOULD attempt redelivery for up to 24hrs after the initial
+attempt.  As previously stated the reports are optional, so while it is
+ideal to attempt redelivery, it is not required.  If multiple retries
+are attempted, ideally they would be on a logarithmic scale.
 </t>
 </section>
 
 <section anchor="metadata-variances" title="Metadata Variances">
-<t>As stated above, there are a variable number of ways to declare information
-about the data therein.  If it should be the case that these objects were to
-disagree, then the report data contained within the JSON body MUST be considered
-the authoritative source for those data elements.
+<t>As stated above, there are a variable number of ways to declare
+information about the data therein.  If it should be the case that these
+objects were to disagree, then the report data contained within the JSON
+body MUST be considered the authoritative source for those data
+elements.
 </t>
 </section>
 </section>
@@ -732,8 +752,8 @@ the authoritative source for those data elements.
 </t>
 
 <section anchor="message-headers" title="Message headers">
-<t>Below is the Internet Assigned Numbers Authority (IANA) Permanent Message Header
-Field registration information per <xref target="RFC3864"/>.
+<t>Below is the Internet Assigned Numbers Authority (IANA) Permanent
+Message Header Field registration information per <xref target="RFC3864"/>.
 </t>
 
 <figure align="center"><artwork align="center">
@@ -762,7 +782,8 @@ following section.
 </section>
 
 <section anchor="applicationtlsrptjson-media-type" title="application/tlsrpt+json Media Type">
-<t>This document registers multiple media types, beginning with Table 1 below.
+<t>This document registers multiple media types, beginning with Table 1
+below.
 </t>
 
 <figure align="center"><artwork align="center">
@@ -876,8 +897,8 @@ following section.
 </section>
 
 <section anchor="starttls-validation-result-types" title="STARTTLS Validation Result Types">
-<t>This document creates a new registry, &quot;STARTTLS Validation Result Types&quot;. The
-initial entries in the registry are:
+<t>This document creates a new registry, &quot;STARTTLS Validation Result
+Types&quot;. The initial entries in the registry are:
 </t>
 
 <figure align="center"><artwork align="center">
@@ -894,58 +915,62 @@ initial entries in the registry are:
 | "validation-failure"          | 
 +-------------------------------+
 </artwork></figure>
-<t>The above entries are described in section <xref target="result-types"/>, &quot;Result Types.&quot; New
-result types can be added to this registry using &quot;Expert Review&quot; IANA
-registration policy.
+<t>The above entries are described in section <xref target="result-types"/>, &quot;Result
+Types.&quot; New result types can be added to this registry using &quot;Expert
+Review&quot; IANA registration policy.
 </t>
 </section>
 </section>
 
 <section anchor="security-considerations" title="Security Considerations">
-<t>SMTP TLS Reporting provides transparency into misconfigurations or attempts to
-intercept or tamper with mail between hosts who support STARTTLS. There are
-several security risks presented by the existence of this reporting channel:
+<t>SMTP TLS Reporting provides transparency into misconfigurations or
+attempts to intercept or tamper with mail between hosts who support
+STARTTLS. There are several security risks presented by the existence of
+this reporting channel:
 </t>
 <t>
 <list style="symbols">
-<t>Flooding of the Aggregate report URI (rua) endpoint: An attacker could flood
-the endpoint with excessive reporting traffic and prevent the receiving domain
-from accepting additional reports. This type of Denial-of-Service attack would
-limit visibility into STARTTLS failures, leaving the receiving domain blind to
-an ongoing attack.</t>
-<t>Untrusted content: An attacker could inject malicious code into the report,
-opening a vulnerability in the receiving domain. Implementers are advised to
-take precautions against evaluating the contents of the report.</t>
-<t>Report snooping: An attacker could create a bogus TLSRPT record to receive
-statistics about a domain the attacker does not own. Since an attacker able to
-poison DNS is already able to receive counts of SMTP connections (and, absent
-DANE or MTA-STS policies, actual SMTP message payloads), this does not present
-a significant new vulnerability.</t>
-<t>Reports as DDoS: TLSRPT allows specifying destinations for the reports that
-are outside the authority of the Policy Domain, which allows domains to
-delegate processing of reports to a partner organization. However, an attacker
-who controls the Policy Domain DNS could also use this mechanism to direct the
-reports to an unwitting victim, flooding that victim with excessive reports.
-DMARC <xref target="RFC7489"/> defines a solution for verifying delegation to avoid such
-attacks; the need for this is greater with DMARC, however, because DMARC
-allows an attacker to trigger reports to a target from an innocent third party
-by sending that third party mail (which triggers a report from the third party
-to the target).  In the case of TLSRPT, the attacker would have to induce the
-third party to send the attacker mail in order to trigger reports from the
-third party to the victim; this reduces the risk of such an attack and the
-need for a verification mechanism.</t>
+<t>Flooding of the Aggregate report URI (rua) endpoint: An attacker could
+flood the endpoint with excessive reporting traffic and prevent the
+receiving domain from accepting additional reports. This type of
+Denial-of-Service attack would limit visibility into STARTTLS
+failures, leaving the receiving domain blind to an ongoing attack.</t>
+<t>Untrusted content: An attacker could inject malicious code into the
+report, opening a vulnerability in the receiving domain. Implementers
+are advised to take precautions against evaluating the contents of the
+report.</t>
+<t>Report snooping: An attacker could create a bogus TLSRPT record to
+receive statistics about a domain the attacker does not own. Since an
+attacker able to poison DNS is already able to receive counts of SMTP
+connections (and, absent DANE or MTA-STS policies, actual SMTP message
+payloads), this does not present a significant new vulnerability.</t>
+<t>Reports as DDoS: TLSRPT allows specifying destinations for the reports
+that are outside the authority of the Policy Domain, which allows
+domains to delegate processing of reports to a partner organization.
+However, an attacker who controls the Policy Domain DNS could also use
+this mechanism to direct the reports to an unwitting victim, flooding
+that victim with excessive reports.  DMARC <xref target="RFC7489"/> defines a
+solution for verifying delegation to avoid such attacks; the need for
+this is greater with DMARC, however, because DMARC allows an attacker
+to trigger reports to a target from an innocent third party by sending
+that third party mail (which triggers a report from the third party to
+the target).  In the case of TLSRPT, the attacker would have to induce
+the third party to send the attacker mail in order to trigger reports
+from the third party to the victim; this reduces the risk of such an
+attack and the need for a verification mechanism.</t>
 </list>
 </t>
 <t>Finally, because TLSRPT is intended to help administrators discover
-man-in-the-middle attacks against transport-layer encryption, including attacks
-designed to thwart negotiation of encrypted connections (by downgrading
-opportunistic encryption or, in the case of MTA-STS, preventing discovery of a
-new MTA-STS policy), we must also consider the risk that an adversary who can
-induce such a downgrade attack can also prevent discovery of the TLSRPT TXT
-record (and thus prevent discovery of the successful downgrade attack).
-Administrators are thus encouraged to deploy TLSRPT TXT records with a large TTL
-(reducing the window for successful attacks against DNS resolution of the
-record) or to deploy DNSSEC on the deploying zone.
+man-in-the-middle attacks against transport-layer encryption, including
+attacks designed to thwart negotiation of encrypted connections (by
+downgrading opportunistic encryption or, in the case of MTA-STS,
+preventing discovery of a new MTA-STS policy), we must also consider the
+risk that an adversary who can induce such a downgrade attack can also
+prevent discovery of the TLSRPT TXT record (and thus prevent discovery
+of the successful downgrade attack).  Administrators are thus encouraged
+to deploy TLSRPT TXT records with a large TTL (reducing the window for
+successful attacks against DNS resolution of the record) or to deploy
+DNSSEC on the deploying zone.
 </t>
 </section>
 
@@ -1015,11 +1040,11 @@ _smtp-tlsrpt.mail.example.com. IN TXT \
 }
 
 </artwork></figure>
-<t>Figure: Example JSON report for a messages from Company-X to Company-Y, where
-100 sessions were attempted to Company Y servers with an expired certificate and
-200 sessions were attempted to Company Y servers that did not successfully
-respond to the <spanx style="verb">STARTTLS</spanx> command.  Additionally 3 sessions failed due to
-&quot;X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED&quot;.
+<t>Figure: Example JSON report for a messages from Company-X to Company-Y,
+where 100 sessions were attempted to Company Y servers with an expired
+certificate and 200 sessions were attempted to Company Y servers that
+did not successfully respond to the <spanx style="verb">STARTTLS</spanx> command.  Additionally 3
+sessions failed due to &quot;X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED&quot;.
 </t>
 </section>
 

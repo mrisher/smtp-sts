@@ -244,36 +244,36 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
    The formal definition of the "_smtp-tlsrpt" TXT record, defined using
    [RFC5234] & [RFC7405], is as follows:
 
-    tlsrpt-record     = tlsrpt-version 1*(field-delim tlsrpt-field)
-                        [field-delim]
+        tlsrpt-record     = tlsrpt-version 1*(field-delim tlsrpt-field)
+                            [field-delim]
 
-    field-delim       = *WSP ";" *WSP
+        field-delim       = *WSP ";" *WSP
 
-    tlsrpt-field      = tlsrpt-rua /        ; Note that the tlsrpt-rua
-                        tlsrpt-extension    ; record is required.
+        tlsrpt-field      = tlsrpt-rua /        ; Note that the
+                            tlsrpt-extension    ; tlsrpt-rua record is
+                                                ; required.
 
-    tlsrpt-version    = %s"v=TLSRPTv1"
+        tlsrpt-version    = %s"v=TLSRPTv1"
 
-    tlsrpt-rua        = %s"rua="
-                    tlsrpt-uri *(*WSP "," *WSP tlsrpt-uri)
+        tlsrpt-rua        = %s"rua="
+                        tlsrpt-uri *(*WSP "," *WSP tlsrpt-uri)
 
-    tlsrpt-uri        = URI
-                      ; "URI" is imported from [@!RFC3986];
-          ; commas (ASCII 0x2C) and exclamation
-          ; points (ASCII 0x21) MUST be encoded
+        tlsrpt-uri        = URI
+                          ; "URI" is imported from [@!RFC3986];
+              ; commas (ASCII 0x2C) and exclamation
+              ; points (ASCII 0x21) MUST be encoded
 
-    tlsrpt-extension  = tlsrpt-ext-name "=" tlsrpt-ext-value
+        tlsrpt-extension  = tlsrpt-ext-name "=" tlsrpt-ext-value
 
-    tlsrpt-ext-name   = (ALPHA / DIGIT) *31(ALPHA /
-                    DIGIT / "_" / "-" / ".")
+        tlsrpt-ext-name   = (ALPHA / DIGIT) *31(ALPHA /
+                        DIGIT / "_" / "-" / ".")
 
-    tlsrpt-ext-value  = 1*(%x21-3A / %x3C / %x3E-7E) ; chars excluding
-                                                     ; "=", ";", SP, and
-                                                     ; control chars
+        tlsrpt-ext-value  = 1*(%x21-3A / %x3C / %x3E-7E)
+                            ; chars excluding "=", ";", SP, and control
+                            ; chars
 
    If multiple TXT records for "_smtp-tlsrpt" are returned by the
    resolver, records which do not begin with "v=TLSRPTv1;" are
-   discarded.  If the number of resulting records is not one, senders
 
 
 
@@ -282,6 +282,7 @@ Margolis, et al.          Expires May 12, 2018                  [Page 5]
 Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
+   discarded.  If the number of resulting records is not one, senders
    MUST assume the recipient domain does not implement TLSRPT.  If the
    resulting TXT record contains multiple strings, then the record MUST
    be treated as if those strings are concatenated together without
@@ -328,8 +329,7 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
       *  One of the following policy types: (1) The MTA-STS policy
          applied (as a string) (2) The DANE TLSA record applied (as a
          string, with each RR entry of the RRset listed and separated by
-         a semicolon) (3) The literal string "no-policy-found", if
-         neither a DANE nor MTA-STS policy could be found.
+
 
 
 
@@ -337,6 +337,9 @@ Margolis, et al.          Expires May 12, 2018                  [Page 6]
 
 Internet-Draft                 SMTP-TLSRPT                 November 2017
 
+
+         a semicolon) (3) The literal string "no-policy-found", if
+         neither a DANE nor MTA-STS policy could be found.
 
       *  The domain for which the policy is applied
 
@@ -382,9 +385,6 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
       Section 4.3, "Result Types", will elaborate on the failed
       negotiation attempts.  This field contains an aggregate count of
       failed connections.
-
-
-
 
 
 
@@ -706,7 +706,8 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
    is a possible filename for the gzip file of a report to the Policy
    Domain "example.net" from the Sending MTA "mail.sender.example.com":
 
- `mail.sender.example.com!example.net!1470013207!1470186007!001.json.gz`
+   "mail.sender.example.com!example.net!1470013207!1470186007!001.json.g
+   z"
 
 5.2.  Compression
 
@@ -721,7 +722,6 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
    The report MAY be delivered by email.  To make the reports machine-
    parsable for the receivers, we define a top-level media type
    "multipart/report" with a new parameter "report-type="tlsrpt"".
-   Inside it, there are two parts: The first part is human readable,
 
 
 
@@ -730,6 +730,7 @@ Margolis, et al.          Expires May 12, 2018                 [Page 13]
 Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
+   Inside it, there are two parts: The first part is human readable,
    typically "text/plain", and the second part is machine readable with
    a new media type defined called "application/tlsrpt+json".  If
    compressed, the report should use the media type "application/
@@ -738,14 +739,12 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
    In addition, the following two new top level message header fields
    are defined:
 
-                    TLS-Report-Domain: Receiver-Domain
-                    TLS-Report-Submitter: Sender-Domain
-
-   The "TLS-Report-Submitter" value MUST match the value found in the
-   filename and the [RFC5321] domain from the "contact-info" from the
-   report body.  These message headers MUST be included and should allow
-   for easy searching for all reports submitted by a report domain or a
-   particular submitter, for example in IMAP [RFC3501]:
+   "TLS-Report-Domain: Receiver-Domain TLS-Report-Submitter: Sender-
+   Domain" The "TLS-Report-Submitter" value MUST match the value found
+   in the filename and the [RFC5321] domain from the "contact-info" from
+   the report body.  These message headers MUST be included and should
+   allow for easy searching for all reports submitted by a report domain
+   or a particular submitter, for example in IMAP [RFC3501]:
 
    "s SEARCH HEADER "TLS-Report-Domain" "example.com""
 
@@ -758,14 +757,15 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
    The [RFC5322].Subject field for report submissions SHOULD conform to
    the following ABNF:
 
-     tlsrpt-subject = %s"Report" FWS               ; "Report"
-                      %s"Domain:" FWS              ; "Domain:"
-              domain-name FWS              ; per RFC6376
-              %s"Submitter:" FWS           ; "Submitter:"
-              domain-name FWS              ; per RFC6376
-              %s"Report-ID:" FWS           ; "Report-ID:
-              "<" id-left "@" id-right ">" ; per RFC5322
-              [CFWS]                       ; per RFC5322 (as with FWS)
+       tlsrpt-subject = %s"Report" FWS               ; "Report"
+                        %s"Domain:" FWS              ; "Domain:"
+                domain-name FWS              ; per RFC6376
+                %s"Submitter:" FWS           ; "Submitter:"
+                domain-name FWS              ; per RFC6376
+                %s"Report-ID:" FWS           ; "Report-ID:
+                "<" id-left "@" id-right ">" ; per RFC5322
+                [CFWS]                       ; per RFC5322
+                                                     ; (as with FWS)
 
    The first domain-name indicates the DNS domain name about which the
    report was generated.  The second domain-name indicates the DNS
@@ -777,7 +777,7 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
    For instance, this is a possible Subject field for a report to the
    Policy Domain "example.net" from the Sending MTA
    "mail.sender.example.com".  It is line-wrapped as allowed by
-   [RFC5322]:
+
 
 
 
@@ -786,9 +786,9 @@ Margolis, et al.          Expires May 12, 2018                 [Page 14]
 Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
-            Subject: Report Domain: example.net
-                Submitter: mail.sender.example.com
-                Report-ID: <735ff.e317+bf22029@mailexample.net>
+              Subject: Report Domain: example.net
+                  Submitter: mail.sender.example.com
+                  Report-ID: <735ff.e317+bf22029@mailexample.net>
 
 5.3.1.  Example Report
 
