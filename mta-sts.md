@@ -367,7 +367,7 @@ NOT attempt to fetch a policy from the parent zone. Thus for mail sent
 to "user@mail.example.com", the policy can be fetched only from
 "mail.example.com", not "example.com".
 
-#Policy Validation
+# Policy Validation
 
 When sending to an MX at a domain for which the sender has a valid and
 non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST

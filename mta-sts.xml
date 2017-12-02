@@ -436,8 +436,10 @@ NOT attempt to fetch a policy from the parent zone. Thus for mail sent
 to &quot;user@mail.example.com&quot;, the policy can be fetched only from
 &quot;mail.example.com&quot;, not &quot;example.com&quot;.
 </t>
-<t>#Policy Validation
-</t>
+</section>
+</section>
+
+<section anchor="policy-validation" title="Policy Validation">
 <t>When sending to an MX at a domain for which the sender has a valid and
 non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST
 validate:
@@ -457,7 +459,6 @@ specify mode values of &quot;report&quot; or &quot;none&quot; MUST NOT be interp
 delivery failures, as described in <xref target="policy-application"/>, &quot;Policy
 Application&quot;.
 </t>
-</section>
 
 <section anchor="mx-certificate-validation" title="MX Certificate Validation">
 <t>The certificate presented by the receiving MX MUST chain to a root CA
