@@ -405,14 +405,14 @@ matching.
 
 To simplify this case, we impose the following constraints on wildcard
 certificates, identical to those in [@?RFC7672] section 3.2.3 and
-[@?RFC6125 section 6.4.3: wildcards are valid in DNS-IDs or CN-IDs, but
+[@?RFC6125] section 6.4.3: wildcards are valid in DNS-IDs or CN-IDs, but
 must be the entire first label of the identifier (that is,
 `*.example.com`, not `mail*.example.com`). Senders who are comparing a
 "suffix" MX pattern with a wildcard identifier should thus strip the
 wildcard and ensure that the two sides match label-by-label, until all
 labels of the shorter side (if unequal length) are consumed.
 
-Note that a wildcard *must* match a label; an `mx` pattern of
+Note that a wildcard must match a label; an `mx` pattern of
 `.example.com` thus does not match a SAN of `example.com`, nor does a
 SAN of `*.example.com` match an `mx` of `example.com`.
 
@@ -605,8 +605,8 @@ A suggested workflow to implement such an opt out is as follows:
 
 ## Well-Known URIs Registry
 
-A new .well-known URI will be registered in the Well-Known URIs registry
-as described below:
+A new "well-known" URI will be registered in the Well-Known URIs
+registry as described below:
 
 URI Suffix: mta-sts.txt Change Controller: IETF
 
