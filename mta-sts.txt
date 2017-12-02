@@ -552,7 +552,7 @@ Internet-Draft                   MTA-STS                   November 2017
        validation.
 
    2.  "report": In this mode, sending MTAs which also implement the
-       TLSRPT specification (TODO: add ref) merely send a report
+       TLSRPT specification [I-D.ietf-uta-smtp-tlsrpt] merely send a
 
 
 
@@ -562,8 +562,8 @@ Margolis, et al.          Expires May 12, 2018                 [Page 10]
 Internet-Draft                   MTA-STS                   November 2017
 
 
-       indicating policy application failures (so long as TLSRPT is also
-       implemented by the recipient domain).
+       report indicating policy application failures (so long as TLSRPT
+       is also implemented by the recipient domain).
 
    3.  "none": In this mode, sending MTAs should treat the policy domain
        as though it does not have any active policy; see Section 7.3,
@@ -601,14 +601,14 @@ Internet-Draft                   MTA-STS                   November 2017
 
 5.  Reporting Failures
 
-   MTA-STS is intended to be used along with TLSRPT (TODO: add ref) in
-   order to ensure implementing domains can detect cases of both benign
-   and malicious failures, and to ensure that failures that indicate an
-   active attack are discoverable.  As such, senders who also implement
-   TLSRPT SHOULD treat the following events as reportable failures:
+   MTA-STS is intended to be used along with TLSRPT
+   [I-D.ietf-uta-smtp-tlsrpt] in order to ensure implementing domains
+   can detect cases of both benign and malicious failures, and to ensure
+   that failures that indicate an active attack are discoverable.  As
+   such, senders who also implement TLSRPT SHOULD treat the following
+   events as reportable failures:
 
    o  HTTPS policy fetch failures when a valid TXT record is present.
-
 
 
 
@@ -1187,6 +1187,11 @@ Internet-Draft                   MTA-STS                   November 2017
 
 13.1.  Normative References
 
+   [I-D.ietf-uta-smtp-tlsrpt]
+              Margolis, D., Brotman, A., Ramakrishnan, B., Jones, J.,
+              and M. Risher, "SMTP TLS Reporting", draft-ietf-uta-smtp-
+              tlsrpt-11 (work in progress), November 2017.
+
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
               RFC2119, March 1997,
@@ -1221,11 +1226,6 @@ Internet-Draft                   MTA-STS                   November 2017
               Extensions: Extension Definitions", RFC 6066, DOI 10
               .17487/RFC6066, January 2011, <https://www.rfc-editor.org/
               info/rfc6066>.
-
-
-
-
-
 
 
 

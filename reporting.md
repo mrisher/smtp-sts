@@ -78,20 +78,21 @@ Because such "downgrade attacks" are not necessarily apparent to the
 receiving MTA, this document defines a mechanism for sending domains to
 report on failures at multiple stages of the MTA-to-MTA conversation.
 
-Recipient domains may also use the mechanisms defined by MTA-STS (TODO:
-Add ref) or DANE [@!RFC6698] to publish additional encryption and
-authentication requirements; this document defines a mechanism for
-sending domains that are compatible with MTA-STS or DANE to share
-success and failure statistics with recipient domains.
+Recipient domains may also use the mechanisms defined by MTA-STS
+[@!I-D.ietf-uta-mta-sts] or DANE [@!RFC6698] to
+publish additional encryption and authentication requirements; this
+document defines a mechanism for sending domains that are compatible
+with MTA-STS or DANE to share success and failure statistics with
+recipient domains.
 
 Specifically, this document defines a reporting schema that covers
 failures in routing, STARTTLS negotiation, and both DANE [@!RFC6698] and
-MTA-STS (TODO: Add ref) policy validation errors, and a standard TXT
-record that recipient domains can use to indicate where reports in this
-format should be sent.
+MTA-STS [@!I-D.ietf-uta-mta-sts] policy validation errors, and a
+standard TXT record that recipient domains can use to indicate where
+reports in this format should be sent.
 
 This document is intended as a companion to the specification for SMTP
-MTA Strict Transport Security (MTA-STS, TODO: Add ref).
+MTA Strict Transport Security [@!I-D.ietf-uta-mta-sts].
 
 ## Terminology
 
@@ -104,7 +105,7 @@ We also define the following terms for further use in this document:
 * MTA-STS Policy: A definition of the expected TLS availability,
   behavior, and desired actions for a given domain when a sending MTA
   encounters problems in negotiating a secure channel. MTA-STS is
-  defined in [TODO]
+  defined in [@!I-D.ietf-uta-mta-sts].
 * DANE Policy: A mechanism by which administrators can supply a record
   that can be used to validate the certificate presented by an MTA. DANE
   is defined in [@!RFC6698].
@@ -117,11 +118,11 @@ We also define the following terms for further use in this document:
 # Related Technologies
 
 * This document is intended as a companion to the specification for SMTP
-  MTA Strict Transport Security (MTA-STS, TODO: Add RFC ref).
+  MTA Strict Transport Security [@!I-D.ietf-uta-mta-sts].
 * SMTP-TLSRPT defines a mechanism for sending domains that are
   compatible with MTA-STS or DANE to share success and failure
   statistics with recipient domains.  DANE is defined in [@!RFC6698] and
-  MTA-STS is defined in [TODO : Add RFC ref]
+  MTA-STS is defined in [@!I-D.ietf-uta-mta-sts].
 
 # Reporting Policy
 

@@ -430,8 +430,8 @@ value of the policy `mode` field:
    hosts which fail MX matching or certificate validation.
 
 2. `report`: In this mode, sending MTAs which also implement the TLSRPT
-   specification (TODO: add ref) merely send a report indicating policy
-   application failures (so long as TLSRPT is also implemented by the
+   specification [@!I-D.ietf-uta-smtp-tlsrpt] merely send a report indicating
+   policy application failures (so long as TLSRPT is also implemented by the
    recipient domain).
 
 3. `none`: In this mode, sending MTAs should treat the policy domain as
@@ -466,11 +466,11 @@ steps:
 
 # Reporting Failures
 
-MTA-STS is intended to be used along with TLSRPT (TODO: add ref) in
+MTA-STS is intended to be used along with TLSRPT [@!I-D.ietf-uta-smtp-tlsrpt] in
 order to ensure implementing domains can detect cases of both benign and
-malicious failures, and to ensure that failures that indicate an active
-attack are discoverable. As such, senders who also implement TLSRPT
-SHOULD treat the following events as reportable failures:
+malicious failures, and to ensure that failures that indicate an active attack
+are discoverable. As such, senders who also implement TLSRPT SHOULD treat the
+following events as reportable failures:
 
 * HTTPS policy fetch failures when a valid TXT record is present.
 

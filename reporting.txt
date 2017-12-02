@@ -142,19 +142,19 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
    conversation.
 
    Recipient domains may also use the mechanisms defined by MTA-STS
-   (TODO: Add ref) or DANE [RFC6698] to publish additional encryption
-   and authentication requirements; this document defines a mechanism
-   for sending domains that are compatible with MTA-STS or DANE to share
-   success and failure statistics with recipient domains.
+   [I-D.ietf-uta-mta-sts] or DANE [RFC6698] to publish additional
+   encryption and authentication requirements; this document defines a
+   mechanism for sending domains that are compatible with MTA-STS or
+   DANE to share success and failure statistics with recipient domains.
 
    Specifically, this document defines a reporting schema that covers
    failures in routing, STARTTLS negotiation, and both DANE [RFC6698]
-   and MTA-STS (TODO: Add ref) policy validation errors, and a standard
-   TXT record that recipient domains can use to indicate where reports
-   in this format should be sent.
+   and MTA-STS [I-D.ietf-uta-mta-sts] policy validation errors, and a
+   standard TXT record that recipient domains can use to indicate where
+   reports in this format should be sent.
 
    This document is intended as a companion to the specification for
-   SMTP MTA Strict Transport Security (MTA-STS, TODO: Add ref).
+   SMTP MTA Strict Transport Security [I-D.ietf-uta-mta-sts].
 
 1.1.  Terminology
 
@@ -175,7 +175,7 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
    o  MTA-STS Policy: A definition of the expected TLS availability,
       behavior, and desired actions for a given domain when a sending
       MTA encounters problems in negotiating a secure channel.  MTA-STS
-      is defined in [TODO]
+      is defined in [I-D.ietf-uta-mta-sts].
 
    o  DANE Policy: A mechanism by which administrators can supply a
       record that can be used to validate the certificate presented by
@@ -192,12 +192,12 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 2.  Related Technologies
 
    o  This document is intended as a companion to the specification for
-      SMTP MTA Strict Transport Security (MTA-STS, TODO: Add RFC ref).
+      SMTP MTA Strict Transport Security [I-D.ietf-uta-mta-sts].
 
    o  SMTP-TLSRPT defines a mechanism for sending domains that are
       compatible with MTA-STS or DANE to share success and failure
       statistics with recipient domains.  DANE is defined in [RFC6698]
-      and MTA-STS is defined in [TODO : Add RFC ref]
+      and MTA-STS is defined in [I-D.ietf-uta-mta-sts].
 
 3.  Reporting Policy
 
@@ -1241,6 +1241,12 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 10.1.  Normative References
 
+   [I-D.ietf-uta-mta-sts]
+              Margolis, D., Risher, M., Ramakrishnan, B., Brotman, A.,
+              and J. Jones, "SMTP MTA Strict Transport Security (MTA-
+              STS)", draft-ietf-uta-mta-sts-11 (work in progress),
+              November 2017.
+
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
               RFC2119, March 1997,
@@ -1275,12 +1281,6 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
               DOI 10.17487/RFC5321, October 2008,
               <http://www.rfc-editor.org/info/rfc5321>.
 
-   [RFC5322]  Resnick, P., Ed., "Internet Message Format", RFC 5322, DOI
-              10.17487/RFC5322, October 2008,
-              <http://www.rfc-editor.org/info/rfc5322>.
-
-
-
 
 
 
@@ -1289,6 +1289,10 @@ Margolis, et al.          Expires May 12, 2018                 [Page 23]
 
 Internet-Draft                 SMTP-TLSRPT                 November 2017
 
+
+   [RFC5322]  Resnick, P., Ed., "Internet Message Format", RFC 5322, DOI
+              10.17487/RFC5322, October 2008,
+              <http://www.rfc-editor.org/info/rfc5322>.
 
    [RFC5891]  Klensin, J., "Internationalized Domain Names in
               Applications (IDNA): Protocol", RFC 5891, DOI 10.17487/
@@ -1335,16 +1339,16 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
               7405, DOI 10.17487/RFC7405, December 2014,
               <http://www.rfc-editor.org/info/rfc7405>.
 
-   [RFC7493]  Bray, T., Ed., "The I-JSON Message Format", RFC 7493, DOI
-              10.17487/RFC7493, March 2015,
-              <http://www.rfc-editor.org/info/rfc7493>.
-
 
 
 Margolis, et al.          Expires May 12, 2018                 [Page 24]
 
 Internet-Draft                 SMTP-TLSRPT                 November 2017
 
+
+   [RFC7493]  Bray, T., Ed., "The I-JSON Message Format", RFC 7493, DOI
+              10.17487/RFC7493, March 2015,
+              <http://www.rfc-editor.org/info/rfc7493>.
 
 10.2.  Informative References
 
@@ -1388,10 +1392,6 @@ Authors' Addresses
    Email: alex_brotman (at) comcast.com
 
 
-   Binu Ramakrishnan
-   Yahoo!, Inc
-
-   Email: rbinu (at) yahoo-inc (dot com)
 
 
 
@@ -1400,6 +1400,12 @@ Authors' Addresses
 Margolis, et al.          Expires May 12, 2018                 [Page 25]
 
 Internet-Draft                 SMTP-TLSRPT                 November 2017
+
+
+   Binu Ramakrishnan
+   Yahoo!, Inc
+
+   Email: rbinu (at) yahoo-inc (dot com)
 
 
    Janet Jones
@@ -1412,12 +1418,6 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
    Google, Inc
 
    Email: risher (at) google (dot com)
-
-
-
-
-
-
 
 
 
