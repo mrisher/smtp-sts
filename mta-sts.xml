@@ -423,6 +423,14 @@ implemented MTA-STS.
 HTTPS, but a valid (non-expired) policy exists in the sender's cache,
 the sender MUST apply that cached policy.
 </t>
+<t>Finally, to mitigate the risk of persistent interference with policy
+refresh, as discussed in-depth in <xref target="security-considerations"/>, MTAs
+SHOULD proactivecly refresh cached policies before they expire; a
+suggested refresh frequency is once per day. To enable administrators to
+discover problems with policy refresh, MTAs SHOULD alert administrators
+(through the use of logs or similar) when such attempts fail, unless the
+cached policy mode is <spanx style="verb">none</spanx>.
+</t>
 </section>
 
 <section anchor="policy-selection-for-smart-hosts-and-subdomains" title="Policy Selection for Smart Hosts and Subdomains">

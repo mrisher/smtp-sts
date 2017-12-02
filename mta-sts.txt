@@ -83,7 +83,7 @@ Table of Contents
    7.  Interoperability Considerations . . . . . . . . . . . . . . .  12
      7.1.  SNI Support . . . . . . . . . . . . . . . . . . . . . . .  12
      7.2.  Minimum TLS Version Support . . . . . . . . . . . . . . .  12
-   8.  Operational Considerations  . . . . . . . . . . . . . . . . .  12
+   8.  Operational Considerations  . . . . . . . . . . . . . . . . .  13
      8.1.  Policy Updates  . . . . . . . . . . . . . . . . . . . . .  13
      8.2.  Policy Delegation . . . . . . . . . . . . . . . . . . . .  13
      8.3.  Removing MTA-STS  . . . . . . . . . . . . . . . . . . . .  14
@@ -466,6 +466,14 @@ Internet-Draft                   MTA-STS                   November 2017
    via HTTPS, but a valid (non-expired) policy exists in the sender's
    cache, the sender MUST apply that cached policy.
 
+   Finally, to mitigate the risk of persistent interference with policy
+   refresh, as discussed in-depth in Section 10, MTAs SHOULD
+   proactivecly refresh cached policies before they expire; a suggested
+   refresh frequency is once per day.  To enable administrators to
+   discover problems with policy refresh, MTAs SHOULD alert
+   administrators (through the use of logs or similar) when such
+   attempts fail, unless the cached policy mode is "none".
+
 3.4.  Policy Selection for Smart Hosts and Subdomains
 
    When sending mail via a "smart host"--an intermediate SMTP relay
@@ -491,20 +499,16 @@ Internet-Draft                   MTA-STS                   November 2017
        one of the identities presented in the MX's X.509 certificate, as
        described in "MX Certificate Validation".
 
-   This section does not dictate the behavior of sending MTAs when
-   policies fail to validate; see Section 5, "Policy Application" for a
-   description of sending MTA behavior when policy validation fails.
-
-
-
-
-
 
 
 Margolis, et al.          Expires May 12, 2018                  [Page 9]
 
 Internet-Draft                   MTA-STS                   November 2017
 
+
+   This section does not dictate the behavior of sending MTAs when
+   policies fail to validate; see Section 5, "Policy Application" for a
+   description of sending MTA behavior when policy validation fails.
 
 4.1.  MX Certificate Validation
 
@@ -551,10 +555,6 @@ Internet-Draft                   MTA-STS                   November 2017
        message to hosts which fail MX matching or certificate
        validation.
 
-   2.  "report": In this mode, sending MTAs which also implement the
-       TLSRPT specification [I-D.ietf-uta-smtp-tlsrpt] merely send a
-
-
 
 
 Margolis, et al.          Expires May 12, 2018                 [Page 10]
@@ -562,6 +562,8 @@ Margolis, et al.          Expires May 12, 2018                 [Page 10]
 Internet-Draft                   MTA-STS                   November 2017
 
 
+   2.  "report": In this mode, sending MTAs which also implement the
+       TLSRPT specification [I-D.ietf-uta-smtp-tlsrpt] merely send a
        report indicating policy application failures (so long as TLSRPT
        is also implemented by the recipient domain).
 
@@ -608,8 +610,6 @@ Internet-Draft                   MTA-STS                   November 2017
    such, senders who also implement TLSRPT SHOULD treat the following
    events as reportable failures:
 
-   o  HTTPS policy fetch failures when a valid TXT record is present.
-
 
 
 
@@ -617,6 +617,8 @@ Margolis, et al.          Expires May 12, 2018                 [Page 11]
 
 Internet-Draft                   MTA-STS                   November 2017
 
+
+   o  HTTPS policy fetch failures when a valid TXT record is present.
 
    o  Policy fetch failures of any kind when a valid policy exists in
       the policy cache, except if that policy's mode is "none".
@@ -660,8 +662,6 @@ Internet-Draft                   MTA-STS                   November 2017
    [RFC5246] or higher.  The general TLS usage guidance in [RFC7525]
    SHOULD be followed.
 
-8.  Operational Considerations
-
 
 
 
@@ -673,6 +673,8 @@ Margolis, et al.          Expires May 12, 2018                 [Page 12]
 
 Internet-Draft                   MTA-STS                   November 2017
 
+
+8.  Operational Considerations
 
 8.1.  Policy Updates
 
@@ -721,14 +723,14 @@ Internet-Draft                   MTA-STS                   November 2017
 
         _mta-sts.user.example.  IN CNAME _mta-sts.provider.example.
 
-   Policy:
-
 
 
 Margolis, et al.          Expires May 12, 2018                 [Page 13]
 
 Internet-Draft                   MTA-STS                   November 2017
 
+
+   Policy:
 
            > GET /.well-known/mta-sts.txt
            > Host: mta-sts.user.example
@@ -776,8 +778,6 @@ Internet-Draft                   MTA-STS                   November 2017
    in the Well-Known URIs registry as described below:
 
    URI Suffix: mta-sts.txt Change Controller: IETF
-
-
 
 
 

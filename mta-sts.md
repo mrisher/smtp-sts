@@ -355,6 +355,14 @@ Conversely, if no "live" policy can be discovered via DNS or fetched via
 HTTPS, but a valid (non-expired) policy exists in the sender's cache,
 the sender MUST apply that cached policy.
 
+Finally, to mitigate the risk of persistent interference with policy
+refresh, as discussed in-depth in (#security-considerations), MTAs
+SHOULD proactivecly refresh cached policies before they expire; a
+suggested refresh frequency is once per day. To enable administrators to
+discover problems with policy refresh, MTAs SHOULD alert administrators
+(through the use of logs or similar) when such attempts fail, unless the
+cached policy mode is `none`.
+
 ## Policy Selection for Smart Hosts and Subdomains
 
 When sending mail via a "smart host"--an intermediate SMTP relay rather
