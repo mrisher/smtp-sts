@@ -928,7 +928,7 @@ ensure that certificates presented by the recipient MX validate.
 _mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
 </artwork></figure>
 <t>MTA-STS Policy file served as the response body at
-<eref target="https://mta-sts.example.com/.well-known/mta-sts.txt:"/>
+<spanx style="verb">https://mta-sts.example.com/.well-known/mta-sts.txt</spanx>:
 </t>
 
 <figure align="center"><artwork align="center">

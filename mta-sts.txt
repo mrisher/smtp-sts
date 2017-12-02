@@ -103,8 +103,8 @@ Table of Contents
    14. References  . . . . . . . . . . . . . . . . . . . . . . . . .  22
      14.1.  Normative References . . . . . . . . . . . . . . . . . .  22
      14.2.  Informative References . . . . . . . . . . . . . . . . .  23
-     14.3.  URIs . . . . . . . . . . . . . . . . . . . . . . . . . .  24
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  24
+
 
 
 
@@ -1026,7 +1026,8 @@ Internet-Draft                   MTA-STS                   November 2017
 
        _mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
 
-   MTA-STS Policy file served as the response body at [1]
+   MTA-STS Policy file served as the response body at "https://mta-
+   sts.example.com/.well-known/mta-sts.txt":
 
                          version: STSv1
                          mode: report
@@ -1057,7 +1058,6 @@ func isNonExpired(policy) {
 
 func tryStartTls(connection) {
   // Attempt to open an SMTP connection with STARTTLS with the MX.
-}
 
 
 
@@ -1065,6 +1065,8 @@ Margolis, et al.          Expires May 12, 2018                 [Page 19]
 
 Internet-Draft                   MTA-STS                   November 2017
 
+
+}
 
 func isWildcardMatch(pat, host) {
   // Literal matches are true.
@@ -1112,8 +1114,6 @@ func tryGetNewPolicy(domain) {
 
 func cachePolicy(domain, policy) {
   // Store "policy" as the cached policy for "domain".
-}
-
 
 
 
@@ -1121,6 +1121,8 @@ Margolis, et al.          Expires May 12, 2018                 [Page 20]
 
 Internet-Draft                   MTA-STS                   November 2017
 
+
+}
 
 func tryGetCachedPolicy(domain) {
   // Return a cached policy for "domain".
@@ -1168,8 +1170,6 @@ func handleMessage(message) {
   } else {
     policy = tryGetCachedPolicy(domain)
   }
-  if policy {
-    return tryWithPolicy(message, domain, policy)
 
 
 
@@ -1178,6 +1178,8 @@ Margolis, et al.          Expires May 12, 2018                 [Page 21]
 Internet-Draft                   MTA-STS                   November 2017
 
 
+  if policy {
+    return tryWithPolicy(message, domain, policy)
   }
   // Try to deliver the message normally (i.e. without MTA-STS).
 }
@@ -1222,10 +1224,8 @@ Internet-Draft                   MTA-STS                   November 2017
               .17487/RFC5785, April 2010,
               <http://www.rfc-editor.org/info/rfc5785>.
 
-   [RFC6066]  Eastlake 3rd, D., "Transport Layer Security (TLS)
-              Extensions: Extension Definitions", RFC 6066, DOI 10
-              .17487/RFC6066, January 2011, <https://www.rfc-editor.org/
-              info/rfc6066>.
+
+
 
 
 
@@ -1233,6 +1233,11 @@ Margolis, et al.          Expires May 12, 2018                 [Page 22]
 
 Internet-Draft                   MTA-STS                   November 2017
 
+
+   [RFC6066]  Eastlake 3rd, D., "Transport Layer Security (TLS)
+              Extensions: Extension Definitions", RFC 6066, DOI 10
+              .17487/RFC6066, January 2011, <https://www.rfc-editor.org/
+              info/rfc6066>.
 
    [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
               Verification of Domain-Based Application Service Identity
@@ -1276,11 +1281,6 @@ Internet-Draft                   MTA-STS                   November 2017
               RFC5891, August 2010,
               <http://www.rfc-editor.org/info/rfc5891>.
 
-   [RFC6818]  Yee, P., "Updates to the Internet X.509 Public Key
-              Infrastructure Certificate and Certificate Revocation List
-              (CRL) Profile", RFC 6818, DOI 10.17487/RFC6818, January
-              2013, <https://www.rfc-editor.org/info/rfc6818>.
-
 
 
 
@@ -1289,6 +1289,11 @@ Margolis, et al.          Expires May 12, 2018                 [Page 23]
 
 Internet-Draft                   MTA-STS                   November 2017
 
+
+   [RFC6818]  Yee, P., "Updates to the Internet X.509 Public Key
+              Infrastructure Certificate and Certificate Revocation List
+              (CRL) Profile", RFC 6818, DOI 10.17487/RFC6818, January
+              2013, <https://www.rfc-editor.org/info/rfc6818>.
 
    [RFC6960]  Santesson, S., Myers, M., Ankney, R., Malpani, A.,
               Galperin, S., and C. Adams, "X.509 Internet Public Key
@@ -1306,10 +1311,6 @@ Internet-Draft                   MTA-STS                   November 2017
               (DANE) Transport Layer Security (TLS)", RFC 7672, DOI 10
               .17487/RFC7672, October 2015,
               <http://www.rfc-editor.org/info/rfc7672>.
-
-14.3.  URIs
-
-   [1] https://mta-sts.example.com/.well-known/mta-sts.txt:
 
 Authors' Addresses
 
@@ -1335,7 +1336,6 @@ Authors' Addresses
    Comcast, Inc
 
    Email: alex_brotman (at) comcast.com
-
 
 
 

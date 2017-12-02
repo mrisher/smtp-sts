@@ -813,7 +813,7 @@ _mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
 ~~~~~~~~~
 
 MTA-STS Policy file served as the response body at
-https://mta-sts.example.com/.well-known/mta-sts.txt:
+`https://mta-sts.example.com/.well-known/mta-sts.txt`:
 ~~~~~~~~~
 version: STSv1
 mode: report
