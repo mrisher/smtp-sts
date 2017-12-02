@@ -115,11 +115,11 @@ MXs, but such a mechanism is not possible for the per-domain policies
 used by MTA-STS.
 
 The primary motivation of MTA-STS is to provide a mechanism for domains
-to upgrade their transport security even when deploying DNSSEC is
-undesirable or impractical. However, MTA-STS is designed not to
-interfere with DANE deployments when the two overlap; in particular,
-senders who implement MTA-STS validation MUST NOT allow a "valid" or
-"report-only" MTA-STS validation to override a failing DANE validation.
+to ensure transport security even when deploying DNSSEC is undesirable
+or impractical. However, MTA-STS is designed not to interfere with DANE
+deployments when the two overlap; in particular, senders who implement
+MTA-STS validation MUST NOT allow a "valid" or "report-only" MTA-STS
+validation to override a failing DANE validation.
 
 # Policy Discovery
 
@@ -381,10 +381,8 @@ validate:
     described in "MX Certificate Validation".
 
 This section does not dictate the behavior of sending MTAs when policies
-fail to validate; in particular, validation failures of policies which
-specify mode values of "testing" or "none" MUST NOT be interpreted as
-delivery failures, as described in (#policy-application), "Policy
-Application".
+fail to validate; see (#policy-application), "Policy Application" for a
+description of sending MTA behavior when policy validation fails.
 
 ## MX Certificate Validation
 
@@ -416,8 +414,8 @@ Note that a wildcard must match a label; an `mx` pattern of
 `.example.com` thus does not match a SAN of `example.com`, nor does a
 SAN of `*.example.com` match an `mx` of `example.com`.
 
-A simple pseudocode implementation of this algorithm is presented in the
-Appendix.
+A simple pseudocode implementation of this algorithm is presented in 
+(#message-delivery-pseudocode).
 
 # Policy Application
 
@@ -549,7 +547,7 @@ allows the hosting organization to control update signaling.
 
 Second, the Policy Domain must point the "well-known" policy location to
 the hosting organization. This can be done either by setting the
-`mta-sts` record to a host or CNAME specified by the hosting
+`mta-sts` record to an IP address or CNAME specified by the hosting
 organization and by giving the hosting organization a TLS certificate
 which is valid for that host, or by setting up a "reverse proxy" (also
 known as a "gateway") server that serves as the Policy Domain's policy
@@ -677,9 +675,9 @@ Policy, making the Policy Domain appear not to have an MTA-STS Policy.
 The sender policy cache is designed to resist this attack by decreasing
 the frequency of policy discovery and thus reducing the window of
 vulnerability; it is nonetheless a risk that attackers who can predict
-or induce policy discovery--for example, by inducing a victim sending
-domain to send mail to a never-before-contacted recipient while carrying
-out a man-in-the-middle attack--may be able to foil policy discovery and
+or induce policy discovery--for example, by inducing a sending domain to
+send mail to a never-before-contacted recipient while carrying out a
+man-in-the-middle attack--may be able to foil policy discovery and
 effectively downgrade the security of the message delivery.
 
 Since this attack depends upon intercepting initial policy discovery, we
@@ -710,13 +708,13 @@ discovery.
 ## Denial of Service
 
 We additionally consider the Denial of Service risk posed by an attacker
-who can modify the DNS records for a victim domain. Absent MTA-STS, such
-an attacker can cause a sending MTA to cache invalid MX records, but
-only for however long the sending resolver caches those records. With
-MTA-STS, the attacker can additionally advertise a new, long-`max_age`
-MTA-STS policy with `mx` constraints that validate the malicious MX
-record, causing senders to cache the policy and refuse to deliver
-messages once the victim has resecured the MX records.
+who can modify the DNS records for a recipient domain. Absent MTA-STS,
+such an attacker can cause a sending MTA to cache invalid MX records,
+but only for however long the sending resolver caches those records.
+With MTA-STS, the attacker can additionally advertise a new,
+long-`max_age` MTA-STS policy with `mx` constraints that validate the
+malicious MX record, causing senders to cache the policy and refuse to
+deliver messages once the victim has resecured the MX records.
 
 This attack is mitigated in part by the ability of a victim domain to
 (at any time) publish a new policy updating the cached, malicious
@@ -799,7 +797,9 @@ Markus Laber
 1&1 Mail & Media Development & Technology GmbH
 markus.laber (at) 1und1 (dot de)
 
-# Appendix 1: MTA-STS example record & policy
+{backmatter}
+
+# MTA-STS example record & policy
 
 The owner of `example.com` wishes to begin using MTA-STS with a policy
 that will solicit reports from senders without affecting how the
@@ -823,7 +823,7 @@ mx: mx.backup-example.com
 max_age: 12345678
 ~~~~~~~~~
 
-# Appendix 2: Message delivery pseudocode
+# Message delivery pseudocode
 
 Below is pseudocode demonstrating the logic of a compliant sending MTA. 
 
@@ -948,5 +948,3 @@ func handleMessage(message) {
 }
 
 ~~~~~~~~~
-
-{backmatter}

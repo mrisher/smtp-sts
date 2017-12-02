@@ -170,11 +170,11 @@ MXs, but such a mechanism is not possible for the per-domain policies
 used by MTA-STS.
 </t>
 <t>The primary motivation of MTA-STS is to provide a mechanism for domains
-to upgrade their transport security even when deploying DNSSEC is
-undesirable or impractical. However, MTA-STS is designed not to
-interfere with DANE deployments when the two overlap; in particular,
-senders who implement MTA-STS validation MUST NOT allow a &quot;valid&quot; or
-&quot;report-only&quot; MTA-STS validation to override a failing DANE validation.
+to ensure transport security even when deploying DNSSEC is undesirable
+or impractical. However, MTA-STS is designed not to interfere with DANE
+deployments when the two overlap; in particular, senders who implement
+MTA-STS validation MUST NOT allow a &quot;valid&quot; or &quot;report-only&quot; MTA-STS
+validation to override a failing DANE validation.
 </t>
 </section>
 
@@ -454,10 +454,8 @@ described in &quot;MX Certificate Validation&quot;.</t>
 </list>
 </t>
 <t>This section does not dictate the behavior of sending MTAs when policies
-fail to validate; in particular, validation failures of policies which
-specify mode values of &quot;testing&quot; or &quot;none&quot; MUST NOT be interpreted as
-delivery failures, as described in <xref target="policy-application"/>, &quot;Policy
-Application&quot;.
+fail to validate; see <xref target="policy-application"/>, &quot;Policy Application&quot; for a
+description of sending MTA behavior when policy validation fails.
 </t>
 
 <section anchor="mx-certificate-validation" title="MX Certificate Validation">
@@ -489,8 +487,8 @@ labels of the shorter side (if unequal length) are consumed.
 <spanx style="verb">.example.com</spanx> thus does not match a SAN of <spanx style="verb">example.com</spanx>, nor does a
 SAN of <spanx style="verb">*.example.com</spanx> match an <spanx style="verb">mx</spanx> of <spanx style="verb">example.com</spanx>.
 </t>
-<t>A simple pseudocode implementation of this algorithm is presented in the
-Appendix.
+<t>A simple pseudocode implementation of this algorithm is presented in
+<xref target="message-delivery-pseudocode"/>.
 </t>
 </section>
 </section>
@@ -636,7 +634,7 @@ allows the hosting organization to control update signaling.
 </t>
 <t>Second, the Policy Domain must point the &quot;well-known&quot; policy location to
 the hosting organization. This can be done either by setting the
-<spanx style="verb">mta-sts</spanx> record to a host or CNAME specified by the hosting
+<spanx style="verb">mta-sts</spanx> record to an IP address or CNAME specified by the hosting
 organization and by giving the hosting organization a TLS certificate
 which is valid for that host, or by setting up a &quot;reverse proxy&quot; (also
 known as a &quot;gateway&quot;) server that serves as the Policy Domain's policy
@@ -785,9 +783,9 @@ Policy, making the Policy Domain appear not to have an MTA-STS Policy.
 The sender policy cache is designed to resist this attack by decreasing
 the frequency of policy discovery and thus reducing the window of
 vulnerability; it is nonetheless a risk that attackers who can predict
-or induce policy discovery--for example, by inducing a victim sending
-domain to send mail to a never-before-contacted recipient while carrying
-out a man-in-the-middle attack--may be able to foil policy discovery and
+or induce policy discovery--for example, by inducing a sending domain to
+send mail to a never-before-contacted recipient while carrying out a
+man-in-the-middle attack--may be able to foil policy discovery and
 effectively downgrade the security of the message delivery.
 </t>
 <t>Since this attack depends upon intercepting initial policy discovery, we
@@ -819,13 +817,13 @@ discovery.
 
 <section anchor="denial-of-service" title="Denial of Service">
 <t>We additionally consider the Denial of Service risk posed by an attacker
-who can modify the DNS records for a victim domain. Absent MTA-STS, such
-an attacker can cause a sending MTA to cache invalid MX records, but
-only for however long the sending resolver caches those records. With
-MTA-STS, the attacker can additionally advertise a new, long-<spanx style="verb">max_age</spanx>
-MTA-STS policy with <spanx style="verb">mx</spanx> constraints that validate the malicious MX
-record, causing senders to cache the policy and refuse to deliver
-messages once the victim has resecured the MX records.
+who can modify the DNS records for a recipient domain. Absent MTA-STS,
+such an attacker can cause a sending MTA to cache invalid MX records,
+but only for however long the sending resolver caches those records.
+With MTA-STS, the attacker can additionally advertise a new,
+long-<spanx style="verb">max_age</spanx> MTA-STS policy with <spanx style="verb">mx</spanx> constraints that validate the
+malicious MX record, causing senders to cache the policy and refuse to
+deliver messages once the victim has resecured the MX records.
 </t>
 <t>This attack is mitigated in part by the ability of a victim domain to
 (at any time) publish a new policy updating the cached, malicious
@@ -914,7 +912,34 @@ markus.laber (at) 1und1 (dot de)
 </t>
 </section>
 
-<section anchor="appendix-1-mtasts-example-record--policy" title="Appendix 1: MTA-STS example record &amp; policy">
+</middle>
+<back>
+<references title="Normative References">
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-uta-smtp-tlsrpt.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3492.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5246.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5280.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5321.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5785.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6066.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6125.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7231.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7405.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7525.xml"?>
+</references>
+<references title="Informative References">
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4033.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5322.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5891.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6818.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6960.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7234.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7672.xml"?>
+</references>
+
+<section anchor="mtasts-example-record--policy" title="MTA-STS example record &amp; policy">
 <t>The owner of <spanx style="verb">example.com</spanx> wishes to begin using MTA-STS with a policy
 that will solicit reports from senders without affecting how the
 messages are processed, in order to verify the identity of MXs that
@@ -941,7 +966,7 @@ max_age: 12345678
 </artwork></figure>
 </section>
 
-<section anchor="appendix-2-message-delivery-pseudocode" title="Appendix 2: Message delivery pseudocode">
+<section anchor="message-delivery-pseudocode" title="Message delivery pseudocode">
 <t>Below is pseudocode demonstrating the logic of a compliant sending MTA.
 </t>
 <t>While this pseudocode implementation suggests synchronous policy
@@ -1067,33 +1092,6 @@ func handleMessage(message) {
 
 </artwork></figure>
 </section>
-
-</middle>
-<back>
-<references title="Normative References">
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-uta-smtp-tlsrpt.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3492.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5246.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5280.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5321.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5785.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6066.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6125.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7231.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7405.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7525.xml"?>
-</references>
-<references title="Informative References">
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4033.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5322.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5891.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6818.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6960.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7234.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7672.xml"?>
-</references>
 
 </back>
 </rfc>

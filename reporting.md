@@ -835,7 +835,9 @@ to deploy TLSRPT TXT records with a large TTL (reducing the window for
 successful attacks against DNS resolution of the record) or to deploy
 DNSSEC on the deploying zone.
 
-# Appendix 1: Example Reporting Policy
+{backmatter}
+
+# Example Reporting Policy
 
 ## Report using MAILTO
 
@@ -852,7 +854,7 @@ _smtp-tlsrpt.mail.example.com. IN TXT \
         rua=https://reporting.example.com/v1/tlsrpt"
 ```
 
-# Appendix 2: Example JSON Report
+# Example JSON Report
 
 ```
 {
@@ -904,5 +906,3 @@ where 100 sessions were attempted to Company Y servers with an expired
 certificate and 200 sessions were attempted to Company Y servers that
 did not successfully respond to the `STARTTLS` command.  Additionally 3
 sessions failed due to "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED".
-
-{backmatter}

@@ -116,13 +116,13 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 
      6.5.  STARTTLS Validation Result Types  . . . . . . . . . . . .  19
    7.  Security Considerations . . . . . . . . . . . . . . . . . . .  19
-   8.  Appendix 1: Example Reporting Policy  . . . . . . . . . . . .  21
-     8.1.  Report using MAILTO . . . . . . . . . . . . . . . . . . .  21
-     8.2.  Report using HTTPS  . . . . . . . . . . . . . . . . . . .  21
-   9.  Appendix 2: Example JSON Report . . . . . . . . . . . . . . .  21
-   10. References  . . . . . . . . . . . . . . . . . . . . . . . . .  23
-     10.1.  Normative References . . . . . . . . . . . . . . . . . .  23
-     10.2.  Informative References . . . . . . . . . . . . . . . . .  25
+   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  21
+     8.1.  Normative References  . . . . . . . . . . . . . . . . . .  21
+     8.2.  Informative References  . . . . . . . . . . . . . . . . .  23
+   Appendix A.  Example Reporting Policy . . . . . . . . . . . . . .  23
+     A.1.  Report using MAILTO . . . . . . . . . . . . . . . . . . .  23
+     A.2.  Report using HTTPS  . . . . . . . . . . . . . . . . . . .  23
+   Appendix B.  Example JSON Report  . . . . . . . . . . . . . . . .  23
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  25
 
 1.  Introduction
@@ -1122,58 +1122,170 @@ Margolis, et al.          Expires May 12, 2018                 [Page 20]
 Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
-8.  Appendix 1: Example Reporting Policy
+8.  References
 
-8.1.  Report using MAILTO
+8.1.  Normative References
 
-            _smtp-tlsrpt.mail.example.com. IN TXT \
-                    "v=TLSRPTv1;rua=mailto:reports@example.com"
+   [I-D.ietf-uta-mta-sts]
+              Margolis, D., Risher, M., Ramakrishnan, B., Brotman, A.,
+              and J. Jones, "SMTP MTA Strict Transport Security (MTA-
+              STS)", draft-ietf-uta-mta-sts-11 (work in progress),
+              November 2017.
 
-8.2.  Report using HTTPS
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
+              RFC2119, March 1997,
+              <http://www.rfc-editor.org/info/rfc2119>.
 
-           _smtp-tlsrpt.mail.example.com. IN TXT \
-                   "v=TLSRPTv1; \
-                   rua=https://reporting.example.com/v1/tlsrpt"
+   [RFC3339]  Klyne, G. and C. Newman, "Date and Time on the Internet:
+              Timestamps", RFC 3339, DOI 10.17487/RFC3339, July 2002,
+              <http://www.rfc-editor.org/info/rfc3339>.
 
-9.  Appendix 2: Example JSON Report
+   [RFC3492]  Costello, A., "Punycode: A Bootstring encoding of Unicode
+              for Internationalized Domain Names in Applications
+              (IDNA)", RFC 3492, DOI 10.17487/RFC3492, March 2003,
+              <http://www.rfc-editor.org/info/rfc3492>.
 
+   [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+              Resource Identifier (URI): Generic Syntax", STD 66, RFC
+              3986, DOI 10.17487/RFC3986, January 2005,
+              <http://www.rfc-editor.org/info/rfc3986>.
 
+   [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
+              Specifications: ABNF", STD 68, RFC 5234, DOI 10.17487/
+              RFC5234, January 2008,
+              <http://www.rfc-editor.org/info/rfc5234>.
 
+   [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
+              Housley, R., and W. Polk, "Internet X.509 Public Key
+              Infrastructure Certificate and Certificate Revocation List
+              (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
+              <http://www.rfc-editor.org/info/rfc5280>.
 
+   [RFC5321]  Klensin, J., "Simple Mail Transfer Protocol", RFC 5321,
+              DOI 10.17487/RFC5321, October 2008,
+              <http://www.rfc-editor.org/info/rfc5321>.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+   [RFC5322]  Resnick, P., Ed., "Internet Message Format", RFC 5322, DOI
+              10.17487/RFC5322, October 2008,
+              <http://www.rfc-editor.org/info/rfc5322>.
 
 
 
 
 Margolis, et al.          Expires May 12, 2018                 [Page 21]
+
+Internet-Draft                 SMTP-TLSRPT                 November 2017
+
+
+   [RFC5891]  Klensin, J., "Internationalized Domain Names in
+              Applications (IDNA): Protocol", RFC 5891, DOI 10.17487/
+              RFC5891, August 2010,
+              <http://www.rfc-editor.org/info/rfc5891>.
+
+   [RFC5952]  Kawamura, S. and M. Kawashima, "A Recommendation for IPv6
+              Address Text Representation", RFC 5952, DOI 10.17487/
+              RFC5952, August 2010,
+              <http://www.rfc-editor.org/info/rfc5952>.
+
+   [RFC6068]  Duerst, M., Masinter, L., and J. Zawinski, "The 'mailto'
+              URI Scheme", RFC 6068, DOI 10.17487/RFC6068, October 2010,
+              <http://www.rfc-editor.org/info/rfc6068>.
+
+   [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
+              Verification of Domain-Based Application Service Identity
+              within Internet Public Key Infrastructure Using X.509
+              (PKIX) Certificates in the Context of Transport Layer
+              Security (TLS)", RFC 6125, DOI 10.17487/RFC6125, March
+              2011, <http://www.rfc-editor.org/info/rfc6125>.
+
+   [RFC6376]  Crocker, D., Ed., Hansen, T., Ed., and M. Kucherawy, Ed.,
+              "DomainKeys Identified Mail (DKIM) Signatures", STD 76,
+              RFC 6376, DOI 10.17487/RFC6376, September 2011,
+              <http://www.rfc-editor.org/info/rfc6376>.
+
+   [RFC6522]  Kucherawy, M., Ed., "The Multipart/Report Media Type for
+              the Reporting of Mail System Administrative Messages", STD
+              73, RFC 6522, DOI 10.17487/RFC6522, January 2012,
+              <http://www.rfc-editor.org/info/rfc6522>.
+
+   [RFC6698]  Hoffman, P. and J. Schlyter, "The DNS-Based Authentication
+              of Named Entities (DANE) Transport Layer Security (TLS)
+              Protocol: TLSA", RFC 6698, DOI 10.17487/RFC6698, August
+              2012, <http://www.rfc-editor.org/info/rfc6698>.
+
+   [RFC7231]  Fielding, R., Ed. and J. Reschke, Ed., "Hypertext Transfer
+              Protocol (HTTP/1.1): Semantics and Content", RFC 7231, DOI
+              10.17487/RFC7231, June 2014, <https://www.rfc-editor.org/
+              info/rfc7231>.
+
+   [RFC7405]  Kyzivat, P., "Case-Sensitive String Support in ABNF", RFC
+              7405, DOI 10.17487/RFC7405, December 2014,
+              <http://www.rfc-editor.org/info/rfc7405>.
+
+   [RFC7493]  Bray, T., Ed., "The I-JSON Message Format", RFC 7493, DOI
+              10.17487/RFC7493, March 2015,
+              <http://www.rfc-editor.org/info/rfc7493>.
+
+
+
+Margolis, et al.          Expires May 12, 2018                 [Page 22]
+
+Internet-Draft                 SMTP-TLSRPT                 November 2017
+
+
+8.2.  Informative References
+
+   [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
+              Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
+              February 2002, <http://www.rfc-editor.org/info/rfc3207>.
+
+   [RFC3501]  Crispin, M., "INTERNET MESSAGE ACCESS PROTOCOL - VERSION
+              4rev1", RFC 3501, DOI 10.17487/RFC3501, March 2003,
+              <http://www.rfc-editor.org/info/rfc3501>.
+
+   [RFC3864]  Klyne, G., Nottingham, M., and J. Mogul, "Registration
+              Procedures for Message Header Fields", BCP 90, RFC 3864,
+              DOI 10.17487/RFC3864, September 2004,
+              <http://www.rfc-editor.org/info/rfc3864>.
+
+   [RFC7435]  Dukhovni, V., "Opportunistic Security: Some Protection
+              Most of the Time", RFC 7435, DOI 10.17487/RFC7435,
+              December 2014, <http://www.rfc-editor.org/info/rfc7435>.
+
+   [RFC7469]  Evans, C., Palmer, C., and R. Sleevi, "Public Key Pinning
+              Extension for HTTP", RFC 7469, DOI 10.17487/RFC7469, April
+              2015, <http://www.rfc-editor.org/info/rfc7469>.
+
+   [RFC7489]  Kucherawy, M., Ed. and E. Zwicky, Ed., "Domain-based
+              Message Authentication, Reporting, and Conformance
+              (DMARC)", RFC 7489, DOI 10.17487/RFC7489, March 2015,
+              <http://www.rfc-editor.org/info/rfc7489>.
+
+Appendix A.  Example Reporting Policy
+
+A.1.  Report using MAILTO
+
+            _smtp-tlsrpt.mail.example.com. IN TXT \
+                    "v=TLSRPTv1;rua=mailto:reports@example.com"
+
+A.2.  Report using HTTPS
+
+           _smtp-tlsrpt.mail.example.com. IN TXT \
+                   "v=TLSRPTv1; \
+                   rua=https://reporting.example.com/v1/tlsrpt"
+
+Appendix B.  Example JSON Report
+
+
+
+
+
+
+
+
+
+Margolis, et al.          Expires May 12, 2018                 [Page 23]
 
 Internet-Draft                 SMTP-TLSRPT                 November 2017
 
@@ -1229,154 +1341,13 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
 
-Margolis, et al.          Expires May 12, 2018                 [Page 22]
+Margolis, et al.          Expires May 12, 2018                 [Page 24]
 
 Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
    command.  Additionally 3 sessions failed due to
    "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED".
-
-10.  References
-
-10.1.  Normative References
-
-   [I-D.ietf-uta-mta-sts]
-              Margolis, D., Risher, M., Ramakrishnan, B., Brotman, A.,
-              and J. Jones, "SMTP MTA Strict Transport Security (MTA-
-              STS)", draft-ietf-uta-mta-sts-11 (work in progress),
-              November 2017.
-
-   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
-              Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
-              RFC2119, March 1997,
-              <http://www.rfc-editor.org/info/rfc2119>.
-
-   [RFC3339]  Klyne, G. and C. Newman, "Date and Time on the Internet:
-              Timestamps", RFC 3339, DOI 10.17487/RFC3339, July 2002,
-              <http://www.rfc-editor.org/info/rfc3339>.
-
-   [RFC3492]  Costello, A., "Punycode: A Bootstring encoding of Unicode
-              for Internationalized Domain Names in Applications
-              (IDNA)", RFC 3492, DOI 10.17487/RFC3492, March 2003,
-              <http://www.rfc-editor.org/info/rfc3492>.
-
-   [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
-              Resource Identifier (URI): Generic Syntax", STD 66, RFC
-              3986, DOI 10.17487/RFC3986, January 2005,
-              <http://www.rfc-editor.org/info/rfc3986>.
-
-   [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
-              Specifications: ABNF", STD 68, RFC 5234, DOI 10.17487/
-              RFC5234, January 2008,
-              <http://www.rfc-editor.org/info/rfc5234>.
-
-   [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
-              Housley, R., and W. Polk, "Internet X.509 Public Key
-              Infrastructure Certificate and Certificate Revocation List
-              (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
-              <http://www.rfc-editor.org/info/rfc5280>.
-
-   [RFC5321]  Klensin, J., "Simple Mail Transfer Protocol", RFC 5321,
-              DOI 10.17487/RFC5321, October 2008,
-              <http://www.rfc-editor.org/info/rfc5321>.
-
-
-
-
-
-Margolis, et al.          Expires May 12, 2018                 [Page 23]
-
-Internet-Draft                 SMTP-TLSRPT                 November 2017
-
-
-   [RFC5322]  Resnick, P., Ed., "Internet Message Format", RFC 5322, DOI
-              10.17487/RFC5322, October 2008,
-              <http://www.rfc-editor.org/info/rfc5322>.
-
-   [RFC5891]  Klensin, J., "Internationalized Domain Names in
-              Applications (IDNA): Protocol", RFC 5891, DOI 10.17487/
-              RFC5891, August 2010,
-              <http://www.rfc-editor.org/info/rfc5891>.
-
-   [RFC5952]  Kawamura, S. and M. Kawashima, "A Recommendation for IPv6
-              Address Text Representation", RFC 5952, DOI 10.17487/
-              RFC5952, August 2010,
-              <http://www.rfc-editor.org/info/rfc5952>.
-
-   [RFC6068]  Duerst, M., Masinter, L., and J. Zawinski, "The 'mailto'
-              URI Scheme", RFC 6068, DOI 10.17487/RFC6068, October 2010,
-              <http://www.rfc-editor.org/info/rfc6068>.
-
-   [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
-              Verification of Domain-Based Application Service Identity
-              within Internet Public Key Infrastructure Using X.509
-              (PKIX) Certificates in the Context of Transport Layer
-              Security (TLS)", RFC 6125, DOI 10.17487/RFC6125, March
-              2011, <http://www.rfc-editor.org/info/rfc6125>.
-
-   [RFC6376]  Crocker, D., Ed., Hansen, T., Ed., and M. Kucherawy, Ed.,
-              "DomainKeys Identified Mail (DKIM) Signatures", STD 76,
-              RFC 6376, DOI 10.17487/RFC6376, September 2011,
-              <http://www.rfc-editor.org/info/rfc6376>.
-
-   [RFC6522]  Kucherawy, M., Ed., "The Multipart/Report Media Type for
-              the Reporting of Mail System Administrative Messages", STD
-              73, RFC 6522, DOI 10.17487/RFC6522, January 2012,
-              <http://www.rfc-editor.org/info/rfc6522>.
-
-   [RFC6698]  Hoffman, P. and J. Schlyter, "The DNS-Based Authentication
-              of Named Entities (DANE) Transport Layer Security (TLS)
-              Protocol: TLSA", RFC 6698, DOI 10.17487/RFC6698, August
-              2012, <http://www.rfc-editor.org/info/rfc6698>.
-
-   [RFC7231]  Fielding, R., Ed. and J. Reschke, Ed., "Hypertext Transfer
-              Protocol (HTTP/1.1): Semantics and Content", RFC 7231, DOI
-              10.17487/RFC7231, June 2014, <https://www.rfc-editor.org/
-              info/rfc7231>.
-
-   [RFC7405]  Kyzivat, P., "Case-Sensitive String Support in ABNF", RFC
-              7405, DOI 10.17487/RFC7405, December 2014,
-              <http://www.rfc-editor.org/info/rfc7405>.
-
-
-
-Margolis, et al.          Expires May 12, 2018                 [Page 24]
-
-Internet-Draft                 SMTP-TLSRPT                 November 2017
-
-
-   [RFC7493]  Bray, T., Ed., "The I-JSON Message Format", RFC 7493, DOI
-              10.17487/RFC7493, March 2015,
-              <http://www.rfc-editor.org/info/rfc7493>.
-
-10.2.  Informative References
-
-   [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
-              Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
-              February 2002, <http://www.rfc-editor.org/info/rfc3207>.
-
-   [RFC3501]  Crispin, M., "INTERNET MESSAGE ACCESS PROTOCOL - VERSION
-              4rev1", RFC 3501, DOI 10.17487/RFC3501, March 2003,
-              <http://www.rfc-editor.org/info/rfc3501>.
-
-   [RFC3864]  Klyne, G., Nottingham, M., and J. Mogul, "Registration
-              Procedures for Message Header Fields", BCP 90, RFC 3864,
-              DOI 10.17487/RFC3864, September 2004,
-              <http://www.rfc-editor.org/info/rfc3864>.
-
-   [RFC7435]  Dukhovni, V., "Opportunistic Security: Some Protection
-              Most of the Time", RFC 7435, DOI 10.17487/RFC7435,
-              December 2014, <http://www.rfc-editor.org/info/rfc7435>.
-
-   [RFC7469]  Evans, C., Palmer, C., and R. Sleevi, "Public Key Pinning
-              Extension for HTTP", RFC 7469, DOI 10.17487/RFC7469, April
-              2015, <http://www.rfc-editor.org/info/rfc7469>.
-
-   [RFC7489]  Kucherawy, M., Ed. and E. Zwicky, Ed., "Domain-based
-              Message Authentication, Reporting, and Conformance
-              (DMARC)", RFC 7489, DOI 10.17487/RFC7489, March 2015,
-              <http://www.rfc-editor.org/info/rfc7489>.
 
 Authors' Addresses
 
@@ -1390,16 +1361,6 @@ Authors' Addresses
    Comcast, Inc
 
    Email: alex_brotman (at) comcast.com
-
-
-
-
-
-
-
-Margolis, et al.          Expires May 12, 2018                 [Page 25]
-
-Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
    Binu Ramakrishnan
@@ -1436,21 +1397,4 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Margolis, et al.          Expires May 12, 2018                 [Page 26]
+Margolis, et al.          Expires May 12, 2018                 [Page 25]
