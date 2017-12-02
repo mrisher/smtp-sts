@@ -260,7 +260,7 @@ media type is &quot;text/plain&quot; to guard against cases where webservers all
 untrusted users to host non-text content (typically, HTML or images) at
 a user-defined path. Additional &quot;Content-Type&quot; parameters are ignored.
 </t>
-<t>This resource contains the following line-separated key/value pairs:
+<t>This resource contains the following newline-separated key/value pairs:
 </t>
 <t>
 <list style="symbols">

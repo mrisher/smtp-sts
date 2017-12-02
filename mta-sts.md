@@ -198,7 +198,7 @@ media type is "text/plain" to guard against cases where webservers allow
 untrusted users to host non-text content (typically, HTML or images) at
 a user-defined path. Additional "Content-Type" parameters are ignored.
 
-This resource contains the following line-separated key/value pairs:
+This resource contains the following newline-separated key/value pairs:
 
 * `version`: (plain-text). Currently only "STSv1" is supported.
 * `mode`: (plain-text). One of "enforce", "report", or "none",

@@ -273,7 +273,7 @@ Internet-Draft                   MTA-STS                   November 2017
    HTML or images) at a user-defined path.  Additional "Content-Type"
    parameters are ignored.
 
-   This resource contains the following line-separated key/value pairs:
+
 
 
 
@@ -281,6 +281,9 @@ Margolis, et al.          Expires May 12, 2018                  [Page 5]
 
 Internet-Draft                   MTA-STS                   November 2017
 
+
+   This resource contains the following newline-separated key/value
+   pairs:
 
    o  "version": (plain-text).  Currently only "STSv1" is supported.
 
@@ -327,9 +330,6 @@ Internet-Draft                   MTA-STS                   November 2017
 
    sts-policy-record        = *WSP sts-policy-field *WSP
                               *(CRLF *WSP sts-policy-field *WSP)
-                              [CRLF]
-
-   sts-policy-field         = sts-policy-version /      ; required once
 
 
 
@@ -338,6 +338,9 @@ Margolis, et al.          Expires May 12, 2018                  [Page 6]
 Internet-Draft                   MTA-STS                   November 2017
 
 
+                              [CRLF]
+
+   sts-policy-field         = sts-policy-version /      ; required once
                               sts-policy-mode    /      ; required once
                               sts-policy-max-age /      ; required once
 
@@ -384,9 +387,6 @@ Internet-Draft                   MTA-STS                   November 2017
    sts-policy-ext-name      = (ALPHA / DIGIT)
                               *31(ALPHA / DIGIT / "_" / "-" / ".")
 
-   sts-policy-ext-value     = 1*(%x21-3A / %x3C / %x3E-7E)
-                            ; chars, excluding "=", ";", SP, and
-
 
 
 Margolis, et al.          Expires May 12, 2018                  [Page 7]
@@ -394,6 +394,8 @@ Margolis, et al.          Expires May 12, 2018                  [Page 7]
 Internet-Draft                   MTA-STS                   November 2017
 
 
+   sts-policy-ext-value     = 1*(%x21-3A / %x3C / %x3E-7E)
+                            ; chars, excluding "=", ";", SP, and
                             ; control chars
 
    Parsers MUST accept TXT records and policy files which are
@@ -439,9 +441,7 @@ Internet-Draft                   MTA-STS                   November 2017
    or longer per version ID, to avoid overwhelming resource-constrained
    recipients with cascading failures.
 
-   Senders MAY impose a timeout on the HTTPS GET and/or a limit on the
-   maximum size of the response body to avoid long delays or resource
-   exhaustion during attempted policy updates.  A suggested timeout is
+
 
 
 
@@ -450,6 +450,9 @@ Margolis, et al.          Expires May 12, 2018                  [Page 8]
 Internet-Draft                   MTA-STS                   November 2017
 
 
+   Senders MAY impose a timeout on the HTTPS GET and/or a limit on the
+   maximum size of the response body to avoid long delays or resource
+   exhaustion during attempted policy updates.  A suggested timeout is
    one minute, and a suggested maximum policy size 64 kilobytes; policy
    hosts SHOULD respond to requests with a complete policy body within
    that timeout and size limit.
@@ -493,9 +496,6 @@ Internet-Draft                   MTA-STS                   November 2017
    policies which specify mode values of "report" or "none" MUST NOT be
    interpreted as delivery failures, as described in Section 4, "Policy
    Application".
-
-
-
 
 
 
