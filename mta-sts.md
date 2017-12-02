@@ -605,8 +605,8 @@ A suggested workflow to implement such an opt out is as follows:
 
 ## Well-Known URIs Registry
 
-A new "well-known" URI will be registered in the Well-Known URIs
-registry as described below:
+A new "well-known" URI as described in (#policy-discovery) will be
+registered in the Well-Known URIs registry as described below:
 
 URI Suffix: mta-sts.txt Change Controller: IETF
 

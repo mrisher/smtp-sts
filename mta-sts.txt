@@ -772,8 +772,8 @@ Internet-Draft                   MTA-STS                   November 2017
 
 9.1.  Well-Known URIs Registry
 
-   A new "well-known" URI will be registered in the Well-Known URIs
-   registry as described below:
+   A new "well-known" URI as described in Section 3 will be registered
+   in the Well-Known URIs registry as described below:
 
    URI Suffix: mta-sts.txt Change Controller: IETF
 

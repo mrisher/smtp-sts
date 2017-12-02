@@ -700,8 +700,8 @@ remove the TXT record and HTTPS endpoint.</t>
 <section anchor="iana-considerations" title="IANA Considerations">
 
 <section anchor="wellknown-uris-registry" title="Well-Known URIs Registry">
-<t>A new &quot;well-known&quot; URI will be registered in the Well-Known URIs
-registry as described below:
+<t>A new &quot;well-known&quot; URI as described in <xref target="policy-discovery"/> will be
+registered in the Well-Known URIs registry as described below:
 </t>
 <t>URI Suffix: mta-sts.txt Change Controller: IETF
 </t>
