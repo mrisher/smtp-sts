@@ -287,7 +287,7 @@ Internet-Draft                   MTA-STS                   November 2017
 
    o  "version": (plain-text).  Currently only "STSv1" is supported.
 
-   o  "mode": (plain-text).  One of "enforce", "report", or "none",
+   o  "mode": (plain-text).  One of "enforce", "testing", or "none",
       indicating the expected behavior of a sending MTA in the case of a
       policy validation failure.
 
@@ -364,7 +364,7 @@ Internet-Draft                   MTA-STS                   November 2017
 
    sts-policy-mode-field    = %s"mode"
 
-   sts-policy-model-value   =  %s"report" / %s"enforce" / %s"none"
+   sts-policy-model-value   =  %s"testing" / %s"enforce" / %s"none"
 
    sts-policy-mx            = sts-policy-mx-field field-delim
                               sts-policy-mx-value
@@ -493,7 +493,7 @@ Internet-Draft                   MTA-STS                   November 2017
 
    This section does not dictate the behavior of sending MTAs when
    policies fail to validate; in particular, validation failures of
-   policies which specify mode values of "report" or "none" MUST NOT be
+   policies which specify mode values of "testing" or "none" MUST NOT be
    interpreted as delivery failures, as described in Section 5, "Policy
    Application".
 

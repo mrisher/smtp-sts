@@ -201,7 +201,7 @@ a user-defined path. Additional "Content-Type" parameters are ignored.
 This resource contains the following newline-separated key/value pairs:
 
 * `version`: (plain-text). Currently only "STSv1" is supported.
-* `mode`: (plain-text). One of "enforce", "report", or "none",
+* `mode`: (plain-text). One of "enforce", "testing", or "none",
   indicating the expected behavior of a sending MTA in the case of a
   policy validation failure.
 * `max_age`: Max lifetime of the policy (plain-text non-negative integer
@@ -271,7 +271,7 @@ follows:
 
     sts-policy-mode-field    = %s"mode"
 
-    sts-policy-model-value   =  %s"report" / %s"enforce" / %s"none"
+    sts-policy-model-value   =  %s"testing" / %s"enforce" / %s"none"
 
     sts-policy-mx            = sts-policy-mx-field field-delim
                                sts-policy-mx-value
@@ -382,7 +382,7 @@ validate:
 
 This section does not dictate the behavior of sending MTAs when policies
 fail to validate; in particular, validation failures of policies which
-specify mode values of "report" or "none" MUST NOT be interpreted as
+specify mode values of "testing" or "none" MUST NOT be interpreted as
 delivery failures, as described in (#policy-application), "Policy
 Application".
 

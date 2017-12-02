@@ -265,7 +265,7 @@ a user-defined path. Additional &quot;Content-Type&quot; parameters are ignored.
 <t>
 <list style="symbols">
 <t><spanx style="verb">version</spanx>: (plain-text). Currently only &quot;STSv1&quot; is supported.</t>
-<t><spanx style="verb">mode</spanx>: (plain-text). One of &quot;enforce&quot;, &quot;report&quot;, or &quot;none&quot;,
+<t><spanx style="verb">mode</spanx>: (plain-text). One of &quot;enforce&quot;, &quot;testing&quot;, or &quot;none&quot;,
 indicating the expected behavior of a sending MTA in the case of a
 policy validation failure.</t>
 <t><spanx style="verb">max_age</spanx>: Max lifetime of the policy (plain-text non-negative integer
@@ -336,7 +336,7 @@ sts-policy-mode          = sts-policy-mode-field field-delim
 
 sts-policy-mode-field    = %s"mode"
 
-sts-policy-model-value   =  %s"report" / %s"enforce" / %s"none"
+sts-policy-model-value   =  %s"testing" / %s"enforce" / %s"none"
 
 sts-policy-mx            = sts-policy-mx-field field-delim
                            sts-policy-mx-value
@@ -455,7 +455,7 @@ described in &quot;MX Certificate Validation&quot;.</t>
 </t>
 <t>This section does not dictate the behavior of sending MTAs when policies
 fail to validate; in particular, validation failures of policies which
-specify mode values of &quot;report&quot; or &quot;none&quot; MUST NOT be interpreted as
+specify mode values of &quot;testing&quot; or &quot;none&quot; MUST NOT be interpreted as
 delivery failures, as described in <xref target="policy-application"/>, &quot;Policy
 Application&quot;.
 </t>
