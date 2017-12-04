@@ -108,7 +108,7 @@ require DNSSEC, at a cost of risking malicious downgrades.  For a
 thorough discussion of this trade-off, see (#security-considerations),
 "Security Considerations".
 
-In addition, MTA-STS provides an optional report-only mode, enabling
+In addition, MTA-STS provides an optional testing-only mode, enabling
 soft deployments to detect policy failures; partial deployments can be
 achieved in DANE by deploying TLSA records only for some of a domain's
 MXs, but such a mechanism is not possible for the per-domain policies
@@ -118,7 +118,7 @@ The primary motivation of MTA-STS is to provide a mechanism for domains
 to ensure transport security even when deploying DNSSEC is undesirable
 or impractical. However, MTA-STS is designed not to interfere with DANE
 deployments when the two overlap; in particular, senders who implement
-MTA-STS validation MUST NOT allow a "valid" or "report-only" MTA-STS
+MTA-STS validation MUST NOT allow a "valid" or "testing"-only MTA-STS
 validation to override a failing DANE validation.
 
 # Policy Discovery
@@ -435,10 +435,10 @@ value of the policy `mode` field:
 1. `enforce`: In this mode, sending MTAs MUST NOT deliver the message to
    hosts which fail MX matching or certificate validation.
 
-2. `report`: In this mode, sending MTAs which also implement the TLSRPT
-   specification [@!I-D.ietf-uta-smtp-tlsrpt] merely send a report indicating
-   policy application failures (so long as TLSRPT is also implemented by the
-   recipient domain).
+2. `testing`: In this mode, sending MTAs which also implement the TLSRPT
+   specification [@!I-D.ietf-uta-smtp-tlsrpt] merely send a report
+   indicating policy application failures (so long as TLSRPT is also
+   implemented by the recipient domain).
 
 3. `none`: In this mode, sending MTAs should treat the policy domain as
    though it does not have any active policy; see (#removing-mtasts),
@@ -824,7 +824,7 @@ MTA-STS Policy file served as the response body at
 `https://mta-sts.example.com/.well-known/mta-sts.txt`:
 ~~~~~~~~~
 version: STSv1
-mode: report
+mode: testing
 mx: mx1.example.com
 mx: mx2.example.com
 mx: mx.backup-example.com

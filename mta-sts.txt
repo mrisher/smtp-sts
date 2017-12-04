@@ -173,7 +173,7 @@ Internet-Draft                   MTA-STS                   December 2017
    downgrades.  For a thorough discussion of this trade-off, see
    Section 10, "Security Considerations".
 
-   In addition, MTA-STS provides an optional report-only mode, enabling
+   In addition, MTA-STS provides an optional testing-only mode, enabling
    soft deployments to detect policy failures; partial deployments can
    be achieved in DANE by deploying TLSA records only for some of a
    domain's MXs, but such a mechanism is not possible for the per-domain
@@ -184,7 +184,7 @@ Internet-Draft                   MTA-STS                   December 2017
    undesirable or impractical.  However, MTA-STS is designed not to
    interfere with DANE deployments when the two overlap; in particular,
    senders who implement MTA-STS validation MUST NOT allow a "valid" or
-   "report-only" MTA-STS validation to override a failing DANE
+   "testing"-only MTA-STS validation to override a failing DANE
    validation.
 
 3.  Policy Discovery
@@ -562,7 +562,7 @@ Margolis, et al.          Expires June 7, 2018                 [Page 10]
 Internet-Draft                   MTA-STS                   December 2017
 
 
-   2.  "report": In this mode, sending MTAs which also implement the
+   2.  "testing": In this mode, sending MTAs which also implement the
        TLSRPT specification [I-D.ietf-uta-smtp-tlsrpt] merely send a
        report indicating policy application failures (so long as TLSRPT
        is also implemented by the recipient domain).
@@ -1156,7 +1156,7 @@ Appendix A.  MTA-STS example record & policy
    sts.example.com/.well-known/mta-sts.txt":
 
                          version: STSv1
-                         mode: report
+                         mode: testing
                          mx: mx1.example.com
                          mx: mx2.example.com
                          mx: mx.backup-example.com

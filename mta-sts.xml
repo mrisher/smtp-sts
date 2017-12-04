@@ -163,7 +163,7 @@ require DNSSEC, at a cost of risking malicious downgrades.  For a
 thorough discussion of this trade-off, see <xref target="security-considerations"/>,
 &quot;Security Considerations&quot;.
 </t>
-<t>In addition, MTA-STS provides an optional report-only mode, enabling
+<t>In addition, MTA-STS provides an optional testing-only mode, enabling
 soft deployments to detect policy failures; partial deployments can be
 achieved in DANE by deploying TLSA records only for some of a domain's
 MXs, but such a mechanism is not possible for the per-domain policies
@@ -173,7 +173,7 @@ used by MTA-STS.
 to ensure transport security even when deploying DNSSEC is undesirable
 or impractical. However, MTA-STS is designed not to interfere with DANE
 deployments when the two overlap; in particular, senders who implement
-MTA-STS validation MUST NOT allow a &quot;valid&quot; or &quot;report-only&quot; MTA-STS
+MTA-STS validation MUST NOT allow a &quot;valid&quot; or &quot;testing&quot;-only MTA-STS
 validation to override a failing DANE validation.
 </t>
 </section>
@@ -511,10 +511,10 @@ value of the policy <spanx style="verb">mode</spanx> field:
 <list style="numbers">
 <t><spanx style="verb">enforce</spanx>: In this mode, sending MTAs MUST NOT deliver the message to
 hosts which fail MX matching or certificate validation.</t>
-<t><spanx style="verb">report</spanx>: In this mode, sending MTAs which also implement the TLSRPT
-specification <xref target="I-D.ietf-uta-smtp-tlsrpt"/> merely send a report indicating
-policy application failures (so long as TLSRPT is also implemented by the
-recipient domain).</t>
+<t><spanx style="verb">testing</spanx>: In this mode, sending MTAs which also implement the TLSRPT
+specification <xref target="I-D.ietf-uta-smtp-tlsrpt"/> merely send a report
+indicating policy application failures (so long as TLSRPT is also
+implemented by the recipient domain).</t>
 <t><spanx style="verb">none</spanx>: In this mode, sending MTAs should treat the policy domain as
 though it does not have any active policy; see <xref target="removing-mtasts"/>,
 &quot;Removing MTA-STS&quot;, for use of this mode value.</t>
@@ -966,7 +966,7 @@ _mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
 
 <figure align="center"><artwork align="center">
 version: STSv1
-mode: report
+mode: testing
 mx: mx1.example.com
 mx: mx2.example.com
 mx: mx.backup-example.com
