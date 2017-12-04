@@ -15,7 +15,7 @@ Expires: June 7, 2018                                    B. Ramakrishnan
 
 
               SMTP MTA Strict Transport Security (MTA-STS)
-                       draft-ietf-uta-mta-sts-11
+                       draft-ietf-uta-mta-sts-12
 
 Abstract
 
