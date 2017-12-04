@@ -1316,7 +1316,7 @@ Authors' Addresses
    Daniel Margolis
    Google, Inc
 
-   Email: dmargolis (at) google.com
+   Email: dmargolis (at) google (dot com)
 
 
    Mark Risher
@@ -1334,7 +1334,7 @@ Authors' Addresses
    Alexander Brotman
    Comcast, Inc
 
-   Email: alex_brotman (at) comcast.com
+   Email: alex_brotman (at) comcast (dot com)
 
 
 

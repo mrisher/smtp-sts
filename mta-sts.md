@@ -17,7 +17,7 @@
    fullname="Daniel Margolis"
    organization="Google, Inc"
      [author.address]
-     email="dmargolis (at) google.com"
+     email="dmargolis (at) google (dot com)"
    [[author]]
    initials="M."
    surname="Risher"
@@ -38,7 +38,7 @@
    fullname="Alexander Brotman"
    organization="Comcast, Inc"
      [author.address]
-     email="alex_brotman (at) comcast.com"
+     email="alex_brotman (at) comcast (dot com)"
    [[author]]
    initials="J."
    surname="Jones"
