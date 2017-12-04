@@ -235,7 +235,7 @@ limit the body length used in the signature.</t>
                     tlsrpt-uri *(*WSP "," *WSP tlsrpt-uri)
 
     tlsrpt-uri        = URI
-                      ; "URI" is imported from [@!RFC3986]; 
+                      ; "URI" is imported from [RFC3986];
           ; commas (ASCII 0x2C) and exclamation 
           ; points (ASCII 0x21) MUST be encoded
 
@@ -573,7 +573,7 @@ POST.
 
  unique-id = 1*(ALPHA / DIGIT)
 
- sender = domain        ; From the [@!RFC5321] that is used 
+ sender = domain        ; From the [RFC5321] that is used
                 ; as the domain for the `contact-info`
             ; address in the report body
 
@@ -625,12 +625,14 @@ report should use the media type <spanx style="verb">application/tlsrpt+gzip</sp
 <t>In addition, the following two new top level message header fields are
 defined:
 </t>
-<t><spanx style="verb">TLS-Report-Domain: Receiver-Domain TLS-Report-Submitter:
-Sender-Domain</spanx> The <spanx style="verb">TLS-Report-Submitter</spanx> value MUST match the value
-found in the filename and the <xref target="RFC5321"/> domain from the <spanx style="verb">contact-info</spanx>
-from the report body.  These message headers MUST be included and should
-allow for easy searching for all reports submitted by a report domain or
-a particular submitter, for example in IMAP <xref target="RFC3501"/>:
+<t><spanx style="verb">TLS-Report-Domain: Receiver-Domain
+TLS-Report-Submitter: Sender-Domain</spanx>
+</t>
+<t>The <spanx style="verb">TLS-Report-Submitter</spanx> value MUST match the value found in the
+filename and the <xref target="RFC5321"/> domain from the <spanx style="verb">contact-info</spanx> from the
+report body.  These message headers MUST be included and should allow
+for easy searching for all reports submitted by a report domain or a
+particular submitter, for example in IMAP <xref target="RFC3501"/>:
 </t>
 <t><spanx style="verb">s SEARCH HEADER "TLS-Report-Domain" "example.com"</spanx>
 </t>
@@ -647,12 +649,12 @@ the following ABNF:
 <figure align="center"><artwork align="center">
 tlsrpt-subject = %s"Report" FWS               ; "Report"
                  %s"Domain:" FWS              ; "Domain:"
-         domain-name FWS              ; per RFC6376
+         domain-name FWS              ; per [RFC6376]
          %s"Submitter:" FWS           ; "Submitter:"
-         domain-name FWS              ; per RFC6376
+         domain-name FWS              ; per [RFC6376]
          %s"Report-ID:" FWS           ; "Report-ID:
-         "&lt;" id-left "@" id-right "&gt;" ; per RFC5322
-         [CFWS]                       ; per RFC5322
+         "&lt;" id-left "@" id-right "&gt;" ; per [RFC5322]
+         [CFWS]                       ; per [RFC5322]
                                               ; (as with FWS)
 </artwork></figure>
 <t>The first domain-name indicates the DNS domain name about which the
@@ -664,7 +666,8 @@ tlsrpt-subject = %s"Report" FWS               ; "Report"
 </t>
 <t>For instance, this is a possible Subject field for a report to the
  Policy Domain &quot;example.net&quot; from the Sending MTA
- &quot;mail.sender.example.com&quot;.  It is line-wrapped as allowed by
+ &quot;mail.sender.example.com&quot;.  It is line-wrapped as allowed
+ by <xref target="RFC5322"/>:
 </t>
 
 <figure align="center"><artwork align="center">

@@ -98,7 +98,7 @@ Table of Contents
      5.2.  Compression . . . . . . . . . . . . . . . . . . . . . . .  13
      5.3.  Email Transport . . . . . . . . . . . . . . . . . . . . .  13
        5.3.1.  Example Report  . . . . . . . . . . . . . . . . . . .  15
-     5.4.  HTTPS Transport . . . . . . . . . . . . . . . . . . . . .  15
+     5.4.  HTTPS Transport . . . . . . . . . . . . . . . . . . . . .  16
      5.5.  Delivery Retry  . . . . . . . . . . . . . . . . . . . . .  16
      5.6.  Metadata Variances  . . . . . . . . . . . . . . . . . . .  16
    6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  16
@@ -115,15 +115,15 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
 
 
      6.5.  STARTTLS Validation Result Types  . . . . . . . . . . . .  19
-   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  19
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  20
    8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  21
      8.1.  Normative References  . . . . . . . . . . . . . . . . . .  21
      8.2.  Informative References  . . . . . . . . . . . . . . . . .  23
-   Appendix A.  Example Reporting Policy . . . . . . . . . . . . . .  23
-     A.1.  Report using MAILTO . . . . . . . . . . . . . . . . . . .  23
-     A.2.  Report using HTTPS  . . . . . . . . . . . . . . . . . . .  23
-   Appendix B.  Example JSON Report  . . . . . . . . . . . . . . . .  23
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  25
+   Appendix A.  Example Reporting Policy . . . . . . . . . . . . . .  24
+     A.1.  Report using MAILTO . . . . . . . . . . . . . . . . . . .  24
+     A.2.  Report using HTTPS  . . . . . . . . . . . . . . . . . . .  24
+   Appendix B.  Example JSON Report  . . . . . . . . . . . . . . . .  24
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  26
 
 1.  Introduction
 
@@ -259,7 +259,7 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
                         tlsrpt-uri *(*WSP "," *WSP tlsrpt-uri)
 
         tlsrpt-uri        = URI
-                          ; "URI" is imported from [@!RFC3986];
+                          ; "URI" is imported from [RFC3986];
               ; commas (ASCII 0x2C) and exclamation
               ; points (ASCII 0x21) MUST be encoded
 
@@ -679,7 +679,7 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
 
        unique-id = 1*(ALPHA / DIGIT)
 
-       sender = domain        ; From the [@!RFC5321] that is used
+       sender = domain        ; From the [RFC5321] that is used
                       ; as the domain for the `contact-info`
                   ; address in the report body
 
@@ -740,11 +740,13 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
    are defined:
 
    "TLS-Report-Domain: Receiver-Domain TLS-Report-Submitter: Sender-
-   Domain" The "TLS-Report-Submitter" value MUST match the value found
-   in the filename and the [RFC5321] domain from the "contact-info" from
-   the report body.  These message headers MUST be included and should
-   allow for easy searching for all reports submitted by a report domain
-   or a particular submitter, for example in IMAP [RFC3501]:
+   Domain"
+
+   The "TLS-Report-Submitter" value MUST match the value found in the
+   filename and the [RFC5321] domain from the "contact-info" from the
+   report body.  These message headers MUST be included and should allow
+   for easy searching for all reports submitted by a report domain or a
+   particular submitter, for example in IMAP [RFC3501]:
 
    "s SEARCH HEADER "TLS-Report-Domain" "example.com""
 
@@ -759,12 +761,12 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
 
        tlsrpt-subject = %s"Report" FWS               ; "Report"
                         %s"Domain:" FWS              ; "Domain:"
-                domain-name FWS              ; per RFC6376
+                domain-name FWS              ; per [RFC6376]
                 %s"Submitter:" FWS           ; "Submitter:"
-                domain-name FWS              ; per RFC6376
+                domain-name FWS              ; per [RFC6376]
                 %s"Report-ID:" FWS           ; "Report-ID:
-                "<" id-left "@" id-right ">" ; per RFC5322
-                [CFWS]                       ; per RFC5322
+                "<" id-left "@" id-right ">" ; per [RFC5322]
+                [CFWS]                       ; per [RFC5322]
                                                      ; (as with FWS)
 
    The first domain-name indicates the DNS domain name about which the
@@ -776,8 +778,6 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
 
    For instance, this is a possible Subject field for a report to the
    Policy Domain "example.net" from the Sending MTA
-   "mail.sender.example.com".  It is line-wrapped as allowed by
-
 
 
 
@@ -785,6 +785,9 @@ Margolis, et al.          Expires June 7, 2018                 [Page 14]
 
 Internet-Draft                 SMTP-TLSRPT                 December 2017
 
+
+   "mail.sender.example.com".  It is line-wrapped as allowed by
+   [RFC5322]:
 
               Subject: Report Domain: example.net
                   Submitter: mail.sender.example.com
@@ -828,12 +831,9 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
    Note that, when sending failure reports via SMTP, sending MTAs MUST
    NOT honor MTA-STS or DANE TLSA failures.
 
-5.4.  HTTPS Transport
 
-   The report MAY be delivered by POST to HTTPS.  If compressed, the
-   report SHOULD use the media type "application/tlsrpt+gzip", and
-   "application/tlsrpt+json" otherwise (see section Section 6, "IANA
-   Considerations").
+
+
 
 
 
@@ -841,6 +841,13 @@ Margolis, et al.          Expires June 7, 2018                 [Page 15]
 
 Internet-Draft                 SMTP-TLSRPT                 December 2017
 
+
+5.4.  HTTPS Transport
+
+   The report MAY be delivered by POST to HTTPS.  If compressed, the
+   report SHOULD use the media type "application/tlsrpt+gzip", and
+   "application/tlsrpt+json" otherwise (see section Section 6, "IANA
+   Considerations").
 
    A reporting entity SHOULD expect a "successful" response from the
    accepting HTTPS server, typically a 200 or 201 HTTP code [RFC7231].
@@ -875,6 +882,22 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
    Below is the Internet Assigned Numbers Authority (IANA) Permanent
    Message Header Field registration information per [RFC3864].
 
+
+
+
+
+
+
+
+
+
+
+
+Margolis, et al.          Expires June 7, 2018                 [Page 16]
+
+Internet-Draft                 SMTP-TLSRPT                 December 2017
+
+
              Header field name:           TLS-Report-Domain
              Applicable protocol:         mail
              Status:                      standard
@@ -887,16 +910,6 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
              Status:                      standard
              Author/Change controller:    IETF
              Specification document(s):   this one
-
-
-
-
-
-
-Margolis, et al.          Expires June 7, 2018                 [Page 16]
-
-Internet-Draft                 SMTP-TLSRPT                 December 2017
-
 
 6.2.  Report Type
 
@@ -933,6 +946,14 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
    Security considerations: Security considerations relating to SMTP TLS
    Reporting are discussed in Section 7.
 
+
+
+
+Margolis, et al.          Expires June 7, 2018                 [Page 17]
+
+Internet-Draft                 SMTP-TLSRPT                 December 2017
+
+
    Interoperability considerations: This document specifies format of
    conforming messages and the interpretation thereof.
 
@@ -942,17 +963,6 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
    Mail Transfer Agents.
 
    Additional information:
-
-
-
-
-
-
-
-Margolis, et al.          Expires June 7, 2018                 [Page 17]
-
-Internet-Draft                 SMTP-TLSRPT                 December 2017
-
 
                       Magic number(s):  n/a
 
@@ -991,6 +1001,15 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
 
    Encoding considerations: Binary
 
+
+
+
+
+Margolis, et al.          Expires June 7, 2018                 [Page 18]
+
+Internet-Draft                 SMTP-TLSRPT                 December 2017
+
+
    Security considerations: Security considerations relating to SMTP TLS
    Reporting are discussed in Section 7.
 
@@ -1001,14 +1020,6 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
 
    Applications that use this media type: Mail User Agents (MUA) and
    Mail Transfer Agents.
-
-
-
-
-Margolis, et al.          Expires June 7, 2018                 [Page 18]
-
-Internet-Draft                 SMTP-TLSRPT                 December 2017
-
 
    Additional information:
 
@@ -1048,6 +1059,13 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
                      | "validation-failure"          |
                      +-------------------------------+
 
+
+
+Margolis, et al.          Expires June 7, 2018                 [Page 19]
+
+Internet-Draft                 SMTP-TLSRPT                 December 2017
+
+
    The above entries are described in section Section 4.3, "Result
    Types."  New result types can be added to this registry using "Expert
    Review" IANA registration policy.
@@ -1058,13 +1076,6 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
    attempts to intercept or tamper with mail between hosts who support
    STARTTLS.  There are several security risks presented by the
    existence of this reporting channel:
-
-
-
-Margolis, et al.          Expires June 7, 2018                 [Page 19]
-
-Internet-Draft                 SMTP-TLSRPT                 December 2017
-
 
    o  Flooding of the Aggregate report URI (rua) endpoint: An attacker
       could flood the endpoint with excessive reporting traffic and
@@ -1103,6 +1114,14 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
 
    Finally, because TLSRPT is intended to help administrators discover
    man-in-the-middle attacks against transport-layer encryption,
+
+
+
+Margolis, et al.          Expires June 7, 2018                 [Page 20]
+
+Internet-Draft                 SMTP-TLSRPT                 December 2017
+
+
    including attacks designed to thwart negotiation of encrypted
    connections (by downgrading opportunistic encryption or, in the case
    of MTA-STS, preventing discovery of a new MTA-STS policy), we must
@@ -1112,15 +1131,6 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
    Administrators are thus encouraged to deploy TLSRPT TXT records with
    a large TTL (reducing the window for successful attacks against DNS
    resolution of the record) or to deploy DNSSEC on the deploying zone.
-
-
-
-
-
-Margolis, et al.          Expires June 7, 2018                 [Page 20]
-
-Internet-Draft                 SMTP-TLSRPT                 December 2017
-
 
 8.  References
 
@@ -1156,6 +1166,18 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
               RFC5234, January 2008,
               <http://www.rfc-editor.org/info/rfc5234>.
 
+
+
+
+
+
+
+
+Margolis, et al.          Expires June 7, 2018                 [Page 21]
+
+Internet-Draft                 SMTP-TLSRPT                 December 2017
+
+
    [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
               Housley, R., and W. Polk, "Internet X.509 Public Key
               Infrastructure Certificate and Certificate Revocation List
@@ -1169,14 +1191,6 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
    [RFC5322]  Resnick, P., Ed., "Internet Message Format", RFC 5322, DOI
               10.17487/RFC5322, October 2008,
               <http://www.rfc-editor.org/info/rfc5322>.
-
-
-
-
-Margolis, et al.          Expires June 7, 2018                 [Page 21]
-
-Internet-Draft                 SMTP-TLSRPT                 December 2017
-
 
    [RFC5891]  Klensin, J., "Internationalized Domain Names in
               Applications (IDNA): Protocol", RFC 5891, DOI 10.17487/
@@ -1209,6 +1223,17 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
               73, RFC 6522, DOI 10.17487/RFC6522, January 2012,
               <http://www.rfc-editor.org/info/rfc6522>.
 
+
+
+
+
+
+
+Margolis, et al.          Expires June 7, 2018                 [Page 22]
+
+Internet-Draft                 SMTP-TLSRPT                 December 2017
+
+
    [RFC6698]  Hoffman, P. and J. Schlyter, "The DNS-Based Authentication
               of Named Entities (DANE) Transport Layer Security (TLS)
               Protocol: TLSA", RFC 6698, DOI 10.17487/RFC6698, August
@@ -1226,13 +1251,6 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
    [RFC7493]  Bray, T., Ed., "The I-JSON Message Format", RFC 7493, DOI
               10.17487/RFC7493, March 2015,
               <http://www.rfc-editor.org/info/rfc7493>.
-
-
-
-Margolis, et al.          Expires June 7, 2018                 [Page 22]
-
-Internet-Draft                 SMTP-TLSRPT                 December 2017
-
 
 8.2.  Informative References
 
@@ -1262,6 +1280,16 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
               (DMARC)", RFC 7489, DOI 10.17487/RFC7489, March 2015,
               <http://www.rfc-editor.org/info/rfc7489>.
 
+
+
+
+
+
+Margolis, et al.          Expires June 7, 2018                 [Page 23]
+
+Internet-Draft                 SMTP-TLSRPT                 December 2017
+
+
 Appendix A.  Example Reporting Policy
 
 A.1.  Report using MAILTO
@@ -1285,7 +1313,35 @@ Appendix B.  Example JSON Report
 
 
 
-Margolis, et al.          Expires June 7, 2018                 [Page 23]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Margolis, et al.          Expires June 7, 2018                 [Page 24]
 
 Internet-Draft                 SMTP-TLSRPT                 December 2017
 
@@ -1341,7 +1397,7 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
 
 
 
-Margolis, et al.          Expires June 7, 2018                 [Page 24]
+Margolis, et al.          Expires June 7, 2018                 [Page 25]
 
 Internet-Draft                 SMTP-TLSRPT                 December 2017
 
@@ -1397,4 +1453,4 @@ Authors' Addresses
 
 
 
-Margolis, et al.          Expires June 7, 2018                 [Page 25]
+Margolis, et al.          Expires June 7, 2018                 [Page 26]

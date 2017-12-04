@@ -173,7 +173,7 @@ The formal definition of the `_smtp-tlsrpt` TXT record, defined using
 	                    tlsrpt-uri *(*WSP "," *WSP tlsrpt-uri)
 
         tlsrpt-uri        = URI
-                          ; "URI" is imported from [@!RFC3986]; 
+                          ; "URI" is imported from [RFC3986];
 			  ; commas (ASCII 0x2C) and exclamation 
 			  ; points (ASCII 0x21) MUST be encoded
 
@@ -462,7 +462,7 @@ The filename is RECOMMENDED to be constructed using the following ABNF:
 
      unique-id = 1*(ALPHA / DIGIT)
 
-     sender = domain        ; From the [@!RFC5321] that is used 
+     sender = domain        ; From the [RFC5321] that is used
      			    ; as the domain for the `contact-info`
 			    ; address in the report body
 
@@ -512,12 +512,14 @@ report should use the media type `application/tlsrpt+gzip`.
 In addition, the following two new top level message header fields are
 defined:
 
-``` TLS-Report-Domain: Receiver-Domain TLS-Report-Submitter:
-Sender-Domain ``` The `TLS-Report-Submitter` value MUST match the value
-found in the filename and the [@!RFC5321] domain from the `contact-info`
-from the report body.  These message headers MUST be included and should
-allow for easy searching for all reports submitted by a report domain or
-a particular submitter, for example in IMAP [@?RFC3501]:
+``` TLS-Report-Domain: Receiver-Domain
+TLS-Report-Submitter: Sender-Domain ```
+
+The `TLS-Report-Submitter` value MUST match the value found in the
+filename and the [@!RFC5321] domain from the `contact-info` from the
+report body.  These message headers MUST be included and should allow
+for easy searching for all reports submitted by a report domain or a
+particular submitter, for example in IMAP [@?RFC3501]:
 
 `s SEARCH HEADER "TLS-Report-Domain" "example.com"`
 
@@ -532,12 +534,12 @@ the following ABNF:
 
     tlsrpt-subject = %s"Report" FWS               ; "Report"
                      %s"Domain:" FWS              ; "Domain:"
-		     domain-name FWS              ; per RFC6376
+		     domain-name FWS              ; per [RFC6376]
 		     %s"Submitter:" FWS           ; "Submitter:"
-		     domain-name FWS              ; per RFC6376
+		     domain-name FWS              ; per [RFC6376]
 		     %s"Report-ID:" FWS           ; "Report-ID:
-		     "<" id-left "@" id-right ">" ; per RFC5322
-		     [CFWS]                       ; per RFC5322
+		     "<" id-left "@" id-right ">" ; per [RFC5322]
+		     [CFWS]                       ; per [RFC5322]
                                                   ; (as with FWS)
     
  The first domain-name indicates the DNS domain name about which the
@@ -549,8 +551,8 @@ the following ABNF:
 
  For instance, this is a possible Subject field for a report to the
  Policy Domain "example.net" from the Sending MTA
- "mail.sender.example.com".  It is line-wrapped as allowed by
- [@!RFC5322]:
+ "mail.sender.example.com".  It is line-wrapped as allowed
+ by [@!RFC5322]:
 
 ```
      Subject: Report Domain: example.net
