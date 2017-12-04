@@ -5,14 +5,14 @@
 Using TLS in Applications                                    D. Margolis
 Internet-Draft                                               Google, Inc
 Intended status: Standards Track                              A. Brotman
-Expires: May 12, 2018                                       Comcast, Inc
+Expires: June 7, 2018                                       Comcast, Inc
                                                          B. Ramakrishnan
                                                              Yahoo!, Inc
                                                                 J. Jones
                                                           Microsoft, Inc
                                                                M. Risher
                                                              Google, Inc
-                                                        November 8, 2017
+                                                        December 4, 2017
 
 
                            SMTP TLS Reporting
@@ -46,16 +46,16 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on May 12, 2018.
+   This Internet-Draft will expire on June 7, 2018.
 
 
 
 
 
 
-Margolis, et al.          Expires May 12, 2018                  [Page 1]
+Margolis, et al.          Expires June 7, 2018                  [Page 1]
 
-Internet-Draft                 SMTP-TLSRPT                 November 2017
+Internet-Draft                 SMTP-TLSRPT                 December 2017
 
 
 Copyright Notice
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Margolis, et al.          Expires May 12, 2018                  [Page 2]
+Margolis, et al.          Expires June 7, 2018                  [Page 2]
 
-Internet-Draft                 SMTP-TLSRPT                 November 2017
+Internet-Draft                 SMTP-TLSRPT                 December 2017
 
 
      6.5.  STARTTLS Validation Result Types  . . . . . . . . . . . .  19
@@ -165,9 +165,9 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
 
-Margolis, et al.          Expires May 12, 2018                  [Page 3]
+Margolis, et al.          Expires June 7, 2018                  [Page 3]
 
-Internet-Draft                 SMTP-TLSRPT                 November 2017
+Internet-Draft                 SMTP-TLSRPT                 December 2017
 
 
    We also define the following terms for further use in this document:
@@ -221,9 +221,9 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
 
-Margolis, et al.          Expires May 12, 2018                  [Page 4]
+Margolis, et al.          Expires June 7, 2018                  [Page 4]
 
-Internet-Draft                 SMTP-TLSRPT                 November 2017
+Internet-Draft                 SMTP-TLSRPT                 December 2017
 
 
    o  In the case of "https", reports should be submitted via POST
@@ -277,9 +277,9 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
 
-Margolis, et al.          Expires May 12, 2018                  [Page 5]
+Margolis, et al.          Expires June 7, 2018                  [Page 5]
 
-Internet-Draft                 SMTP-TLSRPT                 November 2017
+Internet-Draft                 SMTP-TLSRPT                 December 2017
 
 
    discarded.  If the number of resulting records is not one, senders
@@ -333,9 +333,9 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
 
-Margolis, et al.          Expires May 12, 2018                  [Page 6]
+Margolis, et al.          Expires June 7, 2018                  [Page 6]
 
-Internet-Draft                 SMTP-TLSRPT                 November 2017
+Internet-Draft                 SMTP-TLSRPT                 December 2017
 
 
          a semicolon) (3) The literal string "no-policy-found", if
@@ -389,9 +389,9 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
 
-Margolis, et al.          Expires May 12, 2018                  [Page 7]
+Margolis, et al.          Expires June 7, 2018                  [Page 7]
 
-Internet-Draft                 SMTP-TLSRPT                 November 2017
+Internet-Draft                 SMTP-TLSRPT                 December 2017
 
 
 4.3.  Result Types
@@ -445,9 +445,9 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
 
-Margolis, et al.          Expires May 12, 2018                  [Page 8]
+Margolis, et al.          Expires June 7, 2018                  [Page 8]
 
-Internet-Draft                 SMTP-TLSRPT                 November 2017
+Internet-Draft                 SMTP-TLSRPT                 December 2017
 
 
 4.3.2.2.  MTA-STS-specific Policy Failures
@@ -501,9 +501,9 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
 
-Margolis, et al.          Expires May 12, 2018                  [Page 9]
+Margolis, et al.          Expires June 7, 2018                  [Page 9]
 
-Internet-Draft                 SMTP-TLSRPT                 November 2017
+Internet-Draft                 SMTP-TLSRPT                 December 2017
 
 
  {
@@ -557,9 +557,9 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
 
-Margolis, et al.          Expires May 12, 2018                 [Page 10]
+Margolis, et al.          Expires June 7, 2018                 [Page 10]
 
-Internet-Draft                 SMTP-TLSRPT                 November 2017
+Internet-Draft                 SMTP-TLSRPT                 December 2017
 
 
    o  "report-id": A unique identifier for the report.  Report authors
@@ -613,9 +613,9 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
 
-Margolis, et al.          Expires May 12, 2018                 [Page 11]
+Margolis, et al.          Expires June 7, 2018                 [Page 11]
 
-Internet-Draft                 SMTP-TLSRPT                 November 2017
+Internet-Draft                 SMTP-TLSRPT                 December 2017
 
 
    o  "total-failure-session-count": The aggregate number (integer) of
@@ -669,9 +669,9 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
 
-Margolis, et al.          Expires May 12, 2018                 [Page 12]
+Margolis, et al.          Expires June 7, 2018                 [Page 12]
 
-Internet-Draft                 SMTP-TLSRPT                 November 2017
+Internet-Draft                 SMTP-TLSRPT                 December 2017
 
 
        filename = sender "!" policy-domain "!" begin-timestamp
@@ -725,9 +725,9 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
 
-Margolis, et al.          Expires May 12, 2018                 [Page 13]
+Margolis, et al.          Expires June 7, 2018                 [Page 13]
 
-Internet-Draft                 SMTP-TLSRPT                 November 2017
+Internet-Draft                 SMTP-TLSRPT                 December 2017
 
 
    Inside it, there are two parts: The first part is human readable,
@@ -781,9 +781,9 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
 
-Margolis, et al.          Expires May 12, 2018                 [Page 14]
+Margolis, et al.          Expires June 7, 2018                 [Page 14]
 
-Internet-Draft                 SMTP-TLSRPT                 November 2017
+Internet-Draft                 SMTP-TLSRPT                 December 2017
 
 
               Subject: Report Domain: example.net
@@ -837,9 +837,9 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
 
-Margolis, et al.          Expires May 12, 2018                 [Page 15]
+Margolis, et al.          Expires June 7, 2018                 [Page 15]
 
-Internet-Draft                 SMTP-TLSRPT                 November 2017
+Internet-Draft                 SMTP-TLSRPT                 December 2017
 
 
    A reporting entity SHOULD expect a "successful" response from the
@@ -893,9 +893,9 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
 
-Margolis, et al.          Expires May 12, 2018                 [Page 16]
+Margolis, et al.          Expires June 7, 2018                 [Page 16]
 
-Internet-Draft                 SMTP-TLSRPT                 November 2017
+Internet-Draft                 SMTP-TLSRPT                 December 2017
 
 
 6.2.  Report Type
@@ -949,9 +949,9 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
 
-Margolis, et al.          Expires May 12, 2018                 [Page 17]
+Margolis, et al.          Expires June 7, 2018                 [Page 17]
 
-Internet-Draft                 SMTP-TLSRPT                 November 2017
+Internet-Draft                 SMTP-TLSRPT                 December 2017
 
 
                       Magic number(s):  n/a
@@ -1005,9 +1005,9 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
 
-Margolis, et al.          Expires May 12, 2018                 [Page 18]
+Margolis, et al.          Expires June 7, 2018                 [Page 18]
 
-Internet-Draft                 SMTP-TLSRPT                 November 2017
+Internet-Draft                 SMTP-TLSRPT                 December 2017
 
 
    Additional information:
@@ -1061,9 +1061,9 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
 
-Margolis, et al.          Expires May 12, 2018                 [Page 19]
+Margolis, et al.          Expires June 7, 2018                 [Page 19]
 
-Internet-Draft                 SMTP-TLSRPT                 November 2017
+Internet-Draft                 SMTP-TLSRPT                 December 2017
 
 
    o  Flooding of the Aggregate report URI (rua) endpoint: An attacker
@@ -1117,9 +1117,9 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
 
-Margolis, et al.          Expires May 12, 2018                 [Page 20]
+Margolis, et al.          Expires June 7, 2018                 [Page 20]
 
-Internet-Draft                 SMTP-TLSRPT                 November 2017
+Internet-Draft                 SMTP-TLSRPT                 December 2017
 
 
 8.  References
@@ -1173,9 +1173,9 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
 
-Margolis, et al.          Expires May 12, 2018                 [Page 21]
+Margolis, et al.          Expires June 7, 2018                 [Page 21]
 
-Internet-Draft                 SMTP-TLSRPT                 November 2017
+Internet-Draft                 SMTP-TLSRPT                 December 2017
 
 
    [RFC5891]  Klensin, J., "Internationalized Domain Names in
@@ -1229,9 +1229,9 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
 
-Margolis, et al.          Expires May 12, 2018                 [Page 22]
+Margolis, et al.          Expires June 7, 2018                 [Page 22]
 
-Internet-Draft                 SMTP-TLSRPT                 November 2017
+Internet-Draft                 SMTP-TLSRPT                 December 2017
 
 
 8.2.  Informative References
@@ -1285,9 +1285,9 @@ Appendix B.  Example JSON Report
 
 
 
-Margolis, et al.          Expires May 12, 2018                 [Page 23]
+Margolis, et al.          Expires June 7, 2018                 [Page 23]
 
-Internet-Draft                 SMTP-TLSRPT                 November 2017
+Internet-Draft                 SMTP-TLSRPT                 December 2017
 
 
    {
@@ -1341,9 +1341,9 @@ Internet-Draft                 SMTP-TLSRPT                 November 2017
 
 
 
-Margolis, et al.          Expires May 12, 2018                 [Page 24]
+Margolis, et al.          Expires June 7, 2018                 [Page 24]
 
-Internet-Draft                 SMTP-TLSRPT                 November 2017
+Internet-Draft                 SMTP-TLSRPT                 December 2017
 
 
    command.  Additionally 3 sessions failed due to
@@ -1397,4 +1397,4 @@ Authors' Addresses
 
 
 
-Margolis, et al.          Expires May 12, 2018                 [Page 25]
+Margolis, et al.          Expires June 7, 2018                 [Page 25]
