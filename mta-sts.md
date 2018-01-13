@@ -319,7 +319,7 @@ The certificate is valid for the `mta-sts` host with respect to the
 rules described in [@!RFC6125], with the following application-specific
 considerations:
 
-* Matching is performed only against the DNS-ID and CN-ID identifiers.
+* Matching is performed only against the DNS-ID identifiers.
 
 * DNS domain names in server certificates MAY contain the wildcard
   character '\*' as the complete left-most label within the identifier.
@@ -396,10 +396,10 @@ description of sending MTA behavior when policy validation fails.
 
 The certificate presented by the receiving MX MUST chain to a root CA
 that is trusted by the sending MTA and be non-expired. The certificate
-MUST have a CN-ID ([@!RFC6125]) or subject alternative name (SAN,
-[@!RFC5280]) with a DNS-ID matching the `mx` pattern. The MX's
-certificate MAY also be checked for revocation via OCSP [@?RFC6960],
-CRLs [@?RFC6818], or some other mechanism.
+MUST have a subject alternative name (SAN, [@!RFC5280]) with a DNS-ID
+matching the `mx` pattern. The MX's certificate MAY also be checked for
+revocation via OCSP [@?RFC6960], CRLs [@?RFC6818], or some other
+mechanism.
 
 Because the `mx` patterns are not hostnames, however, matching is not
 identical to other common cases of X.509 certificate authentication (as
@@ -411,7 +411,7 @@ matching.
 
 To simplify this case, we impose the following constraints on wildcard
 certificates, identical to those in [@?RFC7672] section 3.2.3 and
-[@?RFC6125] section 6.4.3: wildcards are valid in DNS-IDs or CN-IDs, but
+[@?RFC6125] section 6.4.3: wildcards are valid in DNS-IDs, but
 must be the entire first label of the identifier (that is,
 `*.example.com`, not `mail*.example.com`). Senders who are comparing a
 "suffix" MX pattern with a wildcard identifier should thus strip the
@@ -872,8 +872,8 @@ func isWildcardMatch(pat, host) {
 }
 
 func certMatches(connection, policy) {
-  // Assume a handy function to return CN and DNS-ID SANs.
-  for san in getDnsIdSansAndCnFromCert(connection) {
+  // Assume a handy function to return DNS-ID SANs.
+  for san in getDnsIdSansFromCert(connection) {
     for mx in policy.mx {
       // Return if the server certificate from "connection" matches the
       // "mx" host.
