@@ -1139,8 +1139,8 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
    [I-D.ietf-uta-mta-sts]
               Margolis, D., Risher, M., Ramakrishnan, B., Brotman, A.,
               and J. Jones, "SMTP MTA Strict Transport Security (MTA-
-              STS)", draft-ietf-uta-mta-sts-11 (work in progress),
-              November 2017.
+              STS)", draft-ietf-uta-mta-sts-13 (work in progress),
+              December 2017.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
@@ -1158,8 +1158,8 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
 
    [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
               Resource Identifier (URI): Generic Syntax", STD 66, RFC
-              3986, DOI 10.17487/RFC3986, January 2005,
-              <http://www.rfc-editor.org/info/rfc3986>.
+              3986, DOI 10.17487/RFC3986, January 2005, <https://www
+              .rfc-editor.org/info/rfc3986>.
 
    [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
               Specifications: ABNF", STD 68, RFC 5234, DOI 10.17487/
@@ -1199,8 +1199,8 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
 
    [RFC5952]  Kawamura, S. and M. Kawashima, "A Recommendation for IPv6
               Address Text Representation", RFC 5952, DOI 10.17487/
-              RFC5952, August 2010,
-              <http://www.rfc-editor.org/info/rfc5952>.
+              RFC5952, August 2010, <https://www.rfc-editor.org/info/
+              rfc5952>.
 
    [RFC6068]  Duerst, M., Masinter, L., and J. Zawinski, "The 'mailto'
               URI Scheme", RFC 6068, DOI 10.17487/RFC6068, October 2010,
@@ -1216,7 +1216,7 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
    [RFC6376]  Crocker, D., Ed., Hansen, T., Ed., and M. Kucherawy, Ed.,
               "DomainKeys Identified Mail (DKIM) Signatures", STD 76,
               RFC 6376, DOI 10.17487/RFC6376, September 2011,
-              <http://www.rfc-editor.org/info/rfc6376>.
+              <https://www.rfc-editor.org/info/rfc6376>.
 
    [RFC6522]  Kucherawy, M., Ed., "The Multipart/Report Media Type for
               the Reporting of Mail System Administrative Messages", STD
@@ -1245,12 +1245,12 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
               info/rfc7231>.
 
    [RFC7405]  Kyzivat, P., "Case-Sensitive String Support in ABNF", RFC
-              7405, DOI 10.17487/RFC7405, December 2014,
-              <http://www.rfc-editor.org/info/rfc7405>.
+              7405, DOI 10.17487/RFC7405, December 2014, <https://www
+              .rfc-editor.org/info/rfc7405>.
 
    [RFC7493]  Bray, T., Ed., "The I-JSON Message Format", RFC 7493, DOI
-              10.17487/RFC7493, March 2015,
-              <http://www.rfc-editor.org/info/rfc7493>.
+              10.17487/RFC7493, March 2015, <https://www.rfc-editor.org/
+              info/rfc7493>.
 
 8.2.  Informative References
 
@@ -1260,7 +1260,7 @@ Internet-Draft                 SMTP-TLSRPT                 December 2017
 
    [RFC3501]  Crispin, M., "INTERNET MESSAGE ACCESS PROTOCOL - VERSION
               4rev1", RFC 3501, DOI 10.17487/RFC3501, March 2003,
-              <http://www.rfc-editor.org/info/rfc3501>.
+              <https://www.rfc-editor.org/info/rfc3501>.
 
    [RFC3864]  Klyne, G., Nottingham, M., and J. Mogul, "Registration
               Procedures for Message Header Fields", BCP 90, RFC 3864,

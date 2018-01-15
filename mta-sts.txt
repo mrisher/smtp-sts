@@ -419,8 +419,7 @@ Internet-Draft                   MTA-STS                   December 2017
    rules described in [RFC6125], with the following application-specific
    considerations:
 
-   o  Matching is performed only against the DNS-ID and CN-ID
-      identifiers.
+   o  Matching is performed only against the DNS-ID identifiers.
 
    o  DNS domain names in server certificates MAY contain the wildcard
       character '*' as the complete left-most label within the
@@ -441,7 +440,8 @@ Internet-Draft                   MTA-STS                   December 2017
    or longer per version ID, to avoid overwhelming resource-constrained
    recipients with cascading failures.
 
-
+   Senders MAY impose a timeout on the HTTPS GET and/or a limit on the
+   maximum size of the response body to avoid long delays or resource
 
 
 
@@ -450,8 +450,6 @@ Margolis, et al.          Expires June 7, 2018                  [Page 8]
 Internet-Draft                   MTA-STS                   December 2017
 
 
-   Senders MAY impose a timeout on the HTTPS GET and/or a limit on the
-   maximum size of the response body to avoid long delays or resource
    exhaustion during attempted policy updates.  A suggested timeout is
    one minute, and a suggested maximum policy size 64 kilobytes; policy
    hosts SHOULD respond to requests with a complete policy body within
@@ -501,6 +499,8 @@ Internet-Draft                   MTA-STS                   December 2017
 
 
 
+
+
 Margolis, et al.          Expires June 7, 2018                  [Page 9]
 
 Internet-Draft                   MTA-STS                   December 2017
@@ -514,10 +514,10 @@ Internet-Draft                   MTA-STS                   December 2017
 
    The certificate presented by the receiving MX MUST chain to a root CA
    that is trusted by the sending MTA and be non-expired.  The
-   certificate MUST have a CN-ID ([RFC6125]) or subject alternative name
-   (SAN, [RFC5280]) with a DNS-ID matching the "mx" pattern.  The MX's
-   certificate MAY also be checked for revocation via OCSP [RFC6960],
-   CRLs [RFC6818], or some other mechanism.
+   certificate MUST have a subject alternative name (SAN, [RFC5280])
+   with a DNS-ID matching the "mx" pattern.  The MX's certificate MAY
+   also be checked for revocation via OCSP [RFC6960], CRLs [RFC6818], or
+   some other mechanism.
 
    Because the "mx" patterns are not hostnames, however, matching is not
    identical to other common cases of X.509 certificate authentication
@@ -529,8 +529,8 @@ Internet-Draft                   MTA-STS                   December 2017
 
    To simplify this case, we impose the following constraints on
    wildcard certificates, identical to those in [RFC7672] section 3.2.3
-   and [RFC6125] section 6.4.3: wildcards are valid in DNS-IDs or CN-
-   IDs, but must be the entire first label of the identifier (that is,
+   and [RFC6125] section 6.4.3: wildcards are valid in DNS-IDs, but must
+   be the entire first label of the identifier (that is,
    "*.example.com", not "mail*.example.com").  Senders who are comparing
    a "suffix" MX pattern with a wildcard identifier should thus strip
    the wildcard and ensure that the two sides match label-by-label,
@@ -1020,7 +1020,7 @@ Internet-Draft                   MTA-STS                   December 2017
    [I-D.ietf-uta-smtp-tlsrpt]
               Margolis, D., Brotman, A., Ramakrishnan, B., Jones, J.,
               and M. Risher, "SMTP TLS Reporting", draft-ietf-uta-smtp-
-              tlsrpt-11 (work in progress), November 2017.
+              tlsrpt-13 (work in progress), December 2017.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, DOI 10.17487/
@@ -1079,8 +1079,8 @@ Internet-Draft                   MTA-STS                   December 2017
               info/rfc7231>.
 
    [RFC7405]  Kyzivat, P., "Case-Sensitive String Support in ABNF", RFC
-              7405, DOI 10.17487/RFC7405, December 2014,
-              <http://www.rfc-editor.org/info/rfc7405>.
+              7405, DOI 10.17487/RFC7405, December 2014, <https://www
+              .rfc-editor.org/info/rfc7405>.
 
    [RFC7525]  Sheffer, Y., Holz, R., and P. Saint-Andre,
               "Recommendations for Secure Use of Transport Layer
@@ -1211,8 +1211,8 @@ func isWildcardMatch(pat, host) {
 }
 
 func certMatches(connection, policy) {
-  // Assume a handy function to return CN and DNS-ID SANs.
-  for san in getDnsIdSansAndCnFromCert(connection) {
+  // Assume a handy function to return DNS-ID SANs.
+  for san in getDnsIdSansFromCert(connection) {
     for mx in policy.mx {
       // Return if the server certificate from "connection" matches the
       // "mx" host.
