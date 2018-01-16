@@ -3,13 +3,13 @@
    Title = "SMTP TLS Reporting"
    abbrev = "SMTP-TLSRPT"
    category = "std"
-   docName = "draft-ietf-uta-smtp-tlsrpt-13"
+   docName = "draft-ietf-uta-smtp-tlsrpt-14"
    ipr = "trust200902"
    area = "Applications"
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2017-12-04T00:00:00Z
+   date = 2018-01-18T00:00:00Z
    
    [[author]]
    initials="D."
@@ -17,35 +17,35 @@
    fullname="Daniel Margolis"
    organization="Google, Inc"
      [author.address]
-     email="dmargolis (at) google (dot com)"
+     email="dmargolis@google.com"
    [[author]]
    initials="A."
    surname="Brotman"
    fullname="Alexander Brotman"
    organization="Comcast, Inc"
      [author.address]
-     email="alex_brotman (at) comcast (dot com)"
+     email="alex_brotman@comcast.com"
    [[author]]
    initials="B."
    surname="Ramakrishnan"
    fullname="Binu Ramakrishnan"
    organization="Yahoo!, Inc"
      [author.address]
-     email="rbinu (at) yahoo-inc (dot com)"
+     email="rbinu@yahoo-inc.com"
    [[author]]
    initials="J."
    surname="Jones"
    fullname="Janet Jones"
    organization="Microsoft, Inc"
      [author.address]
-     email="janet.jones (at) microsoft (dot com)"
+     email="janet.jones@microsoft.com"
    [[author]]
    initials="M."
    surname="Risher"
    fullname="Mark Risher"
    organization="Google, Inc"
      [author.address]
-     email="risher (at) google (dot com)"
+     email="risher@google.com"
 
 %%%
 
@@ -312,11 +312,16 @@ set is:
   found to be valid.
 * `dnssec-invalid`: This would indicate that no valid records were
   returned from the recursive resolver.  The request returned with
-  SERVFAIL for the requested TLSA record.  It should be noted that if
-  the reporter's systems are having problems resolving destination DNS
-  records due to DNSSEC failures, it's possible they will also be unable
-  to resolve the TLSRPT record, therefore these types of reports may be
-  rare.
+  SERVFAIL for the requested TLSA record.
+* `dane-required`: This indicates that the sending system is
+  configured to require DANE TLSA records for all the MX hosts
+  of the destination domain, but no DNSSEC-validated TLSA records
+  were present for the MX host that is the subject of the report.
+  Mandatory DANE for SMTP is described in section 6 of [@?RFC7672].
+  Such policies may be created by mutual agreement between two
+  organizations that frequently exchange sensitive content via
+  email.
+
 
 #### MTA-STS-specific Policy Failures
 
@@ -408,14 +413,14 @@ Figure: JSON Report Format
   mx2.example.com\nmx: mx.backup-example.com\nmax_age: 12345678"`
 * `domain`: The Policy Domain is the domain against which the MTA-STS or
   DANE policy is defined. In the case of Internationalized Domain Names
-  ([@?RFC5891]), the domain is the Punycode-encoded A-label
-  ([@!RFC3492]) and not the U-label.
+  ([@?RFC5891]), the domain should consist of the Punycode-encoded 
+  A-labels ([@!RFC3492]) and not the U-labels.
 * `mx-host-pattern`: The pattern of MX hostnames from the applied
   policy. It is provided as a string, and is interpreted in the same
   manner as the "Checking of Wildcard Certificates" rules in Section
   6.4.3 of [@!RFC6125].  In the case of Internationalized Domain Names
-  ([@!RFC5891]), the domain is the Punycode-encoded A-label
-  ([@!RFC3492]) and not the U-label.
+  ([@!RFC5891]), the domain should consist of the Punycode-encoded 
+  A-labels ([@!RFC3492]) and not the U-labels.
 * `result-type`: A value from (#result-types), "Result Types",  above.
 * `ip-address`: The IP address of the sending MTA that attempted the
   STARTTLS connection. It is provided as a string representation of an
@@ -426,6 +431,10 @@ Figure: JSON Report Format
   connection.
 * `receiving-mx-helo`: (optional) The HELO or EHLO string from the
   banner announced during the reported session.
+* `receiving-ip`: The destination IP address that was using when 
+  creating the outbound session. It is provided as a string 
+  representation of an IPv4 (see below) or IPv6 ([@!RFC5952]) address 
+  in dot-decimal or colon-hexadecimal notation.
 * `total-successful-session-count`: The aggregate number (integer) of
   successfully negotiated TLS-enabled connections to the receiving site.
 * `total-failure-session-count`: The aggregate number (integer) of
@@ -618,15 +627,14 @@ In the event of a delivery failure, regardless of the delivery method, a
 sender SHOULD attempt redelivery for up to 24hrs after the initial
 attempt.  As previously stated the reports are optional, so while it is
 ideal to attempt redelivery, it is not required.  If multiple retries
-are attempted, ideally they would be on a logarithmic scale.
+are attempted, ideally they would be on an exponential scale.
 
 ## Metadata Variances
 
 As stated above, there are a variable number of ways to declare
-information about the data therein.  If it should be the case that these
-objects were to disagree, then the report data contained within the JSON
-body MUST be considered the authoritative source for those data
-elements.
+information about the data therein.  If any of items declared via
+subject or filename disagree with the report, the report MUST be
+considered the authoritative source.
 
 # IANA Considerations
 
@@ -888,12 +896,14 @@ _smtp-tlsrpt.mail.example.com. IN TXT \
       "result-type": "starttls-not-supported",
       "sending-mta-ip": "98.22.33.99",
       "receiving-mx-hostname": "mx2.mail.company-y.example",
+      "receiving-ip": "192.168.14.72",
       "failed-session-count": 200,
       "additional-information": "https://reports.company-x.example/ 
         report_info ? id = 5065427 c - 23 d3# StarttlsNotSupported "
     }, {
       "result-type": "validation-failure",
       "sending-mta-ip": "47.97.15.2",
+      "receiving-ip": "10.72.84.12",
       "receiving-mx-hostname": "mx-backup.mail.company-y.example",
       "failed-session-count": 3,
       "failure-error-code": "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED"
