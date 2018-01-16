@@ -5,17 +5,17 @@
 Using TLS in Applications                                    D. Margolis
 Internet-Draft                                                 M. Risher
 Intended status: Standards Track                             Google, Inc
-Expires: June 7, 2018                                    B. Ramakrishnan
+Expires: July 20, 2018                                   B. Ramakrishnan
                                                              Yahoo!, Inc
                                                               A. Brotman
                                                             Comcast, Inc
                                                                 J. Jones
                                                           Microsoft, Inc
-                                                        December 4, 2017
+                                                        January 16, 2018
 
 
               SMTP MTA Strict Transport Security (MTA-STS)
-                       draft-ietf-uta-mta-sts-13
+                       draft-ietf-uta-mta-sts-14
 
 Abstract
 
@@ -40,11 +40,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on June 7, 2018.
+   This Internet-Draft will expire on July 20, 2018.
 
 Copyright Notice
 
-   Copyright (c) 2017 IETF Trust and the persons identified as the
+   Copyright (c) 2018 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Margolis, et al.          Expires June 7, 2018                  [Page 1]
+Margolis, et al.          Expires July 20, 2018                 [Page 1]
 
-Internet-Draft                   MTA-STS                   December 2017
+Internet-Draft                   MTA-STS                    January 2018
 
 
    publication of this document.  Please review these documents
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Margolis, et al.          Expires June 7, 2018                  [Page 2]
+Margolis, et al.          Expires July 20, 2018                 [Page 2]
 
-Internet-Draft                   MTA-STS                   December 2017
+Internet-Draft                   MTA-STS                    January 2018
 
 
 1.  Introduction
@@ -165,9 +165,9 @@ Internet-Draft                   MTA-STS                   December 2017
 
 
 
-Margolis, et al.          Expires June 7, 2018                  [Page 3]
+Margolis, et al.          Expires July 20, 2018                 [Page 3]
 
-Internet-Draft                   MTA-STS                   December 2017
+Internet-Draft                   MTA-STS                    January 2018
 
 
    downgrades.  For a thorough discussion of this trade-off, see
@@ -221,9 +221,9 @@ Internet-Draft                   MTA-STS                   December 2017
 
 
 
-Margolis, et al.          Expires June 7, 2018                  [Page 4]
+Margolis, et al.          Expires July 20, 2018                 [Page 4]
 
-Internet-Draft                   MTA-STS                   December 2017
+Internet-Draft                   MTA-STS                    January 2018
 
 
    "_mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;""
@@ -277,9 +277,9 @@ Internet-Draft                   MTA-STS                   December 2017
 
 
 
-Margolis, et al.          Expires June 7, 2018                  [Page 5]
+Margolis, et al.          Expires July 20, 2018                 [Page 5]
 
-Internet-Draft                   MTA-STS                   December 2017
+Internet-Draft                   MTA-STS                    January 2018
 
 
    This resource contains the following newline-separated key/value
@@ -333,9 +333,9 @@ Internet-Draft                   MTA-STS                   December 2017
 
 
 
-Margolis, et al.          Expires June 7, 2018                  [Page 6]
+Margolis, et al.          Expires July 20, 2018                 [Page 6]
 
-Internet-Draft                   MTA-STS                   December 2017
+Internet-Draft                   MTA-STS                    January 2018
 
 
                               [CRLF]
@@ -389,9 +389,9 @@ Internet-Draft                   MTA-STS                   December 2017
 
 
 
-Margolis, et al.          Expires June 7, 2018                  [Page 7]
+Margolis, et al.          Expires July 20, 2018                 [Page 7]
 
-Internet-Draft                   MTA-STS                   December 2017
+Internet-Draft                   MTA-STS                    January 2018
 
 
    sts-policy-ext-value     = 1*(%x21-3A / %x3C / %x3E-7E)
@@ -445,9 +445,9 @@ Internet-Draft                   MTA-STS                   December 2017
 
 
 
-Margolis, et al.          Expires June 7, 2018                  [Page 8]
+Margolis, et al.          Expires July 20, 2018                 [Page 8]
 
-Internet-Draft                   MTA-STS                   December 2017
+Internet-Draft                   MTA-STS                    January 2018
 
 
    exhaustion during attempted policy updates.  A suggested timeout is
@@ -501,9 +501,9 @@ Internet-Draft                   MTA-STS                   December 2017
 
 
 
-Margolis, et al.          Expires June 7, 2018                  [Page 9]
+Margolis, et al.          Expires July 20, 2018                 [Page 9]
 
-Internet-Draft                   MTA-STS                   December 2017
+Internet-Draft                   MTA-STS                    January 2018
 
 
    This section does not dictate the behavior of sending MTAs when
@@ -557,9 +557,9 @@ Internet-Draft                   MTA-STS                   December 2017
 
 
 
-Margolis, et al.          Expires June 7, 2018                 [Page 10]
+Margolis, et al.          Expires July 20, 2018                [Page 10]
 
-Internet-Draft                   MTA-STS                   December 2017
+Internet-Draft                   MTA-STS                    January 2018
 
 
    2.  "testing": In this mode, sending MTAs which also implement the
@@ -613,9 +613,9 @@ Internet-Draft                   MTA-STS                   December 2017
 
 
 
-Margolis, et al.          Expires June 7, 2018                 [Page 11]
+Margolis, et al.          Expires July 20, 2018                [Page 11]
 
-Internet-Draft                   MTA-STS                   December 2017
+Internet-Draft                   MTA-STS                    January 2018
 
 
    o  HTTPS policy fetch failures when a valid TXT record is present.
@@ -669,9 +669,9 @@ Internet-Draft                   MTA-STS                   December 2017
 
 
 
-Margolis, et al.          Expires June 7, 2018                 [Page 12]
+Margolis, et al.          Expires July 20, 2018                [Page 12]
 
-Internet-Draft                   MTA-STS                   December 2017
+Internet-Draft                   MTA-STS                    January 2018
 
 
 8.  Operational Considerations
@@ -725,9 +725,9 @@ Internet-Draft                   MTA-STS                   December 2017
 
 
 
-Margolis, et al.          Expires June 7, 2018                 [Page 13]
+Margolis, et al.          Expires July 20, 2018                [Page 13]
 
-Internet-Draft                   MTA-STS                   December 2017
+Internet-Draft                   MTA-STS                    January 2018
 
 
    Policy:
@@ -781,9 +781,9 @@ Internet-Draft                   MTA-STS                   December 2017
 
 
 
-Margolis, et al.          Expires June 7, 2018                 [Page 14]
+Margolis, et al.          Expires July 20, 2018                [Page 14]
 
-Internet-Draft                   MTA-STS                   December 2017
+Internet-Draft                   MTA-STS                    January 2018
 
 
 9.2.  MTA-STS TXT Record Fields
@@ -837,9 +837,9 @@ Internet-Draft                   MTA-STS                   December 2017
 
 
 
-Margolis, et al.          Expires June 7, 2018                 [Page 15]
+Margolis, et al.          Expires July 20, 2018                [Page 15]
 
-Internet-Draft                   MTA-STS                   December 2017
+Internet-Draft                   MTA-STS                    January 2018
 
 
       for the recipient domain, or by redirecting client connections
@@ -893,9 +893,9 @@ Internet-Draft                   MTA-STS                   December 2017
 
 
 
-Margolis, et al.          Expires June 7, 2018                 [Page 16]
+Margolis, et al.          Expires July 20, 2018                [Page 16]
 
-Internet-Draft                   MTA-STS                   December 2017
+Internet-Draft                   MTA-STS                    January 2018
 
 
    detect such a persistent attack on policy refresh.  (However, they
@@ -949,9 +949,9 @@ Internet-Draft                   MTA-STS                   December 2017
 
 
 
-Margolis, et al.          Expires June 7, 2018                 [Page 17]
+Margolis, et al.          Expires July 20, 2018                [Page 17]
 
-Internet-Draft                   MTA-STS                   December 2017
+Internet-Draft                   MTA-STS                    January 2018
 
 
 10.4.  Weak Policy Constraints
@@ -1005,9 +1005,9 @@ Internet-Draft                   MTA-STS                   December 2017
 
 
 
-Margolis, et al.          Expires June 7, 2018                 [Page 18]
+Margolis, et al.          Expires July 20, 2018                [Page 18]
 
-Internet-Draft                   MTA-STS                   December 2017
+Internet-Draft                   MTA-STS                    January 2018
 
 
    Markus Laber 1&1 Mail & Media Development & Technology GmbH
@@ -1061,9 +1061,9 @@ Internet-Draft                   MTA-STS                   December 2017
 
 
 
-Margolis, et al.          Expires June 7, 2018                 [Page 19]
+Margolis, et al.          Expires July 20, 2018                [Page 19]
 
-Internet-Draft                   MTA-STS                   December 2017
+Internet-Draft                   MTA-STS                    January 2018
 
 
    [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
@@ -1117,9 +1117,9 @@ Internet-Draft                   MTA-STS                   December 2017
 
 
 
-Margolis, et al.          Expires June 7, 2018                 [Page 20]
+Margolis, et al.          Expires July 20, 2018                [Page 20]
 
-Internet-Draft                   MTA-STS                   December 2017
+Internet-Draft                   MTA-STS                    January 2018
 
 
    [RFC6960]  Santesson, S., Myers, M., Ankney, R., Malpani, A.,
@@ -1173,9 +1173,9 @@ Appendix B.  Message delivery pseudocode
 
 
 
-Margolis, et al.          Expires June 7, 2018                 [Page 21]
+Margolis, et al.          Expires July 20, 2018                [Page 21]
 
-Internet-Draft                   MTA-STS                   December 2017
+Internet-Draft                   MTA-STS                    January 2018
 
 
    background fetch that does not block delivery if no cached policy is
@@ -1229,9 +1229,9 @@ func certMatches(connection, policy) {
 
 
 
-Margolis, et al.          Expires June 7, 2018                 [Page 22]
+Margolis, et al.          Expires July 20, 2018                [Page 22]
 
-Internet-Draft                   MTA-STS                   December 2017
+Internet-Draft                   MTA-STS                    January 2018
 
 
   return false
@@ -1285,9 +1285,9 @@ func tryWithPolicy(message, domain, policy) {
 
 
 
-Margolis, et al.          Expires June 7, 2018                 [Page 23]
+Margolis, et al.          Expires July 20, 2018                [Page 23]
 
-Internet-Draft                   MTA-STS                   December 2017
+Internet-Draft                   MTA-STS                    January 2018
 
 
       return true
@@ -1341,9 +1341,9 @@ Authors' Addresses
 
 
 
-Margolis, et al.          Expires June 7, 2018                 [Page 24]
+Margolis, et al.          Expires July 20, 2018                [Page 24]
 
-Internet-Draft                   MTA-STS                   December 2017
+Internet-Draft                   MTA-STS                    January 2018
 
 
    Janet Jones
@@ -1397,4 +1397,4 @@ Internet-Draft                   MTA-STS                   December 2017
 
 
 
-Margolis, et al.          Expires June 7, 2018                 [Page 25]
+Margolis, et al.          Expires July 20, 2018                [Page 25]
