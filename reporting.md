@@ -612,8 +612,18 @@ honor MTA-STS or DANE TLSA failures.
 
 The report MAY be delivered by POST to HTTPS. If compressed, the report
 SHOULD use the media type `application/tlsrpt+gzip`, and
-`application/tlsrpt+json` otherwise (see section (#iana-considerations),
-"IANA Considerations").
+
+The report MAY be delivered by POST to HTTPS. When doing so, the report
+should use the media-type `application/tlsrpt` (see section 
+(#iana-considerations), "IANA Considerations").  If the reporting entity
+compresses the report, the conversion for the Content-Type should note
+that:
+
+Content-Type: application/tlsrpt; conversions=gzip
+Content-Type: application/tlsrpt; conversions=none
+Content-Type: application/tlsrpt
+
+The second and third items in the list are equivalent.  
 
 A reporting entity SHOULD expect a "successful" response from the
 accepting HTTPS server, typically a 200 or 201 HTTP code [@?RFC7231].
