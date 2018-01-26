@@ -31,7 +31,7 @@
    fullname="Binu Ramakrishnan"
    organization="Yahoo!, Inc"
      [author.address]
-     email="rbinu@yahoo-inc.com"
+     email="rbinu@oath.com"
    [[author]]
    initials="J."
    surname="Jones"
