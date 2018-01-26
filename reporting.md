@@ -9,7 +9,7 @@
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2018-01-22T00:00:00Z
+   date = 2018-01-26T00:00:00Z
    
    [[author]]
    initials="D."
@@ -413,13 +413,13 @@ Figure: JSON Report Format
   mx2.example.com\nmx: mx.backup-example.com\nmax_age: 12345678"`
 * `domain`: The Policy Domain is the domain against which the MTA-STS or
   DANE policy is defined. In the case of Internationalized Domain Names
-  ([@?RFC5891]), the domain should consist of the Punycode-encoded 
+  ([@?RFC5891]), the domain MUST consist of the Punycode-encoded 
   A-labels ([@!RFC3492]) and not the U-labels.
 * `mx-host-pattern`: The pattern of MX hostnames from the applied
   policy. It is provided as a string, and is interpreted in the same
   manner as the "Checking of Wildcard Certificates" rules in Section
   6.4.3 of [@!RFC6125].  In the case of Internationalized Domain Names
-  ([@!RFC5891]), the domain should consist of the Punycode-encoded 
+  ([@!RFC5891]), the domain MUST consist of the Punycode-encoded 
   A-labels ([@!RFC3492]) and not the U-labels.
 * `result-type`: A value from (#result-types), "Result Types",  above.
 * `ip-address`: The IP address of the sending MTA that attempted the
@@ -615,8 +615,8 @@ SHOULD use the media type `application/tlsrpt+gzip`, and
 The report MAY be delivered by POST to HTTPS. When doing so, the report
 should use the media-type `application/tlsrpt` (see section 
 (#iana-considerations), "IANA Considerations").  If the reporting entity
-compresses the report, the conversion for the Content-Type should note
-that:
+compresses the report, that should be noted in the Content-Type 
+"conversions" field:
 
 Content-Type: application/tlsrpt; conversions=gzip
 Content-Type: application/tlsrpt; conversions=none
@@ -636,7 +636,7 @@ In the event of a delivery failure, regardless of the delivery method, a
 sender SHOULD attempt redelivery for up to 24hrs after the initial
 attempt.  As previously stated the reports are optional, so while it is
 ideal to attempt redelivery, it is not required.  If multiple retries
-are attempted, ideally they would be on an exponential scale.
+are attempted, ideally they SHOULD be done with exponential backoff.
 
 ## Metadata Variances
 
