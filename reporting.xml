@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE rfc SYSTEM 'rfc2629.dtd' []>
-<rfc ipr="trust200902" category="std" docName="draft-ietf-uta-smtp-tlsrpt-13">
+<rfc ipr="trust200902" category="std" docName="draft-ietf-uta-smtp-tlsrpt-14">
 <?rfc toc="yes"?>
 <?rfc symrefs="yes"?>
 <?rfc sortrefs="yes"?>
@@ -23,7 +23,7 @@
 <region></region>
 </postal>
 <phone></phone>
-<email>dmargolis (at) google (dot com)</email>
+<email>dmargolis@google.com</email>
 <uri></uri>
 </address>
 </author>
@@ -38,7 +38,7 @@
 <region></region>
 </postal>
 <phone></phone>
-<email>alex_brotman (at) comcast (dot com)</email>
+<email>alex_brotman@comcast.com</email>
 <uri></uri>
 </address>
 </author>
@@ -53,7 +53,7 @@
 <region></region>
 </postal>
 <phone></phone>
-<email>rbinu (at) yahoo-inc (dot com)</email>
+<email>rbinu@oath.com</email>
 <uri></uri>
 </address>
 </author>
@@ -68,7 +68,7 @@
 <region></region>
 </postal>
 <phone></phone>
-<email>janet.jones (at) microsoft (dot com)</email>
+<email>janet.jones@microsoft.com</email>
 <uri></uri>
 </address>
 </author>
@@ -83,11 +83,11 @@
 <region></region>
 </postal>
 <phone></phone>
-<email>risher (at) google (dot com)</email>
+<email>risher@google.com</email>
 <uri></uri>
 </address>
 </author>
-<date year="2017" month="December" day="4"/>
+<date year="2018" month="January" day="26"/>
 
 <area>Applications</area>
 <workgroup>Using TLS in Applications</workgroup>
@@ -402,11 +402,15 @@ associated with a DANE policy.  None of the records in the RRset were
 found to be valid.</t>
 <t><spanx style="verb">dnssec-invalid</spanx>: This would indicate that no valid records were
 returned from the recursive resolver.  The request returned with
-SERVFAIL for the requested TLSA record.  It should be noted that if
-the reporter's systems are having problems resolving destination DNS
-records due to DNSSEC failures, it's possible they will also be unable
-to resolve the TLSRPT record, therefore these types of reports may be
-rare.</t>
+SERVFAIL for the requested TLSA record.</t>
+<t><spanx style="verb">dane-required</spanx>: This indicates that the sending system is
+configured to require DANE TLSA records for all the MX hosts
+of the destination domain, but no DNSSEC-validated TLSA records
+were present for the MX host that is the subject of the report.
+Mandatory DANE for SMTP is described in section 6 of <xref target="RFC7672"/>.
+Such policies may be created by mutual agreement between two
+organizations that frequently exchange sensitive content via
+email.</t>
 </list>
 </t>
 </section>
@@ -506,20 +510,20 @@ domain.  Presently, the only three valid choices are <spanx style="verb">tlsa</s
 and the literal string <spanx style="verb">no-policy-found</spanx>. It is provided as a string.</t>
 <t><spanx style="verb">policy-string</spanx>: A string representation of the policy, whether TLSA
 record (<xref target="RFC6698"/> section 2.3) or MTA-STS policy. Examples: TLSA:
-<spanx style="verb">"_25._tcp.mx.example.com. IN TLSA ( 3 0 1 \
-1F850A337E6DB9C609C522D136A475638CC43E1ED424F8EEC8513D7 47D1D085D )"</spanx>
+<spanx style="verb">"_25._tcp.mx.example.com. 3 0 1 \
+1F850A337E6DB9C609C522D136A475638CC43E1ED424F8EEC8513D747D1D085D)"</spanx>
 MTA-STS: <spanx style="verb">"version: STSv1\nmode: report\nmx: mx1.example.com\nmx: \
 mx2.example.com\nmx: mx.backup-example.com\nmax_age: 12345678"</spanx></t>
 <t><spanx style="verb">domain</spanx>: The Policy Domain is the domain against which the MTA-STS or
 DANE policy is defined. In the case of Internationalized Domain Names
-(<xref target="RFC5891"/>), the domain is the Punycode-encoded A-label
-(<xref target="RFC3492"/>) and not the U-label.</t>
+(<xref target="RFC5891"/>), the domain MUST consist of the Punycode-encoded
+A-labels (<xref target="RFC3492"/>) and not the U-labels.</t>
 <t><spanx style="verb">mx-host-pattern</spanx>: The pattern of MX hostnames from the applied
 policy. It is provided as a string, and is interpreted in the same
 manner as the &quot;Checking of Wildcard Certificates&quot; rules in Section
 6.4.3 of <xref target="RFC6125"/>.  In the case of Internationalized Domain Names
-(<xref target="RFC5891"/>), the domain is the Punycode-encoded A-label
-(<xref target="RFC3492"/>) and not the U-label.</t>
+(<xref target="RFC5891"/>), the domain MUST consist of the Punycode-encoded
+A-labels (<xref target="RFC3492"/>) and not the U-labels.</t>
 <t><spanx style="verb">result-type</spanx>: A value from <xref target="result-types"/>, &quot;Result Types&quot;,  above.</t>
 <t><spanx style="verb">ip-address</spanx>: The IP address of the sending MTA that attempted the
 STARTTLS connection. It is provided as a string representation of an
@@ -530,6 +534,10 @@ with which the sending MTA attempted to negotiate a STARTTLS
 connection.</t>
 <t><spanx style="verb">receiving-mx-helo</spanx>: (optional) The HELO or EHLO string from the
 banner announced during the reported session.</t>
+<t><spanx style="verb">receiving-ip</spanx>: The destination IP address that was using when
+creating the outbound session. It is provided as a string
+representation of an IPv4 (see below) or IPv6 (<xref target="RFC5952"/>) address
+in dot-decimal or colon-hexadecimal notation.</t>
 <t><spanx style="verb">total-successful-session-count</spanx>: The aggregate number (integer) of
 successfully negotiated TLS-enabled connections to the receiving site.</t>
 <t><spanx style="verb">total-failure-session-count</spanx>: The aggregate number (integer) of
@@ -589,18 +597,15 @@ POST.
                  ; indicating end of the time range contained
                  ; in the report
 
- extension = "json" / "json.gz"
+ extension = "json"
 </artwork></figure>
-<t>The extension MUST be &quot;json&quot; for a plain JSON file, or &quot;json.gz&quot; for a
-JSON file compressed using GZIP.
-</t>
 <t>&quot;unique-id&quot; allows an optional unique ID generated by the Sending MTA to
 distinguish among multiple reports generated simultaneously by different
 sources within the same Policy Domain. For example, this is a possible
 filename for the gzip file of a report to the Policy Domain
 &quot;example.net&quot; from the Sending MTA &quot;mail.sender.example.com&quot;:
 </t>
-<t><spanx style="verb">mail.sender.example.com!example.net!1470013207!1470186007!001.json.gz</spanx>
+<t><spanx style="verb">mail.sender.example.com!example.net!1470013207!1470186007!001.json</spanx>
 </t>
 </section>
 
@@ -721,8 +726,18 @@ honor MTA-STS or DANE TLSA failures.
 <section anchor="https-transport" title="HTTPS Transport">
 <t>The report MAY be delivered by POST to HTTPS. If compressed, the report
 SHOULD use the media type <spanx style="verb">application/tlsrpt+gzip</spanx>, and
-<spanx style="verb">application/tlsrpt+json</spanx> otherwise (see section <xref target="iana-considerations"/>,
-&quot;IANA Considerations&quot;).
+</t>
+<t>The report MAY be delivered by POST to HTTPS. When doing so, the report
+should use the media-type <spanx style="verb">application/tlsrpt</spanx> (see section
+<xref target="iana-considerations"/>, &quot;IANA Considerations&quot;).  If the reporting entity
+compresses the report, that should be noted in the Content-Type
+&quot;conversions&quot; field:
+</t>
+<t>Content-Type: application/tlsrpt; conversions=gzip
+Content-Type: application/tlsrpt; conversions=none
+Content-Type: application/tlsrpt
+</t>
+<t>The second and third items in the list are equivalent.
 </t>
 <t>A reporting entity SHOULD expect a &quot;successful&quot; response from the
 accepting HTTPS server, typically a 200 or 201 HTTP code <xref target="RFC7231"/>.
@@ -737,16 +752,15 @@ at receipt time, and MAY store them for processing at a later time.
 sender SHOULD attempt redelivery for up to 24hrs after the initial
 attempt.  As previously stated the reports are optional, so while it is
 ideal to attempt redelivery, it is not required.  If multiple retries
-are attempted, ideally they would be on a logarithmic scale.
+are attempted, ideally they SHOULD be done with exponential backoff.
 </t>
 </section>
 
 <section anchor="metadata-variances" title="Metadata Variances">
 <t>As stated above, there are a variable number of ways to declare
-information about the data therein.  If it should be the case that these
-objects were to disagree, then the report data contained within the JSON
-body MUST be considered the authoritative source for those data
-elements.
+information about the data therein.  If any of items declared via
+subject or filename disagree with the report, the report MUST be
+considered the authoritative source.
 </t>
 </section>
 </section>
@@ -1008,6 +1022,7 @@ DNSSEC on the deploying zone.
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7435.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7469.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7489.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7672.xml"?>
 </references>
 
 <section anchor="example-reporting-policy-1" title="Example Reporting Policy">
@@ -1062,12 +1077,14 @@ _smtp-tlsrpt.mail.example.com. IN TXT \
       "result-type": "starttls-not-supported",
       "sending-mta-ip": "98.22.33.99",
       "receiving-mx-hostname": "mx2.mail.company-y.example",
+      "receiving-ip": "192.168.14.72",
       "failed-session-count": 200,
       "additional-information": "https://reports.company-x.example/ 
         report_info ? id = 5065427 c - 23 d3# StarttlsNotSupported "
     }, {
       "result-type": "validation-failure",
       "sending-mta-ip": "47.97.15.2",
+      "receiving-ip": "10.72.84.12",
       "receiving-mx-hostname": "mx-backup.mail.company-y.example",
       "failed-session-count": 3,
       "failure-error-code": "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED"
