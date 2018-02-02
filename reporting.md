@@ -406,11 +406,18 @@ Figure: JSON Report Format
   domain.  Presently, the only three valid choices are `tlsa`, `sts`,
   and the literal string `no-policy-found`. It is provided as a string.
 * `policy-string`: A string representation of the policy, whether TLSA
-  record ([@!RFC6698] section 2.3) or MTA-STS policy. Examples: TLSA:
-  `"_25._tcp.mx.example.com. 3 0 1 \
-  1F850A337E6DB9C609C522D136A475638CC43E1ED424F8EEC8513D747D1D085D)"`
-  MTA-STS: `"version: STSv1\nmode: report\nmx: mx1.example.com\nmx: \
+  record ([@!RFC6698] section 2.3) or MTA-STS policy. Examples: 
+  
+  TLSA (an array of JSON strings):
+  `["_25._tcp.mx.example.com. 3 0 1 \
+  1F850A337E6DB9C609C522D136A475638CC43E1ED424F8EEC8513D747D1D085D",\
+  "_25._tcp.mx.example.com. 3 0 1 \
+  12350A337E6DB9C6123522D136A475638CC43E1ED424F8EEC8513D747D1D1234"]`
+  
+  MTA-STS: 
+  `"version: STSv1\nmode: report\nmx: mx1.example.com\nmx: \
   mx2.example.com\nmx: mx.backup-example.com\nmax_age: 12345678"`
+  
 * `domain`: The Policy Domain is the domain against which the MTA-STS or
   DANE policy is defined. In the case of Internationalized Domain Names
   ([@?RFC5891]), the domain MUST consist of the Punycode-encoded 
