@@ -410,6 +410,7 @@ Figure: JSON Report Format
   record ([@!RFC6698] section 2.3) or MTA-STS policy. Examples: 
   
   TLSA (an array of JSON strings):
+  
   `["_25._tcp.mx.example.com. 3 0 1 \
   1F850A337E6DB9C609C522D136A475638CC43E1ED424F8EEC8513D747D1D085D",\
   "_25._tcp.mx.example.com. 3 0 1 \
