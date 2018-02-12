@@ -631,6 +631,11 @@ Other codes could indicate a delivery failure, and may be retried as per
 local policy.  The receiving system is not expected to process reports
 at receipt time, and MAY store them for processing at a later time.
 
+Alternately, if a receiving system offers `Accept-Encoding` values of `gzip` or
+`deflate`, the sending system MAY use `Content-Encoding: gzip` or
+`Content-Encoding: deflate` as appropriate.  This can be used in place
+of delivering a compressed file as the payload.
+
 ## Delivery Retry
 
 In the event of a delivery failure, regardless of the delivery method, a
