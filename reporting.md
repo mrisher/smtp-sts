@@ -531,8 +531,8 @@ report should use the media type `application/tlsrpt+gzip`.
 In addition, the following two new top level message header fields are
 defined:
 
-``` TLS-Report-Domain: Receiver-Domain
-TLS-Report-Submitter: Sender-Domain ```
+`TLS-Report-Domain: Receiver-Domain`
+`TLS-Report-Submitter: Sender-Domain`
 
 The `TLS-Report-Submitter` value MUST match the value found in the
 filename and the [@!RFC5321] domain from the `contact-info` from the
