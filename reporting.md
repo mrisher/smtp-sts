@@ -633,8 +633,8 @@ at receipt time, and MAY store them for processing at a later time.
 
 Alternately, if a receiving system offers `Accept-Encoding` values of `gzip` or
 `deflate`, the sending system MAY use `Content-Encoding: gzip` or
-`Content-Encoding: deflate` as appropriate.  This can be used in place
-of delivering a compressed file as the payload.
+`Content-Encoding: deflate` as an HTTP header as appropriate.  This can 
+be used in place of delivering a compressed file as the payload.
 
 ## Delivery Retry
 
