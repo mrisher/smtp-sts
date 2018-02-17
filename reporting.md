@@ -410,10 +410,12 @@ Figure: JSON Report Format
   record ([@!RFC6698] section 2.3) or MTA-STS policy. Examples: 
   
   TLSA (an array of JSON strings):
+  
   ["3 0 1 1F850A337E6DB9C609C522D136A475638CC43E1ED424F8EEC8513D747D1D085D",\
   3 0 1 12350A337E6DB9C6123522D136A475638CC43E1ED424F8EEC8513D747D1D1234"]
   
   MTA-STS (array of JSON strings): 
+  
   ["version: STSv1","mode: report","mx: mx1.example.com","mx: \
   mx2.example.com","mx: mx.backup-example.com","max_age: 12345678"]
   
@@ -529,6 +531,7 @@ In addition, the following two new top level message header fields are
 defined:
 
 `TLS-Report-Domain: Receiver-Domain`
+
 `TLS-Report-Submitter: Sender-Domain`
 
 The `TLS-Report-Submitter` value MUST match the value found in the
