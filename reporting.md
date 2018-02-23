@@ -409,10 +409,10 @@ Figure: JSON Report Format
 * `policy-string`: A string representation of the policy, whether TLSA
   record ([@!RFC6698] section 2.3) or MTA-STS policy. Examples: 
   
-  For DANE TLSA policies, a JSON array array of strings each 
-  representing the RDATA of a single TLSA resource record as a 
-  space-separated list of its four TLSA fields (in RFC6698 Section 2.2) 
-  presentation form with no internal spaces or grouping parentheses:
+  For DANE TLSA policies, a JSON array of strings each  representing 
+  the RDATA of a single TLSA resource record as a space-separated list
+  of its four TLSA fields in (RFC6698 Section 2.2) presentation form 
+  with no internal spaces or grouping parentheses:
   
   ["3 0 1 1F850A337E6DB9C609C522D136A475638CC43E1ED424F8EEC8513D747D1D085D",\
   3 0 1 12350A337E6DB9C6123522D136A475638CC43E1ED424F8EEC8513D747D1D1234"]
