@@ -811,6 +811,8 @@ Types". The initial entries in the registry are:
     | "certificate-expired"         | 
     | "tlsa-invalid"                | 
     | "dnssec-invalid"              | 
+    | "dane-required"               | 
+    | "certificate-not-trusted"     | 
     | "sts-policy-invalid"          | 
     | "sts-webpki-invalid"          | 
     | "validation-failure"          | 
@@ -892,6 +894,12 @@ _smtp-tlsrpt.mail.example.com. IN TXT \
 
 # Example JSON Report
 
+Below is an example JSON report for messages from Company-X to Company-Y,
+where 100 sessions were attempted to Company Y servers with an expired
+certificate and 200 sessions were attempted to Company Y servers that
+did not successfully respond to the `STARTTLS` command.  Additionally 3
+sessions failed due to "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED".
+
 ```
 {
   "organization-name": "Company-X",
@@ -939,8 +947,3 @@ _smtp-tlsrpt.mail.example.com. IN TXT \
 
 ```
 
-Figure: Example JSON report for a messages from Company-X to Company-Y,
-where 100 sessions were attempted to Company Y servers with an expired
-certificate and 200 sessions were attempted to Company Y servers that
-did not successfully respond to the `STARTTLS` command.  Additionally 3
-sessions failed due to "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED".
