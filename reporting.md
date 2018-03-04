@@ -545,11 +545,11 @@ defined:
 
 `TLS-Report-Submitter: Sender-Domain`
 
-The `TLS-Report-Submitter` value MUST match the value found in the
-filename and the [@!RFC5321] domain from the `contact-info` from the
-report body.  These message headers MUST be included and should allow
-for easy searching for all reports submitted by a report domain or a
-particular submitter, for example in IMAP [@?RFC3501]:
+The `TLS-Report-Submitter` value MUST match the value found in the 
+[@!RFC5321] domain from the `contact-info` from the report body.  These 
+message headers MUST be included and should allow for easy searching 
+for all reports submitted by a report domain or a particular submitter,
+for example in IMAP [@?RFC3501]:
 
 `s SEARCH HEADER "TLS-Report-Domain" "example.com"`
 
