@@ -406,9 +406,9 @@ Figure: JSON Report Format
 * `policy-type`: The type of policy that was applied by the sending
   domain.  Presently, the only three valid choices are `tlsa`, `sts`,
   and the literal string `no-policy-found`. It is provided as a string.
-* `policy-string`: A string representation of the policy, whether TLSA
-  record ([@!RFC6698] section 2.3) or MTA-STS policy. Examples follow in
-  the next section. 
+* `policy-string`: An encoding of the applied policy as a JSON array of 
+  strings, whether TLSA record ([@!RFC6698] section 2.3) or MTA-STS 
+  policy. Examples follow in the next section. 
 * `domain`: The Policy Domain is the domain against which the MTA-STS or
   DANE policy is defined. In the case of Internationalized Domain Names
   ([@?RFC5891]), the domain MUST consist of the Punycode-encoded 
@@ -465,16 +465,25 @@ RDATA of a single TLSA resource record as a space-separated list of its
 four TLSA fields; the fields are in presentation format (defined in RFC6698 
 Section 2.2) with no internal spaces or grouping parentheses:
 
-["3 0 1 1F850A337E6DB9C609C522D136A475638CC43E1ED424F8EEC8513D747D1D085D",\
-3 0 1 12350A337E6DB9C6123522D136A475638CC43E1ED424F8EEC8513D747D1D1234"]
+[
+"3 0 1 1F850A337E6DB9C609C522D136A475638CC43E1ED424F8EEC8513D747D1D085D",
+"3 0 1 12350A337E6DB9C6123522D136A475638CC43E1ED424F8EEC8513D747D1D1234"
+]
   
-For the MTA-STS policy, an array of JSON string will represent the policy
+For the MTA-STS policy, an array of JSON strings that represents the policy
 that is declared by the receiving site, including any errors that may be
-present.  Note that if there are multiple MX records, they are not 
-included as an array.
+present.  Note that where there are multiple "mx" values, they must be listed 
+as separate "mx" elements in the policy array, rather as a single nested "mx" 
+sub-array.
 
-["version: STSv1","mode: report","mx: mx1.example.com","mx: \
-mx2.example.com","mx: mx.backup-example.com","max_age: 12345678"]
+[
+"version: STSv1",
+"mode: report",
+"mx: mx1.example.com",
+"mx: mx2.example.com",
+"mx: mx.backup-example.com",
+"max_age: 12345678"
+]
 
 # Report Delivery
 
