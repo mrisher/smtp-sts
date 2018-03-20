@@ -62,7 +62,7 @@ hosts that do not offer TLS with a trusted server certificate.
 
 # Introduction
 
-The STARTTLS extension to SMTP [@?RFC3207] allows SMTP clients and hosts
+The STARTTLS extension to SMTP [@!RFC3207] allows SMTP clients and hosts
 to negotiate the use of a TLS channel for encrypted mail transmission.
 
 While this opportunistic encryption protocol by itself provides a high
@@ -176,10 +176,10 @@ The formal definition of the `_mta-sts` TXT record, defined using
                       *31(ALPHA / DIGIT / "_" / "-" / ".")
 
     sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)
-                      ; chars excluding "=", ";", SP, and control chars
+                      ; chars excluding "=", ";", and control chars
 
-The TXT record begins with sts-version field, and the order of 
-the other fields is not significant. If multiple TXT records for 
+The TXT record MUST begin with sts-version field, and the order of 
+other fields is not significant. If multiple TXT records for 
 `_mta-sts` are returned by the resolver, records which do not begin
 with `v=STSv1;` are discarded. If the number of resulting records is
 not one, senders MUST assume the recipient domain does not implement
