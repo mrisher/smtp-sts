@@ -3,13 +3,13 @@
    Title = "SMTP TLS Reporting"
    abbrev = "SMTP-TLSRPT"
    category = "std"
-   docName = "draft-ietf-uta-smtp-tlsrpt-17"
+   docName = "draft-ietf-uta-smtp-tlsrpt-18"
    ipr = "trust200902"
    area = "Applications"
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2018-03-05T00:00:00Z
+   date = 2018-03-27T00:00:00Z
    
    [[author]]
    initials="D."
@@ -66,13 +66,13 @@ and diagnose unintentional misconfigurations.
 # Introduction
 
 The STARTTLS extension to SMTP [@?RFC3207] allows SMTP clients and hosts
-to establish secure SMTP sessions over TLS. The protocol design is based
-on "Opportunistic Security" (OS) [@?RFC7435], which maintains
-interoperability with clients that do not support STARTTLS but means
-that any attacker who can delete parts of the SMTP session (such as the
-"250 STARTTLS" response) or redirect the entire SMTP session (perhaps by
-overwriting the resolved MX record of the delivery domain) can perform a
-downgrade or interception attack.
+to establish secure SMTP sessions over TLS. The protocol design uses an
+approach that has come to be known as "Opportunistic Security" (OS) 
+[@?RFC7435], which maintains interoperability with clients that do not 
+support STARTTLS but means that any attacker who can delete parts of the 
+SMTP session (such as the "250 STARTTLS" response) or redirect the entire 
+SMTP session (perhaps by overwriting the resolved MX record of the 
+delivery domain) can perform a downgrade or interception attack.
 
 Because such "downgrade attacks" are not necessarily apparent to the
 receiving MTA, this document defines a mechanism for sending domains to
@@ -175,8 +175,9 @@ The formal definition of the `_smtp-tlsrpt` TXT record, defined using
 
         tlsrpt-uri        = URI
                           ; "URI" is imported from [RFC3986];
-			  ; commas (ASCII 0x2C) and exclamation 
-			  ; points (ASCII 0x21) MUST be encoded
+			  ; commas (ASCII 0x2C), exclamation 
+			  ; points (ASCII 0x21), and semicolons
+			  ; (ASCII 0x3B) MUST be encoded
 
         tlsrpt-extension  = tlsrpt-ext-name "=" tlsrpt-ext-value
 
@@ -194,6 +195,15 @@ number of resulting records is not one, senders MUST assume the
 recipient domain does not implement TLSRPT. If the resulting TXT record
 contains multiple strings, then the record MUST be treated as if those
 strings are concatenated together without adding spaces.
+
+The record supports the abillity to declare more than one rua, and if
+there exists more than one, the reporter MAY attempt to deliver to
+each of the supported rua destinations.  A receiver MAY opt to only
+attempt delivery to one of the endpoints, however the report SHOULD NOT
+be considered successfully delivered until one of the endpoints accepts
+delivery of the report.  If the reporter does not support one of the 
+report mechanisms, then it SHOULD NOT attempt delivery to those rua 
+destinations. 
 
 Parsers MUST accept TXT records which are syntactically valid (i.e.
 valid key-value pairs separated by semi-colons) and implementing a
@@ -251,6 +261,10 @@ same domain and MX); even in the case where only a single policy was
 applied, the "policies" field of the report body MUST be an array and
 not a singular value.
 
+In the case of multiple failure types, the `failure-details` array
+would contain multiple entries.  Each entry would have its own set of
+infomation pertaining to that failure type.
+
 ## Report Time-frame
 
 The report SHOULD cover a full day, from 0000-2400 UTC.  This should
@@ -262,16 +276,16 @@ delivered after some delay, perhaps several hours.
 
 ### Success Count
 
-* `success-count`: This indicates that the sending MTA was able to
-  successfully negotiate a policy-compliant TLS connection, and serves
-  to provide a "heartbeat" to receiving domains that reporting is
-  functional and tabulating correctly.  This field contains an aggregate
-  count of successful connections for the reporting system.
+* `total-successful-session-count`: This indicates that the sending MTA 
+  was able to successfully negotiate a policy-compliant TLS connection, 
+  and serves to provide a "heartbeat" to receiving domains that reporting
+  is functional and tabulating correctly.  This field contains an 
+  aggregate count of successful connections for the reporting system.
     
 ### Failure Count
 
-* `failure-count`: This indicates that the sending MTA was unable to
-  successfully establish a connection with the receiving platform.
+* `total-failure-session-count`: This indicates that the sending MTA was
+  unable to successfully establish a connection with the receiving platform.
   (#result-types), "Result Types", will elaborate on the failed
   negotiation attempts.  This field contains an aggregate count of
   failed connections.
