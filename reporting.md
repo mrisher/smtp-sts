@@ -89,7 +89,9 @@ Specifically, this document defines a reporting schema that covers
 failures in routing, DNS resolution, STARTTLS negotiation, and both 
 DANE [@!RFC6698] and MTA-STS [@!I-D.ietf-uta-mta-sts] policy validation 
 errors, and a standard TXT record that recipient domains can use to 
-indicate where reports in this format should be sent.
+indicate where reports in this format should be sent.  The report can
+also serve as a heartbeat that systems are successfully negotiating
+TLS during sessions as expected.
 
 This document is intended as a companion to the specification for SMTP
 MTA Strict Transport Security [@!I-D.ietf-uta-mta-sts], as well as adds
