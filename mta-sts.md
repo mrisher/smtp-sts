@@ -365,7 +365,7 @@ the sender MUST apply that cached policy.
 
 Finally, to mitigate the risk of persistent interference with policy
 refresh, as discussed in-depth in (#security-considerations), MTAs
-SHOULD proactivecly refresh cached policies before they expire; a
+SHOULD proactively refresh cached policies before they expire; a
 suggested refresh frequency is once per day. To enable administrators to
 discover problems with policy refresh, MTAs SHOULD alert administrators
 (through the use of logs or similar) when such attempts fail, unless the
@@ -507,21 +507,24 @@ extension MUST contain the name of the policy host (e.g.
 `mta-sts.example.com`). When connecting to an SMTP server, the SNI
 extension MUST contain the MX hostname.
 
-HTTP servers used to deliver MTA-STS policies MUST have support for the
-TLS SNI extension and MAY rely on SNI to determine which certificate
-chain to present to the client. In either case, HTTP servers MUST
-respond with a certificate chain that matches the policy hostname or
-abort the TLS handshake if unable to do so.
+HTTP servers used to deliver MTA-STS policies MAY rely on SNI to 
+determine which certificate chain to present to the client. HTTP 
+servers MUST respond with a certificate chain that matches the policy
+hostname or abort the TLS handshake if unable to do so. Clients that 
+do not send SNI information may not see the expected certificate chain.
 
-SMTP servers MUST have support for the TLS SNI extension and MAY rely on
-SNI to determine which certificate chain to present to the client. If
-the client sends no SNI extension or sends an SNI extension for an
-unsupported server name, the server MUST simply send a fallback
-certificate chain of its choice. The reason for not enforcing strict
-matching of the requested SNI hostname is that MTA-STS TLS clients may
-be typically willing to accept multiple server names but can only send
-one name in the SNI extension. The server's fallback certificate may
-match a different name that is acceptable to the client, e.g., the
+SMTP servers MAY rely on SNI to determine which certificate chain to
+present to the client. However servers that have one identity and a single 
+matching certificate do not require SNI support. Servers MUST NOT enforce
+the use of SNI by clients, as the client may be using unauthenticated 
+opportunistic TLS and may not expect any particular certificate from
+the server. If the client sends no SNI extension or sends an SNI 
+extension for an unsupported server name, the server MUST simply send a
+fallback certificate chain of its choice. The reason for not enforcing 
+strict matching of the requested SNI hostname is that MTA-STS TLS clients 
+may be typically willing to accept multiple server names but can only 
+send one name in the SNI extension. The server's fallback certificate 
+may match a different name that is acceptable to the client, e.g., the
 original next-hop domain.
 
 ## Minimum TLS Version Support
