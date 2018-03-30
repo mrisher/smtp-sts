@@ -9,7 +9,7 @@
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2018-03-27T00:00:00Z
+   date = 2018-03-30T00:00:00Z
    
    [[author]]
    initials="D."
@@ -132,9 +132,9 @@ We also define the following terms for further use in this document:
 A domain publishes a record to its DNS indicating that it wishes to
 receive reports. These SMTP TLSRPT policies are distributed via DNS from
 the Policy Domain's zone, as TXT records (similar to DMARC policies)
-under the name `_smtp-tlsrpt`. For example, for the Policy Domain
+under the name `_smtp._tls`. For example, for the Policy Domain
 `example.com`, the recipient's TLSRPT policy can be retrieved from
-`_smtp-tlsrpt.example.com`.
+`_smtp._tls.example.com`.
 
 Policies consist of the following directives:
 
@@ -158,7 +158,7 @@ Policies consist of the following directives:
   the recipient.  DKIM signatures must not use the "l=" attribute to
   limit the body length used in the signature.
 
-The formal definition of the `_smtp-tlsrpt` TXT record, defined using
+The formal definition of the `_smtp._tls` TXT record, defined using
 [@!RFC5234] & [@!RFC7405], is as follows:
 
         tlsrpt-record     = tlsrpt-version 1*(field-delim tlsrpt-field)
@@ -191,7 +191,7 @@ The formal definition of the `_smtp-tlsrpt` TXT record, defined using
                             ; chars
 
 
-If multiple TXT records for `_smtp-tlsrpt` are returned by the resolver,
+If multiple TXT records for `_smtp._tls` are returned by the resolver,
 records which do not begin with `v=TLSRPTv1;` are discarded. If the
 number of resulting records is not one, senders MUST assume the
 recipient domain does not implement TLSRPT. If the resulting TXT record
@@ -217,14 +217,14 @@ ignored.
 ### Report using MAILTO
 
 ```
-_smtp-tlsrpt.example.com. IN TXT \
+_smtp._tls.example.com. IN TXT \
 	"v=TLSRPTv1;rua=mailto:reports@example.com"
 ```
 
 ### Report using HTTPS
 
 ```
-_smtp-tlsrpt.example.com. IN TXT \
+_smtp._tls.example.com. IN TXT \
 	"v=TLSRPTv1; \
 	rua=https://reporting.example.com/v1/tlsrpt"
 ```
@@ -905,14 +905,14 @@ DNSSEC on the deploying zone.
 ## Report using MAILTO
 
 ```
-_smtp-tlsrpt.mail.example.com. IN TXT \
+_smtp._tls.mail.example.com. IN TXT \
         "v=TLSRPTv1;rua=mailto:reports@example.com"
 ```
 
 ## Report using HTTPS
 
 ```
-_smtp-tlsrpt.mail.example.com. IN TXT \
+_smtp._tls.mail.example.com. IN TXT \
         "v=TLSRPTv1; \
         rua=https://reporting.example.com/v1/tlsrpt"
 ```
