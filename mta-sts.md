@@ -3,13 +3,13 @@
    Title = "SMTP MTA Strict Transport Security (MTA-STS)"
    abbrev = "MTA-STS"
    category = "std"
-   docName = "draft-ietf-uta-mta-sts-14"
+   docName = "draft-ietf-uta-mta-sts-15"
    ipr = "trust200902"
    area = "Applications"
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2018-01-16T00:00:00Z
+   date = 2018-04-04T00:00:00Z
 
    [[author]]
    initials="D."
@@ -62,7 +62,7 @@ hosts that do not offer TLS with a trusted server certificate.
 
 # Introduction
 
-The STARTTLS extension to SMTP [@?RFC3207] allows SMTP clients and hosts
+The STARTTLS extension to SMTP [@!RFC3207] allows SMTP clients and hosts
 to negotiate the use of a TLS channel for encrypted mail transmission.
 
 While this opportunistic encryption protocol by itself provides a high
@@ -83,13 +83,15 @@ policies specifying:
 ## Terminology
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-"SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and "OPTIONAL" in this
-document are to be interpreted as described in [@!RFC2119].
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+document are to be interpreted as described in [@?RFC2119].  These
+words may also appear in this document in lowercase, absent their
+normative meanings.
 
 We also define the following terms for further use in this document:
 
 * MTA-STS Policy: A commitment by the Policy Domain to support PKIX
-  authenticated TLS for the specified MX hosts.
+  [@?RFC5280] authenticated TLS for the specified MX hosts.
 * Policy Domain: The domain for which an MTA-STS Policy is defined. This
   is the next-hop domain; when sending mail to "alice@example.com" this
   would ordinarily be "example.com", but this may be overridden by
@@ -174,15 +176,17 @@ The formal definition of the `_mta-sts` TXT record, defined using
                       *31(ALPHA / DIGIT / "_" / "-" / ".")
 
     sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)
-                      ; chars excluding "=", ";", SP, and control chars
+                      ; chars excluding "=", ";", and control chars
 
-If multiple TXT records for `_mta-sts` are returned by the resolver,
-records which do not begin with `v=STSv1;` are discarded. If the number
-of resulting records is not one, senders MUST assume the recipient
-domain does not implement MTA-STS and skip the remaining steps of policy
-discovery. If the resulting TXT record contains multiple strings, then
-the record MUST be treated as if those strings are concatenated together
-without adding spaces.
+The TXT record MUST begin with sts-version field, and the order of 
+other fields is not significant. If multiple TXT records for 
+`_mta-sts` are returned by the resolver, records which do not begin
+with `v=STSv1;` are discarded. If the number of resulting records is
+not one, senders MUST assume the recipient domain does not implement
+MTA-STS and skip the remaining steps of policy discovery. If the
+resulting TXT record contains multiple strings, then the record MUST
+be treated as if those strings are concatenated together without
+adding spaces.
 
 ## MTA-STS Policies
 
@@ -192,31 +196,34 @@ header fields) served via the HTTPS GET method from the fixed
 `mta-sts` host at the Policy Domain. Thus for `example.com` the path is
 `https://mta-sts.example.com/.well-known/mta-sts.txt`.
 
-The [@!RFC7231] "Content-Type" media type for this resource MUST be
-"text/plain". When fetching a policy, senders SHOULD validate that the
-media type is "text/plain" to guard against cases where webservers allow
-untrusted users to host non-text content (typically, HTML or images) at
-a user-defined path. Additional "Content-Type" parameters are ignored.
+When fetching a policy, senders SHOULD validate that the media type is
+"text/plain" to guard against cases where webservers allow untrusted
+users to host non-text content (typically, HTML or images) at a 
+user-defined path. All parameters other charset=utf-8 or charset=us-ascii
+are ignored. Additional "Content-Type" parameters are also ignored.
 
-This resource contains the following newline-separated key/value pairs:
+This resource contains the following CRLF-separated key/value pairs:
 
 * `version`: (plain-text). Currently only "STSv1" is supported.
 * `mode`: (plain-text). One of "enforce", "testing", or "none",
   indicating the expected behavior of a sending MTA in the case of a
-  policy validation failure.
+  policy validation failure. See (#policy-application), 
+  "Policy Application." for more details about the three modes.
 * `max_age`: Max lifetime of the policy (plain-text non-negative integer
   seconds, maximum value of 31557600).  Well-behaved clients SHOULD
   cache a policy for up to this value from last policy fetch time. To
   mitigate the risks of attacks at policy refresh time, it is expected
   that this value typically be in the range of weeks or greater.
-* `mx`: MX identity patterns (list of plain-text strings). One or more
-  patterns matching a Common Name ([@!RFC6125]) or Subject Alternative
-  Name ([@!RFC5280]) DNS-ID present in the X.509 certificate presented
-  by any MX receiving mail for this domain.  For example:
+* `mx`: MX identity patterns (list of plain-text strings).  One or
+   more patterns matching a Common Name or Subject Alternative Name
+   ([@?RFC5280]) DNS-ID ([@?RFC6125]) present in the X.509 certificate
+   presented by any MX receiving mail for this domain. For example:
+
   ```
-   mx: mail.example.com
+   mx: mail.example.com <CRLF>
    mx: .example.net
   ```
+  
   indicates that mail for this domain might be handled by any MX with a
   certificate valid for a host at `mail.example.com` or `example.net`.
   Valid patterns can be either fully specified names (`example.com`) or
@@ -243,8 +250,8 @@ max_age: 123456
 The formal definition of the policy resource, defined using [@!RFC7405], is as
 follows:
 
-    sts-policy-record        = *WSP sts-policy-field *WSP
-                               *(CRLF *WSP sts-policy-field *WSP)
+    sts-policy-record        = sts-policy-field *WSP
+                               *(CRLF sts-policy-field *WSP)
                                [CRLF]
 
     sts-policy-field         = sts-policy-version /      ; required once
@@ -286,7 +293,7 @@ follows:
     sts-policy-max-age-field = %s"max_age"
 
     sts-policy-max-age-value = 1*10(DIGIT)
-
+    
     sts-policy-extension     = sts-policy-ext-name   ; additional
                                field-delim           ; extension
                                sts-policy-ext-value  ; fields
@@ -313,7 +320,8 @@ present a X.509 certificate which is valid for the `mta-sts` host (e.g.
 `mta-sts.example.com`) as described below, chain to a root CA that is
 trusted by the sending MTA, and be non-expired. It is expected that
 sending MTAs use a set of trusted CAs similar to those in widely
-deployed Web browsers and operating systems.
+deployed Web browsers and operating systems. See [@?RFC5280] for more
+details about certificate verification.
 
 The certificate is valid for the `mta-sts` host with respect to the
 rules described in [@!RFC6125], with the following application-specific
@@ -357,7 +365,7 @@ the sender MUST apply that cached policy.
 
 Finally, to mitigate the risk of persistent interference with policy
 refresh, as discussed in-depth in (#security-considerations), MTAs
-SHOULD proactivecly refresh cached policies before they expire; a
+SHOULD proactively refresh cached policies before they expire; a
 suggested refresh frequency is once per day. To enable administrators to
 discover problems with policy refresh, MTAs SHOULD alert administrators
 (through the use of logs or similar) when such attempts fail, unless the
@@ -365,10 +373,11 @@ cached policy mode is `none`.
 
 ## Policy Selection for Smart Hosts and Subdomains
 
-When sending mail via a "smart host"--an intermediate SMTP relay rather
-than the message recipient's server--compliant senders MUST treat the
-smart host domain as the policy domain for the purposes of policy
-discovery and application.
+When sending mail via a "smart host"--an administratively configured
+intermediate SMTP relay, which is different from the message recipient's
+server as determined from DNS --compliant senders MUST treat the smart
+host domain as the policy domain for the purposes of policy discovery
+and application.
 
 When sending mail to a mailbox at a subdomain, compliant senders MUST
 NOT attempt to fetch a policy from the parent zone. Thus for mail sent
@@ -397,9 +406,9 @@ description of sending MTA behavior when policy validation fails.
 The certificate presented by the receiving MX MUST chain to a root CA
 that is trusted by the sending MTA and be non-expired. The certificate
 MUST have a subject alternative name (SAN, [@!RFC5280]) with a DNS-ID
-matching the `mx` pattern. The MX's certificate MAY also be checked for
-revocation via OCSP [@?RFC6960], CRLs [@?RFC6818], or some other
-mechanism.
+([@?RFC6125]) matching the `mx` pattern. The MX's certificate MAY also
+be checked for revocation via OCSP [@?RFC6960], CRLs [@?RFC6818], or
+some other mechanism.
 
 Because the `mx` patterns are not hostnames, however, matching is not
 identical to other common cases of X.509 certificate authentication (as
@@ -498,21 +507,24 @@ extension MUST contain the name of the policy host (e.g.
 `mta-sts.example.com`). When connecting to an SMTP server, the SNI
 extension MUST contain the MX hostname.
 
-HTTP servers used to deliver MTA-STS policies MUST have support for the
-TLS SNI extension and MAY rely on SNI to determine which certificate
-chain to present to the client. In either case, HTTP servers MUST
-respond with a certificate chain that matches the policy hostname or
-abort the TLS handshake if unable to do so.
+HTTP servers used to deliver MTA-STS policies MAY rely on SNI to 
+determine which certificate chain to present to the client. HTTP 
+servers MUST respond with a certificate chain that matches the policy
+hostname or abort the TLS handshake if unable to do so. Clients that 
+do not send SNI information may not see the expected certificate chain.
 
-SMTP servers MUST have support for the TLS SNI extension and MAY rely on
-SNI to determine which certificate chain to present to the client. If
-the client sends no SNI extension or sends an SNI extension for an
-unsupported server name, the server MUST simply send a fallback
-certificate chain of its choice. The reason for not enforcing strict
-matching of the requested SNI hostname is that MTA-STS TLS clients may
-be typically willing to accept multiple server names but can only send
-one name in the SNI extension. The server's fallback certificate may
-match a different name that is acceptable to the client, e.g., the
+SMTP servers MAY rely on SNI to determine which certificate chain to
+present to the client. However servers that have one identity and a single 
+matching certificate do not require SNI support. Servers MUST NOT enforce
+the use of SNI by clients, as the client may be using unauthenticated 
+opportunistic TLS and may not expect any particular certificate from
+the server. If the client sends no SNI extension or sends an SNI 
+extension for an unsupported server name, the server MUST simply send a
+fallback certificate chain of its choice. The reason for not enforcing 
+strict matching of the requested SNI hostname is that MTA-STS TLS clients 
+may be typically willing to accept multiple server names but can only 
+send one name in the SNI extension. The server's fallback certificate 
+may match a different name that is acceptable to the client, e.g., the
 original next-hop domain.
 
 ## Minimum TLS Version Support
