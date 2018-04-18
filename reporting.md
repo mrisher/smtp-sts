@@ -117,6 +117,8 @@ We also define the following terms for further use in this document:
 * Policy Domain: The domain against which an MTA-STS or DANE Policy is
   defined.
 * Sending MTA: The MTA initiating the relay of an email message.
+* Aggregate Report URI (rua): A comma-separated list of locations where
+  the report is to be submitted.
 
 # Related Technologies
 
