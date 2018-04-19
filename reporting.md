@@ -197,8 +197,9 @@ If multiple TXT records for `_smtp._tls` are returned by the resolver,
 records which do not begin with `v=TLSRPTv1;` are discarded. If the
 number of resulting records is not one, senders MUST assume the
 recipient domain does not implement TLSRPT. If the resulting TXT record
-contains multiple strings, then the record MUST be treated as if those
-strings are concatenated together without adding spaces.
+contains multiple strings (as described in Section 3.1.3 of [@!RFC4408]),
+then the record MUST be treated as if those strings are concatenated 
+together without adding spaces.
 
 The record supports the abillity to declare more than one rua, and if
 there exists more than one, the reporter MAY attempt to deliver to
