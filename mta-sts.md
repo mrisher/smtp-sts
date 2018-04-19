@@ -302,8 +302,7 @@ follows:
                                *31(ALPHA / DIGIT / "_" / "-" / ".")
 
     sts-policy-ext-value     = 1*(%x21-3A / %x3C / %x3E-7E)
-                             ; chars, excluding "=", ";", SP, and
-                             ; control chars
+                             ; chars, excluding control chars
 
 Parsers MUST accept TXT records and policy files which are syntactically
 valid (i.e. valid key/value pairs separated by semi-colons for TXT
