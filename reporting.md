@@ -720,6 +720,56 @@ This document registers a new parameter `report-type="tlsrpt"` under
 The media type suitable for use as a report-type is defined in the
 following section.
 
+## +gzip Media Type Suffix
+
+This document registers a new media type suffix "+gzip". The GZIP 
+format is a public domain, cross-platform, interoperable file 
+storage and transfer format, specified in [@!RFC1952]; it
+supports compression and is used as the underlying representation
+by a variety of file formats. The media type "application/gzip"
+has been registered for such files. The suffix "+gzip" MAY be
+used with any media type whose representation follows that 
+established for "application/gzip". The media type structured
+syntax suffix registration form follows:
+
+   Type name:  GZIP file storage and transfer format
+
+   +suffix:  +gzip
+
+   References:  [@!RFC1952][@!RFC6713]
+
+   Encoding considerations:  GZIP is a binary encoding.
+
+   Fragment identifier considerations: The syntax and semantics
+      of fragment identifiers specified for
+      +gzip SHOULD be as specified for "application/gzip".  (At
+      publication of this document, there is no fragment identification
+      syntax defined for "application/gzip".) The syntax and semantics
+      for fragment identifiers for a specific "xxx/yyy+gzip" SHOULD be
+      processed as follows:
+      
+      For cases defined in +gzip, where the fragment identifier
+      resolves per the +gzip rules, then process as specified in
+      +gzip.
+
+      For cases defined in +gzip, where the fragment identifier does
+      not resolve per the +gzip rules, then process as specified in
+      "xxx/yyy+gzip".
+
+      For cases not defined in +gzip, then process as specified in
+      "xxx/yyy+gzip".
+
+   Interoperability considerations:  n/a
+
+   Security considerations: GZIP format doesn't provide encryption.
+      Each individual media type registered with a +gzip suffix
+      can have additional security considerations.
+
+   Contact: art@ietf.org
+
+   Author/Change controller:  Internet Engineering Task Force
+      (mailto:iesg@ietf.org).
+
 ## application/tlsrpt+json Media Type
  
 This document registers multiple media types, beginning with Table 1
