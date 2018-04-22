@@ -674,16 +674,17 @@ Margolis, et al.         Expires October 6, 2018               [Page 12]
 Internet-Draft                 SMTP-TLSRPT                    April 2018
 
 
-   o  "total-successful-session-count": The aggregate number (integer)
-      of successfully negotiated TLS-enabled connections to the
-      receiving site.
+   o  "total-successful-session-count": The aggregate count (integer,
+      encoded as a JSON number) of successfully negotiated TLS-enabled
+      connections to the receiving site.
 
-   o  "total-failure-session-count": The aggregate number (integer) of
-      failures to negotiate a TLS-enabled connection to the receiving
-      site.
+   o  "total-failure-session-count": The aggregate count (integer,
+      encoded as a JSON number) of failures to negotiate a TLS-enabled
+      connection to the receiving site.
 
    o  "failed-session-count": The number of (attempted) sessions that
-      match the relevant "result-type" for this section.
+      match the relevant "result-type" for this section (integer,
+      encoded as a JSON number).
 
    o  "additional-info-uri": An optional URI [RFC3986] pointing to
       additional information around the relevant "result-type".  For
@@ -721,7 +722,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
    For the MTA-STS policy, an array of JSON strings that represents the
    policy that is declared by the receiving site, including any errors
    that may be present.  Note that where there are multiple "mx" values,
-
 
 
 

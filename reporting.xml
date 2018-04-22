@@ -554,12 +554,15 @@ banner announced during the reported session.</t>
 creating the outbound session. It is provided as a string
 representation of an IPv4 (see below) or IPv6 (<xref target="RFC5952"/>) address
 in dot-decimal or colon-hexadecimal notation.</t>
-<t><spanx style="verb">total-successful-session-count</spanx>: The aggregate number (integer) of
-successfully negotiated TLS-enabled connections to the receiving site.</t>
-<t><spanx style="verb">total-failure-session-count</spanx>: The aggregate number (integer) of
-failures to negotiate a TLS-enabled connection to the receiving site.</t>
+<t><spanx style="verb">total-successful-session-count</spanx>: The aggregate count (integer, encoded as a
+JSON number) of successfully negotiated TLS-enabled connections to the
+receiving site.</t>
+<t><spanx style="verb">total-failure-session-count</spanx>: The aggregate count (integer, encoded as a JSON
+number) of failures to negotiate a TLS-enabled connection to the receiving
+site.</t>
 <t><spanx style="verb">failed-session-count</spanx>: The number of (attempted) sessions that match
-the relevant <spanx style="verb">result-type</spanx> for this section.</t>
+the relevant <spanx style="verb">result-type</spanx> for this section (integer, encoded as a JSON
+number).</t>
 <t><spanx style="verb">additional-info-uri</spanx>: An optional URI <xref target="RFC3986"/> pointing to
 additional information around the relevant <spanx style="verb">result-type</spanx>. For example,
 this URI might host the complete certificate chain presented during an

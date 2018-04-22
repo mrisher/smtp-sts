@@ -452,12 +452,15 @@ Figure: JSON Report Format
   creating the outbound session. It is provided as a string 
   representation of an IPv4 (see below) or IPv6 ([@!RFC5952]) address 
   in dot-decimal or colon-hexadecimal notation.
-* `total-successful-session-count`: The aggregate number (integer) of
-  successfully negotiated TLS-enabled connections to the receiving site.
-* `total-failure-session-count`: The aggregate number (integer) of
-  failures to negotiate a TLS-enabled connection to the receiving site.
+* `total-successful-session-count`: The aggregate count (integer, encoded as a
+  JSON number) of successfully negotiated TLS-enabled connections to the
+  receiving site.
+* `total-failure-session-count`: The aggregate count (integer, encoded as a JSON
+  number) of failures to negotiate a TLS-enabled connection to the receiving
+  site.
 * `failed-session-count`: The number of (attempted) sessions that match
-  the relevant `result-type` for this section.
+  the relevant `result-type` for this section (integer, encoded as a JSON
+  number).
 * `additional-info-uri`: An optional URI [@!RFC3986] pointing to
   additional information around the relevant `result-type`. For example,
   this URI might host the complete certificate chain presented during an
