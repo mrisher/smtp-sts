@@ -58,8 +58,8 @@ leading to undelivered messages or delivery over unencrypted or
 unauthenticated channels.  This document describes a reporting mechanism
 and format by which sending systems can share statistics and specific
 information about potential failures with recipient domains. Recipient
-domains can then use this information to both detect potential attackers
-and diagnose unintentional misconfigurations.
+domains can then use this information to both detect potential attacks and
+diagnose unintentional misconfigurations.
 
 {mainmatter}
 
@@ -105,13 +105,12 @@ document are to be interpreted as described in [@!RFC2119].
 
 We also define the following terms for further use in this document:
 
-* MTA-STS Policy: A definition of the expected TLS availability,
-  behavior, and desired actions for a given domain when a sending MTA
-  encounters problems in negotiating a secure channel. MTA-STS is
-  defined in [@!I-D.ietf-uta-mta-sts].
-* DANE Policy: A mechanism by which administrators can supply a record
-  that can be used to validate the certificate presented by an MTA. DANE
-  is defined in [@!RFC6698] and [@!RFC7672].
+* MTA-STS Policy: A mechanism by which administrators can specify the expected
+  TLS availability, presented identity, and desired actions for a given
+  email recipient domain. MTA-STS is defined in [@!I-D.ietf-uta-mta-sts].
+* DANE Policy: A mechanism by which administrators can specify constraints to be
+  used to validate certificates presented by an MTA.  DANE is defined in
+  [@!RFC6698] and [@!RFC7672].
 * TLSRPT Policy: A policy specifying the endpoint to which sending MTAs
   should deliver reports.
 * Policy Domain: The domain against which an MTA-STS or DANE Policy is
