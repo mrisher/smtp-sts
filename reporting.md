@@ -263,8 +263,8 @@ Note that the failure types are non-exclusive; an aggregate report may
 contain overlapping `counts` of failure types when a single send attempt
 encountered multiple errors. Reporters may report multiple applied
 policies (for example, an MTA-STS policy and a DANE TLSA record for the
-same domain and MX); even in the case where only a single policy was
-applied, the "policies" field of the report body MUST be an array and
+same domain and MX). Because of this, even in the case where only a single
+policy was applied, the "policies" field of the report body MUST be an array and
 not a singular value.
 
 In the case of multiple failure types, the `failure-details` array
