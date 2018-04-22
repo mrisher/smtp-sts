@@ -694,7 +694,8 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
    o  "failure-reason-code": A text field to include a TLS-related error
       code or error message.
 
-   For report purposes, an IPv4 Address is defined as:
+   For report purposes, an IPv4 Address is defined via the following
+   ABNF:
 
      IPv4address = dec-octet "." dec-octet "." dec-octet "." dec-octet
      dec-octet     = DIGIT                 ; 0-9
@@ -721,7 +722,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
 
    For the MTA-STS policy, an array of JSON strings that represents the
    policy that is declared by the receiving site, including any errors
-   that may be present.  Note that where there are multiple "mx" values,
 
 
 
@@ -730,6 +730,7 @@ Margolis, et al.         Expires October 6, 2018               [Page 13]
 Internet-Draft                 SMTP-TLSRPT                    April 2018
 
 
+   that may be present.  Note that where there are multiple "mx" values,
    they must be listed as separate "mx" elements in the policy array,
    rather as a single nested "mx" sub-array.
 
@@ -777,7 +778,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
    different sources within the same Policy Domain.  For example, this
    is a possible filename for a compressed report to the Policy Domain
    "example.net" from the Sending MTA "mail.sndr.example.com":
-
 
 
 

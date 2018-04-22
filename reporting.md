@@ -468,7 +468,8 @@ Figure: JSON Report Format
 * `failure-reason-code`: A text field to include a TLS-related error
   code or error message.
     
-For report purposes, an IPv4 Address is defined as:
+For report purposes, an IPv4 Address is defined via the following ABNF:
+
      IPv4address = dec-octet "." dec-octet "." dec-octet "." dec-octet     
      dec-octet     = DIGIT                 ; 0-9
                    / %x31-39 DIGIT         ; 10-99

@@ -573,7 +573,7 @@ code or error message.
 <vspace/></t>
 </list>
 </t>
-<t>For report purposes, an IPv4 Address is defined as:
+<t>For report purposes, an IPv4 Address is defined via the following ABNF:
 </t>
 
 <figure align="center"><artwork align="center">
