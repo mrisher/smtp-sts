@@ -468,7 +468,7 @@ Figure: JSON Report Format
     
 For report purposes, an IPv4 Address is defined as:
      IPv4address = dec-octet "." dec-octet "." dec-octet "." dec-octet     
-                   dec-octet     = DIGIT                 ; 0-9
+     dec-octet     = DIGIT                 ; 0-9
                    / %x31-39 DIGIT         ; 10-99
                    / "1" 2DIGIT            ; 100-199
                    / "2" %x30-34 DIGIT     ; 200-249
