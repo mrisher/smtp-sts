@@ -150,15 +150,16 @@ Policies consist of the following directives:
 * In the case of `https`, reports should be submitted via POST
   ([@!RFC7231]) to the specified URI.  Report submitters MAY ignore
   certificate validation errors when submitting reports via https.
-* In the case of `mailto`, reports should be submitted to the specified
-  email address ([@!RFC6068]). When sending failure reports via SMTP,
-  sending MTAs MUST deliver reports despite any TLS-related failures and
-  SHOULD NOT include this SMTP session in the next report. This may mean
-  that the reports are delivered in the clear. Additionally, reports
-  sent via SMTP MUST contain a valid DKIM [@!RFC6376] signature by the
-  reporting domain.  Reports lacking such a signature MUST be ignored by
-  the recipient.  DKIM signatures must not use the "l=" attribute to
-  limit the body length used in the signature.
+* In the case of `mailto`, reports should be submitted to the specified email
+  address ([@!RFC6068]). When sending failure reports via SMTP, sending MTAs
+  MUST deliver reports despite any TLS-related failures and SHOULD NOT include
+  this SMTP session in the next report. When sending failure reports via HTTPS,
+  sending MTAs MAY deliver reports despite any TLS-related faliures. This may
+  mean that the reports are delivered in the clear. Additionally, reports sent
+  via SMTP MUST contain a valid DKIM [@!RFC6376] signature by the reporting
+  domain. Reports lacking such a signature MUST be ignored by the recipient.
+  DKIM signatures must not use the "l=" attribute to limit the body length used
+  in the signature.
 
 The formal definition of the `_smtp._tls` TXT record, defined using
 [@!RFC5234] & [@!RFC7405], is as follows:
