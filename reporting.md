@@ -1001,12 +1001,12 @@ sessions failed due to "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED".
     },
     "failure-details": [{
       "result-type": "certificate-expired",
-      "sending-mta-ip": "198.51.100.13",
+      "sending-mta-ip": "2001:db8:abcd:0012::1",
       "receiving-mx-hostname": "mx1.mail.company-y.example",
       "failed-session-count": 100
     }, {
       "result-type": "starttls-not-supported",
-      "sending-mta-ip": "198.51.100.24",
+      "sending-mta-ip": "2001:db8:abcd:0013::1",
       "receiving-mx-hostname": "mx2.mail.company-y.example",
       "receiving-ip": "203.0.113.56",
       "failed-session-count": 200,
