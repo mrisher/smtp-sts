@@ -139,7 +139,8 @@ under the name `_smtp._tls`. For example, for the Policy Domain
 
 Policies consist of the following directives:
 
-* `v`: This value MUST be equal to `TLSRPTv1`.
+* `v`: This document defines version 1 of TLSRPT, for which this value MUST be
+  equal to `TLSRPTv1`. Other versions may be defined in later documents.
 * `rua`: A URI specifying the endpoint to which aggregate information
   about policy validation results should be sent (see
   (#reporting-schema), "Reporting Schema",  for more information). Two
