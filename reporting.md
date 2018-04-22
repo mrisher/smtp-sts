@@ -674,11 +674,6 @@ Other codes could indicate a delivery failure, and may be retried as per
 local policy.  The receiving system is not expected to process reports
 at receipt time, and MAY store them for processing at a later time.
 
-Alternately, if a receiving system offers `Accept-Encoding` value of 
-`gzip`, the sending system MAY use `Content-Encoding: gzip` as an HTTP 
-header as appropriate.  This can be used in place of delivering a 
-compressed file as the payload.
-
 ## Delivery Retry
 
 In the event of a delivery failure, regardless of the delivery method, a
@@ -765,9 +760,9 @@ syntax suffix registration form follows:
 
    Interoperability considerations:  n/a
 
-   Security considerations: GZIP format doesn't provide encryption.
-      Each individual media type registered with a +gzip suffix
-      can have additional security considerations.
+   Security considerations: GZIP format doesn't provide encryption. See also
+      security considerations of [@?RFC6713]. Each individual media type
+      registered with a +gzip suffix can have additional security considerations
 
    Contact: art@ietf.org
 

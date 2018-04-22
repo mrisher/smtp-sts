@@ -791,11 +791,6 @@ Other codes could indicate a delivery failure, and may be retried as per
 local policy.  The receiving system is not expected to process reports
 at receipt time, and MAY store them for processing at a later time.
 </t>
-<t>Alternately, if a receiving system offers <spanx style="verb">Accept-Encoding</spanx> value of
-<spanx style="verb">gzip</spanx>, the sending system MAY use <spanx style="verb">Content-Encoding: gzip</spanx> as an HTTP
-header as appropriate.  This can be used in place of delivering a
-compressed file as the payload.
-</t>
 </section>
 
 <section anchor="delivery-retry" title="Delivery Retry">
@@ -893,12 +888,12 @@ syntax suffix registration form follows:
 </artwork></figure>
 <t>Interoperability considerations:  n/a
 </t>
-<t>Security considerations: GZIP format doesn't provide encryption.
+<t>Security considerations: GZIP format doesn't provide encryption. See also
 </t>
 
 <figure align="center"><artwork align="center">
-  Each individual media type registered with a +gzip suffix
-  can have additional security considerations.
+  security considerations of [@?RFC6713]. Each individual media type
+  registered with a +gzip suffix can have additional security considerations
 </artwork></figure>
 <t>Contact: art@ietf.org
 </t>

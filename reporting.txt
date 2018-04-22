@@ -104,7 +104,7 @@ Table of Contents
      5.6.  Metadata Variances  . . . . . . . . . . . . . . . . . . .  18
    6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  18
      6.1.  Message headers . . . . . . . . . . . . . . . . . . . . .  18
-     6.2.  Report Type . . . . . . . . . . . . . . . . . . . . . . .  19
+     6.2.  Report Type . . . . . . . . . . . . . . . . . . . . . . .  18
      6.3.  +gzip Media Type Suffix . . . . . . . . . . . . . . . . .  19
 
 
@@ -120,7 +120,7 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
    7.  Security Considerations . . . . . . . . . . . . . . . . . . .  23
    8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  24
      8.1.  Normative References  . . . . . . . . . . . . . . . . . .  24
-     8.2.  Informative References  . . . . . . . . . . . . . . . . .  27
+     8.2.  Informative References  . . . . . . . . . . . . . . . . .  26
    Appendix A.  Example Reporting Policy . . . . . . . . . . . . . .  27
      A.1.  Report using MAILTO . . . . . . . . . . . . . . . . . . .  27
      A.2.  Report using HTTPS  . . . . . . . . . . . . . . . . . . .  27
@@ -957,11 +957,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
    reports at receipt time, and MAY store them for processing at a later
    time.
 
-   Alternately, if a receiving system offers "Accept-Encoding" value of
-   "gzip", the sending system MAY use "Content-Encoding: gzip" as an
-   HTTP header as appropriate.  This can be used in place of delivering
-   a compressed file as the payload.
-
 5.5.  Delivery Retry
 
    In the event of a delivery failure, regardless of the delivery
@@ -1000,16 +995,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
              Author/Change controller:    IETF
              Specification document(s):   this one
 
-
-
-
-
-
-Margolis, et al.         Expires October 6, 2018               [Page 18]
-
-Internet-Draft                 SMTP-TLSRPT                    April 2018
-
-
 6.2.  Report Type
 
    This document registers a new parameter "report-type="tlsrpt"" under
@@ -1017,6 +1002,13 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
 
    The media type suitable for use as a report-type is defined in the
    following section.
+
+
+
+Margolis, et al.         Expires October 6, 2018               [Page 18]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2018
+
 
 6.3.  +gzip Media Type Suffix
 
@@ -1059,19 +1051,20 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
 
    Interoperability considerations: n/a
 
+   Security considerations: GZIP format doesn't provide encryption.  See
+   also
+
+  security considerations of [@?RFC6713]. Each individual media type
+  registered with a +gzip suffix can have additional security considerations
+
+   Contact: art@ietf.org
+
 
 
 Margolis, et al.         Expires October 6, 2018               [Page 19]
 
 Internet-Draft                 SMTP-TLSRPT                    April 2018
 
-
-   Security considerations: GZIP format doesn't provide encryption.
-
-          Each individual media type registered with a +gzip suffix
-          can have additional security considerations.
-
-   Contact: art@ietf.org
 
    Author/Change controller: Internet Engineering Task Force
 
@@ -1114,6 +1107,13 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
 
    Applications that use this media type: Mail User Agents (MUA) and
 
+                            Mail Transfer Agents.
+
+   Additional information:
+
+
+
+
 
 
 
@@ -1121,10 +1121,6 @@ Margolis, et al.         Expires October 6, 2018               [Page 20]
 
 Internet-Draft                 SMTP-TLSRPT                    April 2018
 
-
-                            Mail Transfer Agents.
-
-   Additional information:
 
                       Magic number(s):  n/a
 
@@ -1171,16 +1167,16 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
 
    Interoperability considerations: This document specifies format of
 
+             conforming messages and the interpretation thereof.
+
+   Published specification: Section 5.3 of this document.
+
 
 
 Margolis, et al.         Expires October 6, 2018               [Page 21]
 
 Internet-Draft                 SMTP-TLSRPT                    April 2018
 
-
-             conforming messages and the interpretation thereof.
-
-   Published specification: Section 5.3 of this document.
 
    Applications that use this media type: Mail User Agents (MUA) and
 
@@ -1213,27 +1209,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
    This document creates a new registry, "STARTTLS Validation Result
    Types".  The initial entries in the registry are:
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Margolis, et al.         Expires October 6, 2018               [Page 22]
-
-Internet-Draft                 SMTP-TLSRPT                    April 2018
-
-
                      +-------------------------------+
                      | Result Type                   |
                      +-------------------------------+
@@ -1248,6 +1223,16 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
                      | "sts-webpki-invalid"          |
                      | "validation-failure"          |
                      +-------------------------------+
+
+
+
+
+
+
+Margolis, et al.         Expires October 6, 2018               [Page 22]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2018
+
 
    The above entries are described in section Section 4.3, "Result
    Types."  New result types can be added to this registry using "Expert
@@ -1282,14 +1267,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
    o  Reports as DDoS: TLSRPT allows specifying destinations for the
       reports that are outside the authority of the Policy Domain, which
       allows domains to delegate processing of reports to a partner
-
-
-
-Margolis, et al.         Expires October 6, 2018               [Page 23]
-
-Internet-Draft                 SMTP-TLSRPT                    April 2018
-
-
       organization.  However, an attacker who controls the Policy Domain
       DNS could also use this mechanism to direct the reports to an
       unwitting victim, flooding that victim with excessive reports.
@@ -1305,6 +1282,14 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
 
    Finally, because TLSRPT is intended to help administrators discover
    man-in-the-middle attacks against transport-layer encryption,
+
+
+
+Margolis, et al.         Expires October 6, 2018               [Page 23]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2018
+
+
    including attacks designed to thwart negotiation of encrypted
    connections (by downgrading opportunistic encryption or, in the case
    of MTA-STS, preventing discovery of a new MTA-STS policy), we must
@@ -1339,13 +1324,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
               Timestamps", RFC 3339, DOI 10.17487/RFC3339, July 2002,
               <https://www.rfc-editor.org/info/rfc3339>.
 
-
-
-Margolis, et al.         Expires October 6, 2018               [Page 24]
-
-Internet-Draft                 SMTP-TLSRPT                    April 2018
-
-
    [RFC3492]  Costello, A., "Punycode: A Bootstring encoding of Unicode
               for Internationalized Domain Names in Applications
               (IDNA)", RFC 3492, DOI 10.17487/RFC3492, March 2003,
@@ -1360,6 +1338,13 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
               for Authorizing Use of Domains in E-Mail, Version 1",
               RFC 4408, DOI 10.17487/RFC4408, April 2006,
               <https://www.rfc-editor.org/info/rfc4408>.
+
+
+
+Margolis, et al.         Expires October 6, 2018               [Page 24]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2018
+
 
    [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
               Specifications: ABNF", STD 68, RFC 5234,
@@ -1394,14 +1379,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
               URI Scheme", RFC 6068, DOI 10.17487/RFC6068, October 2010,
               <https://www.rfc-editor.org/info/rfc6068>.
 
-
-
-
-Margolis, et al.         Expires October 6, 2018               [Page 25]
-
-Internet-Draft                 SMTP-TLSRPT                    April 2018
-
-
    [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
               Verification of Domain-Based Application Service Identity
               within Internet Public Key Infrastructure Using X.509
@@ -1413,6 +1390,17 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
               "DomainKeys Identified Mail (DKIM) Signatures", STD 76,
               RFC 6376, DOI 10.17487/RFC6376, September 2011,
               <https://www.rfc-editor.org/info/rfc6376>.
+
+
+
+
+
+
+
+Margolis, et al.         Expires October 6, 2018               [Page 25]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2018
+
 
    [RFC6522]  Kucherawy, M., Ed., "The Multipart/Report Media Type for
               the Reporting of Mail System Administrative Messages",
@@ -1451,13 +1439,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/info/rfc8174>.
 
-
-
-Margolis, et al.         Expires October 6, 2018               [Page 26]
-
-Internet-Draft                 SMTP-TLSRPT                    April 2018
-
-
 8.2.  Informative References
 
    [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
@@ -1467,6 +1448,15 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
    [RFC3501]  Crispin, M., "INTERNET MESSAGE ACCESS PROTOCOL - VERSION
               4rev1", RFC 3501, DOI 10.17487/RFC3501, March 2003,
               <https://www.rfc-editor.org/info/rfc3501>.
+
+
+
+
+
+Margolis, et al.         Expires October 6, 2018               [Page 26]
+
+Internet-Draft                 SMTP-TLSRPT                    April 2018
+
 
    [RFC3864]  Klyne, G., Nottingham, M., and J. Mogul, "Registration
               Procedures for Message Header Fields", BCP 90, RFC 3864,
@@ -1505,6 +1495,16 @@ Appendix B.  Example JSON Report
    Company-Y, where 100 sessions were attempted to Company Y servers
    with an expired certificate and 200 sessions were attempted to
    Company Y servers that did not successfully respond to the "STARTTLS"
+   command.  Additionally 3 sessions failed due to
+   "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED".
+
+
+
+
+
+
+
+
 
 
 
@@ -1513,9 +1513,6 @@ Margolis, et al.         Expires October 6, 2018               [Page 27]
 
 Internet-Draft                 SMTP-TLSRPT                    April 2018
 
-
-   command.  Additionally 3 sessions failed due to
-   "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED".
 
    {
      "organization-name": "Company-X",
@@ -1560,6 +1557,9 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
        }]
      }]
    }
+
+
+
 
 
 
