@@ -268,9 +268,7 @@ there exists more than one, the reporter MAY attempt to deliver to
 each of the supported rua destinations.  A receiver MAY opt to only
 attempt delivery to one of the endpoints, however the report SHOULD NOT
 be considered successfully delivered until one of the endpoints accepts
-delivery of the report.  If the reporter does not support one of the
-report mechanisms, then it SHOULD NOT attempt delivery to those rua
-destinations.
+delivery of the report.
 </t>
 <t>Parsers MUST accept TXT records which are syntactically valid (i.e.
 valid key-value pairs separated by semi-colons) and implementing a

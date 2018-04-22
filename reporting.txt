@@ -324,12 +324,12 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
    each of the supported rua destinations.  A receiver MAY opt to only
    attempt delivery to one of the endpoints, however the report SHOULD
    NOT be considered successfully delivered until one of the endpoints
-   accepts delivery of the report.  If the reporter does not support one
-   of the report mechanisms, then it SHOULD NOT attempt delivery to
-   those rua destinations.
+   accepts delivery of the report.
 
    Parsers MUST accept TXT records which are syntactically valid (i.e.
    valid key-value pairs separated by semi-colons) and implementing a
+   superset of this specification, in which case unknown fields SHALL be
+   ignored.
 
 
 
@@ -337,9 +337,6 @@ Margolis, et al.         Expires October 6, 2018                [Page 6]
 
 Internet-Draft                 SMTP-TLSRPT                    April 2018
 
-
-   superset of this specification, in which case unknown fields SHALL be
-   ignored.
 
 3.1.  Example Reporting Policy
 
@@ -386,6 +383,9 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
 
    o  Aggregate counts, comprising result type, sending MTA IP,
       receiving MTA hostname, session count, and an optional additional
+      information field containing a URI for recipients to review
+      further information on a failure type.
+
 
 
 
@@ -393,9 +393,6 @@ Margolis, et al.         Expires October 6, 2018                [Page 7]
 
 Internet-Draft                 SMTP-TLSRPT                    April 2018
 
-
-      information field containing a URI for recipients to review
-      further information on a failure type.
 
    Note that the failure types are non-exclusive; an aggregate report
    may contain overlapping "counts" of failure types when a single send
@@ -440,6 +437,9 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
    The list of result types will start with the minimal set below, and
    is expected to grow over time based on real-world experience.  The
    initial set is:
+
+
+
 
 
 
