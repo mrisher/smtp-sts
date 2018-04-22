@@ -554,8 +554,8 @@ from the Sending MTA "mail.sndr.example.com":
 
 ## Compression
 
-The report SHOULD be subjected to GZIP compression for both email and
-HTTPS transport. Declining to apply compression can cause the report to
+The report SHOULD be subjected to GZIP [@!RFC1952] compression for both email
+and HTTPS transport. Declining to apply compression can cause the report to
 be too large for a receiver to process (a commonly observed receiver
 limit is ten megabytes); compressing the file increases the chances of
 acceptance of the report at some compute cost.
