@@ -806,7 +806,7 @@ below.
 
    Additional information:
 
-      Magic number(s):  n/a
+      Magic number(s):  The first two bytes are 0x1f, 0x8b.
 
       File extension(s):  ".json"
 
