@@ -146,9 +146,10 @@ reporting abilities for those implementing DANE <xref target="RFC7672"/>.
 </t>
 
 <section anchor="terminology" title="Terminology">
-<t>The key words &quot;MUST&quot;, &quot;MUST NOT&quot;, &quot;REQUIRED&quot;, &quot;SHALL&quot;, &quot;SHALL NOT&quot;,
-&quot;SHOULD&quot;, &quot;SHOULD NOT&quot;, &quot;RECOMMENDED&quot;,  &quot;MAY&quot;, and &quot;OPTIONAL&quot; in this
-document are to be interpreted as described in <xref target="RFC2119"/>.
+<t>The key words &quot;MUST&quot;, &quot;MUST NOT&quot;, &quot;REQUIRED&quot;, &quot;SHALL&quot;, &quot;SHALL NOT&quot;, &quot;SHOULD&quot;,
+&quot;SHOULD NOT&quot;, &quot;RECOMMENDED&quot;, &quot;NOT RECOMMENDED&quot;, &quot;MAY&quot;, and &quot;OPTIONAL&quot; in this
+document are to be interpreted as described in [BCP 14] <xref target="RFC2119"/>
+<xref target="RFC8174"/> when, and only when, they appear in all capitals, as shown here.
 </t>
 <t>We also define the following terms for further use in this document:
 </t>
@@ -1162,6 +1163,7 @@ record) or to deploy DNSSEC on the deploying zone.
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7405.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7493.xml"?>
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7672.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.8174.xml"?>
 </references>
 <references title="Informative References">
 <?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>

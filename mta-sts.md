@@ -82,11 +82,10 @@ policies specifying:
 
 ## Terminology
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
-document are to be interpreted as described in [@?RFC2119].  These
-words may also appear in this document in lowercase, absent their
-normative meanings.
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
+document are to be interpreted as described in [BCP 14] [@!RFC2119]
+[@!RFC8174] when, and only when, they appear in all capitals, as shown here.
 
 We also define the following terms for further use in this document:
 
