@@ -937,7 +937,8 @@ below.
 </t>
 
 <figure align="center"><artwork align="center">
-  TLS Reporting are discussed in Section 7.
+  TLS Reporting are discussed in Section 7. Security considerations related
+  to zlib compression are discussed in [@?RFC6713].
 </artwork></figure>
 <t>Interoperability considerations: This document specifies format of
 </t>

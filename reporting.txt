@@ -1097,7 +1097,8 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
 
    Security considerations: Security considerations relating to SMTP
 
-                  TLS Reporting are discussed in Section 7.
+  TLS Reporting are discussed in Section 7. Security considerations related
+  to zlib compression are discussed in [@?RFC6713].
 
    Interoperability considerations: This document specifies format of
 
@@ -1110,7 +1111,6 @@ Internet-Draft                 SMTP-TLSRPT                    April 2018
                             Mail Transfer Agents.
 
    Additional information:
-
 
 
 

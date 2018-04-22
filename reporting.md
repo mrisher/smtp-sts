@@ -794,7 +794,8 @@ below.
       [@!RFC7493].
 
    Security considerations: Security considerations relating to SMTP
-      TLS Reporting are discussed in Section 7.
+      TLS Reporting are discussed in Section 7. Security considerations related
+      to zlib compression are discussed in [@?RFC6713].
 
    Interoperability considerations: This document specifies format of
       conforming messages and the interpretation thereof.
