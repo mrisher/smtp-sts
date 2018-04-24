@@ -99,9 +99,10 @@ reporting abilities for those implementing DANE [@!RFC7672].
 
 ## Terminology
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-"SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and "OPTIONAL" in this
-document are to be interpreted as described in [@!RFC2119].
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
+document are to be interpreted as described in [BCP 14] [@!RFC2119]
+[@!RFC8174] when, and only when, they appear in all capitals, as shown here.
 
 We also define the following terms for further use in this document:
 
@@ -207,9 +208,7 @@ there exists more than one, the reporter MAY attempt to deliver to
 each of the supported rua destinations.  A receiver MAY opt to only
 attempt delivery to one of the endpoints, however the report SHOULD NOT
 be considered successfully delivered until one of the endpoints accepts
-delivery of the report.  If the reporter does not support one of the 
-report mechanisms, then it SHOULD NOT attempt delivery to those rua 
-destinations. 
+delivery of the report.
 
 Parsers MUST accept TXT records which are syntactically valid (i.e.
 valid key-value pairs separated by semi-colons) and implementing a
@@ -453,12 +452,15 @@ Figure: JSON Report Format
   creating the outbound session. It is provided as a string 
   representation of an IPv4 (see below) or IPv6 ([@!RFC5952]) address 
   in dot-decimal or colon-hexadecimal notation.
-* `total-successful-session-count`: The aggregate number (integer) of
-  successfully negotiated TLS-enabled connections to the receiving site.
-* `total-failure-session-count`: The aggregate number (integer) of
-  failures to negotiate a TLS-enabled connection to the receiving site.
+* `total-successful-session-count`: The aggregate count (integer, encoded as a
+  JSON number) of successfully negotiated TLS-enabled connections to the
+  receiving site.
+* `total-failure-session-count`: The aggregate count (integer, encoded as a JSON
+  number) of failures to negotiate a TLS-enabled connection to the receiving
+  site.
 * `failed-session-count`: The number of (attempted) sessions that match
-  the relevant `result-type` for this section.
+  the relevant `result-type` for this section (integer, encoded as a JSON
+  number).
 * `additional-info-uri`: An optional URI [@!RFC3986] pointing to
   additional information around the relevant `result-type`. For example,
   this URI might host the complete certificate chain presented during an
@@ -466,7 +468,8 @@ Figure: JSON Report Format
 * `failure-reason-code`: A text field to include a TLS-related error
   code or error message.
     
-For report purposes, an IPv4 Address is defined as:
+For report purposes, an IPv4 Address is defined via the following ABNF:
+
      IPv4address = dec-octet "." dec-octet "." dec-octet "." dec-octet     
      dec-octet     = DIGIT                 ; 0-9
                    / %x31-39 DIGIT         ; 10-99
@@ -480,9 +483,9 @@ For report purposes, an IPv4 Address is defined as:
 Part of the report body includes the policy that is applied when attemping
 relay to the destination.
 
-For DANE TLSA policies, a JSON array of strings each representing the 
-RDATA of a single TLSA resource record as a space-separated list of its 
-four TLSA fields; the fields are in presentation format (defined in RFC6698 
+For DANE TLSA policies, this is a JSON array of strings each representing the
+RDATA of a single TLSA resource record as a space-separated list of its four
+TLSA fields; the fields are in presentation format (defined in [@!RFC6698]
 Section 2.2) with no internal spaces or grouping parentheses:
 
 [
@@ -490,9 +493,9 @@ Section 2.2) with no internal spaces or grouping parentheses:
 "3 0 1 12350A337E6DB9C6123522D136A475638CC43E1ED424F8EEC8513D747D1D1234"
 ]
   
-For the MTA-STS policy, an array of JSON strings that represents the policy
-that is declared by the receiving site, including any errors that may be
-present.  Note that where there are multiple "mx" values, they must be listed 
+For MTA-STS policies, this is an array of JSON strings that represents the
+policy that is declared by the receiving site, including any errors that may be
+present. Note that where there are multiple "mx" values, they must be listed 
 as separate "mx" elements in the policy array, rather as a single nested "mx" 
 sub-array.
 
@@ -551,8 +554,8 @@ from the Sending MTA "mail.sndr.example.com":
 
 ## Compression
 
-The report SHOULD be subjected to GZIP compression for both email and
-HTTPS transport. Declining to apply compression can cause the report to
+The report SHOULD be subjected to GZIP [@!RFC1952] compression for both email
+and HTTPS transport. Declining to apply compression can cause the report to
 be too large for a receiver to process (a commonly observed receiver
 limit is ten megabytes); compressing the file increases the chances of
 acceptance of the report at some compute cost.
@@ -671,11 +674,6 @@ Other codes could indicate a delivery failure, and may be retried as per
 local policy.  The receiving system is not expected to process reports
 at receipt time, and MAY store them for processing at a later time.
 
-Alternately, if a receiving system offers `Accept-Encoding` value of 
-`gzip`, the sending system MAY use `Content-Encoding: gzip` as an HTTP 
-header as appropriate.  This can be used in place of delivering a 
-compressed file as the payload.
-
 ## Delivery Retry
 
 In the event of a delivery failure, regardless of the delivery method, a
@@ -762,9 +760,9 @@ syntax suffix registration form follows:
 
    Interoperability considerations:  n/a
 
-   Security considerations: GZIP format doesn't provide encryption.
-      Each individual media type registered with a +gzip suffix
-      can have additional security considerations.
+   Security considerations: GZIP format doesn't provide encryption. See also
+      security considerations of [@?RFC6713]. Each individual media type
+      registered with a +gzip suffix can have additional security considerations
 
    Contact: art@ietf.org
 
@@ -796,7 +794,8 @@ below.
       [@!RFC7493].
 
    Security considerations: Security considerations relating to SMTP
-      TLS Reporting are discussed in Section 7.
+      TLS Reporting are discussed in Section 7. Security considerations related
+      to zlib compression are discussed in [@?RFC6713].
 
    Interoperability considerations: This document specifies format of
       conforming messages and the interpretation thereof.
@@ -808,7 +807,7 @@ below.
 
    Additional information:
 
-      Magic number(s):  n/a
+      Magic number(s):  The first two bytes are 0x1f, 0x8b.
 
       File extension(s):  ".json"
 
@@ -1002,12 +1001,12 @@ sessions failed due to "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED".
     },
     "failure-details": [{
       "result-type": "certificate-expired",
-      "sending-mta-ip": "198.51.100.13",
+      "sending-mta-ip": "2001:db8:abcd:0012::1",
       "receiving-mx-hostname": "mx1.mail.company-y.example",
       "failed-session-count": 100
     }, {
       "result-type": "starttls-not-supported",
-      "sending-mta-ip": "198.51.100.24",
+      "sending-mta-ip": "2001:db8:abcd:0013::1",
       "receiving-mx-hostname": "mx2.mail.company-y.example",
       "receiving-ip": "203.0.113.56",
       "failed-session-count": 200,

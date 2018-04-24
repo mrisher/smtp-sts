@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE rfc SYSTEM 'rfc2629.dtd' []>
-<rfc ipr="trust200902" category="std" docName="draft-ietf-uta-mta-sts-13">
+<rfc ipr="trust200902" category="std" docName="draft-ietf-uta-mta-sts-15">
 <?rfc toc="yes"?>
 <?rfc symrefs="yes"?>
 <?rfc sortrefs="yes"?>
@@ -87,7 +87,7 @@
 <uri></uri>
 </address>
 </author>
-<date year="2017" month="December" day="4"/>
+<date year="2018" month="April" day="4"/>
 
 <area>Applications</area>
 <workgroup>Using TLS in Applications</workgroup>
@@ -102,7 +102,6 @@ specify whether sending SMTP servers should refuse to deliver to MX
 hosts that do not offer TLS with a trusted server certificate.
 </t>
 </abstract>
-
 
 </front>
 
@@ -132,16 +131,17 @@ policies specifying:
 </t>
 
 <section anchor="terminology" title="Terminology">
-<t>The key words &quot;MUST&quot;, &quot;MUST NOT&quot;, &quot;REQUIRED&quot;, &quot;SHALL&quot;, &quot;SHALL NOT&quot;,
-&quot;SHOULD&quot;, &quot;SHOULD NOT&quot;, &quot;RECOMMENDED&quot;,  &quot;MAY&quot;, and &quot;OPTIONAL&quot; in this
-document are to be interpreted as described in <xref target="RFC2119"/>.
+<t>The key words &quot;MUST&quot;, &quot;MUST NOT&quot;, &quot;REQUIRED&quot;, &quot;SHALL&quot;, &quot;SHALL NOT&quot;, &quot;SHOULD&quot;,
+&quot;SHOULD NOT&quot;, &quot;RECOMMENDED&quot;, &quot;NOT RECOMMENDED&quot;, &quot;MAY&quot;, and &quot;OPTIONAL&quot; in this
+document are to be interpreted as described in [BCP 14] <xref target="RFC2119"/>
+<xref target="RFC8174"/> when, and only when, they appear in all capitals, as shown here.
 </t>
 <t>We also define the following terms for further use in this document:
 </t>
 <t>
 <list style="symbols">
 <t>MTA-STS Policy: A commitment by the Policy Domain to support PKIX
-authenticated TLS for the specified MX hosts.</t>
+<xref target="RFC5280"/> authenticated TLS for the specified MX hosts.</t>
 <t>Policy Domain: The domain for which an MTA-STS Policy is defined. This
 is the next-hop domain; when sending mail to &quot;alice@example.com&quot; this
 would ordinarily be &quot;example.com&quot;, but this may be overridden by
@@ -235,15 +235,17 @@ sts-ext-name    = (ALPHA / DIGIT)
                   *31(ALPHA / DIGIT / "_" / "-" / ".")
 
 sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)
-                  ; chars excluding "=", ";", SP, and control chars
+                  ; chars excluding "=", ";", and control chars
 </artwork></figure>
-<t>If multiple TXT records for <spanx style="verb">_mta-sts</spanx> are returned by the resolver,
-records which do not begin with <spanx style="verb">v=STSv1;</spanx> are discarded. If the number
-of resulting records is not one, senders MUST assume the recipient
-domain does not implement MTA-STS and skip the remaining steps of policy
-discovery. If the resulting TXT record contains multiple strings, then
-the record MUST be treated as if those strings are concatenated together
-without adding spaces.
+<t>The TXT record MUST begin with sts-version field, and the order of
+other fields is not significant. If multiple TXT records for
+<spanx style="verb">_mta-sts</spanx> are returned by the resolver, records which do not begin
+with <spanx style="verb">v=STSv1;</spanx> are discarded. If the number of resulting records is
+not one, senders MUST assume the recipient domain does not implement
+MTA-STS and skip the remaining steps of policy discovery. If the
+resulting TXT record contains multiple strings, then the record MUST
+be treated as if those strings are concatenated together without
+adding spaces.
 </t>
 </section>
 
@@ -254,43 +256,48 @@ header fields) served via the HTTPS GET method from the fixed
 <spanx style="verb">mta-sts</spanx> host at the Policy Domain. Thus for <spanx style="verb">example.com</spanx> the path is
 <spanx style="verb">https://mta-sts.example.com/.well-known/mta-sts.txt</spanx>.
 </t>
-<t>The <xref target="RFC7231"/> &quot;Content-Type&quot; media type for this resource MUST be
-&quot;text/plain&quot;. When fetching a policy, senders SHOULD validate that the
-media type is &quot;text/plain&quot; to guard against cases where webservers allow
-untrusted users to host non-text content (typically, HTML or images) at
-a user-defined path. Additional &quot;Content-Type&quot; parameters are ignored.
+<t>When fetching a policy, senders SHOULD validate that the media type is
+&quot;text/plain&quot; to guard against cases where webservers allow untrusted
+users to host non-text content (typically, HTML or images) at a
+user-defined path. All parameters other charset=utf-8 or charset=us-ascii
+are ignored. Additional &quot;Content-Type&quot; parameters are also ignored.
 </t>
-<t>This resource contains the following newline-separated key/value pairs:
+<t>This resource contains the following CRLF-separated key/value pairs:
 </t>
 <t>
 <list style="symbols">
 <t><spanx style="verb">version</spanx>: (plain-text). Currently only &quot;STSv1&quot; is supported.</t>
 <t><spanx style="verb">mode</spanx>: (plain-text). One of &quot;enforce&quot;, &quot;testing&quot;, or &quot;none&quot;,
 indicating the expected behavior of a sending MTA in the case of a
-policy validation failure.</t>
+policy validation failure. See <xref target="policy-application"/>,
+&quot;Policy Application.&quot; for more details about the three modes.</t>
 <t><spanx style="verb">max_age</spanx>: Max lifetime of the policy (plain-text non-negative integer
 seconds, maximum value of 31557600).  Well-behaved clients SHOULD
 cache a policy for up to this value from last policy fetch time. To
 mitigate the risks of attacks at policy refresh time, it is expected
 that this value typically be in the range of weeks or greater.</t>
-<t><spanx style="verb">mx</spanx>: MX identity patterns (list of plain-text strings). One or more
-patterns matching a Common Name (<xref target="RFC6125"/>) or Subject Alternative
-Name (<xref target="RFC5280"/>) DNS-ID present in the X.509 certificate presented
-by any MX receiving mail for this domain.  For example:
-<spanx style="verb">mx: mail.example.com
-mx: .example.net</spanx>
-indicates that mail for this domain might be handled by any MX with a
-certificate valid for a host at <spanx style="verb">mail.example.com</spanx> or <spanx style="verb">example.net</spanx>.
-Valid patterns can be either fully specified names (<spanx style="verb">example.com</spanx>) or
-suffixes (<spanx style="verb">.example.net</spanx>) matching the right-hand parts of a server's
-identity; the latter case are distinguished by a leading period.  If
-there are more than one MX specified by the policy, they MUST be on
-separate lines within the policy file.  In the case of
-Internationalized Domain Names (<xref target="RFC5891"/>), the MX MUST specify the
-Punycode-encoded A-label <xref target="RFC3492"/> and not the Unicode-encoded
-U-label. The full semantics of certificate validation are described in
-<xref target="mx-certificate-validation"/>, &quot;MX Certificate Validation.&quot;</t>
+<t><spanx style="verb">mx</spanx>: MX identity patterns (list of plain-text strings).  One or
+more patterns matching a Common Name or Subject Alternative Name
+(<xref target="RFC5280"/>) DNS-ID (<xref target="RFC6125"/>) present in the X.509 certificate
+presented by any MX receiving mail for this domain. For example:</t>
 </list>
+</t>
+
+<figure align="center"><artwork align="center">
+ mx: mail.example.com &lt;CRLF&gt;
+ mx: .example.net
+</artwork></figure>
+<t>indicates that mail for this domain might be handled by any MX with a
+  certificate valid for a host at <spanx style="verb">mail.example.com</spanx> or <spanx style="verb">example.net</spanx>.
+  Valid patterns can be either fully specified names (<spanx style="verb">example.com</spanx>) or
+  suffixes (<spanx style="verb">.example.net</spanx>) matching the right-hand parts of a server's
+  identity; the latter case are distinguished by a leading period.  If
+  there are more than one MX specified by the policy, they MUST be on
+  separate lines within the policy file.  In the case of
+  Internationalized Domain Names (<xref target="RFC5891"/>), the MX MUST specify the
+  Punycode-encoded A-label <xref target="RFC3492"/> and not the Unicode-encoded
+  U-label. The full semantics of certificate validation are described in
+  <xref target="mx-certificate-validation"/>, &quot;MX Certificate Validation.&quot;
 </t>
 <t>An example policy is as below:
 </t>
@@ -308,8 +315,8 @@ follows:
 </t>
 
 <figure align="center"><artwork align="center">
-sts-policy-record        = *WSP sts-policy-field *WSP
-                           *(CRLF *WSP sts-policy-field *WSP)
+sts-policy-record        = sts-policy-field *WSP
+                           *(CRLF sts-policy-field *WSP)
                            [CRLF]
 
 sts-policy-field         = sts-policy-version /      ; required once
@@ -360,8 +367,7 @@ sts-policy-ext-name      = (ALPHA / DIGIT)
                            *31(ALPHA / DIGIT / "_" / "-" / ".")
 
 sts-policy-ext-value     = 1*(%x21-3A / %x3C / %x3E-7E)
-                         ; chars, excluding "=", ";", SP, and
-                         ; control chars
+                         ; chars, excluding control chars
 </artwork></figure>
 <t>Parsers MUST accept TXT records and policy files which are syntactically
 valid (i.e. valid key/value pairs separated by semi-colons for TXT
@@ -379,7 +385,8 @@ present a X.509 certificate which is valid for the <spanx style="verb">mta-sts</
 <spanx style="verb">mta-sts.example.com</spanx>) as described below, chain to a root CA that is
 trusted by the sending MTA, and be non-expired. It is expected that
 sending MTAs use a set of trusted CAs similar to those in widely
-deployed Web browsers and operating systems.
+deployed Web browsers and operating systems. See <xref target="RFC5280"/> for more
+details about certificate verification.
 </t>
 <t>The certificate is valid for the <spanx style="verb">mta-sts</spanx> host with respect to the
 rules described in <xref target="RFC6125"/>, with the following application-specific
@@ -425,7 +432,7 @@ the sender MUST apply that cached policy.
 </t>
 <t>Finally, to mitigate the risk of persistent interference with policy
 refresh, as discussed in-depth in <xref target="security-considerations"/>, MTAs
-SHOULD proactivecly refresh cached policies before they expire; a
+SHOULD proactively refresh cached policies before they expire; a
 suggested refresh frequency is once per day. To enable administrators to
 discover problems with policy refresh, MTAs SHOULD alert administrators
 (through the use of logs or similar) when such attempts fail, unless the
@@ -434,10 +441,11 @@ cached policy mode is <spanx style="verb">none</spanx>.
 </section>
 
 <section anchor="policy-selection-for-smart-hosts-and-subdomains" title="Policy Selection for Smart Hosts and Subdomains">
-<t>When sending mail via a &quot;smart host&quot;--an intermediate SMTP relay rather
-than the message recipient's server--compliant senders MUST treat the
-smart host domain as the policy domain for the purposes of policy
-discovery and application.
+<t>When sending mail via a &quot;smart host&quot;--an administratively configured
+intermediate SMTP relay, which is different from the message recipient's
+server as determined from DNS --compliant senders MUST treat the smart
+host domain as the policy domain for the purposes of policy discovery
+and application.
 </t>
 <t>When sending mail to a mailbox at a subdomain, compliant senders MUST
 NOT attempt to fetch a policy from the parent zone. Thus for mail sent
@@ -470,9 +478,9 @@ description of sending MTA behavior when policy validation fails.
 <t>The certificate presented by the receiving MX MUST chain to a root CA
 that is trusted by the sending MTA and be non-expired. The certificate
 MUST have a subject alternative name (SAN, <xref target="RFC5280"/>) with a DNS-ID
-matching the <spanx style="verb">mx</spanx> pattern. The MX's certificate MAY also be checked for
-revocation via OCSP <xref target="RFC6960"/>, CRLs <xref target="RFC6818"/>, or some other
-mechanism.
+(<xref target="RFC6125"/>) matching the <spanx style="verb">mx</spanx> pattern. The MX's certificate MAY also
+be checked for revocation via OCSP <xref target="RFC6960"/>, CRLs <xref target="RFC6818"/>, or
+some other mechanism.
 </t>
 <t>Because the <spanx style="verb">mx</spanx> patterns are not hostnames, however, matching is not
 identical to other common cases of X.509 certificate authentication (as
@@ -581,21 +589,24 @@ extension MUST contain the name of the policy host (e.g.
 <spanx style="verb">mta-sts.example.com</spanx>). When connecting to an SMTP server, the SNI
 extension MUST contain the MX hostname.
 </t>
-<t>HTTP servers used to deliver MTA-STS policies MUST have support for the
-TLS SNI extension and MAY rely on SNI to determine which certificate
-chain to present to the client. In either case, HTTP servers MUST
-respond with a certificate chain that matches the policy hostname or
-abort the TLS handshake if unable to do so.
+<t>HTTP servers used to deliver MTA-STS policies MAY rely on SNI to
+determine which certificate chain to present to the client. HTTP
+servers MUST respond with a certificate chain that matches the policy
+hostname or abort the TLS handshake if unable to do so. Clients that
+do not send SNI information may not see the expected certificate chain.
 </t>
-<t>SMTP servers MUST have support for the TLS SNI extension and MAY rely on
-SNI to determine which certificate chain to present to the client. If
-the client sends no SNI extension or sends an SNI extension for an
-unsupported server name, the server MUST simply send a fallback
-certificate chain of its choice. The reason for not enforcing strict
-matching of the requested SNI hostname is that MTA-STS TLS clients may
-be typically willing to accept multiple server names but can only send
-one name in the SNI extension. The server's fallback certificate may
-match a different name that is acceptable to the client, e.g., the
+<t>SMTP servers MAY rely on SNI to determine which certificate chain to
+present to the client. However servers that have one identity and a single
+matching certificate do not require SNI support. Servers MUST NOT enforce
+the use of SNI by clients, as the client may be using unauthenticated
+opportunistic TLS and may not expect any particular certificate from
+the server. If the client sends no SNI extension or sends an SNI
+extension for an unsupported server name, the server MUST simply send a
+fallback certificate chain of its choice. The reason for not enforcing
+strict matching of the requested SNI hostname is that MTA-STS TLS clients
+may be typically willing to accept multiple server names but can only
+send one name in the SNI extension. The server's fallback certificate
+may match a different name that is acceptable to the client, e.g., the
 original next-hop domain.
 </t>
 </section>
@@ -923,28 +934,28 @@ markus.laber (at) 1und1 (dot de)
 </middle>
 <back>
 <references title="Normative References">
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-uta-smtp-tlsrpt.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3492.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5246.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5280.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5321.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5785.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6066.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6125.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7231.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7405.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7525.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-uta-smtp-tlsrpt.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3492.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5246.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5280.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5321.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5785.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6066.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6125.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7405.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7525.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.8174.xml"?>
 </references>
 <references title="Informative References">
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4033.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5322.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5891.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6818.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6960.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7234.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7672.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4033.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5322.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5891.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6818.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6960.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7234.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7672.xml"?>
 </references>
 
 <section anchor="mtasts-example-record--policy" title="MTA-STS example record &amp; policy">
