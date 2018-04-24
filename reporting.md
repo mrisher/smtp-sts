@@ -58,8 +58,8 @@ leading to undelivered messages or delivery over unencrypted or
 unauthenticated channels.  This document describes a reporting mechanism
 and format by which sending systems can share statistics and specific
 information about potential failures with recipient domains. Recipient
-domains can then use this information to both detect potential attackers
-and diagnose unintentional misconfigurations.
+domains can then use this information to both detect potential attacks and
+diagnose unintentional misconfigurations.
 
 {mainmatter}
 
@@ -105,13 +105,12 @@ document are to be interpreted as described in [@!RFC2119].
 
 We also define the following terms for further use in this document:
 
-* MTA-STS Policy: A definition of the expected TLS availability,
-  behavior, and desired actions for a given domain when a sending MTA
-  encounters problems in negotiating a secure channel. MTA-STS is
-  defined in [@!I-D.ietf-uta-mta-sts].
-* DANE Policy: A mechanism by which administrators can supply a record
-  that can be used to validate the certificate presented by an MTA. DANE
-  is defined in [@!RFC6698] and [@!RFC7672].
+* MTA-STS Policy: A mechanism by which administrators can specify the expected
+  TLS availability, presented identity, and desired actions for a given
+  email recipient domain. MTA-STS is defined in [@!I-D.ietf-uta-mta-sts].
+* DANE Policy: A mechanism by which administrators can specify constraints to be
+  used to validate certificates presented by an MTA.  DANE is defined in
+  [@!RFC6698] and [@!RFC7672].
 * TLSRPT Policy: A policy specifying the endpoint to which sending MTAs
   should deliver reports.
 * Policy Domain: The domain against which an MTA-STS or DANE Policy is
@@ -140,7 +139,8 @@ under the name `_smtp._tls`. For example, for the Policy Domain
 
 Policies consist of the following directives:
 
-* `v`: This value MUST be equal to `TLSRPTv1`.
+* `v`: This document defines version 1 of TLSRPT, for which this value MUST be
+  equal to `TLSRPTv1`. Other versions may be defined in later documents.
 * `rua`: A URI specifying the endpoint to which aggregate information
   about policy validation results should be sent (see
   (#reporting-schema), "Reporting Schema",  for more information). Two
@@ -150,15 +150,16 @@ Policies consist of the following directives:
 * In the case of `https`, reports should be submitted via POST
   ([@!RFC7231]) to the specified URI.  Report submitters MAY ignore
   certificate validation errors when submitting reports via https.
-* In the case of `mailto`, reports should be submitted to the specified
-  email address ([@!RFC6068]). When sending failure reports via SMTP,
-  sending MTAs MUST deliver reports despite any TLS-related failures and
-  SHOULD NOT include this SMTP session in the next report. This may mean
-  that the reports are delivered in the clear. Additionally, reports
-  sent via SMTP MUST contain a valid DKIM [@!RFC6376] signature by the
-  reporting domain.  Reports lacking such a signature MUST be ignored by
-  the recipient.  DKIM signatures must not use the "l=" attribute to
-  limit the body length used in the signature.
+* In the case of `mailto`, reports should be submitted to the specified email
+  address ([@!RFC6068]). When sending failure reports via SMTP, sending MTAs
+  MUST deliver reports despite any TLS-related failures and SHOULD NOT include
+  this SMTP session in the next report. When sending failure reports via HTTPS,
+  sending MTAs MAY deliver reports despite any TLS-related faliures. This may
+  mean that the reports are delivered in the clear. Additionally, reports sent
+  via SMTP MUST contain a valid DKIM [@!RFC6376] signature by the reporting
+  domain. Reports lacking such a signature MUST be ignored by the recipient.
+  DKIM signatures must not use the "l=" attribute to limit the body length used
+  in the signature.
 
 The formal definition of the `_smtp._tls` TXT record, defined using
 [@!RFC5234] & [@!RFC7405], is as follows:
@@ -262,8 +263,8 @@ Note that the failure types are non-exclusive; an aggregate report may
 contain overlapping `counts` of failure types when a single send attempt
 encountered multiple errors. Reporters may report multiple applied
 policies (for example, an MTA-STS policy and a DANE TLSA record for the
-same domain and MX); even in the case where only a single policy was
-applied, the "policies" field of the report body MUST be an array and
+same domain and MX). Because of this, even in the case where only a single
+policy was applied, the "policies" field of the report body MUST be an array and
 not a singular value.
 
 In the case of multiple failure types, the `failure-details` array
@@ -467,7 +468,7 @@ Figure: JSON Report Format
     
 For report purposes, an IPv4 Address is defined as:
      IPv4address = dec-octet "." dec-octet "." dec-octet "." dec-octet     
-                   dec-octet     = DIGIT                 ; 0-9
+     dec-octet     = DIGIT                 ; 0-9
                    / %x31-39 DIGIT         ; 10-99
                    / "1" 2DIGIT            ; 100-199
                    / "2" %x30-34 DIGIT     ; 200-249
@@ -946,10 +947,10 @@ downgrading opportunistic encryption or, in the case of MTA-STS,
 preventing discovery of a new MTA-STS policy), we must also consider the
 risk that an adversary who can induce such a downgrade attack can also
 prevent discovery of the TLSRPT TXT record (and thus prevent discovery
-of the successful downgrade attack).  Administrators are thus encouraged
+of the successful downgrade attack). Administrators are thus encouraged
 to deploy TLSRPT TXT records with a large TTL (reducing the window for
-successful attacks against DNS resolution of the record) or to deploy
-DNSSEC on the deploying zone.
+successful application of transient attacks against DNS resolution of the
+record) or to deploy DNSSEC on the deploying zone.
 
 {backmatter}
 
