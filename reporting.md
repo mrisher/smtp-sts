@@ -485,8 +485,8 @@ relay to the destination.
 
 For DANE TLSA policies, this is a JSON array of strings each representing the
 RDATA of a single TLSA resource record as a space-separated list of its four
-TLSA fields; the fields are in presentation format (defined in RFC6698 Section
-2.2) with no internal spaces or grouping parentheses:
+TLSA fields; the fields are in presentation format (defined in [@!RFC6698]
+Section 2.2) with no internal spaces or grouping parentheses:
 
 [
 "3 0 1 1F850A337E6DB9C609C522D136A475638CC43E1ED424F8EEC8513D747D1D085D",
