@@ -68,11 +68,12 @@ diagnose unintentional misconfigurations.
 The STARTTLS extension to SMTP [@?RFC3207] allows SMTP clients and hosts
 to establish secure SMTP sessions over TLS. The protocol design uses an
 approach that has come to be known as "Opportunistic Security" (OS) 
-[@?RFC7435], which maintains interoperability with clients that do not 
-support STARTTLS but means that any attacker who can delete parts of the 
-SMTP session (such as the "250 STARTTLS" response) or redirect the entire 
-SMTP session (perhaps by overwriting the resolved MX record of the 
-delivery domain) can perform a downgrade or interception attack.
+[@?RFC7435]. This method maintains interoperability with clients that do 
+not support STARTTLS, but means that any attacker could potentially 
+eavesdrop on a session.  An attacker could perform a downgrade or 
+interception attack by deleting parts of the SMTP session (such as the 
+"250 STARTTLS" response) or redirect the entire SMTP session (perhaps 
+by overwriting the resolved MX record of the delivery domain).
 
 Because such "downgrade attacks" are not necessarily apparent to the
 receiving MTA, this document defines a mechanism for sending domains to
