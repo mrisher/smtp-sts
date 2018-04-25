@@ -116,7 +116,9 @@ We also define the following terms for further use in this document:
 * TLSRPT Policy: A policy specifying the endpoint to which sending MTAs
   should deliver reports.
 * Policy Domain: The domain against which an MTA-STS or DANE Policy is
-  defined.
+  defined.  This should be the same as the recipient envelope domain [@?RFC5321],
+  such as if the message were going to "alice@example.com', the policy domain would
+  be "example.com".
 * Sending MTA: The MTA initiating the relay of an email message.
 * Aggregate Report URI (rua): A comma-separated list of locations where
   the report is to be submitted.
@@ -669,11 +671,11 @@ SHOULD use the media type `application/tlsrpt+gzip`, and
 `application/tlsrpt+json` otherwise (see section (#iana-considerations),
 "IANA Considerations").
 
-A reporting entity SHOULD expect a "successful" response from the
-accepting HTTPS server, typically a 200 or 201 HTTP code [@?RFC7231].
-Other codes could indicate a delivery failure, and may be retried as per
-local policy.  The receiving system is not expected to process reports
-at receipt time, and MAY store them for processing at a later time.
+The receiving system MUST return a "successful" response from its HTTPS
+server, typically a 200 or 201 HTTP code [@?RFC7321].  Other codes could 
+indicate a delivery failure, and may be retried as per local sender policy.
+The receiving system is not expected to process reports at receipt time, and 
+MAY store them for processing at a later time.
 
 ## Delivery Retry
 
