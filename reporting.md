@@ -926,6 +926,15 @@ this reporting channel:
   attacker able to poison DNS is already able to receive counts of SMTP
   connections (and, absent DANE or MTA-STS policies, actual SMTP message
   payloads), this does not present a significant new vulnerability.
+  
+* Ignoring HTTPS validation when submitting reports: Under normal
+  circumstances, this is not advisable. However, this is a use case where
+  it may be likely that if the staff has misconfigured the SMTP server,
+  they may have also misconfigured the HTTPS daemon.  Furthermore, if an
+  attacker wanted to create a gap in reporting, it would be just as easy
+  to return NXDOMAIN on the TLSRPT record.  It's more important that the
+  sender is able to deliver the report so that the receiving site can
+  obtain useful information about a misconfiguration.
 
 * Reports as DDoS: TLSRPT allows specifying destinations for the reports
   that are outside the authority of the Policy Domain, which allows
