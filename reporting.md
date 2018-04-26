@@ -927,14 +927,18 @@ this reporting channel:
   connections (and, absent DANE or MTA-STS policies, actual SMTP message
   payloads), this does not present a significant new vulnerability.
   
-* Ignoring HTTPS validation when submitting reports: Under normal
-  circumstances, this is not advisable. However, this is a use case where
-  it may be likely that if the staff has misconfigured the SMTP server,
-  they may have also misconfigured the HTTPS daemon.  Furthermore, if an
-  attacker wanted to create a gap in reporting, it would be just as easy
-  to return NXDOMAIN on the TLSRPT record.  It's more important that the
-  sender is able to deliver the report so that the receiving site can
-  obtain useful information about a misconfiguration.
+* Ignoring HTTPS validation when submitting reports: When reporting benign
+  misconfigurations, it is likely that a misconfigured SMTP server may also 
+  mean a misconfigured HTTPS server; as a result, reporters who required 
+  HTTPS validity on the reporting endpoint may fail to alert administrators 
+  about such misconfigurations. Conversely, in the event of an actual attack,
+  an attacker who wished to create a gap in reporting and could intercept 
+  HTTPS reports could, just as easily, simply thwart the resolution of the 
+  TLSRPT TXT record or establishment of the TCP session to the HTTPS endpoint.
+  Furthermore, such a man-in-the-middle attacker could discover most or all of 
+  the metadata exposed in a report merely through passive observation. As a 
+  result, we consider the risks of failure to deliver reports on 
+  misconfigurations to outweigh those of attackers intercepting reports.
 
 * Reports as DDoS: TLSRPT allows specifying destinations for the reports
   that are outside the authority of the Policy Domain, which allows
