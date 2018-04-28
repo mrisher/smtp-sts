@@ -292,7 +292,7 @@ follows:
     sts-policy-max-age-field = %s"max_age"
 
     sts-policy-max-age-value = 1*10(DIGIT)
-    
+
     sts-policy-extension     = sts-policy-ext-name   ; additional
                                field-delim           ; extension
                                sts-policy-ext-value  ; fields
