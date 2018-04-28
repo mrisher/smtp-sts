@@ -277,7 +277,7 @@ follows:
 
     sts-policy-mode-field    = %s"mode"
 
-    sts-policy-model-value   =  %s"testing" / %s"enforce" / %s"none"
+    sts-policy-mode-value    =  %s"testing" / %s"enforce" / %s"none"
 
     sts-policy-mx            = sts-policy-mx-field field-delim
                                sts-policy-mx-value
@@ -292,7 +292,7 @@ follows:
     sts-policy-max-age-field = %s"max_age"
 
     sts-policy-max-age-value = 1*10(DIGIT)
-    
+
     sts-policy-extension     = sts-policy-ext-name   ; additional
                                field-delim           ; extension
                                sts-policy-ext-value  ; fields
