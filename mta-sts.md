@@ -791,13 +791,20 @@ implementations.
 
 # Contributors
 
-Nicolas Lidzborski
-Google, Inc
-nlidz (at) google (dot com)
-
 Wei Chuang
 Google, Inc
 weihaw (at) google (dot com)
+
+Viktor Dukhovni
+ietf-dane (at) dukhovni (dot org)
+
+Markus Laber
+1&1 Mail & Media Development & Technology GmbH
+markus.laber (at) 1und1 (dot de)
+
+Nicolas Lidzborski
+Google, Inc
+nlidz (at) google (dot com)
 
 Brandon Long
 Google, Inc
@@ -810,10 +817,6 @@ fmartin (at) linkedin (dot com)
 Klaus Umbach
 1&1 Mail & Media Development & Technology GmbH
 klaus.umbach (at) 1und1 (dot de)
-
-Markus Laber
-1&1 Mail & Media Development & Technology GmbH
-markus.laber (at) 1und1 (dot de)
 
 {backmatter}
 
