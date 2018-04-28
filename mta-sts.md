@@ -277,7 +277,7 @@ follows:
 
     sts-policy-mode-field    = %s"mode"
 
-    sts-policy-model-value   =  %s"testing" / %s"enforce" / %s"none"
+    sts-policy-mode-value    =  %s"testing" / %s"enforce" / %s"none"
 
     sts-policy-mx            = sts-policy-mx-field field-delim
                                sts-policy-mx-value
