@@ -299,9 +299,17 @@ follows:
 
     sts-policy-ext-name      = (ALPHA / DIGIT)
                                *31(ALPHA / DIGIT / "_" / "-" / ".")
+                               
+    sts-policy-term          = CRLF / LF
 
-    sts-policy-ext-value     = 1*(%x21-3A / %x3C / %x3E-7E)
-                             ; chars, excluding control chars
+    sts-policy-ext-value     = sts-policy-vchar
+                               [*(%x20 / sts-policy-vchar)
+                               sts-policy-vchar]
+                               ; chars, including UTF-8 [@?RFC3629],
+                               ; excluding CTLs and no 
+                               ; leading/trailing spaces
+
+   sts-policy-vchar  = %x21-7E / UTF8-2 / UTF8-3 / UTF8-4
 
 Parsers MUST accept TXT records and policy files which are syntactically
 valid (i.e. valid key/value pairs separated by semi-colons for TXT
