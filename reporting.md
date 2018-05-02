@@ -3,7 +3,7 @@
    Title = "SMTP TLS Reporting"
    abbrev = "SMTP-TLSRPT"
    category = "std"
-   docName = "draft-ietf-uta-smtp-tlsrpt-19"
+   docName = "draft-ietf-uta-smtp-tlsrpt-20"
    ipr = "trust200902"
    area = "Applications"
    workgroup = "Using TLS in Applications"
