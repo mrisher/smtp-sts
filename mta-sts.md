@@ -3,13 +3,13 @@
    Title = "SMTP MTA Strict Transport Security (MTA-STS)"
    abbrev = "MTA-STS"
    category = "std"
-   docName = "draft-ietf-uta-mta-sts-15"
+   docName = "draft-ietf-uta-mta-sts-17"
    ipr = "trust200902"
    area = "Applications"
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2018-04-04T00:00:00Z
+   date = 2018-05-02T00:00:00Z
 
    [[author]]
    initials="D."
@@ -38,7 +38,7 @@
    fullname="Alexander Brotman"
    organization="Comcast, Inc"
      [author.address]
-     email="alex_brotman (at) comcast (dot com)"
+     email="alex_brotman@comcast.com"
    [[author]]
    initials="J."
    surname="Jones"
@@ -82,11 +82,10 @@ policies specifying:
 
 ## Terminology
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
-document are to be interpreted as described in [@?RFC2119].  These
-words may also appear in this document in lowercase, absent their
-normative meanings.
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
+document are to be interpreted as described in [BCP 14] [@!RFC2119]
+[@!RFC8174] when, and only when, they appear in all capitals, as shown here.
 
 We also define the following terms for further use in this document:
 
@@ -278,7 +277,7 @@ follows:
 
     sts-policy-mode-field    = %s"mode"
 
-    sts-policy-model-value   =  %s"testing" / %s"enforce" / %s"none"
+    sts-policy-mode-value    =  %s"testing" / %s"enforce" / %s"none"
 
     sts-policy-mx            = sts-policy-mx-field field-delim
                                sts-policy-mx-value
@@ -293,17 +292,24 @@ follows:
     sts-policy-max-age-field = %s"max_age"
 
     sts-policy-max-age-value = 1*10(DIGIT)
-    
+
     sts-policy-extension     = sts-policy-ext-name   ; additional
                                field-delim           ; extension
                                sts-policy-ext-value  ; fields
 
     sts-policy-ext-name      = (ALPHA / DIGIT)
                                *31(ALPHA / DIGIT / "_" / "-" / ".")
+                               
+    sts-policy-term          = CRLF / LF
 
-    sts-policy-ext-value     = 1*(%x21-3A / %x3C / %x3E-7E)
-                             ; chars, excluding "=", ";", SP, and
-                             ; control chars
+    sts-policy-ext-value     = sts-policy-vchar
+                               [*(%x20 / sts-policy-vchar)
+                               sts-policy-vchar]
+                               ; chars, including UTF-8 [@?RFC3629],
+                               ; excluding CTLs and no 
+                               ; leading/trailing spaces
+
+   sts-policy-vchar  = %x21-7E / UTF8-2 / UTF8-3 / UTF8-4
 
 Parsers MUST accept TXT records and policy files which are syntactically
 valid (i.e. valid key/value pairs separated by semi-colons for TXT
@@ -793,13 +799,20 @@ implementations.
 
 # Contributors
 
-Nicolas Lidzborski
-Google, Inc
-nlidz (at) google (dot com)
-
 Wei Chuang
 Google, Inc
 weihaw (at) google (dot com)
+
+Viktor Dukhovni
+ietf-dane (at) dukhovni (dot org)
+
+Markus Laber
+1&1 Mail & Media Development & Technology GmbH
+markus.laber (at) 1und1 (dot de)
+
+Nicolas Lidzborski
+Google, Inc
+nlidz (at) google (dot com)
 
 Brandon Long
 Google, Inc
@@ -812,10 +825,6 @@ fmartin (at) linkedin (dot com)
 Klaus Umbach
 1&1 Mail & Media Development & Technology GmbH
 klaus.umbach (at) 1und1 (dot de)
-
-Markus Laber
-1&1 Mail & Media Development & Technology GmbH
-markus.laber (at) 1und1 (dot de)
 
 {backmatter}
 

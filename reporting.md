@@ -3,13 +3,13 @@
    Title = "SMTP TLS Reporting"
    abbrev = "SMTP-TLSRPT"
    category = "std"
-   docName = "draft-ietf-uta-smtp-tlsrpt-18"
+   docName = "draft-ietf-uta-smtp-tlsrpt-20"
    ipr = "trust200902"
    area = "Applications"
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2018-04-04T00:00:00Z
+   date = 2018-05-02T00:00:00Z
    
    [[author]]
    initials="D."
@@ -58,8 +58,8 @@ leading to undelivered messages or delivery over unencrypted or
 unauthenticated channels.  This document describes a reporting mechanism
 and format by which sending systems can share statistics and specific
 information about potential failures with recipient domains. Recipient
-domains can then use this information to both detect potential attackers
-and diagnose unintentional misconfigurations.
+domains can then use this information to both detect potential attacks and
+diagnose unintentional misconfigurations.
 
 {mainmatter}
 
@@ -68,11 +68,12 @@ and diagnose unintentional misconfigurations.
 The STARTTLS extension to SMTP [@?RFC3207] allows SMTP clients and hosts
 to establish secure SMTP sessions over TLS. The protocol design uses an
 approach that has come to be known as "Opportunistic Security" (OS) 
-[@?RFC7435], which maintains interoperability with clients that do not 
-support STARTTLS but means that any attacker who can delete parts of the 
-SMTP session (such as the "250 STARTTLS" response) or redirect the entire 
-SMTP session (perhaps by overwriting the resolved MX record of the 
-delivery domain) can perform a downgrade or interception attack.
+[@?RFC7435]. This method maintains interoperability with clients that do 
+not support STARTTLS, but means that any attacker could potentially 
+eavesdrop on a session.  An attacker could perform a downgrade or 
+interception attack by deleting parts of the SMTP session (such as the 
+"250 STARTTLS" response) or redirect the entire SMTP session (perhaps 
+by overwriting the resolved MX record of the delivery domain).
 
 Because such "downgrade attacks" are not necessarily apparent to the
 receiving MTA, this document defines a mechanism for sending domains to
@@ -99,24 +100,28 @@ reporting abilities for those implementing DANE [@!RFC7672].
 
 ## Terminology
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-"SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and "OPTIONAL" in this
-document are to be interpreted as described in [@!RFC2119].
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
+document are to be interpreted as described in [BCP 14] [@!RFC2119]
+[@!RFC8174] when, and only when, they appear in all capitals, as shown here.
 
 We also define the following terms for further use in this document:
 
-* MTA-STS Policy: A definition of the expected TLS availability,
-  behavior, and desired actions for a given domain when a sending MTA
-  encounters problems in negotiating a secure channel. MTA-STS is
-  defined in [@!I-D.ietf-uta-mta-sts].
-* DANE Policy: A mechanism by which administrators can supply a record
-  that can be used to validate the certificate presented by an MTA. DANE
-  is defined in [@!RFC6698] and [@!RFC7672].
+* MTA-STS Policy: A mechanism by which administrators can specify the expected
+  TLS availability, presented identity, and desired actions for a given
+  email recipient domain. MTA-STS is defined in [@!I-D.ietf-uta-mta-sts].
+* DANE Policy: A mechanism by which administrators can specify constraints to be
+  used to validate certificates presented by an MTA.  DANE is defined in
+  [@!RFC6698] and [@!RFC7672].
 * TLSRPT Policy: A policy specifying the endpoint to which sending MTAs
   should deliver reports.
 * Policy Domain: The domain against which an MTA-STS or DANE Policy is
-  defined.
+  defined.  This should be the same as the recipient envelope domain [@?RFC5321],
+  such as if the message were going to "alice@example.com', the policy domain would
+  be "example.com".
 * Sending MTA: The MTA initiating the relay of an email message.
+* Aggregate Report URI (rua): A comma-separated list of locations where
+  the report is to be submitted.
 
 # Related Technologies
 
@@ -138,7 +143,8 @@ under the name `_smtp._tls`. For example, for the Policy Domain
 
 Policies consist of the following directives:
 
-* `v`: This value MUST be equal to `TLSRPTv1`.
+* `v`: This document defines version 1 of TLSRPT, for which this value MUST be
+  equal to `TLSRPTv1`. Other versions may be defined in later documents.
 * `rua`: A URI specifying the endpoint to which aggregate information
   about policy validation results should be sent (see
   (#reporting-schema), "Reporting Schema",  for more information). Two
@@ -148,15 +154,18 @@ Policies consist of the following directives:
 * In the case of `https`, reports should be submitted via POST
   ([@!RFC7231]) to the specified URI.  Report submitters MAY ignore
   certificate validation errors when submitting reports via https.
-* In the case of `mailto`, reports should be submitted to the specified
-  email address ([@!RFC6068]). When sending failure reports via SMTP,
-  sending MTAs MUST deliver reports despite any TLS-related failures and
-  SHOULD NOT include this SMTP session in the next report. This may mean
-  that the reports are delivered in the clear. Additionally, reports
-  sent via SMTP MUST contain a valid DKIM [@!RFC6376] signature by the
-  reporting domain.  Reports lacking such a signature MUST be ignored by
-  the recipient.  DKIM signatures must not use the "l=" attribute to
-  limit the body length used in the signature.
+* In the case of `mailto`, reports should be submitted to the specified email
+  address ([@!RFC6068]). When sending failure reports via SMTP, sending MTAs
+  MUST deliver reports despite any TLS-related failures and SHOULD NOT include
+  this SMTP session in the next report. When sending failure reports via HTTPS,
+  sending MTAs MAY deliver reports despite any TLS-related faliures. This may
+  mean that the reports are delivered in the clear. Reports sent via SMTP MUST 
+  contain a valid DKIM [@!RFC6376] signature by the reporting domain. Reports 
+  lacking such a signature MUST be ignored by the recipient.  DKIM signatures
+  must not use the "l=" attribute to limit the body length used in the 
+  signature. The DKIM TXT record must contain the appropriate service type
+  declaration, `s=tlsrpt`, and if not present the receiving system SHOULD ignore
+  reports signed using this record.
 
 The formal definition of the `_smtp._tls` TXT record, defined using
 [@!RFC5234] & [@!RFC7405], is as follows:
@@ -195,17 +204,16 @@ If multiple TXT records for `_smtp._tls` are returned by the resolver,
 records which do not begin with `v=TLSRPTv1;` are discarded. If the
 number of resulting records is not one, senders MUST assume the
 recipient domain does not implement TLSRPT. If the resulting TXT record
-contains multiple strings, then the record MUST be treated as if those
-strings are concatenated together without adding spaces.
+contains multiple strings (as described in Section 3.1.3 of [@!RFC4408]),
+then the record MUST be treated as if those strings are concatenated 
+together without adding spaces.
 
 The record supports the abillity to declare more than one rua, and if
 there exists more than one, the reporter MAY attempt to deliver to
 each of the supported rua destinations.  A receiver MAY opt to only
 attempt delivery to one of the endpoints, however the report SHOULD NOT
 be considered successfully delivered until one of the endpoints accepts
-delivery of the report.  If the reporter does not support one of the 
-report mechanisms, then it SHOULD NOT attempt delivery to those rua 
-destinations. 
+delivery of the report.
 
 Parsers MUST accept TXT records which are syntactically valid (i.e.
 valid key-value pairs separated by semi-colons) and implementing a
@@ -259,8 +267,8 @@ Note that the failure types are non-exclusive; an aggregate report may
 contain overlapping `counts` of failure types when a single send attempt
 encountered multiple errors. Reporters may report multiple applied
 policies (for example, an MTA-STS policy and a DANE TLSA record for the
-same domain and MX); even in the case where only a single policy was
-applied, the "policies" field of the report body MUST be an array and
+same domain and MX). Because of this, even in the case where only a single
+policy was applied, the "policies" field of the report body MUST be an array and
 not a singular value.
 
 In the case of multiple failure types, the `failure-details` array
@@ -449,12 +457,15 @@ Figure: JSON Report Format
   creating the outbound session. It is provided as a string 
   representation of an IPv4 (see below) or IPv6 ([@!RFC5952]) address 
   in dot-decimal or colon-hexadecimal notation.
-* `total-successful-session-count`: The aggregate number (integer) of
-  successfully negotiated TLS-enabled connections to the receiving site.
-* `total-failure-session-count`: The aggregate number (integer) of
-  failures to negotiate a TLS-enabled connection to the receiving site.
+* `total-successful-session-count`: The aggregate count (integer, encoded as a
+  JSON number) of successfully negotiated TLS-enabled connections to the
+  receiving site.
+* `total-failure-session-count`: The aggregate count (integer, encoded as a JSON
+  number) of failures to negotiate a TLS-enabled connection to the receiving
+  site.
 * `failed-session-count`: The number of (attempted) sessions that match
-  the relevant `result-type` for this section.
+  the relevant `result-type` for this section (integer, encoded as a JSON
+  number).
 * `additional-info-uri`: An optional URI [@!RFC3986] pointing to
   additional information around the relevant `result-type`. For example,
   this URI might host the complete certificate chain presented during an
@@ -462,9 +473,10 @@ Figure: JSON Report Format
 * `failure-reason-code`: A text field to include a TLS-related error
   code or error message.
     
-For report purposes, an IPv4 Address is defined as:
+For report purposes, an IPv4 Address is defined via the following ABNF:
+
      IPv4address = dec-octet "." dec-octet "." dec-octet "." dec-octet     
-                   dec-octet     = DIGIT                 ; 0-9
+     dec-octet     = DIGIT                 ; 0-9
                    / %x31-39 DIGIT         ; 10-99
                    / "1" 2DIGIT            ; 100-199
                    / "2" %x30-34 DIGIT     ; 200-249
@@ -476,22 +488,25 @@ For report purposes, an IPv4 Address is defined as:
 Part of the report body includes the policy that is applied when attemping
 relay to the destination.
 
-For DANE TLSA policies, a JSON array of strings each representing the 
-RDATA of a single TLSA resource record as a space-separated list of its 
-four TLSA fields; the fields are in presentation format (defined in RFC6698 
+For DANE TLSA policies, this is a JSON array of strings each representing the
+RDATA of a single TLSA resource record as a space-separated list of its four
+TLSA fields; the fields are in presentation format (defined in [@!RFC6698]
 Section 2.2) with no internal spaces or grouping parentheses:
 
+```
 [
 "3 0 1 1F850A337E6DB9C609C522D136A475638CC43E1ED424F8EEC8513D747D1D085D",
 "3 0 1 12350A337E6DB9C6123522D136A475638CC43E1ED424F8EEC8513D747D1D1234"
 ]
-  
-For the MTA-STS policy, an array of JSON strings that represents the policy
-that is declared by the receiving site, including any errors that may be
-present.  Note that where there are multiple "mx" values, they must be listed 
+```
+
+For MTA-STS policies, this is an array of JSON strings that represents the
+policy that is declared by the receiving site, including any errors that may be
+present. Note that where there are multiple "mx" values, they must be listed 
 as separate "mx" elements in the policy array, rather as a single nested "mx" 
 sub-array.
 
+```
 [
 "version: STSv1",
 "mode: report",
@@ -500,7 +515,7 @@ sub-array.
 "mx: mx.backup-example.com",
 "max_age: 12345678"
 ]
-
+```
 # Report Delivery
 
 Reports can be delivered either as an email message via SMTP or via HTTP
@@ -547,8 +562,8 @@ from the Sending MTA "mail.sndr.example.com":
 
 ## Compression
 
-The report SHOULD be subjected to GZIP compression for both email and
-HTTPS transport. Declining to apply compression can cause the report to
+The report SHOULD be subjected to GZIP [@!RFC1952] compression for both email
+and HTTPS transport. Declining to apply compression can cause the report to
 be too large for a receiver to process (a commonly observed receiver
 limit is ten megabytes); compressing the file increases the chances of
 acceptance of the report at some compute cost.
@@ -661,16 +676,11 @@ SHOULD use the media type `application/tlsrpt+gzip`, and
 `application/tlsrpt+json` otherwise (see section (#iana-considerations),
 "IANA Considerations").
 
-A reporting entity SHOULD expect a "successful" response from the
-accepting HTTPS server, typically a 200 or 201 HTTP code [@?RFC7231].
-Other codes could indicate a delivery failure, and may be retried as per
-local policy.  The receiving system is not expected to process reports
-at receipt time, and MAY store them for processing at a later time.
-
-Alternately, if a receiving system offers `Accept-Encoding` value of 
-`gzip`, the sending system MAY use `Content-Encoding: gzip` as an HTTP 
-header as appropriate.  This can be used in place of delivering a 
-compressed file as the payload.
+The receiving system MUST return a "successful" response from its HTTPS
+server, typically a 200 or 201 HTTP code [@?RFC7321].  Other codes could 
+indicate a delivery failure, and may be retried as per local sender policy.
+The receiving system is not expected to process reports at receipt time, and 
+MAY store them for processing at a later time.
 
 ## Delivery Retry
 
@@ -717,6 +727,56 @@ This document registers a new parameter `report-type="tlsrpt"` under
 The media type suitable for use as a report-type is defined in the
 following section.
 
+## +gzip Media Type Suffix
+
+This document registers a new media type suffix "+gzip". The GZIP 
+format is a public domain, cross-platform, interoperable file 
+storage and transfer format, specified in [@!RFC1952]; it
+supports compression and is used as the underlying representation
+by a variety of file formats. The media type "application/gzip"
+has been registered for such files. The suffix "+gzip" MAY be
+used with any media type whose representation follows that 
+established for "application/gzip". The media type structured
+syntax suffix registration form follows:
+
+   Type name:  GZIP file storage and transfer format
+
+   +suffix:  +gzip
+
+   References:  [@!RFC1952][@!RFC6713]
+
+   Encoding considerations:  GZIP is a binary encoding.
+
+   Fragment identifier considerations: The syntax and semantics
+      of fragment identifiers specified for
+      +gzip SHOULD be as specified for "application/gzip".  (At
+      publication of this document, there is no fragment identification
+      syntax defined for "application/gzip".) The syntax and semantics
+      for fragment identifiers for a specific "xxx/yyy+gzip" SHOULD be
+      processed as follows:
+      
+      For cases defined in +gzip, where the fragment identifier
+      resolves per the +gzip rules, then process as specified in
+      +gzip.
+
+      For cases defined in +gzip, where the fragment identifier does
+      not resolve per the +gzip rules, then process as specified in
+      "xxx/yyy+gzip".
+
+      For cases not defined in +gzip, then process as specified in
+      "xxx/yyy+gzip".
+
+   Interoperability considerations:  n/a
+
+   Security considerations: GZIP format doesn't provide encryption. See also
+      security considerations of [@?RFC6713]. Each individual media type
+      registered with a +gzip suffix can have additional security considerations
+
+   Contact: art@ietf.org
+
+   Author/Change controller:  Internet Engineering Task Force
+      (mailto:iesg@ietf.org).
+
 ## application/tlsrpt+json Media Type
  
 This document registers multiple media types, beginning with Table 1
@@ -742,7 +802,8 @@ below.
       [@!RFC7493].
 
    Security considerations: Security considerations relating to SMTP
-      TLS Reporting are discussed in Section 7.
+      TLS Reporting are discussed in Section 7. Security considerations related
+      to zlib compression are discussed in [@?RFC6713].
 
    Interoperability considerations: This document specifies format of
       conforming messages and the interpretation thereof.
@@ -754,7 +815,7 @@ below.
 
    Additional information:
 
-      Magic number(s):  n/a
+      Magic number(s):  The first two bytes are 0x1f, 0x8b.
 
       File extension(s):  ".json"
 
@@ -870,6 +931,19 @@ this reporting channel:
   attacker able to poison DNS is already able to receive counts of SMTP
   connections (and, absent DANE or MTA-STS policies, actual SMTP message
   payloads), this does not present a significant new vulnerability.
+  
+* Ignoring HTTPS validation when submitting reports: When reporting benign
+  misconfigurations, it is likely that a misconfigured SMTP server may also 
+  mean a misconfigured HTTPS server; as a result, reporters who required 
+  HTTPS validity on the reporting endpoint may fail to alert administrators 
+  about such misconfigurations. Conversely, in the event of an actual attack,
+  an attacker who wished to create a gap in reporting and could intercept 
+  HTTPS reports could, just as easily, simply thwart the resolution of the 
+  TLSRPT TXT record or establishment of the TCP session to the HTTPS endpoint.
+  Furthermore, such a man-in-the-middle attacker could discover most or all of 
+  the metadata exposed in a report merely through passive observation. As a 
+  result, we consider the risks of failure to deliver reports on 
+  misconfigurations to outweigh those of attackers intercepting reports.
 
 * Reports as DDoS: TLSRPT allows specifying destinations for the reports
   that are outside the authority of the Policy Domain, which allows
@@ -893,10 +967,10 @@ downgrading opportunistic encryption or, in the case of MTA-STS,
 preventing discovery of a new MTA-STS policy), we must also consider the
 risk that an adversary who can induce such a downgrade attack can also
 prevent discovery of the TLSRPT TXT record (and thus prevent discovery
-of the successful downgrade attack).  Administrators are thus encouraged
+of the successful downgrade attack). Administrators are thus encouraged
 to deploy TLSRPT TXT records with a large TTL (reducing the window for
-successful attacks against DNS resolution of the record) or to deploy
-DNSSEC on the deploying zone.
+successful application of transient attacks against DNS resolution of the
+record) or to deploy DNSSEC on the deploying zone.
 
 {backmatter}
 
@@ -948,21 +1022,21 @@ sessions failed due to "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED".
     },
     "failure-details": [{
       "result-type": "certificate-expired",
-      "sending-mta-ip": "98.136.216.25",
+      "sending-mta-ip": "2001:db8:abcd:0012::1",
       "receiving-mx-hostname": "mx1.mail.company-y.example",
       "failed-session-count": 100
     }, {
       "result-type": "starttls-not-supported",
-      "sending-mta-ip": "98.22.33.99",
+      "sending-mta-ip": "2001:db8:abcd:0013::1",
       "receiving-mx-hostname": "mx2.mail.company-y.example",
-      "receiving-ip": "192.168.14.72",
+      "receiving-ip": "203.0.113.56",
       "failed-session-count": 200,
       "additional-information": "https://reports.company-x.example/ 
         report_info ? id = 5065427 c - 23 d3# StarttlsNotSupported "
     }, {
       "result-type": "validation-failure",
-      "sending-mta-ip": "47.97.15.2",
-      "receiving-ip": "10.72.84.12",
+      "sending-mta-ip": "198.51.100.62",
+      "receiving-ip": "203.0.113.58",
       "receiving-mx-hostname": "mx-backup.mail.company-y.example",
       "failed-session-count": 3,
       "failure-error-code": "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED"
