@@ -120,7 +120,7 @@ by overwriting the resolved MX record of the delivery domain) can
 perform downgrade or interception attacks.
 </t>
 <t>This document defines a mechanism for recipient domains to publish
-policies specifying:
+policies, via a combination of DNS and HTTPS, specifying:
 </t>
 <t>
 <list style="symbols">
@@ -251,36 +251,36 @@ adding spaces.
 </section>
 
 <section anchor="mtasts-policies" title="MTA-STS Policies">
-<t>The policy itself is a set of key/value pairs (similar to <xref target="RFC5322"/>
-header fields) served via the HTTPS GET method from the fixed
-<xref target="RFC5785"/> &quot;well-known&quot; path of <spanx style="verb">.well-known/mta-sts.txt</spanx> served by the
-<spanx style="verb">mta-sts</spanx> host at the Policy Domain. Thus for <spanx style="verb">example.com</spanx> the path is
+<t>The policy itself is a set of key/value pairs (similar to <xref target="RFC5322"/> header
+fields) served via the HTTPS GET method from the fixed <xref target="RFC5785"/> &quot;well-known&quot;
+path of <spanx style="verb">.well-known/mta-sts.txt</spanx> served by the <spanx style="verb">mta-sts</spanx> host at the Policy
+Domain. Thus for <spanx style="verb">example.com</spanx> the path is
 <spanx style="verb">https://mta-sts.example.com/.well-known/mta-sts.txt</spanx>.
 </t>
 <t>When fetching a policy, senders SHOULD validate that the media type is
-&quot;text/plain&quot; to guard against cases where webservers allow untrusted
-users to host non-text content (typically, HTML or images) at a
-user-defined path. All parameters other charset=utf-8 or charset=us-ascii
-are ignored. Additional &quot;Content-Type&quot; parameters are also ignored.
+&quot;text/plain&quot; to guard against cases where webservers allow untrusted users to
+host non-text content (typically, HTML or images) at a user-defined path. All
+parameters other than charset=utf-8 or charset=us-ascii are ignored. Additional
+&quot;Content-Type&quot; parameters are also ignored.
 </t>
 <t>This resource contains the following CRLF-separated key/value pairs:
 </t>
 <t>
 <list style="symbols">
-<t><spanx style="verb">version</spanx>: (plain-text). Currently only &quot;STSv1&quot; is supported.</t>
-<t><spanx style="verb">mode</spanx>: (plain-text). One of &quot;enforce&quot;, &quot;testing&quot;, or &quot;none&quot;,
-indicating the expected behavior of a sending MTA in the case of a
-policy validation failure. See <xref target="policy-application"/>,
-&quot;Policy Application.&quot; for more details about the three modes.</t>
+<t><spanx style="verb">version</spanx>: Currently only &quot;STSv1&quot; is supported.</t>
+<t><spanx style="verb">mode</spanx>: One of &quot;enforce&quot;, &quot;testing&quot;, or &quot;none&quot;, indicating the expected
+behavior of a sending MTA in the case of a policy validation failure. See
+<xref target="policy-application"/>, &quot;Policy Application.&quot; for more details about the three
+modes.</t>
 <t><spanx style="verb">max_age</spanx>: Max lifetime of the policy (plain-text non-negative integer
-seconds, maximum value of 31557600).  Well-behaved clients SHOULD
-cache a policy for up to this value from last policy fetch time. To
-mitigate the risks of attacks at policy refresh time, it is expected
-that this value typically be in the range of weeks or greater.</t>
-<t><spanx style="verb">mx</spanx>: MX identity patterns (list of plain-text strings).  One or
-more patterns matching a Common Name or Subject Alternative Name
-(<xref target="RFC5280"/>) DNS-ID (<xref target="RFC6125"/>) present in the X.509 certificate
-presented by any MX receiving mail for this domain. For example:</t>
+seconds, maximum value of 31557600).  Well-behaved clients SHOULD cache a
+policy for up to this value from last policy fetch time. To mitigate the risks
+of attacks at policy refresh time, it is expected that this value typically be
+in the range of weeks or greater.</t>
+<t><spanx style="verb">mx</spanx>: MX identity patterns (list of plain-text strings).  One or more patterns
+matching a Common Name or Subject Alternative Name (<xref target="RFC5280"/>) DNS-ID
+(<xref target="RFC6125"/>) present in the X.509 certificate presented by any MX receiving
+mail for this domain. For example:</t>
 </list>
 </t>
 
@@ -289,14 +289,13 @@ presented by any MX receiving mail for this domain. For example:</t>
  mx: .example.net
 </artwork></figure>
 <t>indicates that mail for this domain might be handled by any MX with a
-  certificate valid for a host at <spanx style="verb">mail.example.com</spanx> or <spanx style="verb">example.net</spanx>.
-  Valid patterns can be either fully specified names (<spanx style="verb">example.com</spanx>) or
-  suffixes (<spanx style="verb">.example.net</spanx>) matching the right-hand parts of a server's
-  identity; the latter case are distinguished by a leading period.  If
-  there are more than one MX specified by the policy, they MUST be on
-  separate lines within the policy file.  In the case of
-  Internationalized Domain Names (<xref target="RFC5891"/>), the MX MUST specify the
-  Punycode-encoded A-label <xref target="RFC3492"/> and not the Unicode-encoded
+  certificate valid for a host at <spanx style="verb">mail.example.com</spanx> or <spanx style="verb">example.net</spanx>.  Valid
+  patterns can be either fully specified names (<spanx style="verb">example.com</spanx>) or suffixes
+  (<spanx style="verb">.example.net</spanx>) matching the right-hand parts of a server's identity; the
+  latter case are distinguished by a leading period.  If there are more than one
+  MX specified by the policy, they MUST be on separate lines within the policy
+  file. In the case of Internationalized Domain Names (<xref target="RFC5891"/>), the MX MUST
+  specify the Punycode-encoded A-label <xref target="RFC3492"/> and not the Unicode-encoded
   U-label. The full semantics of certificate validation are described in
   <xref target="mx-certificate-validation"/>, &quot;MX Certificate Validation.&quot;
 </t>
@@ -389,13 +388,14 @@ specified, the policy SHALL be treated as invalid.
 </section>
 
 <section anchor="https-policy-fetching" title="HTTPS Policy Fetching">
-<t>When fetching a new policy or updating a policy, the HTTPS endpoint MUST
-present a X.509 certificate which is valid for the <spanx style="verb">mta-sts</spanx> host (e.g.
-<spanx style="verb">mta-sts.example.com</spanx>) as described below, chain to a root CA that is
-trusted by the sending MTA, and be non-expired. It is expected that
-sending MTAs use a set of trusted CAs similar to those in widely
-deployed Web browsers and operating systems. See <xref target="RFC5280"/> for more
-details about certificate verification.
+<t>Policy bodies are, as described above, retrieved by sending MTAs via HTTPS
+<xref target="RFC2818"/>.  When fetching a new policy or updating a policy, the HTTPS
+endpoint MUST present a X.509 certificate which is valid for the <spanx style="verb">mta-sts</spanx> host
+(e.g.  <spanx style="verb">mta-sts.example.com</spanx>) as described below, chain to a root CA that is
+trusted by the sending MTA, and be non-expired. It is expected that sending MTAs
+use a set of trusted CAs similar to those in widely deployed Web browsers and
+operating systems. See <xref target="RFC5280"/> for more details about certificate
+verification.
 </t>
 <t>The certificate is valid for the <spanx style="verb">mta-sts</spanx> host with respect to the
 rules described in <xref target="RFC6125"/>, with the following application-specific
@@ -500,13 +500,16 @@ case, if the MX server's X.509 certificate contains a SAN matching
 matching.
 </t>
 <t>To simplify this case, we impose the following constraints on wildcard
-certificates, identical to those in <xref target="RFC7672"/> section 3.2.3 and
-<xref target="RFC6125"/> section 6.4.3: wildcards are valid in DNS-IDs, but
-must be the entire first label of the identifier (that is,
-<spanx style="verb">*.example.com</spanx>, not <spanx style="verb">mail*.example.com</spanx>). Senders who are comparing a
-&quot;suffix&quot; MX pattern with a wildcard identifier should thus strip the
-wildcard and ensure that the two sides match label-by-label, until all
-labels of the shorter side (if unequal length) are consumed.
+certificates, identical to those in <xref target="RFC7672"/> section 3.2.3 and <xref target="RFC6125"/>
+section 6.4.3: wildcards are valid in DNS-IDs, but must be the entire first
+label of the identifier (that is, <spanx style="verb">*.example.com</spanx>, not <spanx style="verb">mail*.example.com</spanx>).
+Senders who are comparing a &quot;suffix&quot; MX pattern with a wildcard identifier
+should thus strip the wildcard and ensure that the two sides match
+label-by-label, until all labels of the shorter side (if unequal length) are
+consumed. Finally, as in <xref target="RFC6125"/> section 6.4.3, a wildcard MUST only be
+matched against the left-most label of the reference identifier, and not
+multiple labels. (Thus an <spanx style="verb">mx</spanx> pattern of <spanx style="verb">.example.com</spanx> matches
+<spanx style="verb">mail.example.com</spanx> but not <spanx style="verb">x.mail.example.com</spanx>.)
 </t>
 <t>Note that a wildcard must match a label; an <spanx style="verb">mx</spanx> pattern of
 <spanx style="verb">.example.com</spanx> thus does not match a SAN of <spanx style="verb">example.com</spanx>, nor does a
@@ -537,12 +540,11 @@ though it does not have any active policy; see <xref target="removing-mtasts"/>,
 &quot;Removing MTA-STS&quot;, for use of this mode value.</t>
 </list>
 </t>
-<t>When a message fails to deliver due to an <spanx style="verb">enforce</spanx> policy, a compliant
-MTA MUST NOT permanently fail to deliver messages before checking for
-the presence of an updated policy at the Policy Domain. (In all cases,
-MTAs SHOULD treat such failures as transient errors and retry delivery
-later.) This allows implementing domains to update long-lived policies
-on the fly.
+<t>When a message fails to deliver due to an <spanx style="verb">enforce</spanx> policy, a compliant MTA MUST
+NOT permanently fail to deliver messages before checking, via DNS, for the
+presence of an updated policy at the Policy Domain. (In all cases, MTAs SHOULD
+treat such failures as transient errors and retry delivery later.) This allows
+implementing domains to update long-lived policies on the fly.
 </t>
 
 <section anchor="policy-application-control-flow" title="Policy Application Control Flow">
@@ -687,6 +689,11 @@ _mta-sts.user.example.  IN CNAME _mta-sts.provider.example.
 &lt; HTTP/1.1 200 OK  # Response proxies content from
                    # https://mta-sts.provider.example
 </artwork></figure>
+<t>Note that in all such cases, the policy endpoint
+(<spanx style="verb">https://mta-sts.user.example/.well-known/mta-sts.txt</spanx> in this example) must
+still present a certificate valid for the Policy Domain (<spanx style="verb">user.example</spanx>), and
+not for that of the provider (<spanx style="verb">provider.example</spanx>).
+</t>
 <t>Note that while sending MTAs MUST NOT use HTTP caching when fetching
 policies via HTTPS, such caching may nonetheless be useful to a reverse
 proxy configured as described in this section. An HTTPS policy endpoint
@@ -948,6 +955,7 @@ klaus.umbach (at) 1und1 (dot de)
 <references title="Normative References">
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-uta-smtp-tlsrpt.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2818.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3492.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5246.xml"?>

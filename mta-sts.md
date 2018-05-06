@@ -73,7 +73,7 @@ by overwriting the resolved MX record of the delivery domain) can
 perform downgrade or interception attacks.
 
 This document defines a mechanism for recipient domains to publish
-policies specifying:
+policies, via a combination of DNS and HTTPS, specifying:
 
    * whether MTAs sending mail to this domain can expect
      PKIX-authenticated TLS support
@@ -189,34 +189,34 @@ adding spaces.
 
 ## MTA-STS Policies
 
-The policy itself is a set of key/value pairs (similar to [@?RFC5322]
-header fields) served via the HTTPS GET method from the fixed
-[@!RFC5785] "well-known" path of `.well-known/mta-sts.txt` served by the
-`mta-sts` host at the Policy Domain. Thus for `example.com` the path is
+The policy itself is a set of key/value pairs (similar to [@?RFC5322] header
+fields) served via the HTTPS GET method from the fixed [@!RFC5785] "well-known"
+path of `.well-known/mta-sts.txt` served by the `mta-sts` host at the Policy
+Domain. Thus for `example.com` the path is
 `https://mta-sts.example.com/.well-known/mta-sts.txt`.
 
 When fetching a policy, senders SHOULD validate that the media type is
-"text/plain" to guard against cases where webservers allow untrusted
-users to host non-text content (typically, HTML or images) at a 
-user-defined path. All parameters other charset=utf-8 or charset=us-ascii
-are ignored. Additional "Content-Type" parameters are also ignored.
+"text/plain" to guard against cases where webservers allow untrusted users to
+host non-text content (typically, HTML or images) at a user-defined path. All
+parameters other than charset=utf-8 or charset=us-ascii are ignored. Additional
+"Content-Type" parameters are also ignored.
 
 This resource contains the following CRLF-separated key/value pairs:
 
-* `version`: (plain-text). Currently only "STSv1" is supported.
-* `mode`: (plain-text). One of "enforce", "testing", or "none",
-  indicating the expected behavior of a sending MTA in the case of a
-  policy validation failure. See (#policy-application), 
-  "Policy Application." for more details about the three modes.
+* `version`: Currently only "STSv1" is supported.
+* `mode`: One of "enforce", "testing", or "none", indicating the expected
+  behavior of a sending MTA in the case of a policy validation failure. See
+  (#policy-application), "Policy Application." for more details about the three
+  modes.
 * `max_age`: Max lifetime of the policy (plain-text non-negative integer
-  seconds, maximum value of 31557600).  Well-behaved clients SHOULD
-  cache a policy for up to this value from last policy fetch time. To
-  mitigate the risks of attacks at policy refresh time, it is expected
-  that this value typically be in the range of weeks or greater.
-* `mx`: MX identity patterns (list of plain-text strings).  One or
-   more patterns matching a Common Name or Subject Alternative Name
-   ([@?RFC5280]) DNS-ID ([@?RFC6125]) present in the X.509 certificate
-   presented by any MX receiving mail for this domain. For example:
+  seconds, maximum value of 31557600).  Well-behaved clients SHOULD cache a
+  policy for up to this value from last policy fetch time. To mitigate the risks
+  of attacks at policy refresh time, it is expected that this value typically be
+  in the range of weeks or greater.
+* `mx`: MX identity patterns (list of plain-text strings).  One or more patterns
+  matching a Common Name or Subject Alternative Name ([@?RFC5280]) DNS-ID
+  ([@?RFC6125]) present in the X.509 certificate presented by any MX receiving
+  mail for this domain. For example:
 
   ```
    mx: mail.example.com <CRLF>
@@ -224,14 +224,13 @@ This resource contains the following CRLF-separated key/value pairs:
   ```
   
   indicates that mail for this domain might be handled by any MX with a
-  certificate valid for a host at `mail.example.com` or `example.net`.
-  Valid patterns can be either fully specified names (`example.com`) or
-  suffixes (`.example.net`) matching the right-hand parts of a server's
-  identity; the latter case are distinguished by a leading period.  If
-  there are more than one MX specified by the policy, they MUST be on
-  separate lines within the policy file.  In the case of
-  Internationalized Domain Names ([@?RFC5891]), the MX MUST specify the
-  Punycode-encoded A-label [@!RFC3492] and not the Unicode-encoded
+  certificate valid for a host at `mail.example.com` or `example.net`.  Valid
+  patterns can be either fully specified names (`example.com`) or suffixes
+  (`.example.net`) matching the right-hand parts of a server's identity; the
+  latter case are distinguished by a leading period.  If there are more than one
+  MX specified by the policy, they MUST be on separate lines within the policy
+  file. In the case of Internationalized Domain Names ([@?RFC5891]), the MX MUST
+  specify the Punycode-encoded A-label [@!RFC3492] and not the Unicode-encoded
   U-label. The full semantics of certificate validation are described in
   (#mx-certificate-validation), "MX Certificate Validation."
 
@@ -321,13 +320,14 @@ specified, the policy SHALL be treated as invalid.
 
 ## HTTPS Policy Fetching
 
-When fetching a new policy or updating a policy, the HTTPS endpoint MUST
-present a X.509 certificate which is valid for the `mta-sts` host (e.g.
-`mta-sts.example.com`) as described below, chain to a root CA that is
-trusted by the sending MTA, and be non-expired. It is expected that
-sending MTAs use a set of trusted CAs similar to those in widely
-deployed Web browsers and operating systems. See [@?RFC5280] for more
-details about certificate verification.
+Policy bodies are, as described above, retrieved by sending MTAs via HTTPS
+[@!RFC2818].  When fetching a new policy or updating a policy, the HTTPS
+endpoint MUST present a X.509 certificate which is valid for the `mta-sts` host
+(e.g.  `mta-sts.example.com`) as described below, chain to a root CA that is
+trusted by the sending MTA, and be non-expired. It is expected that sending MTAs
+use a set of trusted CAs similar to those in widely deployed Web browsers and
+operating systems. See [@?RFC5280] for more details about certificate
+verification.
 
 The certificate is valid for the `mta-sts` host with respect to the
 rules described in [@!RFC6125], with the following application-specific
@@ -425,13 +425,16 @@ case, if the MX server's X.509 certificate contains a SAN matching
 matching.
 
 To simplify this case, we impose the following constraints on wildcard
-certificates, identical to those in [@?RFC7672] section 3.2.3 and
-[@?RFC6125] section 6.4.3: wildcards are valid in DNS-IDs, but
-must be the entire first label of the identifier (that is,
-`*.example.com`, not `mail*.example.com`). Senders who are comparing a
-"suffix" MX pattern with a wildcard identifier should thus strip the
-wildcard and ensure that the two sides match label-by-label, until all
-labels of the shorter side (if unequal length) are consumed.
+certificates, identical to those in [@?RFC7672] section 3.2.3 and [@?RFC6125]
+section 6.4.3: wildcards are valid in DNS-IDs, but must be the entire first
+label of the identifier (that is, `*.example.com`, not `mail*.example.com`).
+Senders who are comparing a "suffix" MX pattern with a wildcard identifier
+should thus strip the wildcard and ensure that the two sides match
+label-by-label, until all labels of the shorter side (if unequal length) are
+consumed. Finally, as in [@?RFC6125] section 6.4.3, a wildcard MUST only be
+matched against the left-most label of the reference identifier, and not
+multiple labels. (Thus an `mx` pattern of `.example.com` matches
+`mail.example.com` but not `x.mail.example.com`.) 
 
 Note that a wildcard must match a label; an `mx` pattern of
 `.example.com` thus does not match a SAN of `example.com`, nor does a
@@ -459,12 +462,11 @@ value of the policy `mode` field:
    though it does not have any active policy; see (#removing-mtasts),
    "Removing MTA-STS", for use of this mode value.
 
-When a message fails to deliver due to an `enforce` policy, a compliant
-MTA MUST NOT permanently fail to deliver messages before checking for
-the presence of an updated policy at the Policy Domain. (In all cases,
-MTAs SHOULD treat such failures as transient errors and retry delivery
-later.) This allows implementing domains to update long-lived policies
-on the fly.
+When a message fails to deliver due to an `enforce` policy, a compliant MTA MUST
+NOT permanently fail to deliver messages before checking, via DNS, for the
+presence of an updated policy at the Policy Domain. (In all cases, MTAs SHOULD
+treat such failures as transient errors and retry delivery later.) This allows
+implementing domains to update long-lived policies on the fly.
 
 ## Policy Application Control Flow
 
@@ -595,6 +597,11 @@ Policy:
 < HTTP/1.1 200 OK  # Response proxies content from
                    # https://mta-sts.provider.example
 ~~~
+
+Note that in all such cases, the policy endpoint
+(`https://mta-sts.user.example/.well-known/mta-sts.txt` in this example) must
+still present a certificate valid for the Policy Domain (`user.example`), and
+not for that of the provider (`provider.example`).
 
 Note that while sending MTAs MUST NOT use HTTP caching when fetching
 policies via HTTPS, such caching may nonetheless be useful to a reverse
