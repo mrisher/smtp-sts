@@ -318,11 +318,12 @@ ignored.  If any field is not specified, the policy SHALL be treated as invalid.
 
 Policy bodies are, as described above, retrieved by sending MTAs via HTTPS
 [@!RFC2818].  When fetching a new policy or updating a policy, the Policy Host
-MUST present a X.509 certificate which is valid for the `mta-sts` DNS-ID (e.g.,
-`mta-sts.example.com`) as described below, chain to a root CA that is trusted by
-the sending MTA, and be non-expired.  It is expected that sending MTAs use a set
-of trusted CAs similar to those in widely deployed Web browsers and operating
-systems.  See [@?RFC5280] for more details about certificate verification.
+MUST present a X.509 certificate which is valid for the `mta-sts` DNS-ID
+([@?RFC6125]) (e.g., `mta-sts.example.com`) as described below, chain to a root
+CA that is trusted by the sending MTA, and be non-expired.  It is expected that
+sending MTAs use a set of trusted CAs similar to those in widely deployed Web
+browsers and operating systems.  See [@?RFC5280] for more details about
+certificate verification.
 
 The certificate is valid for the Policy Host (i.e., `mta-sts` prepended to the
 Policy Domain) with respect to the rules described in [@!RFC6125], with the
