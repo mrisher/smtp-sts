@@ -509,7 +509,7 @@ sub-array.
 ```
 [
 "version: STSv1",
-"mode: report",
+"mode: testing",
 "mx: mx1.example.com",
 "mx: mx2.example.com",
 "mx: mx.backup-example.com",
@@ -1011,7 +1011,7 @@ sessions failed due to "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED".
   "policies": [{
     "policy": {
       "policy-type": "sts",
-      "policy-string": ["version: STSv1","mode: report",
+      "policy-string": ["version: STSv1","mode: testing",
             "mx: .mail.company-y.example","max_age: 86400"],
       "policy-domain": "company-y.example",
       "mx-host": ".mail.company-y.example"
