@@ -189,7 +189,7 @@ fields) served via the HTTPS GET method from the fixed [@!RFC5785] "well-known"
 path of `.well-known/mta-sts.txt` served by the Policy Host.  The Policy Host
 DNS name is constructed by prepending `mta-sts` to the Policy Domain.
 
-Thus for `example.com` the path is
+Thus for a Policy Domain of `example.com` the path is
 `https://mta-sts.example.com/.well-known/mta-sts.txt`.
 
 When fetching a policy, senders SHOULD validate that the media type is

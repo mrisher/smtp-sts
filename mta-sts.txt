@@ -285,7 +285,7 @@ Internet-Draft                   MTA-STS                        May 2018
    the Policy Host.  The Policy Host DNS name is constructed by
    prepending "mta-sts" to the Policy Domain.
 
-   Thus for "example.com" the path is "https://mta-
+   Thus for a Policy Domain of "example.com" the path is "https://mta-
    sts.example.com/.well-known/mta-sts.txt".
 
    When fetching a policy, senders SHOULD validate that the media type
