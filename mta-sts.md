@@ -95,6 +95,9 @@ We also define the following terms for further use in this document:
   ordinarily be "example.com", but this may be overridden by explicit routing
   rules (as described in (#policy-selection-for-smart-hosts-and-subdomains),
   "Policy Selection for Smart Hosts and Subdomains").
+* Policy Host: The HTTPS host which serves the MTA-STS Policy for a Policy
+  Domain. Rules for constructing the hostname are described in
+  (#mtasts-policies), "MTA-STS Policies".
 
 # Related Technologies
 
@@ -183,8 +186,10 @@ treated as if those strings are concatenated together without adding spaces.
 
 The policy itself is a set of key/value pairs (similar to [@?RFC5322] header
 fields) served via the HTTPS GET method from the fixed [@!RFC5785] "well-known"
-path of `.well-known/mta-sts.txt` served by the `mta-sts` host at the Policy
-Domain.  Thus for `example.com` the path is
+path of `.well-known/mta-sts.txt` served by the Policy Host.  The Policy Host
+DNS name is constructed by prepending `mta-sts` to the Policy Domain.
+
+Thus for `example.com` the path is
 `https://mta-sts.example.com/.well-known/mta-sts.txt`.
 
 When fetching a policy, senders SHOULD validate that the media type is
@@ -312,17 +317,16 @@ ignored.  If any field is not specified, the policy SHALL be treated as invalid.
 ## HTTPS Policy Fetching
 
 Policy bodies are, as described above, retrieved by sending MTAs via HTTPS
-[@!RFC2818].  When fetching a new policy or updating a policy, the HTTPS
-endpoint MUST present a X.509 certificate which is valid for the `mta-sts` host
-(e.g., `mta-sts.example.com`) as described below, chain to a root CA that is
-trusted by the sending MTA, and be non-expired.  It is expected that sending
-MTAs use a set of trusted CAs similar to those in widely deployed Web browsers
-and operating systems.  See [@?RFC5280] for more details about certificate
-verification.
+[@!RFC2818].  When fetching a new policy or updating a policy, the Policy Host
+MUST present a X.509 certificate which is valid for the `mta-sts` DNS-ID (e.g.,
+`mta-sts.example.com`) as described below, chain to a root CA that is trusted by
+the sending MTA, and be non-expired.  It is expected that sending MTAs use a set
+of trusted CAs similar to those in widely deployed Web browsers and operating
+systems.  See [@?RFC5280] for more details about certificate verification.
 
-The certificate is valid for the `mta-sts` host with respect to the rules
-described in [@!RFC6125], with the following application-specific
-considerations:
+The certificate is valid for the Policy Host (i.e., `mta-sts` prepended to the
+Policy Domain) with respect to the rules described in [@!RFC6125], with the
+following application-specific considerations:
 
 * Matching is performed only against the DNS-ID identifiers.
 

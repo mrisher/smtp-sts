@@ -147,6 +147,9 @@ next-hop domain; when sending mail to &quot;alice@example.com&quot; this would
 ordinarily be &quot;example.com&quot;, but this may be overridden by explicit routing
 rules (as described in <xref target="policy-selection-for-smart-hosts-and-subdomains"/>,
 &quot;Policy Selection for Smart Hosts and Subdomains&quot;).</t>
+<t>Policy Host: The HTTPS host which serves the MTA-STS Policy for a Policy
+Domain. Rules for constructing the hostname are described in
+<xref target="mtasts-policies"/>, &quot;MTA-STS Policies&quot;.</t>
 </list>
 </t>
 </section>
@@ -245,8 +248,10 @@ treated as if those strings are concatenated together without adding spaces.
 <section anchor="mtasts-policies" title="MTA-STS Policies">
 <t>The policy itself is a set of key/value pairs (similar to <xref target="RFC5322"/> header
 fields) served via the HTTPS GET method from the fixed <xref target="RFC5785"/> &quot;well-known&quot;
-path of <spanx style="verb">.well-known/mta-sts.txt</spanx> served by the <spanx style="verb">mta-sts</spanx> host at the Policy
-Domain.  Thus for <spanx style="verb">example.com</spanx> the path is
+path of <spanx style="verb">.well-known/mta-sts.txt</spanx> served by the Policy Host.  The Policy Host
+DNS name is constructed by prepending <spanx style="verb">mta-sts</spanx> to the Policy Domain.
+</t>
+<t>Thus for <spanx style="verb">example.com</spanx> the path is
 <spanx style="verb">https://mta-sts.example.com/.well-known/mta-sts.txt</spanx>.
 </t>
 <t>When fetching a policy, senders SHOULD validate that the media type is
@@ -380,17 +385,16 @@ ignored.  If any field is not specified, the policy SHALL be treated as invalid.
 
 <section anchor="https-policy-fetching" title="HTTPS Policy Fetching">
 <t>Policy bodies are, as described above, retrieved by sending MTAs via HTTPS
-<xref target="RFC2818"/>.  When fetching a new policy or updating a policy, the HTTPS
-endpoint MUST present a X.509 certificate which is valid for the <spanx style="verb">mta-sts</spanx> host
-(e.g., <spanx style="verb">mta-sts.example.com</spanx>) as described below, chain to a root CA that is
-trusted by the sending MTA, and be non-expired.  It is expected that sending
-MTAs use a set of trusted CAs similar to those in widely deployed Web browsers
-and operating systems.  See <xref target="RFC5280"/> for more details about certificate
-verification.
+<xref target="RFC2818"/>.  When fetching a new policy or updating a policy, the Policy Host
+MUST present a X.509 certificate which is valid for the <spanx style="verb">mta-sts</spanx> DNS-ID (e.g.,
+<spanx style="verb">mta-sts.example.com</spanx>) as described below, chain to a root CA that is trusted by
+the sending MTA, and be non-expired.  It is expected that sending MTAs use a set
+of trusted CAs similar to those in widely deployed Web browsers and operating
+systems.  See <xref target="RFC5280"/> for more details about certificate verification.
 </t>
-<t>The certificate is valid for the <spanx style="verb">mta-sts</spanx> host with respect to the rules
-described in <xref target="RFC6125"/>, with the following application-specific
-considerations:
+<t>The certificate is valid for the Policy Host (i.e., <spanx style="verb">mta-sts</spanx> prepended to the
+Policy Domain) with respect to the rules described in <xref target="RFC6125"/>, with the
+following application-specific considerations:
 </t>
 <t>
 <list style="symbols">
