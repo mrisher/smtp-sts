@@ -492,7 +492,7 @@ certificates, identical to those in <xref target="RFC7672"/> section 3.2.3 and <
 section 6.4.3: wildcards are valid in DNS-IDs, but must be the entire first
 label of the identifier (that is, <spanx style="verb">*.example.com</spanx>, not <spanx style="verb">mail*.example.com</spanx>).
 Senders who are comparing a &quot;suffix&quot; MX pattern with a wildcard identifier
-should thus strip the wildcard and ensure that the two sides match
+(<xref target="RFC6125"/>) should thus strip the wildcard and ensure that the two sides match
 label-by-label, until all labels of the shorter side (if unequal length) are
 consumed.  Finally, as in <xref target="RFC6125"/> section 6.4.3, a wildcard MUST only be
 matched against the left-most label of the reference identifier, and not
@@ -518,7 +518,7 @@ field:
 <t>
 <list style="numbers">
 <t><spanx style="verb">enforce</spanx>: In this mode, sending MTAs MUST NOT deliver the message to hosts
-which fail MX matching or certificate validation.</t>
+which fail MX matching or certificate validation, or do not support STARTTLS.</t>
 <t><spanx style="verb">testing</spanx>: In this mode, sending MTAs which also implement the TLSRPT
 specification <xref target="I-D.ietf-uta-smtp-tlsrpt"/> merely send a report indicating
 policy application failures (so long as TLSRPT is also implemented by the

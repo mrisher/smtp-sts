@@ -417,7 +417,7 @@ certificates, identical to those in [@?RFC7672] section 3.2.3 and [@?RFC6125]
 section 6.4.3: wildcards are valid in DNS-IDs, but must be the entire first
 label of the identifier (that is, `*.example.com`, not `mail*.example.com`).
 Senders who are comparing a "suffix" MX pattern with a wildcard identifier
-should thus strip the wildcard and ensure that the two sides match
+([@?RFC6125]) should thus strip the wildcard and ensure that the two sides match
 label-by-label, until all labels of the shorter side (if unequal length) are
 consumed.  Finally, as in [@?RFC6125] section 6.4.3, a wildcard MUST only be
 matched against the left-most label of the reference identifier, and not
@@ -439,7 +439,7 @@ validation failure one of two ways, depending on the value of the policy `mode`
 field:
 
 1. `enforce`: In this mode, sending MTAs MUST NOT deliver the message to hosts
-   which fail MX matching or certificate validation.
+   which fail MX matching or certificate validation, or do not support STARTTLS.
 
 2. `testing`: In this mode, sending MTAs which also implement the TLSRPT
    specification [@!I-D.ietf-uta-smtp-tlsrpt] merely send a report indicating
