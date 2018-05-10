@@ -695,11 +695,11 @@ as is practical.
 
 Because this attack is also possible upon refresh of a cached policy, we suggest
 implementers do not wait until a cached policy has expired before checking for
-an update; if senders attempt to refresh the cache regularly (for instance, by
-checking their cached version string against the TXT record on each successful
-send, or in a background task that runs daily or weekly), an attacker would have
-to foil policy discovery consistently over the lifetime of a cached policy to
-prevent a successful refresh.
+an update; if senders attempt to refresh the cache regularly (for example, by
+checking their cached version string against the live policy in a background
+task that runs daily or weekly and updating their cache's "max age"
+accordingly), an attacker would have to foil policy discovery consistently over
+the lifetime of a cached policy to prevent a successful refresh.
 
 Additionally, MTAs should alert administrators to repeated policy refresh
 failures long before cached policies expire (through warning logs or similar
