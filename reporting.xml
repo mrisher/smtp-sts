@@ -160,15 +160,19 @@ document are to be interpreted as described in [BCP 14] <xref target="RFC2119"/>
 <t>MTA-STS Policy: A mechanism by which administrators can specify the expected
 TLS availability, presented identity, and desired actions for a given
 email recipient domain. MTA-STS is defined in <xref target="I-D.ietf-uta-mta-sts"/>.</t>
-<t>DANE Policy: A mechanism by which administrators can specify constraints to be
-used to validate certificates presented by an MTA.  DANE is defined in
-<xref target="RFC6698"/> and <xref target="RFC7672"/>.</t>
+<t>DANE Policy: A mechanism by which administrators can use DNSSEC
+to commit an MTA to support STARTTLS and to publish criteria to
+be used to validate its presented certificates.  DANE for SMTP
+is defined in [RFC7672], with the base specification in [RFC6698]
+(updated in [RFC7671].</t>
 <t>TLSRPT Policy: A policy specifying the endpoint to which sending MTAs
 should deliver reports.</t>
-<t>Policy Domain: The domain against which an MTA-STS or DANE Policy is
-defined.  This should be the same as the recipient envelope domain <xref target="RFC5321"/>,
-such as if the message were going to &quot;alice@example.com', the policy domain would
-be &quot;example.com&quot;.</t>
+<t>Policy Domain: The domain against which an MTA-STS or DANE Policy
+is defined.  For MTA-STS this is typically the same as the envelope
+recipient domain [RFC5321], but when mail is routed to a &quot;smarthost&quot;
+gateway by local policy, the &quot;smarthost&quot; domain name is used instead.
+For DANE the Policy Domain is the &quot;TLSA base domain&quot; of the receiving
+SMTP server as described in <eref target="Section 2.2.3">RFC7672</eref> and <eref target="Section 3">RFC6698</eref>.</t>
 <t>Sending MTA: The MTA initiating the relay of an email message.</t>
 <t>Aggregate Report URI (rua): A comma-separated list of locations where
 the report is to be submitted.</t>

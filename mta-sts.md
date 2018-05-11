@@ -98,6 +98,7 @@ We also define the following terms for further use in this document:
 * Policy Host: The HTTPS host which serves the MTA-STS Policy for a Policy
   Domain. Rules for constructing the hostname are described in
   (#mtasts-policies), "MTA-STS Policies".
+* Sender: The SMTP Mail Transfer Agent sending an email message.
 
 # Related Technologies
 
@@ -178,9 +179,13 @@ The TXT record MUST begin with sts-version field, and the order of other fields
 is not significant.  If multiple TXT records for `_mta-sts` are returned by the
 resolver, records which do not begin with `v=STSv1;` are discarded.  If the
 number of resulting records is not one, senders MUST assume the recipient domain
-does not implement MTA-STS and skip the remaining steps of policy discovery.  If
-the resulting TXT record contains multiple strings, then the record MUST be
-treated as if those strings are concatenated together without adding spaces.
+does not have an available MTA-STS policy and skip the remaining steps of policy
+discovery.  (Note that lack of an available policy does not signal opting out of
+MTA-STS altogether if the sender has a previously cached policy for the
+recipient domain, as discussed in (#policy-application-control-flow), "Policy
+Application Control Flow".)  If the resulting TXT record contains multiple
+strings, then the record MUST be treated as if those strings are concatenated
+together without adding spaces.
 
 ## MTA-STS Policies
 
@@ -317,13 +322,13 @@ ignored.  If any field is not specified, the policy SHALL be treated as invalid.
 ## HTTPS Policy Fetching
 
 Policy bodies are, as described above, retrieved by sending MTAs via HTTPS
-[@!RFC2818].  When fetching a new policy or updating a policy, the Policy Host
-MUST present a X.509 certificate which is valid for the `mta-sts` DNS-ID
-([@?RFC6125]) (e.g., `mta-sts.example.com`) as described below, chain to a root
-CA that is trusted by the sending MTA, and be non-expired.  It is expected that
-sending MTAs use a set of trusted CAs similar to those in widely deployed Web
-browsers and operating systems.  See [@?RFC5280] for more details about
-certificate verification.
+[@!RFC2818].  During the TLS handshake initiated to fetch a new or updated
+policy from the Policy Host, the Policy Host HTTPS server MUST present a X.509
+certificate which is valid for the `mta-sts` DNS-ID ([@?RFC6125]) (e.g.,
+`mta-sts.example.com`) as described below, chain to a root CA that is trusted by
+the sending MTA, and be non-expired.  It is expected that sending MTAs use a set
+of trusted CAs similar to those in widely deployed Web browsers and operating
+systems.  See [@?RFC5280] for more details about certificate verification.
 
 The certificate is valid for the Policy Host (i.e., `mta-sts` prepended to the
 Policy Domain) with respect to the rules described in [@!RFC6125], with the
@@ -696,10 +701,11 @@ as is practical.
 Because this attack is also possible upon refresh of a cached policy, we suggest
 implementers do not wait until a cached policy has expired before checking for
 an update; if senders attempt to refresh the cache regularly (for example, by
-checking their cached version string against the live policy in a background
-task that runs daily or weekly and updating their cache's "max age"
-accordingly), an attacker would have to foil policy discovery consistently over
-the lifetime of a cached policy to prevent a successful refresh.
+fetching currently live policy in a background task that runs daily or weekly,
+regardless of the state of the `_mta_sts` TXT record, and updating their cache's
+"max age" accordingly), an attacker would have to foil policy discovery
+consistently over the lifetime of a cached policy to prevent a successful
+refresh.
 
 Additionally, MTAs should alert administrators to repeated policy refresh
 failures long before cached policies expire (through warning logs or similar

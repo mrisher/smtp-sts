@@ -78,7 +78,7 @@ Table of Contents
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
      1.1.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   4
    2.  Related Technologies  . . . . . . . . . . . . . . . . . . . .   4
-   3.  Reporting Policy  . . . . . . . . . . . . . . . . . . . . . .   4
+   3.  Reporting Policy  . . . . . . . . . . . . . . . . . . . . . .   5
      3.1.  Example Reporting Policy  . . . . . . . . . . . . . . . .   7
        3.1.1.  Report using MAILTO . . . . . . . . . . . . . . . . .   7
        3.1.2.  Report using HTTPS  . . . . . . . . . . . . . . . . .   7
@@ -121,6 +121,7 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
    8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  24
      8.1.  Normative References  . . . . . . . . . . . . . . . . . .  24
      8.2.  Informative References  . . . . . . . . . . . . . . . . .  26
+     8.3.  URIs  . . . . . . . . . . . . . . . . . . . . . . . . . .  27
    Appendix A.  Example Reporting Policy . . . . . . . . . . . . . .  27
      A.1.  Report using MAILTO . . . . . . . . . . . . . . . . . . .  27
      A.2.  Report using HTTPS  . . . . . . . . . . . . . . . . . . .  27
@@ -159,9 +160,8 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
    also serve as a heartbeat that systems are successfully negotiating
    TLS during sessions as expected.
 
-   This document is intended as a companion to the specification for
-   SMTP MTA Strict Transport Security [I-D.ietf-uta-mta-sts], as well as
-   adds reporting abilities for those implementing DANE [RFC7672].
+
+
 
 
 
@@ -169,6 +169,10 @@ Margolis, et al.        Expires November 3, 2018                [Page 3]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
+
+   This document is intended as a companion to the specification for
+   SMTP MTA Strict Transport Security [I-D.ietf-uta-mta-sts], as well as
+   adds reporting abilities for those implementing DANE [RFC7672].
 
 1.1.  Terminology
 
@@ -185,17 +189,22 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
       actions for a given email recipient domain.  MTA-STS is defined in
       [I-D.ietf-uta-mta-sts].
 
-   o  DANE Policy: A mechanism by which administrators can specify
-      constraints to be used to validate certificates presented by an
-      MTA.  DANE is defined in [RFC6698] and [RFC7672].
+   o  DANE Policy: A mechanism by which administrators can use DNSSEC to
+      commit an MTA to support STARTTLS and to publish criteria to be
+      used to validate its presented certificates.  DANE for SMTP is
+      defined in [RFC7672], with the base specification in [RFC6698]
+      (updated in [RFC7671].
 
    o  TLSRPT Policy: A policy specifying the endpoint to which sending
       MTAs should deliver reports.
 
    o  Policy Domain: The domain against which an MTA-STS or DANE Policy
-      is defined.  This should be the same as the recipient envelope
-      domain [RFC5321], such as if the message were going to
-      "alice@example.com', the policy domain would be "example.com".
+      is defined.  For MTA-STS this is typically the same as the
+      envelope recipient domain [RFC5321], but when mail is routed to a
+      "smarthost" gateway by local policy, the "smarthost" domain name
+      is used instead.  For DANE the Policy Domain is the "TLSA base
+      domain" of the receiving SMTP server as described in RFC7672 [1]
+      and RFC6698 [2].
 
    o  Sending MTA: The MTA initiating the relay of an email message.
 
@@ -209,6 +218,14 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
    o  SMTP-TLSRPT defines a mechanism for sending domains that are
       compatible with MTA-STS or DANE to share success and failure
+
+
+
+Margolis, et al.        Expires November 3, 2018                [Page 4]
+
+Internet-Draft                 SMTP-TLSRPT                      May 2018
+
+
       statistics with recipient domains.  DANE is defined in [RFC6698]
       and MTA-STS is defined in [I-D.ietf-uta-mta-sts].
 
@@ -218,14 +235,6 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
    receive reports.  These SMTP TLSRPT policies are distributed via DNS
    from the Policy Domain's zone, as TXT records (similar to DMARC
    policies) under the name "_smtp._tls".  For example, for the Policy
-
-
-
-Margolis, et al.        Expires November 3, 2018                [Page 4]
-
-Internet-Draft                 SMTP-TLSRPT                      May 2018
-
-
    Domain "example.com", the recipient's TLSRPT policy can be retrieved
    from "_smtp._tls.example.com".
 
@@ -263,15 +272,6 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
    The formal definition of the "_smtp._tls" TXT record, defined using
    [RFC5234] & [RFC7405], is as follows:
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1482,6 +1482,12 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
               (DMARC)", RFC 7489, DOI 10.17487/RFC7489, March 2015,
               <https://www.rfc-editor.org/info/rfc7489>.
 
+8.3.  URIs
+
+   [1] Section 2.2.3
+
+   [2] Section 3
+
 Appendix A.  Example Reporting Policy
 
 A.1.  Report using MAILTO
@@ -1500,12 +1506,6 @@ Appendix B.  Example JSON Report
    Below is an example JSON report for messages from Company-X to
    Company-Y, where 100 sessions were attempted to Company Y servers
    with an expired certificate and 200 sessions were attempted to
-   Company Y servers that did not successfully respond to the "STARTTLS"
-   command.  Additionally 3 sessions failed due to
-   "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED".
-
-
-
 
 
 
@@ -1513,6 +1513,10 @@ Margolis, et al.        Expires November 3, 2018               [Page 27]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
+
+   Company Y servers that did not successfully respond to the "STARTTLS"
+   command.  Additionally 3 sessions failed due to
+   "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED".
 
    {
      "organization-name": "Company-X",
@@ -1557,10 +1561,6 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
        }]
      }]
    }
-
-
-
-
 
 
 
