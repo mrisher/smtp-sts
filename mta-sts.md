@@ -215,26 +215,23 @@ This resource contains the following CRLF-separated key/value pairs:
   policy for up to this value from last policy fetch time.  To mitigate the
   risks of attacks at policy refresh time, it is expected that this value
   typically be in the range of weeks or greater.
-* `mx`: MX identity patterns (list of plain-text strings).  One or more patterns
-  matching a Common Name or Subject Alternative Name ([@?RFC5280]) DNS-ID
-  ([@?RFC6125]) present in the X.509 certificate presented by any MX receiving
-  mail for this domain.  For example:
+* `mx`: Allowed MX patterns.  One or more patterns matching allowed MX hosts for
+  the Policy Domain.  As an example,
 
   ```
    mx: mail.example.com <CRLF>
-   mx: .example.net
+   mx: *.example.net
   ```
   
-  indicates that mail for this domain might be handled by any MX with a
-  certificate valid for a host at `mail.example.com` or `example.net`.  Valid
-  patterns can be either fully specified names (`example.com`) or suffixes
-  (`.example.net`) matching the right-hand parts of a server's identity; the
-  latter case are distinguished by a leading period.  If there are more than one
-  MX specified by the policy, they MUST be on separate lines within the policy
-  file.  In the case of Internationalized Domain Names ([@?RFC5891]), the MX
-  MUST specify the Punycode-encoded A-label [@!RFC3492] and not the
+  indicates that mail for this domain might be handled by MX `mail.example.com`
+  or any MX at `example.net`.  Valid patterns can be either fully specified
+  names (`example.com`) or suffixes prefixed by a wildcard (`*.example.net`)
+  matching the right-hand parts of a server's identity.  If there are more than
+  one MX specified by the policy, they MUST be on separate lines within the
+  policy file.  In the case of Internationalized Domain Names ([@?RFC5891]), the
+  MX MUST specify the Punycode-encoded A-label [@!RFC3492] and not the
   Unicode-encoded U-label.  The full semantics of certificate validation are
-  described in (#mx-certificate-validation), "MX Certificate Validation."
+  described in (#mx-host-validation), "MX Host Validation."
 
 An example policy is as below:
 
@@ -242,7 +239,7 @@ An example policy is as below:
 version: STSv1
 mode: enforce
 mx: mail.example.com
-mx: .example.net
+mx: *.example.net
 mx: backupmx.example.com
 max_age: 123456
 ```
@@ -391,50 +388,35 @@ not "example.com".
 When sending to an MX at a domain for which the sender has a valid and
 non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST validate:
 
-1.  That the recipient MX supports STARTTLS and offers a valid PKIX-based TLS
-    certificate.
+1. That at least one of the policy's "mx" patterns matches the selected MX host,
+   as described in (#mx-host-validation), "MX Host Validation".
 
-2.  That at least one of the policy's "mx" patterns matches at least one of the
-    identities presented in the MX's X.509 certificate, as described in "MX
-    Certificate Validation".
+2. That the recipient mail server supports STARTTLS and offers a PKIX-based TLS
+   certificate, during TLS handshake, which is valid for that host, as described
+   in (#recipient-mta-certificate-validation), "Recipient MTA Certificate
+   Validation".
 
 This section does not dictate the behavior of sending MTAs when policies fail to
 validate; see (#policy-application), "Policy Application" for a description of
 sending MTA behavior when policy validation fails.
 
-## MX Certificate Validation
+## MX Host Validation
 
-The certificate presented by the receiving MX MUST chain to a root CA that is
+A receiving candidate MX host is valid according to an applied MTA-STS policy if
+the MX record name matches one or more of the `mx` fields in the applied policy.
+Matching is identical to the rules given in [@!RFC6125], with restriction that
+the wildcard character `*` may only be used to match the entire left-most label
+in the presented identifier. Thus the mx pattern `*.example.com` matches
+`mail.example.com` but not `example.com` or `foo.bar.example.com`.
+
+## Recipient MTA Certificate Validation
+
+The certificate presented by the receiving MTA MUST chain to a root CA that is
 trusted by the sending MTA and be non-expired.  The certificate MUST have a
 subject alternative name (SAN, [@!RFC5280]) with a DNS-ID ([@?RFC6125]) matching
-the `mx` pattern.  The MX's certificate MAY also be checked for revocation via
-OCSP [@?RFC6960], CRLs [@?RFC6818], or some other mechanism.
-
-Because the `mx` patterns are not hostnames, however, matching is not identical
-to other common cases of X.509 certificate authentication (as described, for
-example, in [@?RFC6125]).  Consider the example policy given above, with an `mx`
-pattern containing `.example.com`.  In this case, if the MX server's X.509
-certificate contains a SAN matching `*.example.com`, we are required to
-implement "wildcard-to-wildcard" matching.
-
-To simplify this case, we impose the following constraints on wildcard
-certificates, identical to those in [@?RFC7672] section 3.2.3 and [@?RFC6125]
-section 6.4.3: wildcards are valid in DNS-IDs, but must be the entire first
-label of the identifier (that is, `*.example.com`, not `mail*.example.com`).
-Senders who are comparing a "suffix" MX pattern with a wildcard identifier
-([@?RFC6125]) should thus strip the wildcard and ensure that the two sides match
-label-by-label, until all labels of the shorter side (if unequal length) are
-consumed.  Finally, as in [@?RFC6125] section 6.4.3, a wildcard MUST only be
-matched against the left-most label of the reference identifier, and not
-multiple labels.  (Thus an `mx` pattern of `.example.com` matches
-`mail.example.com` but not `x.mail.example.com`.) 
-
-Note that a wildcard must match a label; an `mx` pattern of `.example.com` thus
-does not match a SAN of `example.com`, nor does a SAN of `*.example.com` match
-an `mx` of `example.com`.
-
-A simple pseudocode implementation of this algorithm is presented in
-(#message-delivery-pseudocode).
+the host name, per the rules given in [@!RFC6125].  The MX's certificate MAY
+also be checked for revocation via OCSP [@?RFC6960], CRLs [@?RFC6818], or some
+other mechanism.
 
 # Policy Application
 
@@ -470,9 +452,10 @@ An example control flow for a compliant sender consists of the following steps:
    asynchronously, so as not to block message delivery).  Optionally, sending
    MTAs may unconditionally check for a new policy at this step.
 2. For each candidate MX, in order of MX priority, attempt to deliver the
-   message, enforcing STARTTLS and, assuming a policy is present, PKIX
-   certificate validation as described in (#mx-certificate-validation), "MX
-   Certificate Validation."
+   message.  If a policy is present with an `enforce` mode, when attempting to
+   deliver to each candidate MX, ensure STARTTLS support and host identity
+   validity as described in (#policy-validation), "Policy Validation".  If a
+   candidate fails validation, continue to the next candidate (if there is one).
 3. A message delivery MUST NOT be permanently failed until the sender has first
    checked for the presence of a new policy (as indicated by the `id` field in
    the `_mta-sts` TXT record).  If a new policy is not found, existing rules for
@@ -616,6 +599,33 @@ A suggested workflow to implement such an opt out is as follows:
    but note that older policies may have been served with a greater `max_age`,
    allowing overlapping policy caches--safely remove the TXT record and HTTPS
    endpoint.
+
+## Preserving MX Candidate Traversal
+
+Implementors of send-time MTA-STS validation in mail transfer agents should take
+note of the risks of modifying the logic of traversing MX candidate lists.
+Because an MTA-STS policy can be used to prefilter invalid MX candidates from
+the MX candidate list, it is tempting to implement a "two-pass" model, where MX
+candidates are first filtered for possible validity according to the MTA-STS
+policy, and then the remaining candidates attempted in order as without an
+MTA-STS policy.  This may lead to incorrect implementations, such a message
+loops; implementors are instead recommended to traverse the MX candidate list as
+usual, and treat invalid candidates as though they were unreachable (i.e., as
+though there were some transient error when trying to deliver to that
+candidate).
+
+One consequence of maintaining MX candidate traversal order is that `report`-mode
+policies may show failures even if a message would, in `enforce`-mode,
+successfully be delivered. Consider the case of a domain with a higher-priority
+MX which is MTA-STS invalid and a lower-priority MX which is valid. In `report`
+mode, mail will be delivered to the higher-priority (invalid) host, but generate
+failure reports; in `enforce` mode, mail will successfully be delivered to the
+lower-priority (valid) host.
+
+Similarly, if a higher-priority MX is MTA-STS valid and a lower-priority MX is
+not, senders may never, in normal operation, encounter the lower-priority MX,
+leading to a risk that policy misconfigurations that apply only to "backup" MXes
+may only be discovered in the case of primary MX failure.
 
 # IANA Considerations
 
@@ -859,34 +869,22 @@ func tryStartTls(connection) {
   // Attempt to open an SMTP connection with STARTTLS with the MX.
 }
 
-func isWildcardMatch(pat, host) {
-  // Literal matches are true.
-  if pat == host {
-    return true
-  }
-  // Leading '.' matches a wildcard against the first part, i.e.,
-  // .example.com matches x.example.com but not x.y.example.com.
-  if pat[0] == '.' {
-    parts = SplitN(host, '.', 2)  // Split on the first '.'.
-    if len(parts) > 1 && parts[1] == pat[1:] {
-      return true
-    }
-  }
-  return false
+func certMatches(connection, host) {
+  // Assume a handy function to return check if the server certificate presented
+  // in "connection" is valid for "host".
 }
 
-func certMatches(connection, policy) {
-  // Assume a handy function to return DNS-ID SANs.
-  for san in getDnsIdSansFromCert(connection) {
-    for mx in policy.mx {
-      // Return if the server certificate from "connection" matches the
-      // "mx" host.
-      if san[0] == '*' {
-        // Invalid wildcard!
-        if san[1] != '.' continue
-        san = san[1:]
-      }
-      if isWildcardMatch(san, mx) || isWildcardMatch(mx, san) {
+func policyMatches(candidate, policy) {
+  for mx in policy.mx {
+    // Literal match.
+    if mx == candidate {
+      return true
+    }
+    // Wildcard matches only the leftmost label.
+    // Wildcards must always be followed by a '.'.
+    if mx[0] == '*' {
+      parts = SplitN(candidate, '.', 2)  // Split on the first '.'.
+      if len(parts) > 1 && parts[1] == mx[2:] {
         return true
       }
     }
@@ -922,7 +920,10 @@ func tryMxAccordingTo(message, mx, policy) {
                   // error.
   }
   secure := true
-  if !tryStartTls(connection) {
+  if !policyMatches(mx, policy) {
+    secure = false
+    reportError(E_HOST_MISMATCH)
+  } else if !tryStartTls(connection) {
     secure = false
     reportError(E_NO_VALID_TLS)
   } else if !certMatches(connection, policy) {
