@@ -287,6 +287,52 @@ allow for easier correlation of failure events.  To avoid a Denial of
 Service against the system processing the reports, the reports should be
 delivered after some delay, perhaps several hours.
 
+As an example, a sending site might want to introduce a random delay of up 
+to four hours:
+
+func generate_sleep_delay(){
+	min_delay = 1
+	max_delay = 14400
+	rand = random(min_delay,max_delay)
+	return rand
+}
+
+func generate_report(policy_domain){
+	do_rpt_work(policy_domain)
+	send_rpt(policy_domain)
+}
+
+func generate_tlsrpt(){
+	sleep(generate_sleep_delay())
+	for policy_domain in list_of_tlsrpt_enabled_domains {
+		generate_report(policy_domain)	
+	}
+}
+
+A sending site might wish to institute a random delay per destination
+site, up to four hours:
+
+func generate_sleep_delay(){
+	min_delay = 1
+	max_delay = 14400
+	rand = random(min_delay,max_delay)
+	return rand
+}
+
+func generate_report(policy_domain){
+	sleep(generate_sleep_delay())
+	do_rpt_work(policy_domain)
+	send_rpt(policy_domain)
+}
+
+func generate_tlsrpt(){
+	for policy_domain in list_of_tlsrpt_enabled_domains {
+		generate_report(policy_domain)	
+	}
+}
+
+
+
 ## Delivery Summary
 
 ### Success Count
@@ -894,20 +940,20 @@ below.
 This document creates a new registry, "STARTTLS Validation Result
 Types". The initial entries in the registry are:
 
-    +-------------------------------+
-    | Result Type                   | 
-    +-------------------------------+
-    | "starttls-not-supported"      | 
-    | "certificate-host-mismatch"   | 
-    | "certificate-expired"         | 
-    | "tlsa-invalid"                | 
-    | "dnssec-invalid"              | 
-    | "dane-required"               | 
-    | "certificate-not-trusted"     | 
-    | "sts-policy-invalid"          | 
-    | "sts-webpki-invalid"          | 
-    | "validation-failure"          | 
-    +-------------------------------+
+    +-------------------------------+-----------+
+    | Result Type                   |   Desc    |
+    +-------------------------------+-----------+
+    | "starttls-not-supported"      |    4.3    |
+    | "certificate-host-mismatch"   |    4.3    |
+    | "certificate-expired"         |    4.3    |
+    | "tlsa-invalid"                |    4.3    |
+    | "dnssec-invalid"              |    4.3    |
+    | "dane-required"               |    4.3    |
+    | "certificate-not-trusted"     |    4.3    |
+    | "sts-policy-invalid"          |    4.3    |
+    | "sts-webpki-invalid"          |    4.3    |
+    | "validation-failure"          |    4.3    |
+    +-------------------------------+-----------+
    
 The above entries are described in section (#result-types), "Result
 Types." New result types can be added to this registry using "Expert
@@ -976,6 +1022,19 @@ of the successful downgrade attack). Administrators are thus encouraged
 to deploy TLSRPT TXT records with a large TTL (reducing the window for
 successful application of transient attacks against DNS resolution of the
 record) or to deploy DNSSEC on the deploying zone.
+
+# Privacy Considerations
+
+MTAs are generally considered public knowledge, however, the internals
+of how those MTAs are configured and the users of those MTAs may not be 
+as public.  It should be noted that when providing a receiving site with 
+information, it may reveal information about the sender's configuration, 
+or even information about the senders themselves.  Consider that by sending
+a report, it might disclose your SSL library version as the inability to 
+negotiate a session may be a known incompatbility between two library
+versions, or perhaps commonly used in a operating system release that is
+centered in a certain region.  The risk may be minimal, but should be
+considered.
 
 {backmatter}
 
