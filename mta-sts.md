@@ -387,19 +387,20 @@ not "example.com".
 # Policy Validation
 
 When sending to an MX at a domain for which the sender has a valid and
-non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST validate:
+non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST check whether:
 
-1. That at least one of the policy's "mx" patterns matches the selected MX host,
+1. At least one of the policy's "mx" patterns matches the selected MX host,
    as described in (#mx-host-validation), "MX Host Validation".
 
-2. That the recipient mail server supports STARTTLS and offers a PKIX-based TLS
+2. The recipient mail server supports STARTTLS and offers a PKIX-based TLS
    certificate, during TLS handshake, which is valid for that host, as described
    in (#recipient-mta-certificate-validation), "Recipient MTA Certificate
    Validation".
 
-This section does not dictate the behavior of sending MTAs when policies fail to
-validate; see (#policy-application), "Policy Application" for a description of
-sending MTA behavior when policy validation fails.
+When these conditions are not met, a policy is said to fail to validate.  This
+section does not dictate the behavior of sending MTAs when the above conditions
+are not met; see (#policy-application), "Policy Application" for a description
+of sending MTA behavior when policy validation fails.
 
 ## MX Host Validation
 
@@ -660,7 +661,7 @@ policy.
 # Security Considerations
 
 SMTP MTA Strict Transport Security attempts to protect against an active
-attacker trying to intercept or tamper with mail between hosts who support
+attacker trying to intercept or tamper with mail between hosts that support
 STARTTLS.  There are two classes of attacks considered:
 
 * Foiling TLS negotiation, for example by deleting the "250 STARTTLS" response
