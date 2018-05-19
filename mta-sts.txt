@@ -886,9 +886,9 @@ Internet-Draft                   MTA-STS                        May 2018
 10.  Security Considerations
 
    SMTP MTA Strict Transport Security attempts to protect against an
-   active attacker who wishes to intercept or tamper with mail between
-   hosts who support STARTTLS.  There are two classes of attacks
-   considered:
+   active attacker trying to intercept or tamper with mail between hosts
+   who support STARTTLS.  There are two classes of attacks considered:
+
 
 
 

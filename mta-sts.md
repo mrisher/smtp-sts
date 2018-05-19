@@ -660,7 +660,7 @@ policy.
 # Security Considerations
 
 SMTP MTA Strict Transport Security attempts to protect against an active
-attacker who wishes to intercept or tamper with mail between hosts who support
+attacker trying to intercept or tamper with mail between hosts who support
 STARTTLS.  There are two classes of attacks considered:
 
 * Foiling TLS negotiation, for example by deleting the "250 STARTTLS" response
