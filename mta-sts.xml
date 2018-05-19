@@ -460,21 +460,22 @@ not &quot;example.com&quot;.
 
 <section anchor="policy-validation" title="Policy Validation">
 <t>When sending to an MX at a domain for which the sender has a valid and
-non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST validate:
+non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST check whether:
 </t>
 <t>
 <list style="numbers">
-<t>That at least one of the policy's &quot;mx&quot; patterns matches the selected MX host,
+<t>At least one of the policy's &quot;mx&quot; patterns matches the selected MX host,
 as described in <xref target="mx-host-validation"/>, &quot;MX Host Validation&quot;.</t>
-<t>That the recipient mail server supports STARTTLS and offers a PKIX-based TLS
+<t>The recipient mail server supports STARTTLS and offers a PKIX-based TLS
 certificate, during TLS handshake, which is valid for that host, as described
 in <xref target="recipient-mta-certificate-validation"/>, &quot;Recipient MTA Certificate
 Validation&quot;.</t>
 </list>
 </t>
-<t>This section does not dictate the behavior of sending MTAs when policies fail to
-validate; see <xref target="policy-application"/>, &quot;Policy Application&quot; for a description of
-sending MTA behavior when policy validation fails.
+<t>When these conditions are not met, a policy is said to fail to validate.  This
+section does not dictate the behavior of sending MTAs when the above conditions
+are not met; see <xref target="policy-application"/>, &quot;Policy Application&quot; for a description
+of sending MTA behavior when policy validation fails.
 </t>
 
 <section anchor="mx-host-validation" title="MX Host Validation">
@@ -769,7 +770,7 @@ policy.
 
 <section anchor="security-considerations" title="Security Considerations">
 <t>SMTP MTA Strict Transport Security attempts to protect against an active
-attacker trying to intercept or tamper with mail between hosts who support
+attacker trying to intercept or tamper with mail between hosts that support
 STARTTLS.  There are two classes of attacks considered:
 </t>
 <t>

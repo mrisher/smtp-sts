@@ -527,20 +527,21 @@ Internet-Draft                   MTA-STS                        May 2018
 
    When sending to an MX at a domain for which the sender has a valid
    and non-expired MTA-STS policy, a sending MTA honoring MTA-STS MUST
-   validate:
+   check whether:
 
-   1.  That at least one of the policy's "mx" patterns matches the
-       selected MX host, as described in Section 4.1, "MX Host
-       Validation".
+   1.  At least one of the policy's "mx" patterns matches the selected
+       MX host, as described in Section 4.1, "MX Host Validation".
 
-   2.  That the recipient mail server supports STARTTLS and offers a
-       PKIX-based TLS certificate, during TLS handshake, which is valid
-       for that host, as described in Section 4.2, "Recipient MTA
+   2.  The recipient mail server supports STARTTLS and offers a PKIX-
+       based TLS certificate, during TLS handshake, which is valid for
+       that host, as described in Section 4.2, "Recipient MTA
        Certificate Validation".
 
-   This section does not dictate the behavior of sending MTAs when
-   policies fail to validate; see Section 5, "Policy Application" for a
-   description of sending MTA behavior when policy validation fails.
+   When these conditions are not met, a policy is said to fail to
+   validate.  This section does not dictate the behavior of sending MTAs
+   when the above conditions are not met; see Section 5, "Policy
+   Application" for a description of sending MTA behavior when policy
+   validation fails.
 
 4.1.  MX Host Validation
 
@@ -551,7 +552,6 @@ Internet-Draft                   MTA-STS                        May 2018
    may only be used to match the entire left-most label in the presented
    identifier.  Thus the mx pattern "*.example.com" matches
    "mail.example.com" but not "example.com" or "foo.bar.example.com".
-
 
 
 
@@ -887,7 +887,7 @@ Internet-Draft                   MTA-STS                        May 2018
 
    SMTP MTA Strict Transport Security attempts to protect against an
    active attacker trying to intercept or tamper with mail between hosts
-   who support STARTTLS.  There are two classes of attacks considered:
+   that support STARTTLS.  There are two classes of attacks considered:
 
 
 
