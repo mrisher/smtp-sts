@@ -225,13 +225,14 @@ This resource contains the following CRLF-separated key/value pairs:
   
   indicates that mail for this domain might be handled by MX `mail.example.com`
   or any MX at `example.net`.  Valid patterns can be either fully specified
-  names (`example.com`) or suffixes prefixed by a wildcard (`*.example.net`)
-  matching the right-hand parts of a server's identity.  If there are more than
-  one MX specified by the policy, they MUST be on separate lines within the
-  policy file.  In the case of Internationalized Domain Names ([@?RFC5891]), the
-  MX MUST specify the Punycode-encoded A-label [@!RFC3492] and not the
-  Unicode-encoded U-label.  The full semantics of certificate validation are
-  described in (#mx-host-validation), "MX Host Validation."
+  names (`example.com`) or suffixes prefixed by a wildcard (`*.example.net`).
+  If a policy specifies more than one MX, each MX MUST have its own `mx:` key,
+  and each MX key/value pair MUST be on its own line in the policy file.  In the
+  case of Internationalized Domain Names ([@?RFC5891]), the `mx` value MUST
+  specify the Punycode-encoded A-label [@!RFC3492] to match against, and not the
+  Unicode-encoded U-label.  The full semantics of certificate validation
+  (including the use of wildcard patterns) are described in
+  (#mx-host-validation), "MX Host Validation."
 
 An example policy is as below:
 
@@ -614,16 +615,9 @@ usual, and treat invalid candidates as though they were unreachable (i.e., as
 though there were some transient error when trying to deliver to that
 candidate).
 
-One consequence of maintaining MX candidate traversal order is that `report`-mode
-policies may show failures even if a message would, in `enforce`-mode,
-successfully be delivered. Consider the case of a domain with a higher-priority
-MX which is MTA-STS invalid and a lower-priority MX which is valid. In `report`
-mode, mail will be delivered to the higher-priority (invalid) host, but generate
-failure reports; in `enforce` mode, mail will successfully be delivered to the
-lower-priority (valid) host.
-
-Similarly, if a higher-priority MX is MTA-STS valid and a lower-priority MX is
-not, senders may never, in normal operation, encounter the lower-priority MX,
+One consequence of validating MX hosts in order of ordinary candidate traversal
+is that, in the event that a higher-priority MX is MTA-STS valid and a
+lower-priority MX is not, senders may never encounter the lower-priority MX,
 leading to a risk that policy misconfigurations that apply only to "backup" MXes
 may only be discovered in the case of primary MX failure.
 

@@ -93,16 +93,16 @@ Table of Contents
      9.1.  Well-Known URIs Registry  . . . . . . . . . . . . . . . .  16
      9.2.  MTA-STS TXT Record Fields . . . . . . . . . . . . . . . .  16
      9.3.  MTA-STS Policy Fields . . . . . . . . . . . . . . . . . .  16
-   10. Security Considerations . . . . . . . . . . . . . . . . . . .  17
+   10. Security Considerations . . . . . . . . . . . . . . . . . . .  16
      10.1.  Obtaining a Signed Certificate . . . . . . . . . . . . .  17
      10.2.  Preventing Policy Discovery  . . . . . . . . . . . . . .  17
      10.3.  Denial of Service  . . . . . . . . . . . . . . . . . . .  18
      10.4.  Weak Policy Constraints  . . . . . . . . . . . . . . . .  19
      10.5.  Compromise of the Web PKI System . . . . . . . . . . . .  19
-   11. Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  20
+   11. Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  19
    12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  20
      12.1.  Normative References . . . . . . . . . . . . . . . . . .  20
-     12.2.  Informative References . . . . . . . . . . . . . . . . .  22
+     12.2.  Informative References . . . . . . . . . . . . . . . . .  21
    Appendix A.  MTA-STS example record & policy  . . . . . . . . . .  22
    Appendix B.  Message delivery pseudocode  . . . . . . . . . . . .  23
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  25
@@ -325,11 +325,11 @@ Internet-Draft                   MTA-STS                        May 2018
    indicates that mail for this domain might be handled by MX
    "mail.example.com" or any MX at "example.net".  Valid patterns can be
    either fully specified names ("example.com") or suffixes prefixed by
-   a wildcard ("*.example.net") matching the right-hand parts of a
-   server's identity.  If there are more than one MX specified by the
-   policy, they MUST be on separate lines within the policy file.  In
-   the case of Internationalized Domain Names ([RFC5891]), the MX MUST
-   specify the Punycode-encoded A-label [RFC3492] and not the Unicode-
+   a wildcard ("*.example.net").  If a policy specifies more than one
+   MX, each MX MUST have its own "mx:" key, and each MX key/value pair
+   MUST be on its own line in the policy file.  In the case of
+   Internationalized Domain Names ([RFC5891]), the "mx" value MUST
+   specify the Punycode-encoded A-label [RFC3492] to match against, and
 
 
 
@@ -338,8 +338,9 @@ Margolis, et al.        Expires November 3, 2018                [Page 6]
 Internet-Draft                   MTA-STS                        May 2018
 
 
-   encoded U-label.  The full semantics of certificate validation are
-   described in Section 4.1, "MX Host Validation."
+   not the Unicode-encoded U-label.  The full semantics of certificate
+   validation (including the use of wildcard patterns) are described in
+   Section 4.1, "MX Host Validation."
 
    An example policy is as below:
 
@@ -385,7 +386,6 @@ Internet-Draft                   MTA-STS                        May 2018
 
    sts-policy-mx            = sts-policy-mx-field field-delim
                               sts-policy-mx-value
-
 
 
 
@@ -824,14 +824,14 @@ Internet-Draft                   MTA-STS                        May 2018
    unreachable (i.e., as though there were some transient error when
    trying to deliver to that candidate).
 
-   One consequence of maintaining MX candidate traversal order is that
-   "report"-mode policies may show failures even if a message would, in
-   "enforce"-mode, successfully be delivered.  Consider the case of a
-   domain with a higher-priority MX which is MTA-STS invalid and a
-   lower-priority MX which is valid.  In "report" mode, mail will be
-   delivered to the higher-priority (invalid) host, but generate failure
-   reports; in "enforce" mode, mail will successfully be delivered to
-   the lower-priority (valid) host.
+   One consequence of validating MX hosts in order of ordinary candidate
+   traversal is that, in the event that a higher-priority MX is MTA-STS
+   valid and a lower-priority MX is not, senders may never encounter the
+   lower-priority MX, leading to a risk that policy misconfigurations
+   that apply only to "backup" MXes may only be discovered in the case
+   of primary MX failure.
+
+
 
 
 
@@ -841,12 +841,6 @@ Margolis, et al.        Expires November 3, 2018               [Page 15]
 
 Internet-Draft                   MTA-STS                        May 2018
 
-
-   Similarly, if a higher-priority MX is MTA-STS valid and a lower-
-   priority MX is not, senders may never, in normal operation, encounter
-   the lower-priority MX, leading to a risk that policy
-   misconfigurations that apply only to "backup" MXes may only be
-   discovered in the case of primary MX failure.
 
 9.  IANA Considerations
 
@@ -889,6 +883,12 @@ Internet-Draft                   MTA-STS                        May 2018
    New fields are added to this registry using IANA's "Expert Review"
    policy.
 
+10.  Security Considerations
+
+   SMTP MTA Strict Transport Security attempts to protect against an
+   active attacker who wishes to intercept or tamper with mail between
+   hosts who support STARTTLS.  There are two classes of attacks
+   considered:
 
 
 
@@ -897,13 +897,6 @@ Margolis, et al.        Expires November 3, 2018               [Page 16]
 
 Internet-Draft                   MTA-STS                        May 2018
 
-
-10.  Security Considerations
-
-   SMTP MTA Strict Transport Security attempts to protect against an
-   active attacker who wishes to intercept or tamper with mail between
-   hosts who support STARTTLS.  There are two classes of attacks
-   considered:
 
    o  Foiling TLS negotiation, for example by deleting the "250
       STARTTLS" response from a server or altering TLS session
@@ -946,6 +939,13 @@ Internet-Draft                   MTA-STS                        May 2018
    to foil policy discovery and effectively downgrade the security of
    the message delivery.
 
+   Since this attack depends upon intercepting initial policy discovery,
+   we strongly recommend implementers to prefer policy "max_age" values
+   to be as long as is practical.
+
+   Because this attack is also possible upon refresh of a cached policy,
+   we suggest implementers do not wait until a cached policy has expired
+   before checking for an update; if senders attempt to refresh the
 
 
 
@@ -954,13 +954,6 @@ Margolis, et al.        Expires November 3, 2018               [Page 17]
 Internet-Draft                   MTA-STS                        May 2018
 
 
-   Since this attack depends upon intercepting initial policy discovery,
-   we strongly recommend implementers to prefer policy "max_age" values
-   to be as long as is practical.
-
-   Because this attack is also possible upon refresh of a cached policy,
-   we suggest implementers do not wait until a cached policy has expired
-   before checking for an update; if senders attempt to refresh the
    cache regularly (for example, by fetching currently live policy in a
    background task that runs daily or weekly, regardless of the state of
    the "_mta_sts" TXT record, and updating their cache's "max age"
@@ -1002,6 +995,13 @@ Internet-Draft                   MTA-STS                        May 2018
    allow untrusted users to serve untrusted content on user-specified
    subdomains.  In some cases (e.g., the service Tumblr.com) this takes
    the form of providing HTTPS hosting of user-registered subdomains; in
+   other cases (e.g. dynamic DNS providers) this takes the form of
+   allowing untrusted users to register custom DNS records at the
+   provider's domain.
+
+   In these cases, there is a risk that untrusted users would be able to
+   serve custom content at the "mta-sts" host, including serving an
+   illegitimate MTA-STS policy.  We believe this attack is rendered more
 
 
 
@@ -1010,13 +1010,6 @@ Margolis, et al.        Expires November 3, 2018               [Page 18]
 Internet-Draft                   MTA-STS                        May 2018
 
 
-   other cases (e.g. dynamic DNS providers) this takes the form of
-   allowing untrusted users to register custom DNS records at the
-   provider's domain.
-
-   In these cases, there is a risk that untrusted users would be able to
-   serve custom content at the "mta-sts" host, including serving an
-   illegitimate MTA-STS policy.  We believe this attack is rendered more
    difficult by the need for the attacker to also serve the "_mta-sts"
    TXT record on the same domain--something not, to our knowledge,
    widely provided to untrusted users.  This attack is additionally
@@ -1058,6 +1051,13 @@ Internet-Draft                   MTA-STS                        May 2018
    MTA-STS to implement revocation mechanisms which are most applicable
    to their implementations.
 
+11.  Contributors
+
+   Wei Chuang Google, Inc weihaw (at) google (dot com)
+
+   Viktor Dukhovni ietf-dane (at) dukhovni (dot org)
+
+
 
 
 
@@ -1065,12 +1065,6 @@ Margolis, et al.        Expires November 3, 2018               [Page 19]
 
 Internet-Draft                   MTA-STS                        May 2018
 
-
-11.  Contributors
-
-   Wei Chuang Google, Inc weihaw (at) google (dot com)
-
-   Viktor Dukhovni ietf-dane (at) dukhovni (dot org)
 
    Markus Laber 1&1 Mail & Media Development & Technology GmbH
    markus.laber (at) 1und1 (dot de)
@@ -1111,6 +1105,12 @@ Internet-Draft                   MTA-STS                        May 2018
               (IDNA)", RFC 3492, DOI 10.17487/RFC3492, March 2003,
               <https://www.rfc-editor.org/info/rfc3492>.
 
+   [RFC5246]  Dierks, T. and E. Rescorla, "The Transport Layer Security
+              (TLS) Protocol Version 1.2", RFC 5246,
+              DOI 10.17487/RFC5246, August 2008, <https://www.rfc-
+              editor.org/info/rfc5246>.
+
+
 
 
 
@@ -1121,11 +1121,6 @@ Margolis, et al.        Expires November 3, 2018               [Page 20]
 
 Internet-Draft                   MTA-STS                        May 2018
 
-
-   [RFC5246]  Dierks, T. and E. Rescorla, "The Transport Layer Security
-              (TLS) Protocol Version 1.2", RFC 5246,
-              DOI 10.17487/RFC5246, August 2008, <https://www.rfc-
-              editor.org/info/rfc5246>.
 
    [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
               Housley, R., and W. Polk, "Internet X.509 Public Key
@@ -1168,7 +1163,12 @@ Internet-Draft                   MTA-STS                        May 2018
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/info/rfc8174>.
 
+12.2.  Informative References
 
+   [RFC4033]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
+              Rose, "DNS Security Introduction and Requirements",
+              RFC 4033, DOI 10.17487/RFC4033, March 2005,
+              <https://www.rfc-editor.org/info/rfc4033>.
 
 
 
@@ -1177,13 +1177,6 @@ Margolis, et al.        Expires November 3, 2018               [Page 21]
 
 Internet-Draft                   MTA-STS                        May 2018
 
-
-12.2.  Informative References
-
-   [RFC4033]  Arends, R., Austein, R., Larson, M., Massey, D., and S.
-              Rose, "DNS Security Introduction and Requirements",
-              RFC 4033, DOI 10.17487/RFC4033, March 2005,
-              <https://www.rfc-editor.org/info/rfc4033>.
 
    [RFC5322]  Resnick, P., Ed., "Internet Message Format", RFC 5322,
               DOI 10.17487/RFC5322, October 2008, <https://www.rfc-
@@ -1227,17 +1220,19 @@ Appendix A.  MTA-STS example record & policy
 
    MTA-STS policy indicator TXT RR:
 
+       _mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
+
+   MTA-STS Policy file served as the response body at "https://mta-
+   sts.example.com/.well-known/mta-sts.txt":
+
+
+
 
 
 Margolis, et al.        Expires November 3, 2018               [Page 22]
 
 Internet-Draft                   MTA-STS                        May 2018
 
-
-       _mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
-
-   MTA-STS Policy file served as the response body at "https://mta-
-   sts.example.com/.well-known/mta-sts.txt":
 
                          version: STSv1
                          mode: testing
@@ -1282,6 +1277,11 @@ func policyMatches(candidate, policy) {
       return true
     }
     // Wildcard matches only the leftmost label.
+    // Wildcards must always be followed by a '.'.
+    if mx[0] == '*' {
+      parts = SplitN(candidate, '.', 2)  // Split on the first '.'.
+      if len(parts) > 1 && parts[1] == mx[2:] {
+        return true
 
 
 
@@ -1290,11 +1290,6 @@ Margolis, et al.        Expires November 3, 2018               [Page 23]
 Internet-Draft                   MTA-STS                        May 2018
 
 
-    // Wildcards must always be followed by a '.'.
-    if mx[0] == '*' {
-      parts = SplitN(candidate, '.', 2)  // Split on the first '.'.
-      if len(parts) > 1 && parts[1] == mx[2:] {
-        return true
       }
     }
   }
@@ -1338,6 +1333,11 @@ func tryMxAccordingTo(message, mx, policy) {
   } else if !certMatches(connection, policy) {
     secure = false
     reportError(E_CERT_MISMATCH)
+  }
+  if secure || !isEnforce(policy) {
+    return tryDeliverMail(connection, message)
+  }
+  return false
 
 
 
@@ -1346,11 +1346,6 @@ Margolis, et al.        Expires November 3, 2018               [Page 24]
 Internet-Draft                   MTA-STS                        May 2018
 
 
-  }
-  if secure || !isEnforce(policy) {
-    return tryDeliverMail(connection, message)
-  }
-  return false
 }
 
 func tryWithPolicy(message, domain, policy) {
@@ -1392,6 +1387,11 @@ Authors' Addresses
    Email: risher (at) google (dot com)
 
 
+   Binu Ramakrishnan
+   Yahoo!, Inc
+
+   Email: rbinu (at) yahoo-inc (dot com)
+
 
 
 
@@ -1400,12 +1400,6 @@ Authors' Addresses
 Margolis, et al.        Expires November 3, 2018               [Page 25]
 
 Internet-Draft                   MTA-STS                        May 2018
-
-
-   Binu Ramakrishnan
-   Yahoo!, Inc
-
-   Email: rbinu (at) yahoo-inc (dot com)
 
 
    Alexander Brotman
@@ -1418,6 +1412,12 @@ Internet-Draft                   MTA-STS                        May 2018
    Microsoft, Inc
 
    Email: janet.jones (at) microsoft (dot com)
+
+
+
+
+
+
 
 
 

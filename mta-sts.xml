@@ -290,13 +290,14 @@ the Policy Domain.  As an example,</t>
 </artwork></figure>
 <t>indicates that mail for this domain might be handled by MX <spanx style="verb">mail.example.com</spanx>
   or any MX at <spanx style="verb">example.net</spanx>.  Valid patterns can be either fully specified
-  names (<spanx style="verb">example.com</spanx>) or suffixes prefixed by a wildcard (<spanx style="verb">*.example.net</spanx>)
-  matching the right-hand parts of a server's identity.  If there are more than
-  one MX specified by the policy, they MUST be on separate lines within the
-  policy file.  In the case of Internationalized Domain Names (<xref target="RFC5891"/>), the
-  MX MUST specify the Punycode-encoded A-label <xref target="RFC3492"/> and not the
-  Unicode-encoded U-label.  The full semantics of certificate validation are
-  described in <xref target="mx-host-validation"/>, &quot;MX Host Validation.&quot;
+  names (<spanx style="verb">example.com</spanx>) or suffixes prefixed by a wildcard (<spanx style="verb">*.example.net</spanx>).
+  If a policy specifies more than one MX, each MX MUST have its own <spanx style="verb">mx:</spanx> key,
+  and each MX key/value pair MUST be on its own line in the policy file.  In the
+  case of Internationalized Domain Names (<xref target="RFC5891"/>), the <spanx style="verb">mx</spanx> value MUST
+  specify the Punycode-encoded A-label <xref target="RFC3492"/> to match against, and not the
+  Unicode-encoded U-label.  The full semantics of certificate validation
+  (including the use of wildcard patterns) are described in
+  <xref target="mx-host-validation"/>, &quot;MX Host Validation.&quot;
 </t>
 <t>An example policy is as below:
 </t>
@@ -711,16 +712,9 @@ usual, and treat invalid candidates as though they were unreachable (i.e., as
 though there were some transient error when trying to deliver to that
 candidate).
 </t>
-<t>One consequence of maintaining MX candidate traversal order is that <spanx style="verb">report</spanx>-mode
-policies may show failures even if a message would, in <spanx style="verb">enforce</spanx>-mode,
-successfully be delivered. Consider the case of a domain with a higher-priority
-MX which is MTA-STS invalid and a lower-priority MX which is valid. In <spanx style="verb">report</spanx>
-mode, mail will be delivered to the higher-priority (invalid) host, but generate
-failure reports; in <spanx style="verb">enforce</spanx> mode, mail will successfully be delivered to the
-lower-priority (valid) host.
-</t>
-<t>Similarly, if a higher-priority MX is MTA-STS valid and a lower-priority MX is
-not, senders may never, in normal operation, encounter the lower-priority MX,
+<t>One consequence of validating MX hosts in order of ordinary candidate traversal
+is that, in the event that a higher-priority MX is MTA-STS valid and a
+lower-priority MX is not, senders may never encounter the lower-priority MX,
 leading to a risk that policy misconfigurations that apply only to &quot;backup&quot; MXes
 may only be discovered in the case of primary MX failure.
 </t>
