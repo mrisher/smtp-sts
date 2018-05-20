@@ -5,17 +5,17 @@
 Using TLS in Applications                                    D. Margolis
 Internet-Draft                                                 M. Risher
 Intended status: Standards Track                             Google, Inc
-Expires: November 3, 2018                                B. Ramakrishnan
+Expires: November 21, 2018                               B. Ramakrishnan
                                                              Yahoo!, Inc
                                                               A. Brotman
                                                             Comcast, Inc
                                                                 J. Jones
                                                           Microsoft, Inc
-                                                             May 2, 2018
+                                                            May 20, 2018
 
 
               SMTP MTA Strict Transport Security (MTA-STS)
-                       draft-ietf-uta-mta-sts-17
+                       draft-ietf-uta-mta-sts-18
 
 Abstract
 
@@ -40,7 +40,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on November 3, 2018.
+   This Internet-Draft will expire on November 21, 2018.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Margolis, et al.        Expires November 3, 2018                [Page 1]
+Margolis, et al.        Expires November 21, 2018               [Page 1]
 
 Internet-Draft                   MTA-STS                        May 2018
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Margolis, et al.        Expires November 3, 2018                [Page 2]
+Margolis, et al.        Expires November 21, 2018               [Page 2]
 
 Internet-Draft                   MTA-STS                        May 2018
 
@@ -165,7 +165,7 @@ Internet-Draft                   MTA-STS                        May 2018
 
 
 
-Margolis, et al.        Expires November 3, 2018                [Page 3]
+Margolis, et al.        Expires November 21, 2018               [Page 3]
 
 Internet-Draft                   MTA-STS                        May 2018
 
@@ -221,7 +221,7 @@ Internet-Draft                   MTA-STS                        May 2018
 
 
 
-Margolis, et al.        Expires November 3, 2018                [Page 4]
+Margolis, et al.        Expires November 21, 2018               [Page 4]
 
 Internet-Draft                   MTA-STS                        May 2018
 
@@ -277,7 +277,7 @@ Internet-Draft                   MTA-STS                        May 2018
 
 
 
-Margolis, et al.        Expires November 3, 2018                [Page 5]
+Margolis, et al.        Expires November 21, 2018               [Page 5]
 
 Internet-Draft                   MTA-STS                        May 2018
 
@@ -333,7 +333,7 @@ Internet-Draft                   MTA-STS                        May 2018
 
 
 
-Margolis, et al.        Expires November 3, 2018                [Page 6]
+Margolis, et al.        Expires November 21, 2018               [Page 6]
 
 Internet-Draft                   MTA-STS                        May 2018
 
@@ -389,7 +389,7 @@ Internet-Draft                   MTA-STS                        May 2018
 
 
 
-Margolis, et al.        Expires November 3, 2018                [Page 7]
+Margolis, et al.        Expires November 21, 2018               [Page 7]
 
 Internet-Draft                   MTA-STS                        May 2018
 
@@ -445,7 +445,7 @@ Internet-Draft                   MTA-STS                        May 2018
 
 
 
-Margolis, et al.        Expires November 3, 2018                [Page 8]
+Margolis, et al.        Expires November 21, 2018               [Page 8]
 
 Internet-Draft                   MTA-STS                        May 2018
 
@@ -501,7 +501,7 @@ Internet-Draft                   MTA-STS                        May 2018
 
 
 
-Margolis, et al.        Expires November 3, 2018                [Page 9]
+Margolis, et al.        Expires November 21, 2018               [Page 9]
 
 Internet-Draft                   MTA-STS                        May 2018
 
@@ -557,7 +557,7 @@ Internet-Draft                   MTA-STS                        May 2018
 
 
 
-Margolis, et al.        Expires November 3, 2018               [Page 10]
+Margolis, et al.        Expires November 21, 2018              [Page 10]
 
 Internet-Draft                   MTA-STS                        May 2018
 
@@ -613,7 +613,7 @@ Internet-Draft                   MTA-STS                        May 2018
 
 
 
-Margolis, et al.        Expires November 3, 2018               [Page 11]
+Margolis, et al.        Expires November 21, 2018              [Page 11]
 
 Internet-Draft                   MTA-STS                        May 2018
 
@@ -669,7 +669,7 @@ Internet-Draft                   MTA-STS                        May 2018
 
 
 
-Margolis, et al.        Expires November 3, 2018               [Page 12]
+Margolis, et al.        Expires November 21, 2018              [Page 12]
 
 Internet-Draft                   MTA-STS                        May 2018
 
@@ -725,7 +725,7 @@ Internet-Draft                   MTA-STS                        May 2018
 
 
 
-Margolis, et al.        Expires November 3, 2018               [Page 13]
+Margolis, et al.        Expires November 21, 2018              [Page 13]
 
 Internet-Draft                   MTA-STS                        May 2018
 
@@ -781,7 +781,7 @@ Internet-Draft                   MTA-STS                        May 2018
 
 
 
-Margolis, et al.        Expires November 3, 2018               [Page 14]
+Margolis, et al.        Expires November 21, 2018              [Page 14]
 
 Internet-Draft                   MTA-STS                        May 2018
 
@@ -837,7 +837,7 @@ Internet-Draft                   MTA-STS                        May 2018
 
 
 
-Margolis, et al.        Expires November 3, 2018               [Page 15]
+Margolis, et al.        Expires November 21, 2018              [Page 15]
 
 Internet-Draft                   MTA-STS                        May 2018
 
@@ -893,7 +893,7 @@ Internet-Draft                   MTA-STS                        May 2018
 
 
 
-Margolis, et al.        Expires November 3, 2018               [Page 16]
+Margolis, et al.        Expires November 21, 2018              [Page 16]
 
 Internet-Draft                   MTA-STS                        May 2018
 
@@ -949,7 +949,7 @@ Internet-Draft                   MTA-STS                        May 2018
 
 
 
-Margolis, et al.        Expires November 3, 2018               [Page 17]
+Margolis, et al.        Expires November 21, 2018              [Page 17]
 
 Internet-Draft                   MTA-STS                        May 2018
 
@@ -1005,7 +1005,7 @@ Internet-Draft                   MTA-STS                        May 2018
 
 
 
-Margolis, et al.        Expires November 3, 2018               [Page 18]
+Margolis, et al.        Expires November 21, 2018              [Page 18]
 
 Internet-Draft                   MTA-STS                        May 2018
 
@@ -1053,30 +1053,30 @@ Internet-Draft                   MTA-STS                        May 2018
 
 11.  Contributors
 
-   Wei Chuang Google, Inc weihaw (at) google (dot com)
+   Wei Chuang Google, Inc weihaw@google.com
 
-   Viktor Dukhovni ietf-dane (at) dukhovni (dot org)
-
-
+   Viktor Dukhovni ietf-dane@dukhovni.de
 
 
 
-Margolis, et al.        Expires November 3, 2018               [Page 19]
+
+
+Margolis, et al.        Expires November 21, 2018              [Page 19]
 
 Internet-Draft                   MTA-STS                        May 2018
 
 
    Markus Laber 1&1 Mail & Media Development & Technology GmbH
-   markus.laber (at) 1und1 (dot de)
+   markus.laber@1und1.de
 
-   Nicolas Lidzborski Google, Inc nlidz (at) google (dot com)
+   Nicolas Lidzborski Google, Inc nlidz@google.com
 
-   Brandon Long Google, Inc blong (at) google (dot com)
+   Brandon Long Google, Inc blong@google.com
 
-   Franck Martin LinkedIn, Inc fmartin (at) linkedin (dot com)
+   Franck Martin LinkedIn, Inc fmartin@linkedin.com
 
    Klaus Umbach 1&1 Mail & Media Development & Technology GmbH
-   klaus.umbach (at) 1und1 (dot de)
+   klaus.umbach@1und1.de
 
 12.  References
 
@@ -1117,7 +1117,7 @@ Internet-Draft                   MTA-STS                        May 2018
 
 
 
-Margolis, et al.        Expires November 3, 2018               [Page 20]
+Margolis, et al.        Expires November 21, 2018              [Page 20]
 
 Internet-Draft                   MTA-STS                        May 2018
 
@@ -1173,7 +1173,7 @@ Internet-Draft                   MTA-STS                        May 2018
 
 
 
-Margolis, et al.        Expires November 3, 2018               [Page 21]
+Margolis, et al.        Expires November 21, 2018              [Page 21]
 
 Internet-Draft                   MTA-STS                        May 2018
 
@@ -1229,7 +1229,7 @@ Appendix A.  MTA-STS example record & policy
 
 
 
-Margolis, et al.        Expires November 3, 2018               [Page 22]
+Margolis, et al.        Expires November 21, 2018              [Page 22]
 
 Internet-Draft                   MTA-STS                        May 2018
 
@@ -1285,7 +1285,7 @@ func policyMatches(candidate, policy) {
 
 
 
-Margolis, et al.        Expires November 3, 2018               [Page 23]
+Margolis, et al.        Expires November 21, 2018              [Page 23]
 
 Internet-Draft                   MTA-STS                        May 2018
 
@@ -1341,7 +1341,7 @@ func tryMxAccordingTo(message, mx, policy) {
 
 
 
-Margolis, et al.        Expires November 3, 2018               [Page 24]
+Margolis, et al.        Expires November 21, 2018              [Page 24]
 
 Internet-Draft                   MTA-STS                        May 2018
 
@@ -1378,26 +1378,26 @@ Authors' Addresses
    Daniel Margolis
    Google, Inc
 
-   Email: dmargolis (at) google (dot com)
+   Email: dmargolis@google.com
 
 
    Mark Risher
    Google, Inc
 
-   Email: risher (at) google (dot com)
+   Email: risher@google.com
 
 
    Binu Ramakrishnan
    Yahoo!, Inc
 
-   Email: rbinu (at) yahoo-inc (dot com)
+   Email: rbinu@yahoo-inc.com
 
 
 
 
 
 
-Margolis, et al.        Expires November 3, 2018               [Page 25]
+Margolis, et al.        Expires November 21, 2018              [Page 25]
 
 Internet-Draft                   MTA-STS                        May 2018
 
@@ -1411,7 +1411,7 @@ Internet-Draft                   MTA-STS                        May 2018
    Janet Jones
    Microsoft, Inc
 
-   Email: janet.jones (at) microsoft (dot com)
+   Email: janet.jones@microsoft.com
 
 
 
@@ -1453,4 +1453,4 @@ Internet-Draft                   MTA-STS                        May 2018
 
 
 
-Margolis, et al.        Expires November 3, 2018               [Page 26]
+Margolis, et al.        Expires November 21, 2018              [Page 26]

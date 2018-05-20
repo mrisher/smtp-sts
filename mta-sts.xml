@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE rfc SYSTEM 'rfc2629.dtd' []>
-<rfc ipr="trust200902" category="std" docName="draft-ietf-uta-mta-sts-17">
+<rfc ipr="trust200902" category="std" docName="draft-ietf-uta-mta-sts-18">
 <?rfc toc="yes"?>
 <?rfc symrefs="yes"?>
 <?rfc sortrefs="yes"?>
@@ -23,7 +23,7 @@
 <region></region>
 </postal>
 <phone></phone>
-<email>dmargolis (at) google (dot com)</email>
+<email>dmargolis@google.com</email>
 <uri></uri>
 </address>
 </author>
@@ -38,7 +38,7 @@
 <region></region>
 </postal>
 <phone></phone>
-<email>risher (at) google (dot com)</email>
+<email>risher@google.com</email>
 <uri></uri>
 </address>
 </author>
@@ -53,7 +53,7 @@
 <region></region>
 </postal>
 <phone></phone>
-<email>rbinu (at) yahoo-inc (dot com)</email>
+<email>rbinu@yahoo-inc.com</email>
 <uri></uri>
 </address>
 </author>
@@ -83,11 +83,11 @@
 <region></region>
 </postal>
 <phone></phone>
-<email>janet.jones (at) microsoft (dot com)</email>
+<email>janet.jones@microsoft.com</email>
 <uri></uri>
 </address>
 </author>
-<date year="2018" month="May" day="2"/>
+<date year="2018" month="May" day="20"/>
 
 <area>Applications</area>
 <workgroup>Using TLS in Applications</workgroup>
@@ -907,30 +907,30 @@ which are most applicable to their implementations.
 <section anchor="contributors" title="Contributors">
 <t>Wei Chuang
 Google, Inc
-weihaw (at) google (dot com)
+weihaw@google.com
 </t>
 <t>Viktor Dukhovni
-ietf-dane (at) dukhovni (dot org)
+ietf-dane@dukhovni.de
 </t>
 <t>Markus Laber
 1&amp;1 Mail &amp; Media Development &amp; Technology GmbH
-markus.laber (at) 1und1 (dot de)
+markus.laber@1und1.de
 </t>
 <t>Nicolas Lidzborski
 Google, Inc
-nlidz (at) google (dot com)
+nlidz@google.com
 </t>
 <t>Brandon Long
 Google, Inc
-blong (at) google (dot com)
+blong@google.com
 </t>
 <t>Franck Martin
 LinkedIn, Inc
-fmartin (at) linkedin (dot com)
+fmartin@linkedin.com
 </t>
 <t>Klaus Umbach
 1&amp;1 Mail &amp; Media Development &amp; Technology GmbH
-klaus.umbach (at) 1und1 (dot de)
+klaus.umbach@1und1.de
 </t>
 </section>
 

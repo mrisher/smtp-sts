@@ -3,13 +3,13 @@
    Title = "SMTP MTA Strict Transport Security (MTA-STS)"
    abbrev = "MTA-STS"
    category = "std"
-   docName = "draft-ietf-uta-mta-sts-17"
+   docName = "draft-ietf-uta-mta-sts-18"
    ipr = "trust200902"
    area = "Applications"
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2018-05-02T00:00:00Z
+   date = 2018-05-20T00:00:00Z
 
    [[author]]
    initials="D."
@@ -17,21 +17,21 @@
    fullname="Daniel Margolis"
    organization="Google, Inc"
      [author.address]
-     email="dmargolis (at) google (dot com)"
+     email="dmargolis@google.com"
    [[author]]
    initials="M."
    surname="Risher"
    fullname="Mark Risher"
    organization="Google, Inc"
      [author.address]
-     email="risher (at) google (dot com)"
+     email="risher@google.com"
    [[author]]
    initials="B."
    surname="Ramakrishnan"
    fullname="Binu Ramakrishnan"
    organization="Yahoo!, Inc"
      [author.address]
-     email="rbinu (at) yahoo-inc (dot com)"
+     email="rbinu@yahoo-inc.com"
    [[author]]
    initials="A."
    surname="Brotman"
@@ -45,7 +45,7 @@
    fullname="Janet Jones"
    organization="Microsoft, Inc"
      [author.address]
-     email="janet.jones (at) microsoft (dot com)"
+     email="janet.jones@microsoft.com"
 
 %%%
 
@@ -790,30 +790,30 @@ which are most applicable to their implementations.
 
 Wei Chuang
 Google, Inc
-weihaw (at) google (dot com)
+weihaw@google.com
 
 Viktor Dukhovni
-ietf-dane (at) dukhovni (dot org)
+ietf-dane@dukhovni.de
 
 Markus Laber
 1&1 Mail & Media Development & Technology GmbH
-markus.laber (at) 1und1 (dot de)
+markus.laber@1und1.de
 
 Nicolas Lidzborski
 Google, Inc
-nlidz (at) google (dot com)
+nlidz@google.com
 
 Brandon Long
 Google, Inc
-blong (at) google (dot com)
+blong@google.com
 
 Franck Martin
 LinkedIn, Inc
-fmartin (at) linkedin (dot com)
+fmartin@linkedin.com
 
 Klaus Umbach
 1&1 Mail & Media Development & Technology GmbH
-klaus.umbach (at) 1und1 (dot de)
+klaus.umbach@1und1.de
 
 {backmatter}
 
