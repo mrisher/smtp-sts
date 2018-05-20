@@ -347,9 +347,9 @@ HTTP 3xx redirects MUST NOT be followed, and HTTP caching (as specified in
 
 Senders may wish to rate-limit the frequency of attempts to fetch the HTTPS
 endpoint even if a valid TXT record for the recipient domain exists.  In the
-case that the HTTPS GET fails, we suggest implementions may limit further
-attempts to a period of five minutes or longer per version ID, to avoid
-overwhelming resource-constrained recipients with cascading failures.
+case that the HTTPS GET fails, we implementions SHOULD limit further attempts to
+a period of five minutes or longer per version ID, to avoid overwhelming
+resource-constrained recipients with cascading failures.
 
 Senders MAY impose a timeout on the HTTPS GET and/or a limit on the maximum size
 of the response body to avoid long delays or resource exhaustion during
@@ -528,12 +528,12 @@ TXT record's TTL has passed.
 In other words, a sender who is unable to successfully deliver a message while
 applying a cache of the recipient's now-outdated policy may be unable to
 discover that a new policy exists until the DNS TTL has passed.  Recipients
-should therefore ensure that old policies continue to work for message delivery
+SHOULD therefore ensure that old policies continue to work for message delivery
 during this period of time, or risk message delays.
 
-Recipients should also prefer to update the HTTPS policy body before updating
-the TXT record; this ordering avoids the risk that senders, seeing a new TXT
-record, mistakenly cache the old policy from HTTPS.
+Recipients SHOULD also update the HTTPS policy body before updating the TXT
+record; this ordering avoids the risk that senders, seeing a new TXT record,
+mistakenly cache the old policy from HTTPS.
 
 ## Policy Delegation
 
@@ -699,20 +699,20 @@ inducing a sending domain to send mail to a never-before-contacted recipient
 while carrying out a man-in-the-middle attack--may be able to foil policy
 discovery and effectively downgrade the security of the message delivery.
 
-Since this attack depends upon intercepting initial policy discovery, we
-strongly recommend implementers to prefer policy `max_age` values to be as long
-as is practical.
+Since this attack depends upon intercepting initial policy discovery,
+implementers SHOULD prefer policy `max_age` values to be as long as is
+practical.
 
-Because this attack is also possible upon refresh of a cached policy, we suggest
-implementers do not wait until a cached policy has expired before checking for
-an update; if senders attempt to refresh the cache regularly (for example, by
-fetching currently live policy in a background task that runs daily or weekly,
-regardless of the state of the `_mta_sts` TXT record, and updating their cache's
-"max age" accordingly), an attacker would have to foil policy discovery
+Because this attack is also possible upon refresh of a cached policy,
+implementors SHOULD NOT wait until a cached policy has expired before checking
+for an update; if senders attempt to refresh the cache regularly (for example,
+by fetching currently live policy in a background task that runs daily or
+weekly, regardless of the state of the `_mta_sts` TXT record, and updating their
+cache's "max age" accordingly), an attacker would have to foil policy discovery
 consistently over the lifetime of a cached policy to prevent a successful
 refresh.
 
-Additionally, MTAs should alert administrators to repeated policy refresh
+Additionally, MTAs SHOULD alert administrators to repeated policy refresh
 failures long before cached policies expire (through warning logs or similar
 applicable mechanisms), allowing administrators to detect such a persistent
 attack on policy refresh.  (However, they should not implement such alerts if
