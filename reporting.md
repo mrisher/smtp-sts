@@ -290,48 +290,50 @@ delivered after some delay, perhaps several hours.
 As an example, a sending site might want to introduce a random delay of up 
 to four hours:
 
-func generate_sleep_delay(){
-	min_delay = 1
-	max_delay = 14400
-	rand = random(min_delay,max_delay)
-	return rand
+```
+func generate_sleep_delay() {
+  min_delay = 1
+  max_delay = 14400
+  rand = random(min_delay,max_delay)
+  return rand
 }
 
-func generate_report(policy_domain){
-	do_rpt_work(policy_domain)
-	send_rpt(policy_domain)
+func generate_report(policy_domain) {
+  do_rpt_work(policy_domain)
+  send_rpt(policy_domain)
 }
 
-func generate_tlsrpt(){
-	sleep(generate_sleep_delay())
-	for policy_domain in list_of_tlsrpt_enabled_domains {
-		generate_report(policy_domain)	
-	}
+func generate_tlsrpt() {
+  sleep(generate_sleep_delay())
+  for policy_domain in list_of_tlsrpt_enabled_domains {
+    generate_report(policy_domain)	
+  }
 }
+```
 
-A sending site might wish to institute a random delay per destination
+A sending site might wish to introduce a random delay per destination
 site, up to four hours:
 
-func generate_sleep_delay(){
-	min_delay = 1
-	max_delay = 14400
-	rand = random(min_delay,max_delay)
-	return rand
+```
+func generate_sleep_delay() {
+  min_delay = 1
+  max_delay = 14400
+  rand = random(min_delay,max_delay)
+  return rand
 }
 
-func generate_report(policy_domain){
-	sleep(generate_sleep_delay())
-	do_rpt_work(policy_domain)
-	send_rpt(policy_domain)
+func generate_report(policy_domain) {
+  sleep(generate_sleep_delay())
+  do_rpt_work(policy_domain)
+  send_rpt(policy_domain)
 }
 
-func generate_tlsrpt(){
-	for policy_domain in list_of_tlsrpt_enabled_domains {
-		generate_report(policy_domain)	
-	}
+func generate_tlsrpt() {
+  for policy_domain in list_of_tlsrpt_enabled_domains {
+    generate_report(policy_domain)	
+  }
 }
-
-
+```
 
 ## Delivery Summary
 
@@ -796,6 +798,7 @@ An entry in this registry should contain:
 
 The initial entries are:
 
+```
 Report-Type: tlsrpt
 Media Type: application/tlsrpt+gzip, application/tlsrpt+json
 Registered By: [RFCXXXX]
@@ -816,6 +819,7 @@ Registered By: [@?RFC3464]
 Report-Type: delivery-status
 Media Type: message/global-delivery-status
 Registered By: [@?RFC6533]
+```
 
 ## +gzip Media Type Suffix
 
@@ -1072,7 +1076,7 @@ or even information about the senders themselves.  Consider that by sending
 a report, it might disclose your SSL library version as the inability to 
 negotiate a session may be a known incompatbility between two library
 versions, or perhaps commonly used in a operating system release that is
-centered in a certain region.  The risk may be minimal, but should be
+centered in a certain region. The risk may be minimal, but should be
 considered.
 
 {backmatter}
@@ -1114,7 +1118,7 @@ sessions failed due to "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED".
   "policies": [{
     "policy": {
       "policy-type": "sts",
-      "policy-string": ["version: STSv1","mode: report",
+      "policy-string": ["version: STSv1","mode: testing",
             "mx: .mail.company-y.example","max_age: 86400"],
       "policy-domain": "company-y.example",
       "mx-host": ".mail.company-y.example"
