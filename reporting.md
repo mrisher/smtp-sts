@@ -733,6 +733,11 @@ indicate a delivery failure, and may be retried as per local sender policy.
 The receiving system is not expected to process reports at receipt time, and 
 MAY store them for processing at a later time.
 
+Alternately, if a receiving system offers "Accept-Encoding" value of
+"gzip", the sending system MAY use "Content-Encoding: gzip" as an
+HTTP header as appropriate.  This can be used in place of delivering
+a compressed file as the payload.
+
 ## Delivery Retry
 
 In the event of a delivery failure, regardless of the delivery method, a
@@ -772,11 +777,45 @@ Message Header Field registration information per [@?RFC3864].
 
 ## Report Type
 
-This document registers a new parameter `report-type="tlsrpt"` under
-`multipart/report` top-level media type for use with [@!RFC6522].
+This document creates a new registry for "report-type" parameter to
+the Content-Type header field for the "multipart/report" top-level media
+type defined in [@!RFC6522].
 
-The media type suitable for use as a report-type is defined in the
-following section.
+The registry name is "Report Type Registry", and the procedure for
+updating the registry will be "Specification Required".
+
+An entry in this registry should contain:
+
+* the report-type being registered
+
+* one or more registered media-types that can be used with this report-type
+
+* the document containing the registration action
+
+* an optional comment
+
+The initial entries are:
+
+Report-Type: tlsrpt
+Media Type: application/tlsrpt+gzip, application/tlsrpt+json
+Registered By: [RFCXXXX]
+Comment: Media types suitable for use with this report-type are defined in Sections 6.4 and 6.5 of [RFCXXXX]
+
+Report-Type: disposition-notification
+Media Type: message/disposition-notification
+Registered By: [@?RFC8098]
+
+Report-Type: disposition-notification
+Media Type: message/global-disposition-notification
+Registered By: [@?RFC6533]
+
+Report-Type: delivery-status
+Media Type: message/delivery-status
+Registered By: [@?RFC3464]
+
+Report-Type: delivery-status
+Media Type: message/global-delivery-status
+Registered By: [@?RFC6533]
 
 ## +gzip Media Type Suffix
 
@@ -1075,7 +1114,7 @@ sessions failed due to "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED".
   "policies": [{
     "policy": {
       "policy-type": "sts",
-      "policy-string": ["version: STSv1","mode: testing",
+      "policy-string": ["version: STSv1","mode: report",
             "mx: .mail.company-y.example","max_age: 86400"],
       "policy-domain": "company-y.example",
       "mx-host": ".mail.company-y.example"
