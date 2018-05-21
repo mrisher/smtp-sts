@@ -187,18 +187,18 @@ The formal definition of the `_smtp._tls` TXT record, defined using
         tlsrpt-version    = %s"v=TLSRPTv1"
 
         tlsrpt-rua        = %s"rua="
-	                    tlsrpt-uri *(*WSP "," *WSP tlsrpt-uri)
+                            tlsrpt-uri *(*WSP "," *WSP tlsrpt-uri)
 
         tlsrpt-uri        = URI
-                          ; "URI" is imported from [RFC3986];
-			  ; commas (ASCII 0x2C), exclamation 
-			  ; points (ASCII 0x21), and semicolons
-			  ; (ASCII 0x3B) MUST be encoded
+                            ; "URI" is imported from [RFC3986];
+                            ; commas (ASCII 0x2C), exclamation 
+                            ; points (ASCII 0x21), and semicolons
+                            ; (ASCII 0x3B) MUST be encoded
 
         tlsrpt-extension  = tlsrpt-ext-name "=" tlsrpt-ext-value
 
         tlsrpt-ext-name   = (ALPHA / DIGIT) *31(ALPHA / 
-	                    DIGIT / "_" / "-" / ".")
+                            DIGIT / "_" / "-" / ".")
 
         tlsrpt-ext-value  = 1*(%x21-3A / %x3C / %x3E-7E)
                             ; chars excluding "=", ";", SP, and control
@@ -566,7 +566,7 @@ sub-array.
 "mx: mx1.example.com",
 "mx: mx2.example.com",
 "mx: mx.backup-example.com",
-"max_age: 12345678"
+"max_age: 604800"
 ]
 ```
 # Report Delivery
@@ -578,28 +578,28 @@ POST.
 
 The filename is RECOMMENDED to be constructed using the following ABNF:
 
-     filename = sender "!" policy-domain "!" begin-timestamp
-               "!" end-timestamp [ "!" unique-id ] "." extension
+     filename        = sender "!" policy-domain "!" begin-timestamp
+                       "!" end-timestamp [ "!" unique-id ] "." extension
 
-     unique-id = 1*(ALPHA / DIGIT)
+     unique-id       = 1*(ALPHA / DIGIT)
 
-     sender = domain        ; From the [RFC5321] that is used
-     			    ; as the domain for the `contact-info`
-			    ; address in the report body
+     sender          = domain ; From the [RFC5321] that is used
+                       ; as the domain for the `contact-info`
+                       ; address in the report body
 
      policy-domain   = domain
 
      begin-timestamp = 1*DIGIT
-                     ; seconds since 00:00:00 UTC January 1, 1970
-                     ; indicating start of the time range contained
-                     ; in the report
+                       ; seconds since 00:00:00 UTC January 1, 1970
+                       ; indicating start of the time range contained
+                       ; in the report
 
-     end-timestamp = 1*DIGIT
-                     ; seconds since 00:00:00 UTC January 1, 1970
-                     ; indicating end of the time range contained
-                     ; in the report
+     end-timestamp   = 1*DIGIT
+                       ; seconds since 00:00:00 UTC January 1, 1970
+                       ; indicating end of the time range contained
+                       ; in the report
 
-     extension = "json" / "json.gz"
+     extension       = "json" / "json.gz"
 
 
 The extension MUST be "json" for a plain JSON file, or "json.gz" for a 
@@ -657,12 +657,12 @@ the following ABNF:
 
     tlsrpt-subject = %s"Report" FWS               ; "Report"
                      %s"Domain:" FWS              ; "Domain:"
-		     domain-name FWS              ; per [RFC6376]
-		     %s"Submitter:" FWS           ; "Submitter:"
-		     domain-name FWS              ; per [RFC6376]
-		     %s"Report-ID:" FWS           ; "Report-ID:
-		     "<" id-left "@" id-right ">" ; per [RFC5322]
-		     [CFWS]                       ; per [RFC5322]
+                     domain-name FWS              ; per [RFC6376]
+                     %s"Submitter:" FWS           ; "Submitter:"
+                     domain-name FWS              ; per [RFC6376]
+                     %s"Report-ID:" FWS           ; "Report-ID:
+                     "<" id-left "@" id-right ">" ; per [RFC5322]
+                     [CFWS]                       ; per [RFC5322]
                                                   ; (as with FWS)
     
  The first domain-name indicates the DNS domain name about which the
@@ -734,11 +734,6 @@ server, typically a 200 or 201 HTTP code [@?RFC7321].  Other codes could
 indicate a delivery failure, and may be retried as per local sender policy.
 The receiving system is not expected to process reports at receipt time, and 
 MAY store them for processing at a later time.
-
-Alternately, if a receiving system offers "Accept-Encoding" value of
-"gzip", the sending system MAY use "Content-Encoding: gzip" as an
-HTTP header as appropriate.  This can be used in place of delivering
-a compressed file as the payload.
 
 ## Delivery Retry
 
@@ -1119,9 +1114,9 @@ sessions failed due to "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED".
     "policy": {
       "policy-type": "sts",
       "policy-string": ["version: STSv1","mode: testing",
-            "mx: .mail.company-y.example","max_age: 86400"],
+            "mx: *.mail.company-y.example","max_age: 86400"],
       "policy-domain": "company-y.example",
-      "mx-host": ".mail.company-y.example"
+      "mx-host": "*.mail.company-y.example"
     },
     "summary": {
       "total-successful-session-count": 5326,
