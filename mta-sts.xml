@@ -308,7 +308,7 @@ mode: enforce
 mx: mail.example.com
 mx: *.example.net
 mx: backupmx.example.com
-max_age: 123456
+max_age: 604800
 </artwork></figure>
 <t>The formal definition of the policy resource, defined using <xref target="RFC7405"/>, is as
 follows:
@@ -350,7 +350,15 @@ sts-policy-mx            = sts-policy-mx-field field-delim
 
 sts-policy-mx-field      = %s"mx"
 
-sts-policy-mx-value      = 1*(ALPHA / DIGIT / "_" / "-" / ".")
+sts-policy-mx-value      = ["*."] *(sts-policy-mx-label ".") 
+                           sts-policy-mx-toplabel
+
+sts-policy-mx-label      = sts-policy-alphanum | 
+                           sts-policy-alphanum *(sts-policy-alphanum | "-") 
+                           sts-policy-alphanum
+
+sts-policy-mx-toplabel   = ALPHA | ALPHA *(sts-policy-alphanum | "-") 
+                           sts-policy-alphanum
 
 sts-policy-max-age       = sts-policy-max-age-field field-delim
                            sts-policy-max-age-value
@@ -363,8 +371,8 @@ sts-policy-extension     = sts-policy-ext-name   ; additional
                            field-delim           ; extension
                            sts-policy-ext-value  ; fields
 
-sts-policy-ext-name      = (ALPHA / DIGIT)
-                           *31(ALPHA / DIGIT / "_" / "-" / ".")
+sts-policy-ext-name      = (sts-policy-alphanum)
+                           *31(sta-policy-alphanum / "_" / "-" / ".")
 
 sts-policy-term          = CRLF / LF
 
@@ -374,9 +382,11 @@ sts-policy-ext-value     = sts-policy-vchar
                            ; chars, including UTF-8 [@?RFC3629],
                            ; excluding CTLs and no 
                            ; leading/trailing spaces
+
+sts-policy-alphanum     = ALPHA | DIGIT
+
+sts-policy-vchar        = %x21-7E / UTF8-2 / UTF8-3 / UTF8-4
 </artwork></figure>
-<t>sts-policy-vchar  = %x21-7E / UTF8-2 / UTF8-3 / UTF8-4
-</t>
 <t>Parsers MUST accept TXT records and policy files which are syntactically valid
 (i.e., valid key/value pairs separated by semi-colons for TXT records) and but
 containing additional key/value pairs not specified in this document, in which
@@ -873,7 +883,7 @@ update an invalid policy at any future date.
 <t>Even if an attacker cannot modify a served policy, the potential exists for
 configurations that allow attackers on the same domain to receive mail for that
 domain.  For example, an easy configuration option when authoring an MTA-STS
-Policy for <spanx style="verb">example.com</spanx> is to set the <spanx style="verb">mx</spanx> equal to <spanx style="verb">.example.com</spanx>; recipient
+Policy for <spanx style="verb">example.com</spanx> is to set the <spanx style="verb">mx</spanx> equal to <spanx style="verb">*.example.com</spanx>; recipient
 domains must consider in this case the risk that any user possessing a valid
 hostname and CA-signed certificate (for example, <spanx style="verb">dhcp-123.example.com</spanx>) will,
 from the perspective of MTA-STS Policy validation, be a valid MX host for that
@@ -985,7 +995,7 @@ mode: testing
 mx: mx1.example.com
 mx: mx2.example.com
 mx: mx.backup-example.com
-max_age: 12345678
+max_age: 1296000
 </artwork></figure>
 </section>
 
