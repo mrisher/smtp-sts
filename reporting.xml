@@ -248,18 +248,18 @@ reports signed using this record.</t>
     tlsrpt-version    = %s"v=TLSRPTv1"
 
     tlsrpt-rua        = %s"rua="
-                    tlsrpt-uri *(*WSP "," *WSP tlsrpt-uri)
+                        tlsrpt-uri *(*WSP "," *WSP tlsrpt-uri)
 
     tlsrpt-uri        = URI
-                      ; "URI" is imported from [RFC3986];
-          ; commas (ASCII 0x2C), exclamation 
-          ; points (ASCII 0x21), and semicolons
-          ; (ASCII 0x3B) MUST be encoded
+                        ; "URI" is imported from [RFC3986];
+                        ; commas (ASCII 0x2C), exclamation 
+                        ; points (ASCII 0x21), and semicolons
+                        ; (ASCII 0x3B) MUST be encoded
 
     tlsrpt-extension  = tlsrpt-ext-name "=" tlsrpt-ext-value
 
     tlsrpt-ext-name   = (ALPHA / DIGIT) *31(ALPHA / 
-                    DIGIT / "_" / "-" / ".")
+                        DIGIT / "_" / "-" / ".")
 
     tlsrpt-ext-value  = 1*(%x21-3A / %x3C / %x3E-7E)
                         ; chars excluding "=", ";", SP, and control
@@ -361,49 +361,51 @@ delivered after some delay, perhaps several hours.
 <t>As an example, a sending site might want to introduce a random delay of up
 to four hours:
 </t>
-<t>func generate_sleep_delay(){
-    min_delay = 1
-    max_delay = 14400
-    rand = random(min_delay,max_delay)
-    return rand
+
+<figure align="center"><artwork align="center">
+func generate_sleep_delay() {
+  min_delay = 1
+  max_delay = 14400
+  rand = random(min_delay,max_delay)
+  return rand
 }
-</t>
-<t>func generate_report(policy_domain){
-    do_rpt_work(policy_domain)
-    send_rpt(policy_domain)
+
+func generate_report(policy_domain) {
+  do_rpt_work(policy_domain)
+  send_rpt(policy_domain)
 }
-</t>
-<t>func generate_tlsrpt(){
-    sleep(generate_sleep_delay())
-    for policy_domain in list_of_tlsrpt_enabled_domains {
-        generate_report(policy_domain)
-<vspace/>
-    }
+
+func generate_tlsrpt() {
+  sleep(generate_sleep_delay())
+  for policy_domain in list_of_tlsrpt_enabled_domains {
+    generate_report(policy_domain)	
+  }
 }
-</t>
-<t>A sending site might wish to institute a random delay per destination
+</artwork></figure>
+<t>A sending site might wish to introduce a random delay per destination
 site, up to four hours:
 </t>
-<t>func generate_sleep_delay(){
-    min_delay = 1
-    max_delay = 14400
-    rand = random(min_delay,max_delay)
-    return rand
+
+<figure align="center"><artwork align="center">
+func generate_sleep_delay() {
+  min_delay = 1
+  max_delay = 14400
+  rand = random(min_delay,max_delay)
+  return rand
 }
-</t>
-<t>func generate_report(policy_domain){
-    sleep(generate_sleep_delay())
-    do_rpt_work(policy_domain)
-    send_rpt(policy_domain)
+
+func generate_report(policy_domain) {
+  sleep(generate_sleep_delay())
+  do_rpt_work(policy_domain)
+  send_rpt(policy_domain)
 }
-</t>
-<t>func generate_tlsrpt(){
-    for policy_domain in list_of_tlsrpt_enabled_domains {
-        generate_report(policy_domain)
-<vspace/>
-    }
+
+func generate_tlsrpt() {
+  for policy_domain in list_of_tlsrpt_enabled_domains {
+    generate_report(policy_domain)	
+  }
 }
-</t>
+</artwork></figure>
 </section>
 
 <section anchor="delivery-summary" title="Delivery Summary">
@@ -672,7 +674,7 @@ sub-array.
 "mx: mx1.example.com",
 "mx: mx2.example.com",
 "mx: mx.backup-example.com",
-"max_age: 12345678"
+"max_age: 604800"
 ]
 </artwork></figure>
 </section>
@@ -688,28 +690,28 @@ POST.
 </t>
 
 <figure align="center"><artwork align="center">
- filename = sender "!" policy-domain "!" begin-timestamp
-           "!" end-timestamp [ "!" unique-id ] "." extension
+ filename        = sender "!" policy-domain "!" begin-timestamp
+                   "!" end-timestamp [ "!" unique-id ] "." extension
 
- unique-id = 1*(ALPHA / DIGIT)
+ unique-id       = 1*(ALPHA / DIGIT)
 
- sender = domain        ; From the [RFC5321] that is used
-                ; as the domain for the `contact-info`
-            ; address in the report body
+ sender          = domain ; From the [RFC5321] that is used
+                   ; as the domain for the `contact-info`
+                   ; address in the report body
 
  policy-domain   = domain
 
  begin-timestamp = 1*DIGIT
-                 ; seconds since 00:00:00 UTC January 1, 1970
-                 ; indicating start of the time range contained
-                 ; in the report
+                   ; seconds since 00:00:00 UTC January 1, 1970
+                   ; indicating start of the time range contained
+                   ; in the report
 
- end-timestamp = 1*DIGIT
-                 ; seconds since 00:00:00 UTC January 1, 1970
-                 ; indicating end of the time range contained
-                 ; in the report
+ end-timestamp   = 1*DIGIT
+                   ; seconds since 00:00:00 UTC January 1, 1970
+                   ; indicating end of the time range contained
+                   ; in the report
 
- extension = "json" / "json.gz"
+ extension       = "json" / "json.gz"
 </artwork></figure>
 <t>The extension MUST be &quot;json&quot; for a plain JSON file, or &quot;json.gz&quot; for a
 JSON file compressed using GZIP.
@@ -770,12 +772,12 @@ the following ABNF:
 <figure align="center"><artwork align="center">
 tlsrpt-subject = %s"Report" FWS               ; "Report"
                  %s"Domain:" FWS              ; "Domain:"
-         domain-name FWS              ; per [RFC6376]
-         %s"Submitter:" FWS           ; "Submitter:"
-         domain-name FWS              ; per [RFC6376]
-         %s"Report-ID:" FWS           ; "Report-ID:
-         "&lt;" id-left "@" id-right "&gt;" ; per [RFC5322]
-         [CFWS]                       ; per [RFC5322]
+                 domain-name FWS              ; per [RFC6376]
+                 %s"Submitter:" FWS           ; "Submitter:"
+                 domain-name FWS              ; per [RFC6376]
+                 %s"Report-ID:" FWS           ; "Report-ID:
+                 "&lt;" id-left "@" id-right "&gt;" ; per [RFC5322]
+                 [CFWS]                       ; per [RFC5322]
                                               ; (as with FWS)
 </artwork></figure>
 <t>The first domain-name indicates the DNS domain name about which the
@@ -851,11 +853,6 @@ indicate a delivery failure, and may be retried as per local sender policy.
 The receiving system is not expected to process reports at receipt time, and
 MAY store them for processing at a later time.
 </t>
-<t>Alternately, if a receiving system offers &quot;Accept-Encoding&quot; value of
-&quot;gzip&quot;, the sending system MAY use &quot;Content-Encoding: gzip&quot; as an
-HTTP header as appropriate.  This can be used in place of delivering
-a compressed file as the payload.
-</t>
 </section>
 
 <section anchor="delivery-retry" title="Delivery Retry">
@@ -921,27 +918,29 @@ updating the registry will be &quot;Specification Required&quot;.
 </t>
 <t>The initial entries are:
 </t>
-<t>Report-Type: tlsrpt
+
+<figure align="center"><artwork align="center">
+Report-Type: tlsrpt
 Media Type: application/tlsrpt+gzip, application/tlsrpt+json
 Registered By: [RFCXXXX]
 Comment: Media types suitable for use with this report-type are defined in Sections 6.4 and 6.5 of [RFCXXXX]
-</t>
-<t>Report-Type: disposition-notification
+
+Report-Type: disposition-notification
 Media Type: message/disposition-notification
-Registered By: <xref target="RFC8098"/>
-</t>
-<t>Report-Type: disposition-notification
+Registered By: [@?RFC8098]
+
+Report-Type: disposition-notification
 Media Type: message/global-disposition-notification
-Registered By: <xref target="RFC6533"/>
-</t>
-<t>Report-Type: delivery-status
+Registered By: [@?RFC6533]
+
+Report-Type: delivery-status
 Media Type: message/delivery-status
-Registered By: <xref target="RFC3464"/>
-</t>
-<t>Report-Type: delivery-status
+Registered By: [@?RFC3464]
+
+Report-Type: delivery-status
 Media Type: message/global-delivery-status
-Registered By: <xref target="RFC6533"/>
-</t>
+Registered By: [@?RFC6533]
+</artwork></figure>
 </section>
 
 <section anchor="gzip-media-type-suffix" title="+gzip Media Type Suffix">
@@ -1214,7 +1213,7 @@ or even information about the senders themselves.  Consider that by sending
 a report, it might disclose your SSL library version as the inability to
 negotiate a session may be a known incompatbility between two library
 versions, or perhaps commonly used in a operating system release that is
-centered in a certain region.  The risk may be minimal, but should be
+centered in a certain region. The risk may be minimal, but should be
 considered.
 </t>
 </section>
@@ -1249,15 +1248,12 @@ considered.
 </references>
 <references title="Informative References">
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3464.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3501.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3864.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6533.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7321.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7435.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7469.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7489.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8098.xml"?>
 </references>
 
 <section anchor="example-reporting-policy-1" title="Example Reporting Policy">
@@ -1300,10 +1296,10 @@ sessions failed due to &quot;X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED&quot;.
   "policies": [{
     "policy": {
       "policy-type": "sts",
-      "policy-string": ["version: STSv1","mode: report",
-            "mx: .mail.company-y.example","max_age: 86400"],
+      "policy-string": ["version: STSv1","mode: testing",
+            "mx: *.mail.company-y.example","max_age: 86400"],
       "policy-domain": "company-y.example",
-      "mx-host": ".mail.company-y.example"
+      "mx-host": "*.mail.company-y.example"
     },
     "summary": {
       "total-successful-session-count": 5326,
