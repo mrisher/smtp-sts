@@ -793,7 +793,6 @@ An entry in this registry should contain:
 
 The initial entries are:
 
-```
 Report-Type: tlsrpt
 Media Type: application/tlsrpt+gzip, application/tlsrpt+json
 Registered By: [RFCXXXX]
@@ -801,20 +800,19 @@ Comment: Media types suitable for use with this report-type are defined in Secti
 
 Report-Type: disposition-notification
 Media Type: message/disposition-notification
-Registered By: [@?RFC8098]
+Registered By: [@?RFC8098] Section 10
 
 Report-Type: disposition-notification
 Media Type: message/global-disposition-notification
-Registered By: [@?RFC6533]
+Registered By: [@?RFC6533] Section 6
 
 Report-Type: delivery-status
 Media Type: message/delivery-status
-Registered By: [@?RFC3464]
+Registered By: [@?RFC3464] Appendix D
 
 Report-Type: delivery-status
 Media Type: message/global-delivery-status
-Registered By: [@?RFC6533]
-```
+Registered By: [@?RFC6533] Section 6
 
 ## +gzip Media Type Suffix
 
