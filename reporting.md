@@ -891,8 +891,7 @@ below.
       [@!RFC7493].
 
    Security considerations: Security considerations relating to SMTP
-      TLS Reporting are discussed in Section 7. Security considerations related
-      to zlib compression are discussed in [@?RFC6713].
+      TLS Reporting are discussed in Section 7.
 
    Interoperability considerations: This document specifies format of
       conforming messages and the interpretation thereof.
@@ -904,7 +903,7 @@ below.
 
    Additional information:
 
-      Magic number(s):  The first two bytes are 0x1f, 0x8b.
+      Magic number(s):  n/a
 
       File extension(s):  ".json"
 
@@ -943,7 +942,9 @@ below.
    Encoding considerations: Binary
 
    Security considerations: Security considerations relating to SMTP
-      TLS Reporting are discussed in Section 7.
+      TLS Reporting are discussed in Section 7.  Security 
+      considerations related to gzip compression are discussed 
+      in [RFC6713].
 
    Interoperability considerations: This document specifies format of
       conforming messages and the interpretation thereof.
@@ -955,7 +956,7 @@ below.
 
    Additional information:
 
-      Magic number(s):  n/a
+      Magic number(s):  The first two bytes are 0x1f, 0x8b.
 
       File extension(s):  ".gz"
 
