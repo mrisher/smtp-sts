@@ -788,8 +788,9 @@ Internet-Draft                   MTA-STS                        May 2018
 
    Note that in all such cases, the policy endpoint ("https://mta-
    sts.user.example/.well-known/mta-sts.txt" in this example) must still
-   present a certificate valid for the Policy Domain ("user.example"),
-   and not for that of the provider ("provider.example").
+   present a certificate valid for the Policy Host ("mta-
+   sts.user.example"), and not for that host at the provider's domain
+   ("mta-sts.provider.example").
 
    Note that while sending MTAs MUST NOT use HTTP caching when fetching
    policies via HTTPS, such caching may nonetheless be useful to a
@@ -833,7 +834,6 @@ Internet-Draft                   MTA-STS                        May 2018
    implement a "two-pass" model, where MX candidates are first filtered
    for possible validity according to the MTA-STS policy, and then the
    remaining candidates attempted in order as without an MTA-STS policy.
-   This may lead to incorrect implementations, such a message loops;
 
 
 
@@ -842,6 +842,7 @@ Margolis, et al.        Expires November 21, 2018              [Page 15]
 Internet-Draft                   MTA-STS                        May 2018
 
 
+   This may lead to incorrect implementations, such a message loops;
    implementors are instead recommended to traverse the MX candidate
    list as usual, and treat invalid candidates as though they were
    unreachable (i.e., as though there were some transient error when
@@ -882,7 +883,6 @@ Internet-Draft                   MTA-STS                        May 2018
 
    IANA is requested to create a new registry titled "MTA-STS Policy
    Fields".  The initial entries in the registry are:
-
 
 
 
@@ -1106,7 +1106,7 @@ Internet-Draft                   MTA-STS                        May 2018
    [I-D.ietf-uta-smtp-tlsrpt]
               Margolis, D., Brotman, A., Ramakrishnan, B., Jones, J.,
               and M. Risher, "SMTP TLS Reporting", draft-ietf-uta-smtp-
-              tlsrpt-20 (work in progress), May 2018.
+              tlsrpt-21 (work in progress), May 2018.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,

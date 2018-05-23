@@ -673,8 +673,8 @@ _mta-sts.user.example.  IN CNAME _mta-sts.provider.example.
 </artwork></figure>
 <t>Note that in all such cases, the policy endpoint
 (<spanx style="verb">https://mta-sts.user.example/.well-known/mta-sts.txt</spanx> in this example) must
-still present a certificate valid for the Policy Domain (<spanx style="verb">user.example</spanx>), and
-not for that of the provider (<spanx style="verb">provider.example</spanx>).
+still present a certificate valid for the Policy Host (<spanx style="verb">mta-sts.user.example</spanx>),
+and not for that host at the provider's domain (<spanx style="verb">mta-sts.provider.example</spanx>).
 </t>
 <t>Note that while sending MTAs MUST NOT use HTTP caching when fetching policies
 via HTTPS, such caching may nonetheless be useful to a reverse proxy configured

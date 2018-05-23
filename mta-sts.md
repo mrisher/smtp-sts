@@ -581,8 +581,8 @@ Policy:
 
 Note that in all such cases, the policy endpoint
 (`https://mta-sts.user.example/.well-known/mta-sts.txt` in this example) must
-still present a certificate valid for the Policy Domain (`user.example`), and
-not for that of the provider (`provider.example`).
+still present a certificate valid for the Policy Host (`mta-sts.user.example`),
+and not for that host at the provider's domain (`mta-sts.provider.example`).
 
 Note that while sending MTAs MUST NOT use HTTP caching when fetching policies
 via HTTPS, such caching may nonetheless be useful to a reverse proxy configured
