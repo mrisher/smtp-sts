@@ -241,12 +241,12 @@ is not significant.  If multiple TXT records for <spanx style="verb">_mta-sts</s
 resolver, records which do not begin with <spanx style="verb">v=STSv1;</spanx> are discarded.  If the
 number of resulting records is not one, senders MUST assume the recipient domain
 does not have an available MTA-STS policy and skip the remaining steps of policy
-discovery.  (Note that lack of an available policy does not signal opting out of
-MTA-STS altogether if the sender has a previously cached policy for the
-recipient domain, as discussed in <xref target="policy-application-control-flow"/>, &quot;Policy
-Application Control Flow&quot;.)  If the resulting TXT record contains multiple
-strings, then the record MUST be treated as if those strings are concatenated
-together without adding spaces.
+discovery.  (Note that absence of a usable TXT record is not by itself
+sufficient to remove a sender's previously cached policy for the Policy Domain,
+as discussed in <xref target="policy-application-control-flow"/>, &quot;Policy Application Control
+Flow&quot;.)  If the resulting TXT record contains multiple strings, then the record
+MUST be treated as if those strings are concatenated together without adding
+spaces.
 </t>
 </section>
 
@@ -256,7 +256,7 @@ fields) served via the HTTPS GET method from the fixed <xref target="RFC5785"/> 
 path of <spanx style="verb">.well-known/mta-sts.txt</spanx> served by the Policy Host.  The Policy Host
 DNS name is constructed by prepending <spanx style="verb">mta-sts</spanx> to the Policy Domain.
 </t>
-<t>Thus for a Policy Domain of <spanx style="verb">example.com</spanx> the path is
+<t>Thus for a Policy Domain of <spanx style="verb">example.com</spanx> the ful URL is
 <spanx style="verb">https://mta-sts.example.com/.well-known/mta-sts.txt</spanx>.
 </t>
 <t>When fetching a policy, senders SHOULD validate that the media type is
@@ -499,12 +499,12 @@ in the presented identifier. Thus the mx pattern <spanx style="verb">*.example.c
 </section>
 
 <section anchor="recipient-mta-certificate-validation" title="Recipient MTA Certificate Validation">
-<t>The certificate presented by the receiving MTA MUST chain to a root CA that is
-trusted by the sending MTA and be non-expired.  The certificate MUST have a
-subject alternative name (SAN, <xref target="RFC5280"/>) with a DNS-ID (<xref target="RFC6125"/>) matching
-the host name, per the rules given in <xref target="RFC6125"/>.  The MX's certificate MAY
-also be checked for revocation via OCSP <xref target="RFC6960"/>, CRLs <xref target="RFC6818"/>, or some
-other mechanism.
+<t>The certificate presented by the receiving MTA MUST not be expired, and MUST
+chain to a root CA that is trusted by the sending MTA.  The certificate MUST
+have a subject alternative name (SAN, <xref target="RFC5280"/>) with a DNS-ID (<xref target="RFC6125"/>)
+matching the host name, per the rules given in <xref target="RFC6125"/>.  The MX's
+certificate MAY also be checked for revocation via OCSP <xref target="RFC6960"/>, CRLs
+<xref target="RFC6818"/>, or some other mechanism.
 </t>
 </section>
 </section>

@@ -180,12 +180,12 @@ is not significant.  If multiple TXT records for `_mta-sts` are returned by the
 resolver, records which do not begin with `v=STSv1;` are discarded.  If the
 number of resulting records is not one, senders MUST assume the recipient domain
 does not have an available MTA-STS policy and skip the remaining steps of policy
-discovery.  (Note that lack of an available policy does not signal opting out of
-MTA-STS altogether if the sender has a previously cached policy for the
-recipient domain, as discussed in (#policy-application-control-flow), "Policy
-Application Control Flow".)  If the resulting TXT record contains multiple
-strings, then the record MUST be treated as if those strings are concatenated
-together without adding spaces.
+discovery.  (Note that absence of a usable TXT record is not by itself
+sufficient to remove a sender's previously cached policy for the Policy Domain,
+as discussed in (#policy-application-control-flow), "Policy Application Control
+Flow".)  If the resulting TXT record contains multiple strings, then the record
+MUST be treated as if those strings are concatenated together without adding
+spaces.
 
 ## MTA-STS Policies
 
@@ -194,7 +194,7 @@ fields) served via the HTTPS GET method from the fixed [@!RFC5785] "well-known"
 path of `.well-known/mta-sts.txt` served by the Policy Host.  The Policy Host
 DNS name is constructed by prepending `mta-sts` to the Policy Domain.
 
-Thus for a Policy Domain of `example.com` the path is
+Thus for a Policy Domain of `example.com` the ful URL is
 `https://mta-sts.example.com/.well-known/mta-sts.txt`.
 
 When fetching a policy, senders SHOULD validate that the media type is
@@ -423,12 +423,12 @@ in the presented identifier. Thus the mx pattern `*.example.com` matches
 
 ## Recipient MTA Certificate Validation
 
-The certificate presented by the receiving MTA MUST chain to a root CA that is
-trusted by the sending MTA and be non-expired.  The certificate MUST have a
-subject alternative name (SAN, [@!RFC5280]) with a DNS-ID ([@?RFC6125]) matching
-the host name, per the rules given in [@!RFC6125].  The MX's certificate MAY
-also be checked for revocation via OCSP [@?RFC6960], CRLs [@?RFC6818], or some
-other mechanism.
+The certificate presented by the receiving MTA MUST not be expired, and MUST
+chain to a root CA that is trusted by the sending MTA.  The certificate MUST
+have a subject alternative name (SAN, [@!RFC5280]) with a DNS-ID ([@?RFC6125])
+matching the host name, per the rules given in [@!RFC6125].  The MX's
+certificate MAY also be checked for revocation via OCSP [@?RFC6960], CRLs
+[@?RFC6818], or some other mechanism.
 
 # Policy Application
 

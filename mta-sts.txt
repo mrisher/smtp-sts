@@ -264,12 +264,12 @@ Internet-Draft                   MTA-STS                        May 2018
    "v=STSv1;" are discarded.  If the number of resulting records is not
    one, senders MUST assume the recipient domain does not have an
    available MTA-STS policy and skip the remaining steps of policy
-   discovery.  (Note that lack of an available policy does not signal
-   opting out of MTA-STS altogether if the sender has a previously
-   cached policy for the recipient domain, as discussed in Section 5.1,
-   "Policy Application Control Flow".)  If the resulting TXT record
-   contains multiple strings, then the record MUST be treated as if
-   those strings are concatenated together without adding spaces.
+   discovery.  (Note that absence of a usable TXT record is not by
+   itself sufficient to remove a sender's previously cached policy for
+   the Policy Domain, as discussed in Section 5.1, "Policy Application
+   Control Flow".)  If the resulting TXT record contains multiple
+   strings, then the record MUST be treated as if those strings are
+   concatenated together without adding spaces.
 
 
 
@@ -290,8 +290,8 @@ Internet-Draft                   MTA-STS                        May 2018
    the Policy Host.  The Policy Host DNS name is constructed by
    prepending "mta-sts" to the Policy Domain.
 
-   Thus for a Policy Domain of "example.com" the path is "https://mta-
-   sts.example.com/.well-known/mta-sts.txt".
+   Thus for a Policy Domain of "example.com" the ful URL is
+   "https://mta-sts.example.com/.well-known/mta-sts.txt".
 
    When fetching a policy, senders SHOULD validate that the media type
    is "text/plain" to guard against cases where webservers allow
@@ -574,8 +574,8 @@ Internet-Draft                   MTA-STS                        May 2018
 
 4.2.  Recipient MTA Certificate Validation
 
-   The certificate presented by the receiving MTA MUST chain to a root
-   CA that is trusted by the sending MTA and be non-expired.  The
+   The certificate presented by the receiving MTA MUST not be expired,
+   and MUST chain to a root CA that is trusted by the sending MTA.  The
    certificate MUST have a subject alternative name (SAN, [RFC5280])
    with a DNS-ID ([RFC6125]) matching the host name, per the rules given
    in [RFC6125].  The MX's certificate MAY also be checked for
