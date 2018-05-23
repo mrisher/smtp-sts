@@ -1082,22 +1082,27 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
    The initial entries are:
 
-   Report-Type: tlsrpt Media Type: application/tlsrpt+gzip, application/
-   tlsrpt+json Registered By: [RFCXXXX] Comment: Media types suitable
-   for use with this report-type are defined in Sections 6.4 and 6.5 of
-   [RFCXXXX]
+   Report-Type: tlsrpt 
+   Media Type: application/tlsrpt+gzip, application/tlsrpt+json 
+   Registered By: [I-D.ietf-uta-smtp-tlsrpt] 
+   Comment: Media types suitable for use with this report-type are 
+   defined in Sections 6.4 and 6.5 of [I-D.ietf-uta-smtp-tlsrpt]
 
-   Report-Type: disposition-notification Media Type: message/
-   disposition-notification Registered By: [RFC8098] Section 10
+   Report-Type: disposition-notification 
+   Media Type: message/disposition-notification 
+   Registered By: [RFC8098] Section 10
 
-   Report-Type: disposition-notification Media Type: message/global-
-   disposition-notification Registered By: [RFC6533] Section 6
+   Report-Type: disposition-notification 
+   Media Type: message/global-disposition-notification 
+   Registered By: [RFC6533] Section 6
 
-   Report-Type: delivery-status Media Type: message/delivery-status
+   Report-Type: delivery-status 
+   Media Type: message/delivery-status
    Registered By: [RFC3464] Appendix D
 
-   Report-Type: delivery-status Media Type: message/global-delivery-
-   status Registered By: [RFC6533] Section 6
+   Report-Type: delivery-status 
+   Media Type: message/global-delivery-status 
+   Registered By: [RFC6533] Section 6
 
 6.3.  +gzip Media Type Suffix
 
