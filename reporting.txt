@@ -5,18 +5,18 @@
 Using TLS in Applications                                    D. Margolis
 Internet-Draft                                               Google, Inc
 Intended status: Standards Track                              A. Brotman
-Expires: November 21, 2018                                  Comcast, Inc
+Expires: November 24, 2018                                  Comcast, Inc
                                                          B. Ramakrishnan
                                                              Yahoo!, Inc
                                                                 J. Jones
                                                           Microsoft, Inc
                                                                M. Risher
                                                              Google, Inc
-                                                            May 20, 2018
+                                                            May 23, 2018
 
 
                            SMTP TLS Reporting
-                     draft-ietf-uta-smtp-tlsrpt-21
+                     draft-ietf-uta-smtp-tlsrpt-22
 
 Abstract
 
@@ -46,14 +46,14 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on November 21, 2018.
+   This Internet-Draft will expire on November 24, 2018.
 
 
 
 
 
 
-Margolis, et al.        Expires November 21, 2018               [Page 1]
+Margolis, et al.        Expires November 24, 2018               [Page 1]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
@@ -109,13 +109,13 @@ Table of Contents
 
 
 
-Margolis, et al.        Expires November 21, 2018               [Page 2]
+Margolis, et al.        Expires November 24, 2018               [Page 2]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
 
      6.4.  application/tlsrpt+json Media Type  . . . . . . . . . . .  21
-     6.5.  application/tlsrpt+gzip Media Type  . . . . . . . . . . .  23
+     6.5.  application/tlsrpt+gzip Media Type  . . . . . . . . . . .  22
      6.6.  STARTTLS Validation Result Types  . . . . . . . . . . . .  24
    7.  Security Considerations . . . . . . . . . . . . . . . . . . .  24
    8.  Privacy Considerations  . . . . . . . . . . . . . . . . . . .  26
@@ -123,9 +123,9 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
      9.1.  Normative References  . . . . . . . . . . . . . . . . . .  26
      9.2.  Informative References  . . . . . . . . . . . . . . . . .  28
      9.3.  URIs  . . . . . . . . . . . . . . . . . . . . . . . . . .  29
-   Appendix A.  Example Reporting Policy . . . . . . . . . . . . . .  29
-     A.1.  Report using MAILTO . . . . . . . . . . . . . . . . . . .  29
-     A.2.  Report using HTTPS  . . . . . . . . . . . . . . . . . . .  29
+   Appendix A.  Example Reporting Policy . . . . . . . . . . . . . .  30
+     A.1.  Report using MAILTO . . . . . . . . . . . . . . . . . . .  30
+     A.2.  Report using HTTPS  . . . . . . . . . . . . . . . . . . .  30
    Appendix B.  Example JSON Report  . . . . . . . . . . . . . . . .  30
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  32
 
@@ -165,7 +165,7 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
 
 
-Margolis, et al.        Expires November 21, 2018               [Page 3]
+Margolis, et al.        Expires November 24, 2018               [Page 3]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
@@ -221,7 +221,7 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
 
 
-Margolis, et al.        Expires November 21, 2018               [Page 4]
+Margolis, et al.        Expires November 24, 2018               [Page 4]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
@@ -277,7 +277,7 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
 
 
-Margolis, et al.        Expires November 21, 2018               [Page 5]
+Margolis, et al.        Expires November 24, 2018               [Page 5]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
@@ -333,7 +333,7 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
 
 
-Margolis, et al.        Expires November 21, 2018               [Page 6]
+Margolis, et al.        Expires November 24, 2018               [Page 6]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
@@ -389,7 +389,7 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
 
 
-Margolis, et al.        Expires November 21, 2018               [Page 7]
+Margolis, et al.        Expires November 24, 2018               [Page 7]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
@@ -445,7 +445,7 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
 
 
-Margolis, et al.        Expires November 21, 2018               [Page 8]
+Margolis, et al.        Expires November 24, 2018               [Page 8]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
@@ -501,7 +501,7 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
 
 
-Margolis, et al.        Expires November 21, 2018               [Page 9]
+Margolis, et al.        Expires November 24, 2018               [Page 9]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
@@ -557,7 +557,7 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
 
 
-Margolis, et al.        Expires November 21, 2018              [Page 10]
+Margolis, et al.        Expires November 24, 2018              [Page 10]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
@@ -613,7 +613,7 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
 
 
-Margolis, et al.        Expires November 21, 2018              [Page 11]
+Margolis, et al.        Expires November 24, 2018              [Page 11]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
@@ -669,7 +669,7 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
 
 
-Margolis, et al.        Expires November 21, 2018              [Page 12]
+Margolis, et al.        Expires November 24, 2018              [Page 12]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
@@ -725,7 +725,7 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
 
 
-Margolis, et al.        Expires November 21, 2018              [Page 13]
+Margolis, et al.        Expires November 24, 2018              [Page 13]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
@@ -781,7 +781,7 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
 
 
-Margolis, et al.        Expires November 21, 2018              [Page 14]
+Margolis, et al.        Expires November 24, 2018              [Page 14]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
@@ -837,7 +837,7 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
 
 
-Margolis, et al.        Expires November 21, 2018              [Page 15]
+Margolis, et al.        Expires November 24, 2018              [Page 15]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
@@ -893,7 +893,7 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
 
 
-Margolis, et al.        Expires November 21, 2018              [Page 16]
+Margolis, et al.        Expires November 24, 2018              [Page 16]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
@@ -949,7 +949,7 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
 
 
-Margolis, et al.        Expires November 21, 2018              [Page 17]
+Margolis, et al.        Expires November 24, 2018              [Page 17]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
@@ -1005,7 +1005,7 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
 
 
-Margolis, et al.        Expires November 21, 2018              [Page 18]
+Margolis, et al.        Expires November 24, 2018              [Page 18]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
@@ -1061,7 +1061,7 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
 
 
-Margolis, et al.        Expires November 21, 2018              [Page 19]
+Margolis, et al.        Expires November 24, 2018              [Page 19]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
@@ -1082,26 +1082,22 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
    The initial entries are:
 
-Report-Type: tlsrpt
-Media Type: application/tlsrpt+gzip, application/tlsrpt+json
-Registered By: [RFCXXXX]
-Comment: Media types suitable for use with this report-type are defined in Sections 6.4 and 6.5 of [RFCXXXX]
+   Report-Type: tlsrpt Media Type: application/tlsrpt+gzip, application/
+   tlsrpt+json Registered By: [RFCXXXX] Comment: Media types suitable
+   for use with this report-type are defined in Sections 6.4 and 6.5 of
+   [RFCXXXX]
 
-Report-Type: disposition-notification
-Media Type: message/disposition-notification
-Registered By: [@?RFC8098]
+   Report-Type: disposition-notification Media Type: message/
+   disposition-notification Registered By: [RFC8098] Section 10
 
-Report-Type: disposition-notification
-Media Type: message/global-disposition-notification
-Registered By: [@?RFC6533]
+   Report-Type: disposition-notification Media Type: message/global-
+   disposition-notification Registered By: [RFC6533] Section 6
 
-Report-Type: delivery-status
-Media Type: message/delivery-status
-Registered By: [@?RFC3464]
+   Report-Type: delivery-status Media Type: message/delivery-status
+   Registered By: [RFC3464] Appendix D
 
-Report-Type: delivery-status
-Media Type: message/global-delivery-status
-Registered By: [@?RFC6533]
+   Report-Type: delivery-status Media Type: message/global-delivery-
+   status Registered By: [RFC6533] Section 6
 
 6.3.  +gzip Media Type Suffix
 
@@ -1114,17 +1110,17 @@ Registered By: [@?RFC6533]
    representation follows that established for "application/gzip".  The
    media type structured syntax suffix registration form follows:
 
-
-
-
-Margolis, et al.        Expires November 21, 2018              [Page 20]
-
-Internet-Draft                 SMTP-TLSRPT                      May 2018
-
-
    Type name: GZIP file storage and transfer format
 
    +suffix: +gzip
+
+
+
+
+Margolis, et al.        Expires November 24, 2018              [Page 20]
+
+Internet-Draft                 SMTP-TLSRPT                      May 2018
+
 
    References: [RFC1952][RFC6713]
 
@@ -1165,19 +1161,6 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
    This document registers multiple media types, beginning with Table 1
    below.
 
-
-
-
-
-
-
-
-
-Margolis, et al.        Expires November 21, 2018              [Page 21]
-
-Internet-Draft                 SMTP-TLSRPT                      May 2018
-
-
     +-------------+----------------+-------------+-------------------+
     | Type        | Subtype        | File extn   | Specification     |
     +-------------+----------------+-------------+-------------------+
@@ -1186,6 +1169,14 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
                     Table 1: SMTP TLS Reporting Media Type
 
    Type name: application
+
+
+
+
+Margolis, et al.        Expires November 24, 2018              [Page 21]
+
+Internet-Draft                 SMTP-TLSRPT                      May 2018
+
 
    Subtype name: tlsrpt+json
 
@@ -1198,8 +1189,7 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
    [RFC7493].
 
    Security considerations: Security considerations relating to SMTP TLS
-   Reporting are discussed in Section 7.  Security considerations
-   related to zlib compression are discussed in [RFC6713].
+   Reporting are discussed in Section 7.
 
    Interoperability considerations: This document specifies format of
    conforming messages and the interpretation thereof.
@@ -1211,11 +1201,11 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
    Additional information:
 
-            Magic number(s):  The first two bytes are 0x1f, 0x8b.
+                      Magic number(s):  n/a
 
-            File extension(s):  ".json"
+                      File extension(s):  ".json"
 
-            Macintosh file type code(s):  n/a
+                      Macintosh file type code(s):  n/a
 
    Person & email address to contact for further information: See
    Authors' Addresses section.
@@ -1226,18 +1216,23 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
    Author: See Authors' Addresses section.
 
-
-
-
-Margolis, et al.        Expires November 21, 2018              [Page 22]
-
-Internet-Draft                 SMTP-TLSRPT                      May 2018
-
-
    Change controller: Internet Engineering Task Force
    (mailto:iesg@ietf.org).
 
 6.5.  application/tlsrpt+gzip Media Type
+
+
+
+
+
+
+
+
+
+Margolis, et al.        Expires November 24, 2018              [Page 22]
+
+Internet-Draft                 SMTP-TLSRPT                      May 2018
+
 
     +-------------+----------------+-------------+-------------------+
     | Type        | Subtype        | File extn   | Specification     |
@@ -1257,7 +1252,8 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
    Encoding considerations: Binary
 
    Security considerations: Security considerations relating to SMTP TLS
-   Reporting are discussed in Section 7.
+   Reporting are discussed in Section 7.  Security considerations
+   related to gzip compression are discussed in [RFC6713].
 
    Interoperability considerations: This document specifies format of
    conforming messages and the interpretation thereof.
@@ -1269,11 +1265,11 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
    Additional information:
 
-                      Magic number(s):  n/a
+            Magic number(s):  The first two bytes are 0x1f, 0x8b.
 
-                      File extension(s):  ".gz"
+            File extension(s):  ".gz"
 
-                      Macintosh file type code(s):  n/a
+            Macintosh file type code(s):  n/a
 
    Person & email address to contact for further information: See
    Authors' Addresses section.
@@ -1282,18 +1278,17 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
    Restrictions on usage: n/a
 
-
-
-
-Margolis, et al.        Expires November 21, 2018              [Page 23]
-
-Internet-Draft                 SMTP-TLSRPT                      May 2018
-
-
    Author: See Authors' Addresses section.
 
    Change controller: Internet Engineering Task Force
    (mailto:iesg@ietf.org).
+
+
+
+Margolis, et al.        Expires November 24, 2018              [Page 23]
+
+Internet-Draft                 SMTP-TLSRPT                      May 2018
+
 
 6.6.  STARTTLS Validation Result Types
 
@@ -1338,18 +1333,19 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
       Implementers are advised to take precautions against evaluating
       the contents of the report.
 
-
-
-
-Margolis, et al.        Expires November 21, 2018              [Page 24]
-
-Internet-Draft                 SMTP-TLSRPT                      May 2018
-
-
    o  Report snooping: An attacker could create a bogus TLSRPT record to
       receive statistics about a domain the attacker does not own.
       Since an attacker able to poison DNS is already able to receive
       counts of SMTP connections (and, absent DANE or MTA-STS policies,
+
+
+
+
+Margolis, et al.        Expires November 24, 2018              [Page 24]
+
+Internet-Draft                 SMTP-TLSRPT                      May 2018
+
+
       actual SMTP message payloads), this does not present a significant
       new vulnerability.
 
@@ -1394,16 +1390,17 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
    (and thus prevent discovery of the successful downgrade attack).
    Administrators are thus encouraged to deploy TLSRPT TXT records with
    a large TTL (reducing the window for successful application of
+   transient attacks against DNS resolution of the record) or to deploy
+   DNSSEC on the deploying zone.
 
 
 
-Margolis, et al.        Expires November 21, 2018              [Page 25]
+
+
+Margolis, et al.        Expires November 24, 2018              [Page 25]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
-
-   transient attacks against DNS resolution of the record) or to deploy
-   DNSSEC on the deploying zone.
 
 8.  Privacy Considerations
 
@@ -1453,7 +1450,10 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
 
 
-Margolis, et al.        Expires November 21, 2018              [Page 26]
+
+
+
+Margolis, et al.        Expires November 24, 2018              [Page 26]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
@@ -1509,7 +1509,7 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
 
 
-Margolis, et al.        Expires November 21, 2018              [Page 27]
+Margolis, et al.        Expires November 24, 2018              [Page 27]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
@@ -1565,10 +1565,15 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
 
 
-Margolis, et al.        Expires November 21, 2018              [Page 28]
+Margolis, et al.        Expires November 24, 2018              [Page 28]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
+
+   [RFC3464]  Moore, K. and G. Vaudreuil, "An Extensible Message Format
+              for Delivery Status Notifications", RFC 3464,
+              DOI 10.17487/RFC3464, January 2003, <https://www.rfc-
+              editor.org/info/rfc3464>.
 
    [RFC3501]  Crispin, M., "INTERNET MESSAGE ACCESS PROTOCOL - VERSION
               4rev1", RFC 3501, DOI 10.17487/RFC3501, March 2003,
@@ -1578,6 +1583,11 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
               Procedures for Message Header Fields", BCP 90, RFC 3864,
               DOI 10.17487/RFC3864, September 2004, <https://www.rfc-
               editor.org/info/rfc3864>.
+
+   [RFC6533]  Hansen, T., Ed., Newman, C., and A. Melnikov,
+              "Internationalized Delivery Status and Disposition
+              Notifications", RFC 6533, DOI 10.17487/RFC6533, February
+              2012, <https://www.rfc-editor.org/info/rfc6533>.
 
    [RFC7321]  McGrew, D. and P. Hoffman, "Cryptographic Algorithm
               Implementation Requirements and Usage Guidance for
@@ -1598,11 +1608,23 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
               (DMARC)", RFC 7489, DOI 10.17487/RFC7489, March 2015,
               <https://www.rfc-editor.org/info/rfc7489>.
 
+   [RFC8098]  Hansen, T., Ed. and A. Melnikov, Ed., "Message Disposition
+              Notification", STD 85, RFC 8098, DOI 10.17487/RFC8098,
+              February 2017, <https://www.rfc-editor.org/info/rfc8098>.
+
 9.3.  URIs
 
    [1] Section 2.2.3
 
    [2] Section 3
+
+
+
+
+Margolis, et al.        Expires November 24, 2018              [Page 29]
+
+Internet-Draft                 SMTP-TLSRPT                      May 2018
+
 
 Appendix A.  Example Reporting Policy
 
@@ -1616,15 +1638,6 @@ A.2.  Report using HTTPS
            _smtp._tls.mail.example.com. IN TXT \
                    "v=TLSRPTv1; \
                    rua=https://reporting.example.com/v1/tlsrpt"
-
-
-
-
-
-Margolis, et al.        Expires November 21, 2018              [Page 29]
-
-Internet-Draft                 SMTP-TLSRPT                      May 2018
-
 
 Appendix B.  Example JSON Report
 
@@ -1664,20 +1677,7 @@ Appendix B.  Example JSON Report
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-Margolis, et al.        Expires November 21, 2018              [Page 30]
+Margolis, et al.        Expires November 24, 2018              [Page 30]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
@@ -1733,7 +1733,7 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
 
 
-Margolis, et al.        Expires November 21, 2018              [Page 31]
+Margolis, et al.        Expires November 24, 2018              [Page 31]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
@@ -1789,4 +1789,4 @@ Authors' Addresses
 
 
 
-Margolis, et al.        Expires November 21, 2018              [Page 32]
+Margolis, et al.        Expires November 24, 2018              [Page 32]
