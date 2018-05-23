@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE rfc SYSTEM 'rfc2629.dtd' []>
-<rfc ipr="trust200902" category="std" docName="draft-ietf-uta-smtp-tlsrpt-21">
+<rfc ipr="trust200902" category="std" docName="draft-ietf-uta-smtp-tlsrpt-22">
 <?rfc toc="yes"?>
 <?rfc symrefs="yes"?>
 <?rfc sortrefs="yes"?>
@@ -87,7 +87,7 @@
 <uri></uri>
 </address>
 </author>
-<date year="2018" month="May" day="20"/>
+<date year="2018" month="May" day="23"/>
 
 <area>Applications</area>
 <workgroup>Using TLS in Applications</workgroup>
@@ -918,29 +918,27 @@ updating the registry will be &quot;Specification Required&quot;.
 </t>
 <t>The initial entries are:
 </t>
-
-<figure align="center"><artwork align="center">
-Report-Type: tlsrpt
+<t>Report-Type: tlsrpt
 Media Type: application/tlsrpt+gzip, application/tlsrpt+json
 Registered By: [RFCXXXX]
 Comment: Media types suitable for use with this report-type are defined in Sections 6.4 and 6.5 of [RFCXXXX]
-
-Report-Type: disposition-notification
+</t>
+<t>Report-Type: disposition-notification
 Media Type: message/disposition-notification
-Registered By: [@?RFC8098]
-
-Report-Type: disposition-notification
+Registered By: <xref target="RFC8098"/> Section 10
+</t>
+<t>Report-Type: disposition-notification
 Media Type: message/global-disposition-notification
-Registered By: [@?RFC6533]
-
-Report-Type: delivery-status
+Registered By: <xref target="RFC6533"/> Section 6
+</t>
+<t>Report-Type: delivery-status
 Media Type: message/delivery-status
-Registered By: [@?RFC3464]
-
-Report-Type: delivery-status
+Registered By: <xref target="RFC3464"/> Appendix D
+</t>
+<t>Report-Type: delivery-status
 Media Type: message/global-delivery-status
-Registered By: [@?RFC6533]
-</artwork></figure>
+Registered By: <xref target="RFC6533"/> Section 6
+</t>
 </section>
 
 <section anchor="gzip-media-type-suffix" title="+gzip Media Type Suffix">
@@ -1022,8 +1020,7 @@ below.
       <xref target="RFC7493"/>.
 </t>
 <t>Security considerations: Security considerations relating to SMTP
-      TLS Reporting are discussed in Section 7. Security considerations related
-      to zlib compression are discussed in <xref target="RFC6713"/>.
+      TLS Reporting are discussed in Section 7.
 </t>
 <t>Interoperability considerations: This document specifies format of
       conforming messages and the interpretation thereof.
@@ -1037,7 +1034,7 @@ below.
 </t>
 
 <figure align="center"><artwork align="center">
-  Magic number(s):  The first two bytes are 0x1f, 0x8b.
+  Magic number(s):  n/a
 
   File extension(s):  ".json"
 
@@ -1078,7 +1075,9 @@ below.
 <t>Encoding considerations: Binary
 </t>
 <t>Security considerations: Security considerations relating to SMTP
-      TLS Reporting are discussed in Section 7.
+      TLS Reporting are discussed in Section 7.  Security
+      considerations related to gzip compression are discussed
+      in [RFC6713].
 </t>
 <t>Interoperability considerations: This document specifies format of
       conforming messages and the interpretation thereof.
@@ -1092,7 +1091,7 @@ below.
 </t>
 
 <figure align="center"><artwork align="center">
-  Magic number(s):  n/a
+  Magic number(s):  The first two bytes are 0x1f, 0x8b.
 
   File extension(s):  ".gz"
 
@@ -1248,12 +1247,15 @@ considered.
 </references>
 <references title="Informative References">
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3464.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3501.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3864.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6533.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7321.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7435.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7469.xml"?>
 <?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7489.xml"?>
+<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8098.xml"?>
 </references>
 
 <section anchor="example-reporting-policy-1" title="Example Reporting Policy">
