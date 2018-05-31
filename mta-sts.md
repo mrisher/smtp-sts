@@ -158,12 +158,13 @@ An example TXT record is as below:
 The formal definition of the `_mta-sts` TXT record, defined using ABNF
 ([@!RFC7405]), is as follows:
 
-    sts-text-record = sts-version 1*(field-delim sts-field) [field-delim]
+    sts-text-record = sts-version 1*(sts-field-delim sts-field)
+                      [sts-field-delim]
 
     sts-field       = sts-id /                 ; Note that sts-id record
                       sts-extension            ; is required.
 
-    field-delim     = *WSP ";" *WSP
+    sts-field-delim = *WSP ";" *WSP
 
     sts-version     = %s"v=STSv1"
 
@@ -264,23 +265,23 @@ follows:
 
                                sts-policy-extension      ; other fields
 
-    field-delim              = ":" *WSP
+    sts-policy-field-delim   = ":" *WSP
 
-    sts-policy-version       = sts-policy-version-field field-delim
+    sts-policy-version       = sts-policy-version-field sts-policy-field-delim
                                sts-policy-version-value
 
     sts-policy-version-field = %s"version"
 
     sts-policy-version-value = %s"STSv1"
 
-    sts-policy-mode          = sts-policy-mode-field field-delim
+    sts-policy-mode          = sts-policy-mode-field sts-policy-field-delim
                                sts-policy-mode-value
 
     sts-policy-mode-field    = %s"mode"
 
     sts-policy-mode-value    =  %s"testing" / %s"enforce" / %s"none"
 
-    sts-policy-mx            = sts-policy-mx-field field-delim
+    sts-policy-mx            = sts-policy-mx-field sts-policy-field-delim
                                sts-policy-mx-value
 
     sts-policy-mx-field      = %s"mx"
@@ -295,16 +296,16 @@ follows:
     sts-policy-mx-toplabel   = ALPHA | ALPHA *(sts-policy-alphanum | "-") 
                                sts-policy-alphanum
 
-    sts-policy-max-age       = sts-policy-max-age-field field-delim
+    sts-policy-max-age       = sts-policy-max-age-field sts-policy-field-delim
                                sts-policy-max-age-value
 
     sts-policy-max-age-field = %s"max_age"
 
     sts-policy-max-age-value = 1*10(DIGIT)
 
-    sts-policy-extension     = sts-policy-ext-name   ; additional
-                               field-delim           ; extension
-                               sts-policy-ext-value  ; fields
+    sts-policy-extension     = sts-policy-ext-name    ; additional
+                               sts-policy-field-delim ; extension
+                               sts-policy-ext-value   ; fields
 
     sts-policy-ext-name      = (sts-policy-alphanum)
                                *31(sta-policy-alphanum / "_" / "-" / ".")
