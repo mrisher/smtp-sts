@@ -181,14 +181,14 @@ The formal definition of the `_mta-sts` TXT record, defined using ABNF
 The TXT record MUST begin with sts-version field, and the order of other fields
 is not significant.  If multiple TXT records for `_mta-sts` are returned by the
 resolver, records which do not begin with `v=STSv1;` are discarded.  If the
-number of resulting records is not one, senders MUST assume the recipient domain
-does not have an available MTA-STS policy and skip the remaining steps of policy
-discovery.  (Note that absence of a usable TXT record is not by itself
-sufficient to remove a sender's previously cached policy for the Policy Domain,
-as discussed in (#policy-application-control-flow), "Policy Application Control
-Flow".)  If the resulting TXT record contains multiple strings, then the record
-MUST be treated as if those strings are concatenated together without adding
-spaces.
+number of resulting records is not one, or if the resulting record is
+syntactically invalid, senders MUST assume the recipient domain does not have an
+available MTA-STS policy and skip the remaining steps of policy discovery.
+(Note that absence of a usable TXT record is not by itself sufficient to remove
+a sender's previously cached policy for the Policy Domain, as discussed in
+(#policy-application-control-flow), "Policy Application Control Flow".)  If the
+resulting TXT record contains multiple strings, then the record MUST be treated
+as if those strings are concatenated together without adding spaces.
 
 ## MTA-STS Policies
 

@@ -268,12 +268,12 @@ Internet-Draft                   MTA-STS                        May 2018
    other fields is not significant.  If multiple TXT records for "_mta-
    sts" are returned by the resolver, records which do not begin with
    "v=STSv1;" are discarded.  If the number of resulting records is not
-   one, senders MUST assume the recipient domain does not have an
-   available MTA-STS policy and skip the remaining steps of policy
-   discovery.  (Note that absence of a usable TXT record is not by
-   itself sufficient to remove a sender's previously cached policy for
-   the Policy Domain, as discussed in Section 5.1, "Policy Application
-   Control Flow".)  If the resulting TXT record contains multiple
+   one, or if the resulting record is syntactically invalid, senders
+   MUST assume the recipient domain does not have an available MTA-STS
+   policy and skip the remaining steps of policy discovery.  (Note that
+   absence of a usable TXT record is not by itself sufficient to remove
+   a sender's previously cached policy for the Policy Domain, as
+   discussed in Section 5.1, "Policy Application Control Flow".)  If the
 
 
 
@@ -282,8 +282,9 @@ Margolis, et al.        Expires November 24, 2018               [Page 5]
 Internet-Draft                   MTA-STS                        May 2018
 
 
-   strings, then the record MUST be treated as if those strings are
-   concatenated together without adding spaces.
+   resulting TXT record contains multiple strings, then the record MUST
+   be treated as if those strings are concatenated together without
+   adding spaces.
 
 3.2.  MTA-STS Policies
 
@@ -329,7 +330,6 @@ Internet-Draft                   MTA-STS                        May 2018
    "mail.example.com" or any MX at "example.net".  Valid patterns can be
    either fully specified names ("example.com") or suffixes prefixed by
    a wildcard ("*.example.net").  If a policy specifies more than one
-   MX, each MX MUST have its own "mx:" key, and each MX key/value pair
 
 
 
@@ -338,6 +338,7 @@ Margolis, et al.        Expires November 24, 2018               [Page 6]
 Internet-Draft                   MTA-STS                        May 2018
 
 
+   MX, each MX MUST have its own "mx:" key, and each MX key/value pair
    MUST be on its own line in the policy file.  In the case of
    Internationalized Domain Names ([RFC5891]), the "mx" value MUST
    specify the Punycode-encoded A-label [RFC3492] to match against, and
@@ -385,7 +386,6 @@ sts-policy-mode          = sts-policy-mode-field sts-policy-field-delim
 
 sts-policy-mode-field    = %s"mode"
 
-sts-policy-mode-value    =  %s"testing" / %s"enforce" / %s"none"
 
 
 
@@ -393,6 +393,8 @@ Margolis, et al.        Expires November 24, 2018               [Page 7]
 
 Internet-Draft                   MTA-STS                        May 2018
 
+
+sts-policy-mode-value    =  %s"testing" / %s"enforce" / %s"none"
 
 sts-policy-mx            = sts-policy-mx-field sts-policy-field-delim
                            sts-policy-mx-value
@@ -440,8 +442,6 @@ UTF8-2          =   <Defined in Section 4 of [@!RFC3629]>
 
 UTF8-3          =   <Defined in Section 4 of [@!RFC3629]>
 
-UTF8-4          =   <Defined in Section 4 of [@!RFC3629]>
-
 
 
 
@@ -449,6 +449,8 @@ Margolis, et al.        Expires November 24, 2018               [Page 8]
 
 Internet-Draft                   MTA-STS                        May 2018
 
+
+UTF8-4          =   <Defined in Section 4 of [@!RFC3629]>
 
    Parsers MUST accept TXT records and policy files which are
    syntactically valid (i.e., valid key/value pairs separated by semi-
@@ -496,8 +498,6 @@ Internet-Draft                   MTA-STS                        May 2018
    SHOULD limit further attempts to a period of five minutes or longer
    per version ID, to avoid overwhelming resource-constrained recipients
    with cascading failures.
-
-
 
 
 
