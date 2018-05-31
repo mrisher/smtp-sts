@@ -312,13 +312,20 @@ follows:
     sts-policy-ext-value     = sts-policy-vchar
                                [*(%x20 / sts-policy-vchar)
                                sts-policy-vchar]
-                               ; chars, including UTF-8 [@?RFC3629],
+                               ; chars, including UTF-8 [@!RFC3629],
                                ; excluding CTLs and no 
                                ; leading/trailing spaces
 
     sts-policy-alphanum     = ALPHA | DIGIT
 
     sts-policy-vchar        = %x21-7E / UTF8-2 / UTF8-3 / UTF8-4
+
+    UTF8-2          =   <Defined in Section 4 of [@!RFC3629]>
+
+    UTF8-3          =   <Defined in Section 4 of [@!RFC3629]>
+
+    UTF8-4          =   <Defined in Section 4 of [@!RFC3629]>
+
 
 Parsers MUST accept TXT records and policy files which are syntactically valid
 (i.e., valid key/value pairs separated by semi-colons for TXT records) and but

@@ -425,7 +425,7 @@ sts-policy-term          = CRLF / LF
 sts-policy-ext-value     = sts-policy-vchar
                            [*(%x20 / sts-policy-vchar)
                            sts-policy-vchar]
-                           ; chars, including UTF-8 [@?RFC3629],
+                           ; chars, including UTF-8 [@!RFC3629],
                            ; excluding CTLs and no
                            ; leading/trailing spaces
 
@@ -433,15 +433,15 @@ sts-policy-alphanum     = ALPHA | DIGIT
 
 sts-policy-vchar        = %x21-7E / UTF8-2 / UTF8-3 / UTF8-4
 
+UTF8-2          =   <Defined in Section 4 of [@!RFC3629]>
+
+UTF8-3          =   <Defined in Section 4 of [@!RFC3629]>
+
+UTF8-4          =   <Defined in Section 4 of [@!RFC3629]>
+
    Parsers MUST accept TXT records and policy files which are
    syntactically valid (i.e., valid key/value pairs separated by semi-
    colons for TXT records) and but containing additional key/value pairs
-   not specified in this document, in which case unknown fields SHALL be
-   ignored.  If any non-repeated field--i.e., all fields excepting "mx"
-   --is duplicated, all entries except for the first SHALL be ignored.
-   If any field is not specified, the policy SHALL be treated as
-   invalid.
-
 
 
 
@@ -449,6 +449,12 @@ Margolis, et al.        Expires November 24, 2018               [Page 8]
 
 Internet-Draft                   MTA-STS                        May 2018
 
+
+   not specified in this document, in which case unknown fields SHALL be
+   ignored.  If any non-repeated field--i.e., all fields excepting "mx"
+   --is duplicated, all entries except for the first SHALL be ignored.
+   If any field is not specified, the policy SHALL be treated as
+   invalid.
 
 3.3.  HTTPS Policy Fetching
 
@@ -492,12 +498,6 @@ Internet-Draft                   MTA-STS                        May 2018
    maximum size of the response body to avoid long delays or resource
    exhaustion during attempted policy updates.  A suggested timeout is
    one minute, and a suggested maximum policy size 64 kilobytes; policy
-   hosts SHOULD respond to requests with a complete policy body within
-   that timeout and size limit.
-
-   If a valid TXT record is found but no policy can be fetched via HTTPS
-   (for any reason), and there is no valid (non-expired) previously-
-
 
 
 
@@ -506,6 +506,11 @@ Margolis, et al.        Expires November 24, 2018               [Page 9]
 Internet-Draft                   MTA-STS                        May 2018
 
 
+   hosts SHOULD respond to requests with a complete policy body within
+   that timeout and size limit.
+
+   If a valid TXT record is found but no policy can be fetched via HTTPS
+   (for any reason), and there is no valid (non-expired) previously-
    cached policy, senders MUST continue with delivery as though the
    domain has not implemented MTA-STS.
 
@@ -548,11 +553,6 @@ Internet-Draft                   MTA-STS                        May 2018
        that host, as described in Section 4.2, "Recipient MTA
        Certificate Validation".
 
-   When these conditions are not met, a policy is said to fail to
-   validate.  This section does not dictate the behavior of sending MTAs
-   when the above conditions are not met; see Section 5, "Policy
-   Application" for a description of sending MTA behavior when policy
-   validation fails.
 
 
 
@@ -561,6 +561,12 @@ Margolis, et al.        Expires November 24, 2018              [Page 10]
 
 Internet-Draft                   MTA-STS                        May 2018
 
+
+   When these conditions are not met, a policy is said to fail to
+   validate.  This section does not dictate the behavior of sending MTAs
+   when the above conditions are not met; see Section 5, "Policy
+   Application" for a description of sending MTA behavior when policy
+   validation fails.
 
 4.1.  MX Host Validation
 
@@ -604,12 +610,6 @@ Internet-Draft                   MTA-STS                        May 2018
 
    When a message fails to deliver due to an "enforce" policy, a
    compliant MTA MUST NOT permanently fail to deliver messages before
-   checking, via DNS, for the presence of an updated policy at the
-   Policy Domain.  (In all cases, MTAs SHOULD treat such failures as
-   transient errors and retry delivery later.)  This allows implementing
-   domains to update long-lived policies on the fly.
-
-
 
 
 
@@ -617,6 +617,11 @@ Margolis, et al.        Expires November 24, 2018              [Page 11]
 
 Internet-Draft                   MTA-STS                        May 2018
 
+
+   checking, via DNS, for the presence of an updated policy at the
+   Policy Domain.  (In all cases, MTAs SHOULD treat such failures as
+   transient errors and retry delivery later.)  This allows implementing
+   domains to update long-lived policies on the fly.
 
 5.1.  Policy Application Control Flow
 
@@ -661,11 +666,6 @@ Internet-Draft                   MTA-STS                        May 2018
       STARTTLS or does not present a certificate which validates
       according to the applied policy, except if that policy's mode is
       "none".
-
-
-
-
-
 
 
 
