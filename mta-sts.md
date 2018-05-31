@@ -153,7 +153,7 @@ semicolon-separated key/value pairs containing the following fields:
 
 An example TXT record is as below:
 
-`_mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"`
+`_mta-sts.example.com.  IN TXT v=STSv1; id=20160831085700Z;`
 
 The formal definition of the `_mta-sts` TXT record, defined using ABNF
 ([@!RFC7405]), is as follows:
@@ -847,7 +847,7 @@ the recipient MX validate.
 
 MTA-STS policy indicator TXT RR:
 ~~~~~~~~~
-_mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
+_mta-sts.example.com.  IN TXT v=STSv1; id=20160831085700Z;
 ~~~~~~~~~
 
 MTA-STS Policy file served as the response body at
