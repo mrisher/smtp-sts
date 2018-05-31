@@ -99,6 +99,8 @@ We also define the following terms for further use in this document:
   Domain. Rules for constructing the hostname are described in
   (#mtasts-policies), "MTA-STS Policies".
 * Sender: The SMTP Mail Transfer Agent sending an email message.
+* ABNF: Augmented Backus-Naur Form, a syntax for formally specifying syntax,
+  defined in [@!RFC5234] and [@!RFC7405].
 
 # Related Technologies
 
@@ -153,8 +155,8 @@ An example TXT record is as below:
 
 `_mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"`
 
-The formal definition of the `_mta-sts` TXT record, defined using [@!RFC7405],
-is as follows:
+The formal definition of the `_mta-sts` TXT record, defined using ABNF
+([@!RFC7405]), is as follows:
 
     sts-text-record = sts-version 1*(field-delim sts-field) [field-delim]
 

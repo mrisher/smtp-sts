@@ -85,7 +85,7 @@ Table of Contents
      7.1.  SNI Support . . . . . . . . . . . . . . . . . . . . . . .  13
      7.2.  Minimum TLS Version Support . . . . . . . . . . . . . . .  13
    8.  Operational Considerations  . . . . . . . . . . . . . . . . .  13
-     8.1.  Policy Updates  . . . . . . . . . . . . . . . . . . . . .  13
+     8.1.  Policy Updates  . . . . . . . . . . . . . . . . . . . . .  14
      8.2.  Policy Delegation . . . . . . . . . . . . . . . . . . . .  14
      8.3.  Removing MTA-STS  . . . . . . . . . . . . . . . . . . . .  15
      8.4.  Preserving MX Candidate Traversal . . . . . . . . . . . .  15
@@ -105,7 +105,7 @@ Table of Contents
      12.2.  Informative References . . . . . . . . . . . . . . . . .  22
    Appendix A.  MTA-STS example record & policy  . . . . . . . . . .  23
    Appendix B.  Message delivery pseudocode  . . . . . . . . . . . .  23
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  25
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  26
 
 
 
@@ -170,6 +170,9 @@ Margolis, et al.        Expires November 24, 2018               [Page 3]
 Internet-Draft                   MTA-STS                        May 2018
 
 
+   o  ABNF: Augmented Backus-Naur Form, a syntax for formally specifying
+      syntax, defined in [RFC5234] and [RFC7405].
+
 2.  Related Technologies
 
    The DANE TLSA record [RFC7672] is similar, in that DANE is also
@@ -214,10 +217,7 @@ Internet-Draft                   MTA-STS                        May 2018
 
    The MTA-STS TXT record is a TXT record with the name "_mta-sts" at
    the Policy Domain.  For the domain "example.com", this record would
-   be "_mta-sts.example.com".  MTA-STS TXT records MUST be US-ASCII,
-   semicolon-separated key/value pairs containing the following fields:
 
-   o  "v": (plain-text, required).  Currently only "STSv1" is supported.
 
 
 
@@ -225,6 +225,11 @@ Margolis, et al.        Expires November 24, 2018               [Page 4]
 
 Internet-Draft                   MTA-STS                        May 2018
 
+
+   be "_mta-sts.example.com".  MTA-STS TXT records MUST be US-ASCII,
+   semicolon-separated key/value pairs containing the following fields:
+
+   o  "v": (plain-text, required).  Currently only "STSv1" is supported.
 
    o  "id": (plain-text, required).  A short string used to track policy
       updates.  This string MUST uniquely identify a given instance of a
@@ -237,7 +242,7 @@ Internet-Draft                   MTA-STS                        May 2018
    "_mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;""
 
    The formal definition of the "_mta-sts" TXT record, defined using
-   [RFC7405], is as follows:
+   ABNF ([RFC7405]), is as follows:
 
    sts-text-record = sts-version 1*(field-delim sts-field) [field-delim]
 
@@ -268,11 +273,6 @@ Internet-Draft                   MTA-STS                        May 2018
    itself sufficient to remove a sender's previously cached policy for
    the Policy Domain, as discussed in Section 5.1, "Policy Application
    Control Flow".)  If the resulting TXT record contains multiple
-   strings, then the record MUST be treated as if those strings are
-   concatenated together without adding spaces.
-
-
-
 
 
 
@@ -281,6 +281,9 @@ Margolis, et al.        Expires November 24, 2018               [Page 5]
 
 Internet-Draft                   MTA-STS                        May 2018
 
+
+   strings, then the record MUST be treated as if those strings are
+   concatenated together without adding spaces.
 
 3.2.  MTA-STS Policies
 
@@ -327,9 +330,6 @@ Internet-Draft                   MTA-STS                        May 2018
    either fully specified names ("example.com") or suffixes prefixed by
    a wildcard ("*.example.net").  If a policy specifies more than one
    MX, each MX MUST have its own "mx:" key, and each MX key/value pair
-   MUST be on its own line in the policy file.  In the case of
-   Internationalized Domain Names ([RFC5891]), the "mx" value MUST
-   specify the Punycode-encoded A-label [RFC3492] to match against, and
 
 
 
@@ -338,6 +338,9 @@ Margolis, et al.        Expires November 24, 2018               [Page 6]
 Internet-Draft                   MTA-STS                        May 2018
 
 
+   MUST be on its own line in the policy file.  In the case of
+   Internationalized Domain Names ([RFC5891]), the "mx" value MUST
+   specify the Punycode-encoded A-label [RFC3492] to match against, and
    not the Unicode-encoded U-label.  The full semantics of certificate
    validation (including the use of wildcard patterns) are described in
    Section 4.1, "MX Host Validation."
@@ -384,15 +387,15 @@ sts-policy-mode-field    = %s"mode"
 
 sts-policy-mode-value    =  %s"testing" / %s"enforce" / %s"none"
 
-sts-policy-mx            = sts-policy-mx-field field-delim
-                           sts-policy-mx-value
-
 
 
 Margolis, et al.        Expires November 24, 2018               [Page 7]
 
 Internet-Draft                   MTA-STS                        May 2018
 
+
+sts-policy-mx            = sts-policy-mx-field field-delim
+                           sts-policy-mx-value
 
 sts-policy-mx-field      = %s"mx"
 
@@ -439,9 +442,6 @@ UTF8-3          =   <Defined in Section 4 of [@!RFC3629]>
 
 UTF8-4          =   <Defined in Section 4 of [@!RFC3629]>
 
-   Parsers MUST accept TXT records and policy files which are
-   syntactically valid (i.e., valid key/value pairs separated by semi-
-   colons for TXT records) and but containing additional key/value pairs
 
 
 
@@ -450,6 +450,9 @@ Margolis, et al.        Expires November 24, 2018               [Page 8]
 Internet-Draft                   MTA-STS                        May 2018
 
 
+   Parsers MUST accept TXT records and policy files which are
+   syntactically valid (i.e., valid key/value pairs separated by semi-
+   colons for TXT records) and but containing additional key/value pairs
    not specified in this document, in which case unknown fields SHALL be
    ignored.  If any non-repeated field--i.e., all fields excepting "mx"
    --is duplicated, all entries except for the first SHALL be ignored.
@@ -494,10 +497,7 @@ Internet-Draft                   MTA-STS                        May 2018
    per version ID, to avoid overwhelming resource-constrained recipients
    with cascading failures.
 
-   Senders MAY impose a timeout on the HTTPS GET and/or a limit on the
-   maximum size of the response body to avoid long delays or resource
-   exhaustion during attempted policy updates.  A suggested timeout is
-   one minute, and a suggested maximum policy size 64 kilobytes; policy
+
 
 
 
@@ -506,6 +506,10 @@ Margolis, et al.        Expires November 24, 2018               [Page 9]
 Internet-Draft                   MTA-STS                        May 2018
 
 
+   Senders MAY impose a timeout on the HTTPS GET and/or a limit on the
+   maximum size of the response body to avoid long delays or resource
+   exhaustion during attempted policy updates.  A suggested timeout is
+   one minute, and a suggested maximum policy size 64 kilobytes; policy
    hosts SHOULD respond to requests with a complete policy body within
    that timeout and size limit.
 
@@ -550,10 +554,6 @@ Internet-Draft                   MTA-STS                        May 2018
 
    2.  The recipient mail server supports STARTTLS and offers a PKIX-
        based TLS certificate, during TLS handshake, which is valid for
-       that host, as described in Section 4.2, "Recipient MTA
-       Certificate Validation".
-
-
 
 
 
@@ -561,6 +561,9 @@ Margolis, et al.        Expires November 24, 2018              [Page 10]
 
 Internet-Draft                   MTA-STS                        May 2018
 
+
+       that host, as described in Section 4.2, "Recipient MTA
+       Certificate Validation".
 
    When these conditions are not met, a policy is said to fail to
    validate.  This section does not dictate the behavior of sending MTAs
@@ -608,9 +611,6 @@ Internet-Draft                   MTA-STS                        May 2018
        as though it does not have any active policy; see Section 8.3,
        "Removing MTA-STS", for use of this mode value.
 
-   When a message fails to deliver due to an "enforce" policy, a
-   compliant MTA MUST NOT permanently fail to deliver messages before
-
 
 
 Margolis, et al.        Expires November 24, 2018              [Page 11]
@@ -618,6 +618,8 @@ Margolis, et al.        Expires November 24, 2018              [Page 11]
 Internet-Draft                   MTA-STS                        May 2018
 
 
+   When a message fails to deliver due to an "enforce" policy, a
+   compliant MTA MUST NOT permanently fail to deliver messages before
    checking, via DNS, for the presence of an updated policy at the
    Policy Domain.  (In all cases, MTAs SHOULD treat such failures as
    transient errors and retry delivery later.)  This allows implementing
@@ -664,8 +666,6 @@ Internet-Draft                   MTA-STS                        May 2018
 
    o  Delivery attempts in which a contacted MX does not support
       STARTTLS or does not present a certificate which validates
-      according to the applied policy, except if that policy's mode is
-      "none".
 
 
 
@@ -673,6 +673,9 @@ Margolis, et al.        Expires November 24, 2018              [Page 12]
 
 Internet-Draft                   MTA-STS                        May 2018
 
+
+      according to the applied policy, except if that policy's mode is
+      "none".
 
 7.  Interoperability Considerations
 
@@ -715,12 +718,9 @@ Internet-Draft                   MTA-STS                        May 2018
 
 8.  Operational Considerations
 
-8.1.  Policy Updates
 
-   Updating the policy requires that the owner make changes in two
-   places: the "_mta-sts" TXT record in the Policy Domain's DNS zone and
-   at the corresponding HTTPS endpoint.  As a result, recipients should
-   expect a policy will continue to be used by senders until both the
+
+
 
 
 
@@ -730,6 +730,12 @@ Margolis, et al.        Expires November 24, 2018              [Page 13]
 Internet-Draft                   MTA-STS                        May 2018
 
 
+8.1.  Policy Updates
+
+   Updating the policy requires that the owner make changes in two
+   places: the "_mta-sts" TXT record in the Policy Domain's DNS zone and
+   at the corresponding HTTPS endpoint.  As a result, recipients should
+   expect a policy will continue to be used by senders until both the
    HTTPS and TXT endpoints are updated and the TXT record's TTL has
    passed.
 
@@ -773,18 +779,16 @@ Internet-Draft                   MTA-STS                        May 2018
 
    Policy:
 
-         > GET /.well-known/mta-sts.txt Host: mta-sts.user.example
-         < HTTP/1.1 200 OK  # Response proxies content from
-                            # https://mta-sts.provider.example
-
-
-
 
 
 Margolis, et al.        Expires November 24, 2018              [Page 14]
 
 Internet-Draft                   MTA-STS                        May 2018
 
+
+         > GET /.well-known/mta-sts.txt Host: mta-sts.user.example
+         < HTTP/1.1 200 OK  # Response proxies content from
+                            # https://mta-sts.provider.example
 
    Note that in all such cases, the policy endpoint ("https://mta-
    sts.user.example/.well-known/mta-sts.txt" in this example) must still
@@ -830,10 +834,6 @@ Internet-Draft                   MTA-STS                        May 2018
    Implementors of send-time MTA-STS validation in mail transfer agents
    should take note of the risks of modifying the logic of traversing MX
    candidate lists.  Because an MTA-STS policy can be used to prefilter
-   invalid MX candidates from the MX candidate list, it is tempting to
-   implement a "two-pass" model, where MX candidates are first filtered
-   for possible validity according to the MTA-STS policy, and then the
-   remaining candidates attempted in order as without an MTA-STS policy.
 
 
 
@@ -842,6 +842,10 @@ Margolis, et al.        Expires November 24, 2018              [Page 15]
 Internet-Draft                   MTA-STS                        May 2018
 
 
+   invalid MX candidates from the MX candidate list, it is tempting to
+   implement a "two-pass" model, where MX candidates are first filtered
+   for possible validity according to the MTA-STS policy, and then the
+   remaining candidates attempted in order as without an MTA-STS policy.
    This may lead to incorrect implementations, such a message loops;
    implementors are instead recommended to traverse the MX candidate
    list as usual, and treat invalid candidates as though they were
@@ -883,10 +887,6 @@ Internet-Draft                   MTA-STS                        May 2018
 
    IANA is requested to create a new registry titled "MTA-STS Policy
    Fields".  The initial entries in the registry are:
-
-
-
-
 
 
 
@@ -1135,6 +1135,11 @@ Internet-Draft                   MTA-STS                        May 2018
               (IDNA)", RFC 3492, DOI 10.17487/RFC3492, March 2003,
               <https://www.rfc-editor.org/info/rfc3492>.
 
+   [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
+              Specifications: ABNF", STD 68, RFC 5234,
+              DOI 10.17487/RFC5234, January 2008, <https://www.rfc-
+              editor.org/info/rfc5234>.
+
    [RFC5246]  Dierks, T. and E. Rescorla, "The Transport Layer Security
               (TLS) Protocol Version 1.2", RFC 5246,
               DOI 10.17487/RFC5246, August 2008, <https://www.rfc-
@@ -1160,6 +1165,19 @@ Internet-Draft                   MTA-STS                        May 2018
               DOI 10.17487/RFC6066, January 2011, <https://www.rfc-
               editor.org/info/rfc6066>.
 
+
+
+
+
+
+
+
+
+Margolis, et al.        Expires November 24, 2018              [Page 21]
+
+Internet-Draft                   MTA-STS                        May 2018
+
+
    [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
               Verification of Domain-Based Application Service Identity
               within Internet Public Key Infrastructure Using X.509
@@ -1170,13 +1188,6 @@ Internet-Draft                   MTA-STS                        May 2018
    [RFC7405]  Kyzivat, P., "Case-Sensitive String Support in ABNF",
               RFC 7405, DOI 10.17487/RFC7405, December 2014,
               <https://www.rfc-editor.org/info/rfc7405>.
-
-
-
-Margolis, et al.        Expires November 24, 2018              [Page 21]
-
-Internet-Draft                   MTA-STS                        May 2018
-
 
    [RFC7525]  Sheffer, Y., Holz, R., and P. Saint-Andre,
               "Recommendations for Secure Use of Transport Layer
@@ -1215,6 +1226,14 @@ Internet-Draft                   MTA-STS                        May 2018
               RFC 6960, DOI 10.17487/RFC6960, June 2013,
               <https://www.rfc-editor.org/info/rfc6960>.
 
+
+
+
+Margolis, et al.        Expires November 24, 2018              [Page 22]
+
+Internet-Draft                   MTA-STS                        May 2018
+
+
    [RFC7234]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
               Ed., "Hypertext Transfer Protocol (HTTP/1.1): Caching",
               RFC 7234, DOI 10.17487/RFC7234, June 2014,
@@ -1225,14 +1244,6 @@ Internet-Draft                   MTA-STS                        May 2018
               (DANE) Transport Layer Security (TLS)", RFC 7672,
               DOI 10.17487/RFC7672, October 2015, <https://www.rfc-
               editor.org/info/rfc7672>.
-
-
-
-
-Margolis, et al.        Expires November 24, 2018              [Page 22]
-
-Internet-Draft                   MTA-STS                        May 2018
-
 
 Appendix A.  MTA-STS example record & policy
 
@@ -1271,6 +1282,14 @@ Appendix B.  Message delivery pseudocode
 
 func isEnforce(policy) {
   // Return true if the policy mode is "enforce".
+
+
+
+Margolis, et al.        Expires November 24, 2018              [Page 23]
+
+Internet-Draft                   MTA-STS                        May 2018
+
+
 }
 
 func isNonExpired(policy) {
@@ -1282,14 +1301,6 @@ func tryStartTls(connection) {
 }
 
 func certMatches(connection, host) {
-
-
-
-Margolis, et al.        Expires November 24, 2018              [Page 23]
-
-Internet-Draft                   MTA-STS                        May 2018
-
-
   // Assume a handy function to return check if the server certificate presented
   // in "connection" is valid for "host".
 }
@@ -1327,6 +1338,14 @@ func cachePolicy(domain, policy) {
 
 func tryGetCachedPolicy(domain) {
   // Return a cached policy for "domain".
+
+
+
+Margolis, et al.        Expires November 24, 2018              [Page 24]
+
+Internet-Draft                   MTA-STS                        May 2018
+
+
 }
 
 func reportError(error) {
@@ -1338,14 +1357,6 @@ func tryMxAccordingTo(message, mx, policy) {
   if !connection {
     return false  // Can't connect to the MX so it's not an MTA-STS
                   // error.
-
-
-
-Margolis, et al.        Expires November 24, 2018              [Page 24]
-
-Internet-Draft                   MTA-STS                        May 2018
-
-
   }
   secure := true
   if !policyMatches(mx, policy) {
@@ -1383,17 +1394,6 @@ func handleMessage(message) {
     policy = tryGetCachedPolicy(domain)
   }
   if policy {
-    return tryWithPolicy(message, domain, policy)
-  }
-  // Try to deliver the message normally (i.e., without MTA-STS).
-}
-
-
-Authors' Addresses
-
-
-
-
 
 
 
@@ -1401,6 +1401,14 @@ Margolis, et al.        Expires November 24, 2018              [Page 25]
 
 Internet-Draft                   MTA-STS                        May 2018
 
+
+    return tryWithPolicy(message, domain, policy)
+  }
+  // Try to deliver the message normally (i.e., without MTA-STS).
+}
+
+
+Authors' Addresses
 
    Daniel Margolis
    Google, Inc
@@ -1430,14 +1438,6 @@ Internet-Draft                   MTA-STS                        May 2018
    Microsoft, Inc
 
    Email: janet.jones@microsoft.com
-
-
-
-
-
-
-
-
 
 
 
