@@ -115,14 +115,14 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
 
      6.4.  application/tlsrpt+json Media Type  . . . . . . . . . . .  21
-     6.5.  application/tlsrpt+gzip Media Type  . . . . . . . . . . .  22
+     6.5.  application/tlsrpt+gzip Media Type  . . . . . . . . . . .  23
      6.6.  STARTTLS Validation Result Types  . . . . . . . . . . . .  24
-   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  24
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  25
    8.  Privacy Considerations  . . . . . . . . . . . . . . . . . . .  26
    9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  26
      9.1.  Normative References  . . . . . . . . . . . . . . . . . .  26
-     9.2.  Informative References  . . . . . . . . . . . . . . . . .  28
-     9.3.  URIs  . . . . . . . . . . . . . . . . . . . . . . . . . .  29
+     9.2.  Informative References  . . . . . . . . . . . . . . . . .  29
+     9.3.  URIs  . . . . . . . . . . . . . . . . . . . . . . . . . .  30
    Appendix A.  Example Reporting Policy . . . . . . . . . . . . . .  30
      A.1.  Report using MAILTO . . . . . . . . . . . . . . . . . . .  30
      A.2.  Report using HTTPS  . . . . . . . . . . . . . . . . . . .  30
@@ -1082,27 +1082,22 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
    The initial entries are:
 
-   Report-Type: tlsrpt 
-   Media Type: application/tlsrpt+gzip, application/tlsrpt+json 
-   Registered By: [I-D.ietf-uta-smtp-tlsrpt] 
-   Comment: Media types suitable for use with this report-type are 
-   defined in Sections 6.4 and 6.5 of [I-D.ietf-uta-smtp-tlsrpt]
+   Report-Type: tlsrpt Media Type: application/tlsrpt+gzip, application/
+   tlsrpt+json Registered By: [RFCXXXX] Comment: Media types suitable
+   for use with this report-type are defined in Sections 6.4 and 6.5 of
+   [RFCXXXX]
 
-   Report-Type: disposition-notification 
-   Media Type: message/disposition-notification 
-   Registered By: [RFC8098] Section 10
+   Report-Type: disposition-notification Media Type: message/
+   disposition-notification Registered By: [RFC8098] Section 10
 
-   Report-Type: disposition-notification 
-   Media Type: message/global-disposition-notification 
-   Registered By: [RFC6533] Section 6
+   Report-Type: disposition-notification Media Type: message/global-
+   disposition-notification Registered By: [RFC6533] Section 6
 
-   Report-Type: delivery-status 
-   Media Type: message/delivery-status
+   Report-Type: delivery-status Media Type: message/delivery-status
    Registered By: [RFC3464] Appendix D
 
-   Report-Type: delivery-status 
-   Media Type: message/global-delivery-status 
-   Registered By: [RFC6533] Section 6
+   Report-Type: delivery-status Media Type: message/global-delivery-
+   status Registered By: [RFC6533] Section 6
 
 6.3.  +gzip Media Type Suffix
 
@@ -1131,40 +1126,57 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
    Encoding considerations: GZIP is a binary encoding.
 
-   Fragment identifier considerations: The syntax and semantics of
-   fragment identifiers specified for +gzip SHOULD be as specified for
-   "application/gzip".  (At publication of this document, there is no
-   fragment identification syntax defined for "application/gzip".)  The
-   syntax and semantics for fragment identifiers for a specific "xxx/
-   yyy+gzip" SHOULD be processed as follows:
+   Fragment identifier considerations: The syntax and semantics
 
-       For cases defined in +gzip, where the fragment identifier
-       resolves per the +gzip rules, then process as specified in
-       +gzip.
+      of fragment identifiers specified for
+      +gzip SHOULD be as specified for "application/gzip".  (At
+      publication of this document, there is no fragment identification
+      syntax defined for "application/gzip".) The syntax and semantics
+      for fragment identifiers for a specific "xxx/yyy+gzip" SHOULD be
+      processed as follows:
 
-       For cases defined in +gzip, where the fragment identifier does
-       not resolve per the +gzip rules, then process as specified in
-       "xxx/yyy+gzip".
+      For cases defined in +gzip, where the fragment identifier
+      resolves per the +gzip rules, then process as specified in
+      +gzip.
 
-       For cases not defined in +gzip, then process as specified in
-       "xxx/yyy+gzip".
+      For cases defined in +gzip, where the fragment identifier does
+      not resolve per the +gzip rules, then process as specified in
+      "xxx/yyy+gzip".
+
+      For cases not defined in +gzip, then process as specified in
+      "xxx/yyy+gzip".
 
    Interoperability considerations: n/a
 
    Security considerations: GZIP format doesn't provide encryption.  See
-   also security considerations of [RFC6713].  Each individual media
-   type registered with a +gzip suffix can have additional security
-   considerations
+   also
+
+  security considerations of [@?RFC6713]. Each individual media type
+  registered with a +gzip suffix can have additional security considerations
 
    Contact: art@ietf.org
 
    Author/Change controller: Internet Engineering Task Force
-   (mailto:iesg@ietf.org).
+
+                           (mailto:iesg@ietf.org).
 
 6.4.  application/tlsrpt+json Media Type
 
    This document registers multiple media types, beginning with Table 1
    below.
+
+
+
+
+
+
+
+
+
+Margolis, et al.        Expires November 24, 2018              [Page 21]
+
+Internet-Draft                 SMTP-TLSRPT                      May 2018
+
 
     +-------------+----------------+-------------+-------------------+
     | Type        | Subtype        | File extn   | Specification     |
@@ -1175,14 +1187,6 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
    Type name: application
 
-
-
-
-Margolis, et al.        Expires November 24, 2018              [Page 21]
-
-Internet-Draft                 SMTP-TLSRPT                      May 2018
-
-
    Subtype name: tlsrpt+json
 
    Required parameters: n/a
@@ -1190,19 +1194,23 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
    Optional parameters: n/a
 
    Encoding considerations: Encoding considerations are identical to
-   those specified for the "application/json" media type.  See
-   [RFC7493].
 
-   Security considerations: Security considerations relating to SMTP TLS
-   Reporting are discussed in Section 7.
+         those specified for the `application/json` media type. See
+         [@!RFC7493].
+
+   Security considerations: Security considerations relating to SMTP
+
+                  TLS Reporting are discussed in Section 7.
 
    Interoperability considerations: This document specifies format of
-   conforming messages and the interpretation thereof.
+
+             conforming messages and the interpretation thereof.
 
    Published specification: Section 5.3 of this document.
 
    Applications that use this media type: Mail User Agents (MUA) and
-   Mail Transfer Agents.
+
+                            Mail Transfer Agents.
 
    Additional information:
 
@@ -1213,23 +1221,10 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
                       Macintosh file type code(s):  n/a
 
    Person & email address to contact for further information: See
-   Authors' Addresses section.
+
+                         Authors' Addresses section.
 
    Intended usage: COMMON
-
-   Restrictions on usage: n/a
-
-   Author: See Authors' Addresses section.
-
-   Change controller: Internet Engineering Task Force
-   (mailto:iesg@ietf.org).
-
-6.5.  application/tlsrpt+gzip Media Type
-
-
-
-
-
 
 
 
@@ -1238,6 +1233,16 @@ Margolis, et al.        Expires November 24, 2018              [Page 22]
 
 Internet-Draft                 SMTP-TLSRPT                      May 2018
 
+
+   Restrictions on usage: n/a
+
+   Author: See Authors' Addresses section.
+
+   Change controller: Internet Engineering Task Force
+
+                           (mailto:iesg@ietf.org).
+
+6.5.  application/tlsrpt+gzip Media Type
 
     +-------------+----------------+-------------+-------------------+
     | Type        | Subtype        | File extn   | Specification     |
@@ -1256,19 +1261,34 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
 
    Encoding considerations: Binary
 
-   Security considerations: Security considerations relating to SMTP TLS
-   Reporting are discussed in Section 7.  Security considerations
-   related to gzip compression are discussed in [RFC6713].
+   Security considerations: Security considerations relating to SMTP
+
+          TLS Reporting are discussed in Section 7.  Security
+          considerations related to gzip compression are discussed
+          in [RFC6713].
 
    Interoperability considerations: This document specifies format of
-   conforming messages and the interpretation thereof.
+
+             conforming messages and the interpretation thereof.
 
    Published specification: Section 5.3 of this document.
 
    Applications that use this media type: Mail User Agents (MUA) and
-   Mail Transfer Agents.
+
+                            Mail Transfer Agents.
 
    Additional information:
+
+
+
+
+
+
+
+Margolis, et al.        Expires November 24, 2018              [Page 23]
+
+Internet-Draft                 SMTP-TLSRPT                      May 2018
+
 
             Magic number(s):  The first two bytes are 0x1f, 0x8b.
 
@@ -1277,7 +1297,8 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
             Macintosh file type code(s):  n/a
 
    Person & email address to contact for further information: See
-   Authors' Addresses section.
+
+                         Authors' Addresses section.
 
    Intended usage: COMMON
 
@@ -1286,14 +1307,8 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
    Author: See Authors' Addresses section.
 
    Change controller: Internet Engineering Task Force
-   (mailto:iesg@ietf.org).
 
-
-
-Margolis, et al.        Expires November 24, 2018              [Page 23]
-
-Internet-Draft                 SMTP-TLSRPT                      May 2018
-
+                           (mailto:iesg@ietf.org).
 
 6.6.  STARTTLS Validation Result Types
 
@@ -1319,6 +1334,18 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
    Types."  New result types can be added to this registry using "Expert
    Review" IANA registration policy.
 
+
+
+
+
+
+
+
+Margolis, et al.        Expires November 24, 2018              [Page 24]
+
+Internet-Draft                 SMTP-TLSRPT                      May 2018
+
+
 7.  Security Considerations
 
    SMTP TLS Reporting provides transparency into misconfigurations or
@@ -1342,15 +1369,6 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
       receive statistics about a domain the attacker does not own.
       Since an attacker able to poison DNS is already able to receive
       counts of SMTP connections (and, absent DANE or MTA-STS policies,
-
-
-
-
-Margolis, et al.        Expires November 24, 2018              [Page 24]
-
-Internet-Draft                 SMTP-TLSRPT                      May 2018
-
-
       actual SMTP message payloads), this does not present a significant
       new vulnerability.
 
@@ -1376,6 +1394,14 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
       DNS could also use this mechanism to direct the reports to an
       unwitting victim, flooding that victim with excessive reports.
       DMARC [RFC7489] defines a solution for verifying delegation to
+
+
+
+Margolis, et al.        Expires November 24, 2018              [Page 25]
+
+Internet-Draft                 SMTP-TLSRPT                      May 2018
+
+
       avoid such attacks; the need for this is greater with DMARC,
       however, because DMARC allows an attacker to trigger reports to a
       target from an innocent third party by sending that third party
@@ -1398,15 +1424,6 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
    transient attacks against DNS resolution of the record) or to deploy
    DNSSEC on the deploying zone.
 
-
-
-
-
-Margolis, et al.        Expires November 24, 2018              [Page 25]
-
-Internet-Draft                 SMTP-TLSRPT                      May 2018
-
-
 8.  Privacy Considerations
 
    MTAs are generally considered public knowledge, however, the
@@ -1427,12 +1444,19 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
    [I-D.ietf-uta-mta-sts]
               Margolis, D., Risher, M., Ramakrishnan, B., Brotman, A.,
               and J. Jones, "SMTP MTA Strict Transport Security (MTA-
-              STS)", draft-ietf-uta-mta-sts-17 (work in progress), May
+              STS)", draft-ietf-uta-mta-sts-19 (work in progress), May
               2018.
 
    [RFC1952]  Deutsch, P., "GZIP file format specification version 4.3",
               RFC 1952, DOI 10.17487/RFC1952, May 1996,
               <https://www.rfc-editor.org/info/rfc1952>.
+
+
+
+Margolis, et al.        Expires November 24, 2018              [Page 26]
+
+Internet-Draft                 SMTP-TLSRPT                      May 2018
+
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -1452,16 +1476,6 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
               Resource Identifier (URI): Generic Syntax", STD 66,
               RFC 3986, DOI 10.17487/RFC3986, January 2005,
               <https://www.rfc-editor.org/info/rfc3986>.
-
-
-
-
-
-
-Margolis, et al.        Expires November 24, 2018              [Page 26]
-
-Internet-Draft                 SMTP-TLSRPT                      May 2018
-
 
    [RFC4408]  Wong, M. and W. Schlitt, "Sender Policy Framework (SPF)
               for Authorizing Use of Domains in E-Mail, Version 1",
@@ -1492,6 +1506,14 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
               DOI 10.17487/RFC5891, August 2010, <https://www.rfc-
               editor.org/info/rfc5891>.
 
+
+
+
+Margolis, et al.        Expires November 24, 2018              [Page 27]
+
+Internet-Draft                 SMTP-TLSRPT                      May 2018
+
+
    [RFC5952]  Kawamura, S. and M. Kawashima, "A Recommendation for IPv6
               Address Text Representation", RFC 5952,
               DOI 10.17487/RFC5952, August 2010, <https://www.rfc-
@@ -1507,17 +1529,6 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
               (PKIX) Certificates in the Context of Transport Layer
               Security (TLS)", RFC 6125, DOI 10.17487/RFC6125, March
               2011, <https://www.rfc-editor.org/info/rfc6125>.
-
-
-
-
-
-
-
-Margolis, et al.        Expires November 24, 2018              [Page 27]
-
-Internet-Draft                 SMTP-TLSRPT                      May 2018
-
 
    [RFC6376]  Crocker, D., Ed., Hansen, T., Ed., and M. Kucherawy, Ed.,
               "DomainKeys Identified Mail (DKIM) Signatures", STD 76,
@@ -1551,6 +1562,14 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
               DOI 10.17487/RFC7493, March 2015, <https://www.rfc-
               editor.org/info/rfc7493>.
 
+
+
+
+Margolis, et al.        Expires November 24, 2018              [Page 28]
+
+Internet-Draft                 SMTP-TLSRPT                      May 2018
+
+
    [RFC7672]  Dukhovni, V. and W. Hardaker, "SMTP Security via
               Opportunistic DNS-Based Authentication of Named Entities
               (DANE) Transport Layer Security (TLS)", RFC 7672,
@@ -1566,14 +1585,6 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
    [RFC3207]  Hoffman, P., "SMTP Service Extension for Secure SMTP over
               Transport Layer Security", RFC 3207, DOI 10.17487/RFC3207,
               February 2002, <https://www.rfc-editor.org/info/rfc3207>.
-
-
-
-
-Margolis, et al.        Expires November 24, 2018              [Page 28]
-
-Internet-Draft                 SMTP-TLSRPT                      May 2018
-
 
    [RFC3464]  Moore, K. and G. Vaudreuil, "An Extensible Message Format
               for Delivery Status Notifications", RFC 3464,
@@ -1608,6 +1619,13 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
               Extension for HTTP", RFC 7469, DOI 10.17487/RFC7469, April
               2015, <https://www.rfc-editor.org/info/rfc7469>.
 
+
+
+Margolis, et al.        Expires November 24, 2018              [Page 29]
+
+Internet-Draft                 SMTP-TLSRPT                      May 2018
+
+
    [RFC7489]  Kucherawy, M., Ed. and E. Zwicky, Ed., "Domain-based
               Message Authentication, Reporting, and Conformance
               (DMARC)", RFC 7489, DOI 10.17487/RFC7489, March 2015,
@@ -1622,14 +1640,6 @@ Internet-Draft                 SMTP-TLSRPT                      May 2018
    [1] Section 2.2.3
 
    [2] Section 3
-
-
-
-
-Margolis, et al.        Expires November 24, 2018              [Page 29]
-
-Internet-Draft                 SMTP-TLSRPT                      May 2018
-
 
 Appendix A.  Example Reporting Policy
 
@@ -1652,21 +1662,6 @@ Appendix B.  Example JSON Report
    Company Y servers that did not successfully respond to the "STARTTLS"
    command.  Additionally 3 sessions failed due to
    "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED".
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

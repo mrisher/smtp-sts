@@ -107,7 +107,6 @@ diagnose unintentional misconfigurations.
 </t>
 </abstract>
 
-
 </front>
 
 <middle>
@@ -961,15 +960,16 @@ syntax suffix registration form follows:
 <t>Encoding considerations:  GZIP is a binary encoding.
 </t>
 <t>Fragment identifier considerations: The syntax and semantics
-      of fragment identifiers specified for
-      +gzip SHOULD be as specified for &quot;application/gzip&quot;.  (At
-      publication of this document, there is no fragment identification
-      syntax defined for &quot;application/gzip&quot;.) The syntax and semantics
-      for fragment identifiers for a specific &quot;xxx/yyy+gzip&quot; SHOULD be
-      processed as follows:
 </t>
 
 <figure align="center"><artwork align="center">
+  of fragment identifiers specified for
+  +gzip SHOULD be as specified for "application/gzip".  (At
+  publication of this document, there is no fragment identification
+  syntax defined for "application/gzip".) The syntax and semantics
+  for fragment identifiers for a specific "xxx/yyy+gzip" SHOULD be
+  processed as follows:
+
   For cases defined in +gzip, where the fragment identifier
   resolves per the +gzip rules, then process as specified in
   +gzip.
@@ -984,14 +984,20 @@ syntax suffix registration form follows:
 <t>Interoperability considerations:  n/a
 </t>
 <t>Security considerations: GZIP format doesn't provide encryption. See also
-      security considerations of <xref target="RFC6713"/>. Each individual media type
-      registered with a +gzip suffix can have additional security considerations
 </t>
+
+<figure align="center"><artwork align="center">
+  security considerations of [@?RFC6713]. Each individual media type
+  registered with a +gzip suffix can have additional security considerations
+</artwork></figure>
 <t>Contact: art@ietf.org
 </t>
 <t>Author/Change controller:  Internet Engineering Task Force
-      (mailto:iesg@ietf.org).
 </t>
+
+<figure align="center"><artwork align="center">
+  (mailto:iesg@ietf.org).
+</artwork></figure>
 </section>
 
 <section anchor="applicationtlsrptjson-media-type" title="application/tlsrpt+json Media Type">
@@ -1016,20 +1022,32 @@ below.
 <t>Optional parameters: n/a
 </t>
 <t>Encoding considerations: Encoding considerations are identical to
-      those specified for the <spanx style="verb">application/json</spanx> media type. See
-      <xref target="RFC7493"/>.
 </t>
+
+<figure align="center"><artwork align="center">
+  those specified for the `application/json` media type. See
+  [@!RFC7493].
+</artwork></figure>
 <t>Security considerations: Security considerations relating to SMTP
-      TLS Reporting are discussed in Section 7.
 </t>
+
+<figure align="center"><artwork align="center">
+  TLS Reporting are discussed in Section 7.
+</artwork></figure>
 <t>Interoperability considerations: This document specifies format of
-      conforming messages and the interpretation thereof.
 </t>
+
+<figure align="center"><artwork align="center">
+  conforming messages and the interpretation thereof.
+</artwork></figure>
 <t>Published specification: Section 5.3 of this document.
 </t>
 <t>Applications that use this media type: Mail User Agents (MUA) and
-      Mail Transfer Agents.
 </t>
+
+<figure align="center"><artwork align="center">
+  Mail Transfer Agents.
+</artwork></figure>
 <t>Additional information:
 </t>
 
@@ -1041,8 +1059,11 @@ below.
   Macintosh file type code(s):  n/a
 </artwork></figure>
 <t>Person &amp; email address to contact for further information: See
-      Authors' Addresses section.
 </t>
+
+<figure align="center"><artwork align="center">
+  Authors' Addresses section.
+</artwork></figure>
 <t>Intended usage:  COMMON
 </t>
 <t>Restrictions on usage:  n/a
@@ -1050,8 +1071,11 @@ below.
 <t>Author:  See Authors' Addresses section.
 </t>
 <t>Change controller:  Internet Engineering Task Force
-      (mailto:iesg@ietf.org).
 </t>
+
+<figure align="center"><artwork align="center">
+  (mailto:iesg@ietf.org).
+</artwork></figure>
 </section>
 
 <section anchor="applicationtlsrptgzip-media-type" title="application/tlsrpt+gzip Media Type">
@@ -1075,18 +1099,27 @@ below.
 <t>Encoding considerations: Binary
 </t>
 <t>Security considerations: Security considerations relating to SMTP
-      TLS Reporting are discussed in Section 7.  Security
-      considerations related to gzip compression are discussed
-      in [RFC6713].
 </t>
+
+<figure align="center"><artwork align="center">
+  TLS Reporting are discussed in Section 7.  Security 
+  considerations related to gzip compression are discussed 
+  in [RFC6713].
+</artwork></figure>
 <t>Interoperability considerations: This document specifies format of
-      conforming messages and the interpretation thereof.
 </t>
+
+<figure align="center"><artwork align="center">
+  conforming messages and the interpretation thereof.
+</artwork></figure>
 <t>Published specification: Section 5.3 of this document.
 </t>
 <t>Applications that use this media type: Mail User Agents (MUA) and
-      Mail Transfer Agents.
 </t>
+
+<figure align="center"><artwork align="center">
+  Mail Transfer Agents.
+</artwork></figure>
 <t>Additional information:
 </t>
 
@@ -1098,8 +1131,11 @@ below.
   Macintosh file type code(s):  n/a
 </artwork></figure>
 <t>Person &amp; email address to contact for further information: See
-      Authors' Addresses section.
 </t>
+
+<figure align="center"><artwork align="center">
+  Authors' Addresses section.
+</artwork></figure>
 <t>Intended usage:  COMMON
 </t>
 <t>Restrictions on usage:  n/a
@@ -1107,8 +1143,11 @@ below.
 <t>Author:  See Authors' Addresses section.
 </t>
 <t>Change controller:  Internet Engineering Task Force
-      (mailto:iesg@ietf.org).
 </t>
+
+<figure align="center"><artwork align="center">
+  (mailto:iesg@ietf.org).
+</artwork></figure>
 </section>
 
 <section anchor="starttls-validation-result-types" title="STARTTLS Validation Result Types">
@@ -1220,42 +1259,42 @@ considered.
 </middle>
 <back>
 <references title="Normative References">
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-uta-mta-sts.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.1952.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3339.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3492.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3986.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4408.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5234.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5280.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5321.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5322.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5891.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.5952.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6068.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6125.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6376.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6522.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6698.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6713.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7231.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7405.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7493.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7672.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8174.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml3/reference.I-D.ietf-uta-mta-sts.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.1952.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3339.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3492.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3986.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4408.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5234.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5280.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5321.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5322.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5891.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5952.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6068.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6125.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6376.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6522.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6698.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6713.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7231.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7405.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7493.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7672.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.8174.xml"?>
 </references>
 <references title="Informative References">
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3464.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3501.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3864.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.6533.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7321.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7435.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7469.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.7489.xml"?>
-<?rfc include="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8098.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3207.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3464.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3501.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3864.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6533.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7321.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7435.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7469.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.7489.xml"?>
+<?rfc include="http://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.8098.xml"?>
 </references>
 
 <section anchor="example-reporting-policy-1" title="Example Reporting Policy">
