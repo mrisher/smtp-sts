@@ -197,7 +197,7 @@ fields) served via the HTTPS GET method from the fixed [@!RFC5785] "well-known"
 path of `.well-known/mta-sts.txt` served by the Policy Host.  The Policy Host
 DNS name is constructed by prepending `mta-sts` to the Policy Domain.
 
-Thus for a Policy Domain of `example.com` the ful URL is
+Thus for a Policy Domain of `example.com` the full URL is
 `https://mta-sts.example.com/.well-known/mta-sts.txt`.
 
 When fetching a policy, senders SHOULD validate that the media type is
@@ -367,7 +367,7 @@ HTTP 3xx redirects MUST NOT be followed, and HTTP caching (as specified in
 
 Senders may wish to rate-limit the frequency of attempts to fetch the HTTPS
 endpoint even if a valid TXT record for the recipient domain exists.  In the
-case that the HTTPS GET fails, we implementions SHOULD limit further attempts to
+case that the HTTPS GET fails, implementers SHOULD limit further attempts to
 a period of five minutes or longer per version ID, to avoid overwhelming
 resource-constrained recipients with cascading failures.
 
