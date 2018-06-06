@@ -252,14 +252,14 @@ The formal definition of the policy resource, defined using [@!RFC7405], is as
 follows:
 
     sts-policy-record        = sts-policy-field *WSP
-                               *(CRLF sts-policy-field *WSP)
-                               [CRLF]
+                               *(sts-policy-term sts-policy-field *WSP)
+                               [sts-policy-term]
 
     sts-policy-field         = sts-policy-version /      ; required once
                                sts-policy-mode    /      ; required once
                                sts-policy-max-age /      ; required once
 
-                               0*(sts-policy-mx *WSP CRLF) /
+                               0*(sts-policy-mx *WSP sts-policy-term) /
                                ; required at least once, except when
                                ; mode is "none"
 
@@ -310,7 +310,7 @@ follows:
     sts-policy-ext-name      = (sts-policy-alphanum)
                                *31(sta-policy-alphanum / "_" / "-" / ".")
                                
-    sts-policy-term          = CRLF / LF
+    sts-policy-term          = LF / CR / CRLF
 
     sts-policy-ext-value     = sts-policy-vchar
                                [*(%x20 / sts-policy-vchar)
@@ -331,7 +331,7 @@ follows:
 
 
 Parsers MUST accept TXT records and policy files which are syntactically valid
-(i.e., valid key/value pairs separated by semi-colons for TXT records) and but
+(i.e., valid key/value pairs separated by semi-colons for TXT records), possibly
 containing additional key/value pairs not specified in this document, in which
 case unknown fields SHALL be ignored.  If any non-repeated field--i.e., all
 fields excepting `mx`--is duplicated, all entries except for the first SHALL be
