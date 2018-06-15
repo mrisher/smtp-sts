@@ -400,8 +400,8 @@ When sending mail via a "smart host"--an administratively configured
 intermediate SMTP relay, which is different from the message recipient's server
 as determined from DNS --compliant senders MUST treat the smart host domain as
 the policy domain for the purposes of policy discovery and application.  This
-specification does not provide a means of associating policies with addresses
-that employ Address Literals [@!RFC5321].
+specification does not provide a means of associating policies with email 
+addresses that employ Address Literals [@!RFC5321].
 
 When sending mail to a mailbox at a subdomain, compliant senders MUST NOT
 attempt to fetch a policy from the parent zone.  Thus for mail sent to
