@@ -293,7 +293,7 @@ follows:
                                sts-policy-alphanum *(sts-policy-alphanum / "-") 
                                sts-policy-alphanum
 
-    sts-policy-mx-toplabel   = ALPHA | ALPHA *(sts-policy-alphanum / "-") 
+    sts-policy-mx-toplabel   = ALPHA / ALPHA *(sts-policy-alphanum / "-") 
                                sts-policy-alphanum
 
     sts-policy-max-age       = sts-policy-max-age-field sts-policy-field-delim
@@ -319,7 +319,7 @@ follows:
                                ; excluding CTLs and no 
                                ; leading/trailing spaces
 
-    sts-policy-alphanum     = ALPHA | DIGIT
+    sts-policy-alphanum     = ALPHA / DIGIT
 
     sts-policy-vchar        = %x21-7E / UTF8-2 / UTF8-3 / UTF8-4
 
