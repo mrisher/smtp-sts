@@ -289,13 +289,6 @@ follows:
     
     sts-policy-mx-value      = ["."] Domain
 
-    sts-policy-mx-label      = sts-policy-alphanum / 
-                               sts-policy-alphanum *(sts-policy-alphanum / "-") 
-                               sts-policy-alphanum
-
-    sts-policy-mx-toplabel   = ALPHA / ALPHA *(sts-policy-alphanum / "-") 
-                               sts-policy-alphanum
-
     sts-policy-max-age       = sts-policy-max-age-field sts-policy-field-delim
                                sts-policy-max-age-value
 
