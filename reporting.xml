@@ -984,7 +984,7 @@ syntax suffix registration form follows:
 <t>Interoperability considerations:  n/a
 </t>
 <t>Security considerations: GZIP format doesn't provide confidentiality protection.
-      Integrity protection is provided by and Adler-32 checksum, which is not
+      Integrity protection is provided by an Adler-32 checksum, which is not
       cryptographically strong. See also security considerations of <xref target="RFC6713"/>.
       Each individual media type registered with a +gzip suffix can have additional
       security considerations.  Additionally, GZIP objects can contain multiple

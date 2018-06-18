@@ -287,7 +287,7 @@ follows:
 
     sts-policy-mx-field      = %s"mx"
     
-    sts-policy-mx-value      = ["."] Domain
+    sts-policy-mx-value      = ["*."] Domain
 
     sts-policy-max-age       = sts-policy-max-age-field sts-policy-field-delim
                                sts-policy-max-age-value

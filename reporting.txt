@@ -1147,7 +1147,7 @@ Internet-Draft                 SMTP-TLSRPT                     June 2018
    Interoperability considerations: n/a
 
    Security considerations: GZIP format doesn't provide confidentiality
-   protection.  Integrity protection is provided by and Adler-32
+   protection.  Integrity protection is provided by an Adler-32
    checksum, which is not cryptographically strong.  See also security
    considerations of [RFC6713].  Each individual media type registered
    with a +gzip suffix can have additional security considerations.
@@ -1425,7 +1425,7 @@ Internet-Draft                 SMTP-TLSRPT                     June 2018
    [I-D.ietf-uta-mta-sts]
               Margolis, D., Risher, M., Ramakrishnan, B., Brotman, A.,
               and J. Jones, "SMTP MTA Strict Transport Security (MTA-
-              STS)", draft-ietf-uta-mta-sts-19 (work in progress), May
+              STS)", draft-ietf-uta-mta-sts-21 (work in progress), June
               2018.
 
    [RFC1952]  Deutsch, P., "GZIP file format specification version 4.3",
