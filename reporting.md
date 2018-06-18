@@ -3,13 +3,13 @@
    Title = "SMTP TLS Reporting"
    abbrev = "SMTP-TLSRPT"
    category = "std"
-   docName = "draft-ietf-uta-smtp-tlsrpt-22"
+   docName = "draft-ietf-uta-smtp-tlsrpt-23"
    ipr = "trust200902"
    area = "Applications"
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2018-05-23T00:00:00Z
+   date = 2018-06-14T00:00:00Z
    
    [[author]]
    initials="D."
@@ -855,9 +855,14 @@ syntax suffix registration form follows:
 
    Interoperability considerations:  n/a
 
-   Security considerations: GZIP format doesn't provide encryption. See also
-      security considerations of [@?RFC6713]. Each individual media type
-      registered with a +gzip suffix can have additional security considerations
+   Security considerations: GZIP format doesn't provide confidentiality protection.
+      Integrity protection is provided by an Adler-32 checksum, which is not 
+      cryptographically strong. See also security considerations of [@?RFC6713]. 
+      Each individual media type registered with a +gzip suffix can have additional 
+      security considerations.  Additionally, GZIP objects can contain multiple
+      files and associated paths.  File paths must be validated when the files
+      are extracted; a malicious file path could otherwise cause the extractor
+      to overwrite application or system files.
 
    Contact: art@ietf.org
 

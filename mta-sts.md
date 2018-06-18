@@ -3,13 +3,13 @@
    Title = "SMTP MTA Strict Transport Security (MTA-STS)"
    abbrev = "MTA-STS"
    category = "std"
-   docName = "draft-ietf-uta-mta-sts-19"
+   docName = "draft-ietf-uta-mta-sts-21"
    ipr = "trust200902"
    area = "Applications"
    workgroup = "Using TLS in Applications"
    keyword = [""]
 
-   date = 2018-05-23T00:00:00Z
+   date = 2018-06-16T00:00:00Z
 
    [[author]]
    initials="D."
@@ -153,7 +153,7 @@ semicolon-separated key/value pairs containing the following fields:
 
 An example TXT record is as below:
 
-`_mta-sts.example.com.  IN TXT v=STSv1; id=20160831085700Z;`
+_mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
 
 The formal definition of the `_mta-sts` TXT record, defined using ABNF
 ([@!RFC7405]), is as follows:
@@ -176,19 +176,20 @@ The formal definition of the `_mta-sts` TXT record, defined using ABNF
                       *31(ALPHA / DIGIT / "_" / "-" / ".")
 
     sts-ext-value   = 1*(%x21-3A / %x3C / %x3E-7E)
-                      ; chars excluding "=", ";", and control chars
+                      ; chars excluding "=", ";", SP, and CTLs
 
 The TXT record MUST begin with sts-version field, and the order of other fields
 is not significant.  If multiple TXT records for `_mta-sts` are returned by the
 resolver, records which do not begin with `v=STSv1;` are discarded.  If the
-number of resulting records is not one, or if the resulting record is
-syntactically invalid, senders MUST assume the recipient domain does not have an
-available MTA-STS policy and skip the remaining steps of policy discovery.
-(Note that absence of a usable TXT record is not by itself sufficient to remove
-a sender's previously cached policy for the Policy Domain, as discussed in
-(#policy-application-control-flow), "Policy Application Control Flow".)  If the
-resulting TXT record contains multiple strings, then the record MUST be treated
-as if those strings are concatenated together without adding spaces.
+number of resulting records is not one, or if the resulting record is 
+syntactically invalid, senders MUST assume the recipient domain does not 
+have an available MTA-STS policy and skip the remaining steps of policy
+discovery.  (Note that absence of a usable TXT record is not by itself
+sufficient to remove a sender's previously cached policy for the Policy Domain,
+as discussed in (#policy-application-control-flow), "Policy Application Control
+Flow".)  If the resulting TXT record contains multiple strings, then the record
+MUST be treated as if those strings are concatenated together without adding
+spaces.
 
 ## MTA-STS Policies
 
@@ -197,7 +198,7 @@ fields) served via the HTTPS GET method from the fixed [@!RFC5785] "well-known"
 path of `.well-known/mta-sts.txt` served by the Policy Host.  The Policy Host
 DNS name is constructed by prepending `mta-sts` to the Policy Domain.
 
-Thus for a Policy Domain of `example.com` the ful URL is
+Thus for a Policy Domain of `example.com` the full URL is
 `https://mta-sts.example.com/.well-known/mta-sts.txt`.
 
 When fetching a policy, senders SHOULD validate that the media type is
@@ -252,14 +253,14 @@ The formal definition of the policy resource, defined using [@!RFC7405], is as
 follows:
 
     sts-policy-record        = sts-policy-field *WSP
-                               *(CRLF sts-policy-field *WSP)
-                               [CRLF]
+                               *(sts-policy-term sts-policy-field *WSP)
+                               [sts-policy-term]
 
     sts-policy-field         = sts-policy-version /      ; required once
                                sts-policy-mode    /      ; required once
                                sts-policy-max-age /      ; required once
 
-                               0*(sts-policy-mx *WSP CRLF) /
+                               sts-policy-term /
                                ; required at least once, except when
                                ; mode is "none"
 
@@ -286,15 +287,7 @@ follows:
 
     sts-policy-mx-field      = %s"mx"
     
-    sts-policy-mx-value      = ["*."] *(sts-policy-mx-label ".") 
-                               sts-policy-mx-toplabel
-
-    sts-policy-mx-label      = sts-policy-alphanum | 
-                               sts-policy-alphanum *(sts-policy-alphanum | "-") 
-                               sts-policy-alphanum
-
-    sts-policy-mx-toplabel   = ALPHA | ALPHA *(sts-policy-alphanum | "-") 
-                               sts-policy-alphanum
+    sts-policy-mx-value      = ["."] Domain
 
     sts-policy-max-age       = sts-policy-max-age-field sts-policy-field-delim
                                sts-policy-max-age-value
@@ -310,7 +303,7 @@ follows:
     sts-policy-ext-name      = (sts-policy-alphanum)
                                *31(sta-policy-alphanum / "_" / "-" / ".")
                                
-    sts-policy-term          = CRLF / LF
+    sts-policy-term          = LF / CRLF
 
     sts-policy-ext-value     = sts-policy-vchar
                                [*(%x20 / sts-policy-vchar)
@@ -319,7 +312,7 @@ follows:
                                ; excluding CTLs and no 
                                ; leading/trailing spaces
 
-    sts-policy-alphanum     = ALPHA | DIGIT
+    sts-policy-alphanum     = ALPHA / DIGIT
 
     sts-policy-vchar        = %x21-7E / UTF8-2 / UTF8-3 / UTF8-4
 
@@ -328,14 +321,16 @@ follows:
     UTF8-3          =   <Defined in Section 4 of [@!RFC3629]>
 
     UTF8-4          =   <Defined in Section 4 of [@!RFC3629]>
+    
+    Domain          =   <see RFC 5321 4.1.2>
 
 
 Parsers MUST accept TXT records and policy files which are syntactically valid
-(i.e., valid key/value pairs separated by semi-colons for TXT records) and but
+(i.e., valid key/value pairs separated by semi-colons for TXT records), possibly
 containing additional key/value pairs not specified in this document, in which
 case unknown fields SHALL be ignored.  If any non-repeated field--i.e., all
 fields excepting `mx`--is duplicated, all entries except for the first SHALL be
-ignored.  If any field is not specified, the policy SHALL be treated as invalid.
+ignored.
 
 ## HTTPS Policy Fetching
 
@@ -367,7 +362,7 @@ HTTP 3xx redirects MUST NOT be followed, and HTTP caching (as specified in
 
 Senders may wish to rate-limit the frequency of attempts to fetch the HTTPS
 endpoint even if a valid TXT record for the recipient domain exists.  In the
-case that the HTTPS GET fails, we implementions SHOULD limit further attempts to
+case that the HTTPS GET fails, implementers SHOULD limit further attempts to
 a period of five minutes or longer per version ID, to avoid overwhelming
 resource-constrained recipients with cascading failures.
 
@@ -397,7 +392,9 @@ when such attempts fail, unless the cached policy mode is `none`.
 When sending mail via a "smart host"--an administratively configured
 intermediate SMTP relay, which is different from the message recipient's server
 as determined from DNS --compliant senders MUST treat the smart host domain as
-the policy domain for the purposes of policy discovery and application.
+the policy domain for the purposes of policy discovery and application.  This
+specification does not provide a means of associating policies with email 
+addresses that employ Address Literals [@!RFC5321].
 
 When sending mail to a mailbox at a subdomain, compliant senders MUST NOT
 attempt to fetch a policy from the parent zone.  Thus for mail sent to

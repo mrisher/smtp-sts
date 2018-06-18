@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE rfc SYSTEM 'rfc2629.dtd' []>
-<rfc ipr="trust200902" category="std" docName="draft-ietf-uta-smtp-tlsrpt-22">
+<rfc ipr="trust200902" category="std" docName="draft-ietf-uta-smtp-tlsrpt-23">
 <?rfc toc="yes"?>
 <?rfc symrefs="yes"?>
 <?rfc sortrefs="yes"?>
@@ -87,7 +87,7 @@
 <uri></uri>
 </address>
 </author>
-<date year="2018" month="May" day="23"/>
+<date year="2018" month="June" day="14"/>
 
 <area>Applications</area>
 <workgroup>Using TLS in Applications</workgroup>
@@ -983,9 +983,14 @@ syntax suffix registration form follows:
 </artwork></figure>
 <t>Interoperability considerations:  n/a
 </t>
-<t>Security considerations: GZIP format doesn't provide encryption. See also
-      security considerations of <xref target="RFC6713"/>. Each individual media type
-      registered with a +gzip suffix can have additional security considerations
+<t>Security considerations: GZIP format doesn't provide confidentiality protection.
+      Integrity protection is provided by and Adler-32 checksum, which is not
+      cryptographically strong. See also security considerations of <xref target="RFC6713"/>.
+      Each individual media type registered with a +gzip suffix can have additional
+      security considerations.  Additionally, GZIP objects can contain multiple
+      files and associated paths.  File paths must be validated when the files
+      are extracted; a malicious file path could otherwise cause the extractor
+      to overwrite application or system files.
 </t>
 <t>Contact: art@ietf.org
 </t>
