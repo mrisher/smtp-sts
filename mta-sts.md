@@ -844,7 +844,7 @@ the recipient MX validate.
 
 MTA-STS policy indicator TXT RR:
 ~~~~~~~~~
-_mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z";
+_mta-sts.example.com.  IN TXT "v=STSv1; id=20160831085700Z;"
 ~~~~~~~~~
 
 MTA-STS Policy file served as the response body at
