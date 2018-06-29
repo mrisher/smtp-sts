@@ -365,8 +365,9 @@ sts-policy-record        = sts-policy-field *WSP
 sts-policy-field         = sts-policy-version /      ; required once
                            sts-policy-mode    /      ; required once
                            sts-policy-max-age /      ; required once
-
                            sts-policy-term /
+
+                           0*(sts-policy-mx *WSP CRLF) /
                            ; required at least once, except when
                            ; mode is "none"
 
@@ -385,7 +386,6 @@ sts-policy-mode          = sts-policy-mode-field sts-policy-field-delim
                            sts-policy-mode-value
 
 sts-policy-mode-field    = %s"mode"
-
 
 
 
