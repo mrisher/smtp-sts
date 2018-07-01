@@ -835,7 +835,7 @@ practical.
 implementors SHOULD NOT wait until a cached policy has expired before checking
 for an update; if senders attempt to refresh the cache regularly (for example,
 by fetching currently live policy in a background task that runs daily or
-weekly, regardless of the state of the <spanx style="verb">_mta_sts</spanx> TXT record, and updating their
+weekly, regardless of the state of the <spanx style="verb">_mta-sts</spanx> TXT record, and updating their
 cache's &quot;max age&quot; accordingly), an attacker would have to foil policy discovery
 consistently over the lifetime of a cached policy to prevent a successful
 refresh.
