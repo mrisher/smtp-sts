@@ -977,7 +977,7 @@ Internet-Draft                   MTA-STS                       June 2018
    checking for an update; if senders attempt to refresh the cache
    regularly (for example, by fetching currently live policy in a
    background task that runs daily or weekly, regardless of the state of
-   the "_mta_sts" TXT record, and updating their cache's "max age"
+   the "_mta-sts" TXT record, and updating their cache's "max age"
    accordingly), an attacker would have to foil policy discovery
    consistently over the lifetime of a cached policy to prevent a
    successful refresh.
