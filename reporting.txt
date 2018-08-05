@@ -1721,7 +1721,7 @@ Internet-Draft                 SMTP-TLSRPT                     June 2018
          "receiving-ip": "203.0.113.58",
          "receiving-mx-hostname": "mx-backup.mail.company-y.example",
          "failed-session-count": 3,
-         "failure-error-code": "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED"
+         "failure-reason-code": "X509_V_ERR_PROXY_PATH_LENGTH_EXCEEDED"
        }]
      }]
    }
