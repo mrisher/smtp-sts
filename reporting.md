@@ -585,9 +585,18 @@ The filename is RECOMMENDED to be constructed using the following ABNF:
 
      sender          = domain ; From the [RFC5321] that is used
                        ; as the domain for the `contact-info`
-                       ; address in the report body
+                       ; address in the report body.
+                       ; In the case of Internationalized Domain 
+		       ; Names ([@?RFC5891]), the domain MUST consist of 
+		       ; the Punycode-encoded A-labels ([@!RFC3492]) and 
+		       ; not the U-labels. 
+
 
      policy-domain   = domain
+                       ; In the case of Internationalized Domain 
+		       ; Names ([@?RFC5891]), the domain MUST consist of 
+		       ; the Punycode-encoded A-labels ([@!RFC3492]) and 
+		       ; not the U-labels. 
 
      begin-timestamp = 1*DIGIT
                        ; seconds since 00:00:00 UTC January 1, 1970
