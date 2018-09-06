@@ -259,8 +259,9 @@ follows:
     sts-policy-field         = sts-policy-version /      ; required once
                                sts-policy-mode    /      ; required once
                                sts-policy-max-age /      ; required once
-
                                sts-policy-term /
+
+                               0*(sts-policy-mx *WSP CRLF) /
                                ; required at least once, except when
                                ; mode is "none"
 
